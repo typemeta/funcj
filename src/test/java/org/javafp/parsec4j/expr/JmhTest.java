@@ -15,7 +15,6 @@ public class JmhTest {
 //        new JmhTest().runJmh();
 //    }
     @Test
-    @Ignore
     public void runJmh() throws RunnerException, IOException {
         final Options opt = new OptionsBuilder()
             .jvmArgs("-XX:+UnlockCommercialFeatures")

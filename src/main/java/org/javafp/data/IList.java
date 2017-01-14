@@ -1,5 +1,7 @@
 package org.javafp.data;
 
+import org.javafp.data.Functions.*;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.*;
@@ -166,7 +168,7 @@ public abstract class IList<T> implements Iterable<T> {
      * Apply one of two functions depending on whether this list is empty or not.
      * @return the result of applying the appropriate function.
      */
-    public abstract <S> S match(Functions.F<NonEmpty<T>, S> nonEmpty, Functions.F<Empty<T>, S> empty);
+    public abstract <S> S match(F<NonEmpty<T>, S> nonEmpty, F<Empty<T>, S> empty);
 
     /**
      * Create a new list by appending an element to the end of this list.
@@ -186,27 +188,27 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Map a function over this list.
      */
-    public abstract <U> IList<U> map(Functions.F<? super T, ? extends U> f);
+    public abstract <U> IList<U> map(F<? super T, ? extends U> f);
 
     /**
      * Left-fold a function over this list.
      */
-    public abstract <U> U foldr(Functions.F2<T, U, U> f, U z);
+    public abstract <U> U foldr(F2<T, U, U> f, U z);
 
     /**
      * Right-fold a function over this list.
      */
-    public abstract <U> U foldl(Functions.F2<U, T, U> f, U z);
+    public abstract <U> U foldl(F2<U, T, U> f, U z);
 
     /**
      * Right-fold a function over this non-empty list.
      */
-    public abstract T foldr1(Functions.Op2<T> f);
+    public abstract T foldr1(Op2<T> f);
 
     /**
      * Left-fold a function over this non-empty list.
      */
-    public abstract T foldl1(Functions.Op2<T> f);
+    public abstract T foldl1(Op2<T> f);
 
     /**
      * Create a spliterator.
@@ -286,7 +288,7 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <S> S match(Functions.F<NonEmpty<T>, S> nonEmpty, Functions.F<Empty<T>, S> empty) {
+        public <S> S match(F<NonEmpty<T>, S> nonEmpty, F<Empty<T>, S> empty) {
             return empty.apply(this);
         }
 
@@ -306,27 +308,27 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <U> IList<U> map(Functions.F<? super T, ? extends U> f) {
+        public <U> IList<U> map(F<? super T, ? extends U> f) {
             return EMPTY;
         }
 
         @Override
-        public <U> U foldr(Functions.F2<T, U, U> f, U z) {
+        public <U> U foldr(F2<T, U, U> f, U z) {
             return z;
         }
 
         @Override
-        public <U> U foldl(Functions.F2<U, T, U> f, U z) {
+        public <U> U foldl(F2<U, T, U> f, U z) {
             return z;
         }
 
         @Override
-        public T foldr1(Functions.Op2<T> f) {
+        public T foldr1(Op2<T> f) {
             throw new UnsupportedOperationException("Cannot call foldr1 on an empty list");
         }
 
         @Override
-        public T foldl1(Functions.Op2<T> f) {
+        public T foldl1(Op2<T> f) {
             throw new UnsupportedOperationException("Cannot call foldl1 on an empty list");
         }
 
@@ -464,7 +466,7 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <S> S match(Functions.F<NonEmpty<T>, S> nonEmpty, Functions.F<Empty<T>, S> empty) {
+        public <S> S match(F<NonEmpty<T>, S> nonEmpty, F<Empty<T>, S> empty) {
             return nonEmpty.apply(this);
         }
 
@@ -496,7 +498,7 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <U> IList<U> map(Functions.F<? super T, ? extends U> f) {
+        public <U> IList<U> map(F<? super T, ? extends U> f) {
             IList<U> result = IList.nil();
             IList<T> next = this;
             for (;!next.isEmpty(); next = next.tail()) {
@@ -506,12 +508,12 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <U> U foldr(Functions.F2<T, U, U> f, U z) {
+        public <U> U foldr(F2<T, U, U> f, U z) {
             return f.apply(head, tail.foldr(f, z));
         }
 
         @Override
-        public <U> U foldl(Functions.F2<U, T, U> f, U z) {
+        public <U> U foldl(F2<U, T, U> f, U z) {
             U r = z;
 
             for (IList<T> l = this; !l.isEmpty(); l = l.tail()) {
@@ -522,14 +524,14 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public T foldr1(Functions.Op2<T> f) {
+        public T foldr1(Op2<T> f) {
             return tail.nonEmpty()
                 .map(tl -> f.apply(head, tl.foldr1(f)))
                 .orElse(head);
         }
 
         @Override
-        public T foldl1(Functions.Op2<T> f) {
+        public T foldl1(Op2<T> f) {
             T r = null;
 
             for (IList<T> l = this; !l.isEmpty(); l = l.tail()) {
