@@ -26,7 +26,7 @@ public class JmhTest {
            new Runner(opt).run();
     }
 
-    private static final Parser<Character, Model.Expr> parser = Grammar.parser;
+    private static final Parser<Character, Grammar.Ctx, Model.Expr> parser = Grammar.parser;
 
     public static void main(String[] args) throws IOException {
         System.out.println(testGood());
@@ -35,11 +35,12 @@ public class JmhTest {
 
     @Benchmark
     public static String testGood() {
-        return parser.run(Input.of("3*-max(4%+(5bp+-x),-2bp)-1")).toString();
+        return Grammar.parse("3*-max(4%+(5bp+-x),-2bp)-1").toString();
     }
 
     @Benchmark
     public static String testBad() {
-        return parser.run(Input.of("3*-max(4%+(5bp+-x)x,-2bp)-1z")).toString();
+        return Grammar.parse("3*-max(4%+(5bp+-x)x,-2bp)-1z").toString();
     }
+
 }
