@@ -4,37 +4,26 @@ import org.javafp.data.Unit;
 
 public interface Input<I> {
     static Input<Character> of(String s) {
-        return new StringInput(s, 0);
+        return new StringInput(s);
     }
 
-    static <I> Input<I> of(I[] array) {
-        return new ArrayInput<I>(array, 0);
-    }
-
-    default boolean isEof() {
+    default boolean isEof(int pos) {
         return false;
     }
 
-    I head();
-
-    Input<I> tail();
+    I at(int pos);
 }
 
 enum EofInput implements Input<Unit> {
     EOF {
         @Override
-        public Unit head() {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public Input<Unit> tail() {
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public boolean isEof() {
+        public boolean isEof(int pos) {
             return true;
+        }
+
+        @Override
+        public Unit at(int pos) {
+            return Unit.UNIT;
         }
     };
 
@@ -43,67 +32,29 @@ enum EofInput implements Input<Unit> {
     }
 }
 
-abstract class PositionBasedInput<T> implements Input<T> {
-    protected final int pos;
-
-    protected PositionBasedInput(int pos) {
-        this.pos = pos;
-    }
-}
-
-class StringInput extends PositionBasedInput<Character> {
+class StringInput implements Input<Character> {
     protected final char[] s;
 
-    StringInput(String s, int pos) {
-        super(pos);
+    StringInput(String s) {
         this.s = s.toCharArray();
     }
 
-    StringInput(char[] s, int pos) {
-        super(pos);
+    StringInput(char[] s) {
         this.s = s;
     }
 
     @Override
     public String toString() {
-        return "<pos=" + pos + " : [" + new String(s) + "]>";
+        return new String(s);
     }
 
     @Override
-    public Character head() {
+    public boolean isEof(int pos) {
+        return pos >= s.length;
+    }
+
+    @Override
+    public Character at(int pos) {
         return s[pos];
-    }
-
-    @Override
-    public Input<Character> tail() {
-        if (pos+1 < s.length) {
-            return new StringInput(s, pos + 1);
-        } else {
-            return EofInput.of();
-        }
-    }
-}
-
-class ArrayInput<I> extends PositionBasedInput<I> {
-
-    final I[] array;
-
-    ArrayInput(I[] array, int pos) {
-        super(pos);
-        this.array = array;
-    }
-
-    @Override
-    public I head() {
-        return array[pos];
-    }
-
-    @Override
-    public Input<I> tail() {
-        if (pos+1 < array.length) {
-            return new ArrayInput(array, pos + 1);
-        } else {
-            return EofInput.of();
-        }
     }
 }

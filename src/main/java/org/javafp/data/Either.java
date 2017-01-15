@@ -9,7 +9,7 @@ import org.javafp.data.Functions.*;
  * @param <A> left-hand type
  * @param <B> right-hand type
  */
-public interface Either<A,B> {
+public interface Either<A, B> {
     static <A, B> Either<A, B> left(A value) {
         return new Left<A, B>(value);
     }

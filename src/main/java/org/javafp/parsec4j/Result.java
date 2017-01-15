@@ -8,12 +8,12 @@ import org.javafp.data.Functions;
  * @param <A>
  */
 public interface Result<I, A> {
-    static <I, A> Result<I, A> success(A result, Input<I> rest) {
-        return new Success<I, A>(result, rest);
+    static <I, A> Result<I, A> success(A result, int next) {
+        return new Success<I, A>(result, next);
     }
 
-    static <I, A> Result<I, A> failure(Input<I> input) {
-        return new Failure<I, A>(input);
+    static <I, A> Result<I, A> failure(int pos) {
+        return new Failure<I, A>(pos);
     }
 
     boolean isSuccess();
@@ -26,18 +26,18 @@ public interface Result<I, A> {
 
     class Success<I, A> implements Result<I, A> {
         public final A value;
-        public final Input<I> tail;
+        public final int next;
 
-        public Success(A value, Input<I> tail) {
+        public Success(A value, int next) {
             this.value = value;
-            this.tail = tail;
+            this.next = next;
         }
 
         @Override
         public String toString() {
             return "Success{" +
                 "value=" + value +
-                ", tail=" + tail +
+                ", next=" + next +
                 '}';
         }
 
@@ -48,12 +48,12 @@ public interface Result<I, A> {
 
             Success<?, ?> rhsT = (Success<?, ?>) rhs;
 
-            return tail == rhsT.tail && value.equals(rhsT.value);
+            return next == rhsT.next && value.equals(rhsT.value);
         }
 
         @Override
         public int hashCode() {
-            return 31 * value.hashCode() + tail.hashCode();
+            return 31 * value.hashCode() + next;
         }
 
         @Override
@@ -68,7 +68,7 @@ public interface Result<I, A> {
 
         @Override
         public <B> Result<I, B> map(Functions.F<A, B> f) {
-            return success(f.apply(value), tail);
+            return success(f.apply(value), next);
         }
 
         @Override
@@ -78,16 +78,16 @@ public interface Result<I, A> {
     }
 
     class Failure<I, A> implements Result<I, A> {
-        public final Input<I> input;
+        public final int pos;
 
-        public Failure(Input<I> input) {
-            this.input = input;
+        public Failure(int pos) {
+            this.pos = pos;
         }
 
         @Override
         public String toString() {
             return "Failure{" +
-                "input=" + input +
+                "pos=" + pos +
                 '}';
         }
 
@@ -98,7 +98,7 @@ public interface Result<I, A> {
 
             Failure<?, ?> rhsT = (Failure<?, ?>) rhs;
 
-            return input == rhsT.input;
+            return pos == rhsT.pos;
         }
 
         public <T> Failure<I, T> cast() {
@@ -107,7 +107,7 @@ public interface Result<I, A> {
 
         @Override
         public int hashCode() {
-            return input.hashCode();
+            return pos;
         }
 
         @Override
@@ -117,7 +117,7 @@ public interface Result<I, A> {
 
         @Override
         public A getOrThrow() {
-            throw new RuntimeException("Failure at position " + input);
+            throw new RuntimeException("Failure at position " + pos);
         }
 
         @Override

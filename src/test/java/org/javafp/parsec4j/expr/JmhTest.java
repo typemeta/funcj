@@ -26,14 +26,11 @@ public class JmhTest {
            new Runner(opt).run();
     }
 
-    private static final P<Character, Model.Expr> parser = Grammar.parser;
+    private static final Parser<Character, Model.Expr> parser = Grammar.parser;
 
     public static void main(String[] args) throws IOException {
-        System.in.read();
-        while (true) {
-            System.out.println(testGood());
-            System.out.println(testBad());
-        }
+        System.out.println(testGood());
+        System.out.println(testBad());
     }
 
     @Benchmark

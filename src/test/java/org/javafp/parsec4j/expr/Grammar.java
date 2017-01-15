@@ -13,68 +13,68 @@ public abstract class Grammar {
         // To get around circular references.
         final Ref<Character, Expr> expr = Ref.of();
 
-        final P<Character, Character> open = chr('(');
-        final P<Character, Character> close = chr(')');
-        final P<Character, Character> comma = chr(',');
+        final Parser<Character, Character> open = chr('(');
+        final Parser<Character, Character> close = chr(')');
+        final Parser<Character, Character> comma = chr(',');
 
-        final P<Character, UnaryOp> plus = chr('+').andR(pure(UnaryOp.POS));
-        final P<Character, UnaryOp> minus = chr('-').andR(pure(UnaryOp.NEG));
+        final Parser<Character, UnaryOp> plus = chr('+').andR(pure(UnaryOp.POS));
+        final Parser<Character, UnaryOp> minus = chr('-').andR(pure(UnaryOp.NEG));
 
-        final P<Character, BinOp> add = chr('+').andR(pure(BinOp.ADD));
-        final P<Character, BinOp> sub = chr('-').andR(pure(BinOp.SUBTRACT));
-        final P<Character, BinOp> mult = chr('*').andR(pure(BinOp.MULTIPLY));
-        final P<Character, BinOp> div = chr('/').andR(pure(BinOp.DIVIDE));
+        final Parser<Character, BinOp> add = chr('+').andR(pure(BinOp.ADD));
+        final Parser<Character, BinOp> sub = chr('-').andR(pure(BinOp.SUBTRACT));
+        final Parser<Character, BinOp> mult = chr('*').andR(pure(BinOp.MULTIPLY));
+        final Parser<Character, BinOp> div = chr('/').andR(pure(BinOp.DIVIDE));
 
-        final P<Character, NumExpr.Units> pct = string("%").andR(pure(NumExpr.Units.PCT));
-        final P<Character, NumExpr.Units> bps = string("bp").andR(pure(NumExpr.Units.BPS));
+        final Parser<Character, NumExpr.Units> pct = string("%").andR(pure(NumExpr.Units.PCT));
+        final Parser<Character, NumExpr.Units> bps = string("bp").andR(pure(NumExpr.Units.BPS));
 
-        final P<Character, String> funcName =
+        final Parser<Character, String> funcName =
             string("min").or(string("max"));
 
         // addSub = add | sub
-        final P<Character, Op2<Expr>> addSub =
+        final Parser<Character, Op2<Expr>> addSub =
             add.or(sub).map(BinOp::ctor);
 
         // multDiv = mult | div
-        final P<Character, Op2<Expr>> multDiv =
+        final Parser<Character, Op2<Expr>> multDiv =
             mult.or(div).map(BinOp::ctor);
 
         // units = % | bp
-        final P<Character, NumExpr.Units> units =
+        final Parser<Character, NumExpr.Units> units =
             pct.or(bps).or(pure(NumExpr.Units.ABS));
 
         // num = intr
-        final P<Character, Expr> num = dble.and(units).map(Model::numExpr);
+        final Parser<Character, Expr> num = dble.and(units).map(Model::numExpr);
 
         // brackExpr = open expr close
-        final P<Character, Expr> brackExpr =
+        final Parser<Character, Expr> brackExpr =
             open.andR(expr).andL(close);
 
-        final P<Character, Expr> var =
+        final Parser<Character, Expr> var =
             alpha.map(Model::varExpr);
 
         // funcN = name { args | ε }
-        final P<Character, Expr> funcN =
+        final Parser<Character, Expr> funcN =
             funcName.andL(open).and(expr).andL(comma).and(expr).andL(close)
                 .map(Model::func2Expr);
 
         // sign = + | -
-        final P<Character, UnaryOp> sign = plus.or(minus);
+        final Parser<Character, UnaryOp> sign = plus.or(minus);
 
         // signedExpr = sign expr
-        final P<Character, Expr> signedExpr =
+        final Parser<Character, Expr> signedExpr =
             sign.and(expr).map(Model::unaryOpExpr);
 
         // term = num | brackExpr | funcN | signedExpr
-        final P<Character, Expr> term =
+        final Parser<Character, Expr> term =
             num.or(brackExpr).or(funcN).or(var).or(signedExpr);
 
         // prod = term chainl1 multDiv
-        final P<Character, Expr> prod = term.chainl1(multDiv);
+        final Parser<Character, Expr> prod = term.chainl1(multDiv);
 
         // expr = prod chainl1 addSub
         parser = expr.set(prod.chainl1(addSub));
     }
 
-    public static final P<Character, Expr> parser;
+    public static final Parser<Character, Expr> parser;
 }
