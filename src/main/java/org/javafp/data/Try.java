@@ -42,21 +42,10 @@ public interface Try<T> {
     /**
      * Standard monadic sequencing.
      */
-    static <T> Try<IList<T>> sequence(List<Try<T>> ct) {
-        return Functional.foldr(
-                (tt, tlt) -> tt.flatMap(t -> tlt.flatMap(l -> success((IList<T>)l.add(t)))),
-                Try.success(IList.empty()),
-                ct
-        );
-    }
-
-    /**
-     * Standard monadic sequencing.
-     */
     static <T> Try<IList<T>> sequence(IList<Try<T>> lt) {
         return lt.foldr(
                 (tt, tlt) -> tt.flatMap(t -> tlt.flatMap(l -> success((IList<T>)l.add(t)))),
-                Try.success(IList.empty())
+                Try.success(IList.nil())
         );
     }
 
