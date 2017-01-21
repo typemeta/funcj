@@ -1,6 +1,6 @@
 package org.javafp.data;
 
-import org.javafp.data.Functions.F;
+import org.javafp.data.Functions.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -31,6 +31,9 @@ public interface Try<T> {
         return new Failure<T>(error);
     }
 
+    /**
+     * Create a Try value from a function which either yields a result or throws.
+     */
     static <T> Try<T> of(FunctionsEx.F0<T> f) {
         try {
             return new Success<T>(f.apply());
@@ -55,11 +58,6 @@ public interface Try<T> {
     boolean isSuccess();
 
     /**
-     * Do we have a failure result?
-     */
-    boolean isFailure();
-
-    /**
      * Either return the result value, otherwise return the supplied default value.
      */
     T getOrElse(T defaultValue);
@@ -72,7 +70,7 @@ public interface Try<T> {
     /**
      * Similar to getOrThrow but will throw a RuntimeException.
      */
-    T getValue();
+    T get();
 
     /**
      * Push the result to a Consumer.
@@ -82,25 +80,25 @@ public interface Try<T> {
     /**
      * Map either function over the result.
      */
-    <R> R match(Function<? super T, ? extends R> success, Function<Exception, ? extends R> failure);
+    <R> R match(F<Success<T>, ? extends R> success, F<Failure<T>, ? extends R> failure);
 
     /**
      * Functor function application.
      * Apply the function to the value held within this result.
      */
-    <R> Try<R> map(Function<? super T, ? extends R> f);
+    <R> Try<R> map(F<? super T, ? extends R> f);
 
     /**
      * If this is a success then apply the function to the value and return the result,
      * Otherwise return the failure result.
      */
-    <R> Try<R> flatMap(Function<? super T, Try<R>> f);
+    <R> Try<R> flatMap(F<? super T, Try<R>> f);
 
     /**
      * Variant of flatMap which ignores the supplied value.
      */
-    default <R> Try<R> flatMap(Supplier<Try<R>> f) {
-        return flatMap(unused -> f.get());
+    default <R> Try<R> flatMap(F0<Try<R>> f) {
+        return flatMap(unused -> f.apply());
     }
 
     /**
@@ -110,16 +108,13 @@ public interface Try<T> {
 
         public final T value;
 
-        public Success(T value) {
+        private Success(T value) {
             this.value = Objects.requireNonNull(value);
         }
 
+        @Override
         public boolean isSuccess() {
             return true;
-        }
-
-        public boolean isFailure() {
-            return false;
         }
 
         @Override
@@ -133,13 +128,8 @@ public interface Try<T> {
         }
 
         @Override
-        public T getValue() {
+        public T get() {
             return value;
-        }
-
-        @Override
-        public String toString() {
-            return "Success(" + value + ")";
         }
 
         @Override
@@ -148,18 +138,23 @@ public interface Try<T> {
         }
 
         @Override
-        public <R> R match(Function<? super T, ? extends R> success, Function<Exception, ? extends R> failure) {
-            return success.apply(value);
+        public <R> R match(F<Success<T>, ? extends R> success, F<Failure<T>, ? extends R> failure) {
+            return success.apply(this);
         }
 
         @Override
-        public <R> Try<R> map(Function<? super T, ? extends R> f) {
+        public <R> Try<R> map(F<? super T, ? extends R> f) {
             return new Success<R>(f.apply(value));
         }
 
         @Override
-        public <R> Try<R> flatMap(Function<? super T, Try<R>> f) {
+        public <R> Try<R> flatMap(F<? super T, Try<R>> f) {
             return f.apply(value);
+        }
+
+        @Override
+        public String toString() {
+            return "Success(" + value + ")";
         }
 
         @Override
@@ -189,16 +184,13 @@ public interface Try<T> {
 
         public final Exception error;
 
-        public Failure(Exception error) {
+        private Failure(Exception error) {
             this.error = Objects.requireNonNull(error);
         }
 
+        @Override
         public boolean isSuccess() {
             return false;
-        }
-
-        public boolean isFailure() {
-            return true;
         }
 
         @Override
@@ -212,13 +204,8 @@ public interface Try<T> {
         }
 
         @Override
-        public T getValue() {
+        public T get() {
             throw new RuntimeException(error);
-        }
-
-        @Override
-        public String toString() {
-            return "Failure(" + error + ")";
         }
 
         @Override
@@ -227,18 +214,23 @@ public interface Try<T> {
         }
 
         @Override
-        public <R> R match(Function<? super T, ? extends R> success, Function<Exception, ? extends R> failure) {
-            return failure.apply(error);
+        public <R> R match(F<Success<T>, ? extends R> success, F<Failure<T>, ? extends R> failure) {
+            return failure.apply(this);
         }
 
         @Override
-        public <R> Try<R> map(Function<? super T, ? extends R> f) {
+        public <R> Try<R> map(F<? super T, ? extends R> f) {
             return Try.failure(error);
         }
 
         @Override
-        public <R> Try<R> flatMap(Function<? super T, Try<R>> f) {
+        public <R> Try<R> flatMap(F<? super T, Try<R>> f) {
             return Try.failure(error);
+        }
+
+        @Override
+        public String toString() {
+            return "Failure(" + error + ")";
         }
 
         @Override
@@ -257,7 +249,7 @@ public interface Try<T> {
 
             final Failure<?> rhs = (Failure<?>)obj;
 
-            // In general the equals() method for Exception classes isn't overridden,
+            // In general the equals() method for Exception classes isn't implemented,
             // which means we get object equality. This is rarely useful so here
             // we instead compare the string representations.
             return error.toString().equals(rhs.error.toString());

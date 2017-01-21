@@ -1,9 +1,9 @@
 package org.javafp.parsec4j;
 
-import org.javafp.data.Unit;
+import org.javafp.data.*;
 
 public interface Input<I> {
-    static Input<Character> of(String s) {
+    static Input<Chr> of(String s) {
         return new StringInput(s);
     }
 
@@ -32,7 +32,7 @@ enum EofInput implements Input<Unit> {
     }
 }
 
-class StringInput implements Input<Character> {
+class StringInput implements Input<Chr> {
     protected final char[] s;
 
     StringInput(String s) {
@@ -54,7 +54,7 @@ class StringInput implements Input<Character> {
     }
 
     @Override
-    public Character at(int pos) {
-        return s[pos];
+    public Chr at(int pos) {
+        return Chr.valueOf(s[pos]);
     }
 }

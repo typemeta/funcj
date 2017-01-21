@@ -9,7 +9,7 @@ import java.util.stream.*;
 /**
  * Simple recursive, immutable linked list.
  * This list type allows tails to be shared between lists.
- * It does not allow null values to be held in the list.
+ * Null elements are not allowed.
  * @param <T> element type
  */
 public abstract class IList<T> implements Iterable<T> {
@@ -145,7 +145,7 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Internal helper method.
      */
-    protected abstract StringBuilder asString(StringBuilder sb);
+    public abstract StringBuilder append(StringBuilder sb);
 
     /**
      * List equality.
@@ -153,9 +153,10 @@ public abstract class IList<T> implements Iterable<T> {
      */
     @Override
     public boolean equals(Object rhs) {
-        if (this == rhs) return true;
-        if (rhs == null || getClass() != rhs.getClass()) return false;
-        return equals((IList<T>)rhs);
+        return this == rhs ||
+            (rhs != null &&
+                getClass() == rhs.getClass() &&
+                equals((IList<T>) rhs));
     }
 
     /**
@@ -191,12 +192,12 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract <U> IList<U> map(F<? super T, ? extends U> f);
 
     /**
-     * Left-fold a function over this list.
+     * Right-fold a function over this list.
      */
     public abstract <U> U foldr(F2<T, U, U> f, U z);
 
     /**
-     * Right-fold a function over this list.
+     * Left-fold a function over this list.
      */
     public abstract <U> U foldl(F2<U, T, U> f, U z);
 
@@ -283,7 +284,7 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        protected StringBuilder asString(StringBuilder sb) {
+        public StringBuilder append(StringBuilder sb) {
             return sb;
         }
 
@@ -324,12 +325,12 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public T foldr1(Op2<T> f) {
-            throw new UnsupportedOperationException("Cannot call foldr1 on an empty list");
+            throw new UnsupportedOperationException("Cannot call foldr1(f) on an empty list");
         }
 
         @Override
         public T foldl1(Op2<T> f) {
-            throw new UnsupportedOperationException("Cannot call foldl1 on an empty list");
+            throw new UnsupportedOperationException("Cannot call foldl1(f) on an empty list");
         }
 
         @Override
@@ -439,13 +440,13 @@ public abstract class IList<T> implements Iterable<T> {
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder("[");
-            asString(sb).setCharAt(sb.length() - 1, ']');
+            append(sb).setCharAt(sb.length() - 1, ']');
             return sb.toString();
         }
 
         @Override
-        protected StringBuilder asString(StringBuilder sb) {
-            return tail.asString(sb.append(head).append(','));
+        public StringBuilder append(StringBuilder sb) {
+            return tail.append(sb.append(head).append(','));
         }
 
         @Override
@@ -515,11 +516,9 @@ public abstract class IList<T> implements Iterable<T> {
         @Override
         public <U> U foldl(F2<U, T, U> f, U z) {
             U r = z;
-
             for (IList<T> l = this; !l.isEmpty(); l = l.tail()) {
                 r = f.apply(r, l.head());
             }
-
             return r;
         }
 
@@ -532,17 +531,9 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public T foldl1(Op2<T> f) {
-            T r = null;
-
-            for (IList<T> l = this; !l.isEmpty(); l = l.tail()) {
-                if (r == null) {
-                    r = l.head();
-                } else {
-                    r = f.apply(r, l.head());
-                }
-            }
-
-            return r;
+            return tail.nonEmpty()
+                .map(tl -> f.apply(head, tl.foldl1(f)))
+                .orElse(head);
         }
 
         @Override

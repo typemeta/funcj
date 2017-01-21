@@ -21,10 +21,10 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
         Input<I> input();
     }
 
-    class CtxImpl<I> implements Context<I> {
+    class Ctx<I> implements Context<I> {
         private final Input<I> input;
 
-        public CtxImpl(Input<I> input) {
+        public Ctx(Input<I> input) {
             this.input = input;
         }
 

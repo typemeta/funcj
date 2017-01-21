@@ -1,6 +1,5 @@
 package org.javafp.parsec4j.expr;
 
-import org.javafp.parsec4j.Input;
 import org.javafp.data.Unit;
 import org.junit.*;
 

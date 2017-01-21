@@ -1,6 +1,9 @@
 package org.javafp.data;
 
 import org.javafp.data.Functions.*;
+
+import java.util.*;
+
 /**
  * Standard tagged union type over two types.
  * A value of Either&lt;A, B&gt; wraps either a value of type A or a value of type B.
@@ -22,21 +25,25 @@ public interface Either<A, B> {
 
     boolean isRight();
 
-    A leftOrThrow();
+    Optional<A> left();
 
-    B rightOrThrow();
+    Optional<B> right();
 
-    <T> T map(F<? super A, ? extends T> left, F<? super B, ? extends T> right);
+    <T> T match(F<Left<A, B>, ? extends T> left, F<Right<A, B>, ? extends T> right);
+
+    <T> Either<T, B> mapLeft(F<? super A, ? extends T> f);
+
+    <T> Either<A, T> mapRight(F<? super B, ? extends T> f);
 
     <T> Either<A, T> flatMap(F<? super B, Either<A, T>> f);
 
     Either<B, A> swap();
 
     class Left<A, B> implements Either<A, B> {
-        private final A value;
+        public final A value;
 
-        Left(A value) {
-            this.value = value;
+        private Left(A value) {
+            this.value = Objects.requireNonNull(value);
         }
 
         @Override
@@ -50,23 +57,33 @@ public interface Either<A, B> {
         }
 
         @Override
-        public A leftOrThrow() {
-            return value;
+        public Optional<A> left() {
+            return Optional.of(value);
         }
 
         @Override
-        public B rightOrThrow() {
-            throw new RuntimeException("Right value is not present");
+        public Optional<B> right() {
+            return Optional.empty();
         }
 
         @Override
-        public <T> T map(F<? super A, ? extends T> left, F<? super B, ? extends T> right) {
-            return left.apply(value);
+        public <T> T match(F<Left<A, B>, ? extends T> left, F<Right<A, B>, ? extends T> right) {
+            return left.apply(this);
+        }
+
+        @Override
+        public <T> Either<T, B> mapLeft(F<? super A, ? extends T> f) {
+            return Either.<T, B>left(f.apply(value));
+        }
+
+        @Override
+        public <T> Either<A, T> mapRight(F<? super B, ? extends T> f) {
+            return (Either<A, T>) this;
         }
 
         @Override
         public <T> Either<A, T> flatMap(F<? super B, Either<A, T>> f) {
-            return Either.left(value);
+            return (Either<A, T>) this;
         }
 
         @Override
@@ -76,10 +93,10 @@ public interface Either<A, B> {
     }
 
     class Right<A, B> implements Either<A, B> {
-        private final B value;
+        public final B value;
 
-        Right(B value) {
-            this.value = value;
+        private Right(B value) {
+            this.value = Objects.requireNonNull(value);
         }
 
         @Override
@@ -93,18 +110,28 @@ public interface Either<A, B> {
         }
 
         @Override
-        public A leftOrThrow() {
-            throw new RuntimeException("Left value is not present");
+        public Optional<A> left() {
+            return Optional.empty();
         }
 
         @Override
-        public B rightOrThrow() {
-            return value;
+        public Optional<B> right() {
+            return Optional.of(value);
         }
 
         @Override
-        public <T> T map(F<? super A, ? extends T> left, F<? super B, ? extends T> right) {
-            return right.apply(value);
+        public <T> T match(F<Left<A, B>, ? extends T> left, F<Right<A, B>, ? extends T> right) {
+            return right.apply(this);
+        }
+
+        @Override
+        public <T> Either<T, B> mapLeft(F<? super A, ? extends T> f) {
+            return (Either<T, B>) this;
+        }
+
+        @Override
+        public <T> Either<A, T> mapRight(F<? super B, ? extends T> f) {
+            return Either.right(f.apply(value));
         }
 
         @Override

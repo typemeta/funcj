@@ -8,13 +8,57 @@ public final class Chr implements Comparable<Chr> {
 
     static {
         chrs = new Chr[N];
-        for (int i = 0; i < N; ++i) {
+        for (int i = 0; i != N; ++i) {
             chrs[i] = new Chr(i);
         }
     }
 
     public static Chr valueOf(char c) {
         return c < N ? chrs[c] : new Chr(c);
+    }
+
+    public static boolean isLetterOrDigit(Chr c) {
+        return isLetterOrDigit(c.charValue());
+    }
+
+    public static boolean isLetterOrDigit(char c) {
+        return isLetter(c) || isDigit(c);
+    }
+
+    public static boolean isLetter(Chr c) {
+        return isLetter(c.charValue());
+    }
+
+    public static boolean isLetter(char c) {
+        return isUpperCase(c) || isLowerCase(c);
+    }
+
+    public static boolean isUpperCase(char c) {
+        return c >= 'A' && c <= 'Z';
+    }
+
+    public static boolean isLowerCase(char c) {
+        return c >= 'a' && c <= 'z';
+    }
+
+    public static boolean isDigit(Chr c) {
+        return isDigit(c.charValue());
+    }
+
+    public static boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    public static boolean isWhitespace(Chr c) {
+        return isWhitespace(c.charValue());
+    }
+
+    public static boolean isWhitespace(char c) {
+        return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+    }
+
+    public static int getNumericValue(char d) {
+        return d - '0';
     }
 
     private final char value;
@@ -43,11 +87,8 @@ public final class Chr implements Comparable<Chr> {
 
     @Override
     public boolean equals(Object rhs) {
-        if (rhs instanceof Chr) {
-            return value == ((Chr)rhs).charValue();
-        } else {
-            return false;
-        }
+        return rhs instanceof Chr &&
+            value == ((Chr) rhs).charValue();
     }
 
     @Override

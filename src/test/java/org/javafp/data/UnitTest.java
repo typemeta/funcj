@@ -1,11 +1,12 @@
 package org.javafp.data;
 
-import org.junit.Test;
+import org.junit.*;
 
 public class UnitTest {
     @Test
     public void test() {
-        final Unit unit = Unit.UNIT;
-        System.out.println("UNIT=" + unit.toString());
+        Assert.assertTrue(
+            "String representation contains the word UNIT",
+            Unit.UNIT.toString().contains("UNIT"));
     }
 }

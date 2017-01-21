@@ -1,80 +1,86 @@
 package org.javafp.parsec4j;
 
+import org.javafp.data.Chr;
+
 import static org.javafp.parsec4j.Parser.*;
 
 public class Text {
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Character> anyChar() {
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Chr> anyChar() {
         return any();
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Character> chr(char c) {
-        return satisfy(cc -> cc == c);
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Chr> chr(char c) {
+        return satisfy(cc -> cc.charValue() == c);
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Character> notChr(char c) {
-        return satisfy(cc -> cc != c);
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Chr> notChr(char c) {
+        return satisfy(cc -> cc.charValue() != c);
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Character> alpha() {
-        return satisfy(Character::isLetter);
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Chr> alpha() {
+        return satisfy(Chr::isLetter);
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Character> digit() {
-        return satisfy(Character::isDigit);
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Chr> digit() {
+        return satisfy(Chr::isDigit);
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Character> alphaNum() {
-        return satisfy(Character::isLetterOrDigit);
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Chr> alphaNum() {
+        return satisfy(Chr::isLetterOrDigit);
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Character> ws() {
-        return satisfy(Character::isWhitespace);
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Chr> ws() {
+        return satisfy(Chr::isWhitespace);
     }
 
-    private static int digitToInt(char d) {
-        return Character.getNumericValue(d);
+    private static int digitToInt(char c) {
+        return Chr.getNumericValue(c);
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Integer> uintr() {
+    private static int digitToInt(Chr c) {
+        return Chr.getNumericValue(c.charValue());
+    }
+
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Integer> uintr() {
         return many1(Text.<CTX>digit().map(Text::digitToInt))
             .map(l -> l.foldl1((x, acc) -> x*10 + acc));
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Integer> intr() {
-        return Text.<CTX>chr('+').or(chr('-')).or(pure('+'))
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Integer> intr() {
+        return Text.<CTX>chr('+').or(chr('-')).or(pure(Chr.valueOf('+')))
             .and(uintr())
-            .map((sign, i) -> sign == '+' ? i : -i);
+            .map((sign, i) -> sign.charValue() == '+' ? i : -i);
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Double> floating() {
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Double> floating() {
         return many1(Text.<CTX>digit().map(Text::digitToInt))
             .map(l -> l.foldr((d, acc) -> d + acc / 10.0, 0.0) / 10.0);
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, Double> dble() {
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, Double> dble() {
         return Text.<CTX>intr().and(optional(Text.<CTX>chr('.').andR(floating())))
             .map((i, f) -> i.doubleValue() + f.orElse(0.0));
     }
 
-    public static <CTX extends Parser.Context<Character>>
-    Parser<Character, CTX, String> string(String s) {
+    public static <CTX extends Parser.Context<Chr>>
+    Parser<Chr, CTX, String> string(String s) {
         switch (s.length()) {
             case 0: return fail();
             case 1: return Text.<CTX>chr(s.charAt(0)).map(Object::toString);
             default: {
-                return new Parser<Character, CTX, String>() {
-                    @Override public Result<Character, String> parse(CTX ctx, int pos) {
+                return new Parser<Chr, CTX, String>() {
+                    @Override public Result<Chr, String> parse(CTX ctx, int pos) {
                         int pos2 = pos;
                         for (int i = 0; i < s.length(); ++i) {
                             if (ctx.input().isEof(pos2) || ctx.input().at(pos2).charValue() != s.charAt(i)) {
@@ -87,8 +93,8 @@ public class Text {
                         return Result.success(s, pos2);
                     }
 
-                    @Override public boolean accepts(Character token) {
-                        return s.charAt(0) == token;
+                    @Override public boolean accepts(Chr token) {
+                        return s.charAt(0) == token.charValue();
                     }
                 };
             }

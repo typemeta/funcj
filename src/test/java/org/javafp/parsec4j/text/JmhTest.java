@@ -1,9 +1,8 @@
-package org.javafp.parsec4j.expr;
+package org.javafp.parsec4j.text;
 
-import org.javafp.data.Chr;
-import org.javafp.parsec4j.*;
-import org.junit.*;
-import org.openjdk.jmh.annotations.*;
+import org.javafp.parsec4j.expr.Model;
+import org.junit.Test;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.runner.*;
 import org.openjdk.jmh.runner.options.*;
 
@@ -27,7 +26,7 @@ public class JmhTest {
            new Runner(opt).run();
     }
 
-    private static final Parser<Chr, Grammar.Ctx, Model.Expr> parser = Grammar.parser;
+    private static final Parser<Model.Expr> parser = Grammar.parser;
 
     public static void main(String[] args) throws IOException {
         System.out.println(testGood());
@@ -36,7 +35,7 @@ public class JmhTest {
 
     @Benchmark
     public static String testGood() {
-        return Grammar.parse("3*-max(4%+(5bp+-x),-2bp)-1").toString();
+        return org.javafp.parsec4j.expr.Grammar.parse("3*-max(4%+(5bp+-x),-2bp)-1").toString();
     }
 
     @Benchmark
