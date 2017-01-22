@@ -51,15 +51,4 @@ public class Ref<I, CTX extends Parser.Context<I>, A>
     public Result<I, A> parse(CTX ctx, int pos) {
         return impl.parse(ctx, pos);
     }
-
-    @Override
-    public boolean accepts(Input<I> input, int pos) {
-        return impl.accepts(input, pos);
-    }
-
-
-    @Override
-    public boolean accepts(I token) {
-        return impl.accepts(token);
-    }
 }

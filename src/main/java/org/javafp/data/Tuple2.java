@@ -4,6 +4,11 @@ import org.javafp.data.Functions.F;
 
 import java.util.Objects;
 
+/**
+ * A 2-tuple of values
+ * @param <A> 1st value type
+ * @param <B> 2nd value type
+ */
 public class Tuple2<A, B> {
     public static <A, B> Tuple2<A, B> of(A _1, B _2) {
         return new Tuple2<A, B>(_1, _2);

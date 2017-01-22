@@ -61,23 +61,17 @@ public class Text {
             case 0: return fail();
             case 1: return chr(s.charAt(0)).map(Object::toString);
             default: {
-                return new Parser<String>() {
-                    @Override public Result<String> parse(Input input, int pos) {
-                        int pos2 = pos;
-                        for (int i = 0; i < s.length(); ++i) {
-                            if (input.isEof(pos2) || input.at(pos2) != s.charAt(i)) {
-                                return Result.failure(pos);
-                            } else {
-                                pos2 = pos2+1;
-                            }
+                return (input, pos) -> {
+                    int pos2 = pos;
+                    for (int i = 0; i < s.length(); ++i) {
+                        if (input.isEof(pos2) || input.at(pos2) != s.charAt(i)) {
+                            return Result.failure(pos);
+                        } else {
+                            pos2 = pos2+1;
                         }
-
-                        return Result.success(s, pos2);
                     }
 
-                    @Override public boolean accepts(char token) {
-                        return s.charAt(0) == token;
-                    }
+                    return Result.success(s, pos2);
                 };
             }
         }

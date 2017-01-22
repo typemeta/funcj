@@ -1,7 +1,7 @@
 package org.javafp.parsec4j.text;
 
 import org.javafp.parsec4j.expr.Model;
-import org.junit.Test;
+import org.junit.*;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.runner.*;
 import org.openjdk.jmh.runner.options.*;
@@ -10,11 +10,6 @@ import java.io.IOException;
 
 public class JmhTest {
 
-//    public static void main(String[] args) throws IOException, RunnerException {
-//        System.in.read();
-//        new JmhTest().runJmh();
-//    }
-    @Test
     public void runJmh() throws RunnerException, IOException {
         final Options opt = new OptionsBuilder()
             .jvmArgs("-XX:+UnlockCommercialFeatures")

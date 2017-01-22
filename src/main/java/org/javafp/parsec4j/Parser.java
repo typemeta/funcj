@@ -3,7 +3,7 @@ package org.javafp.parsec4j;
 import org.javafp.data.*;
 import org.javafp.data.Functions.*;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static org.javafp.data.Functions.F2.curry;
@@ -40,16 +40,8 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
         return this.andL(eof()).parse(ctx, 0);
     }
 
-    default boolean accepts(Input<I> input, int pos) {
-        return !input.isEof(pos) && accepts(input.at(pos));
-    }
-
-    default boolean accepts(I token) {
-        return true;
-    }
-
     default <B> Parser<I, CTX, B> map(F<A, B> f) {
-        return new Chain<I, CTX, A, B>(this) {
+        return new Parser<I, CTX, B>() {
             @Override public Result<I, B> parse(CTX ctx, int pos) {
                 return Parser.this.parse(ctx, pos).map(f);
             }
@@ -57,29 +49,13 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     default Parser<I, CTX, A> or(Parser<I, CTX, A> rhs) {
-        return new Parser<I, CTX, A>() {
-            @Override public Result<I, A> parse(CTX ctx, int pos) {
-                if (Parser.this.accepts(ctx.input(), pos)) {
-                    final Result<I, A> r = Parser.this.parse(ctx, pos);
-                    if (r.isSuccess()) {
-                        return r;
-                    }
-                }
-
-                if (rhs.accepts(ctx.input(), pos)) {
-                    return rhs.parse(ctx, pos);
-                } else {
-                    return Result.failure(pos);
-                }
+        return (ctx, pos) -> {
+            final Result<I, A> r = Parser.this.parse(ctx, pos);
+            if (r.isSuccess()) {
+                return r;
             }
 
-            @Override public boolean accepts(Input<I> input, int pos) {
-                return Parser.this.accepts(input, pos) || rhs.accepts(input, pos);
-            }
-
-            @Override public boolean accepts(I token) {
-                return Parser.this.accepts(token) || rhs.accepts(token);
-            }
+            return rhs.parse(ctx, pos);
         };
     }
 
@@ -100,15 +76,11 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     default <B> Parser<I, CTX, B> flatMap(F<A, Parser<I, CTX, B>> f) {
-        return new Chain<I, CTX, A, B>(this) {
-            @Override public Result<I, B> parse(CTX ctx, int pos) {
-                return Parser.this.parse(ctx, pos)
-                    .match(
-                        succ -> f.apply(succ.value).parse(ctx, pos+1),
-                        fail -> fail.cast()
-                    );
-            }
-        };
+        return (ctx, pos) -> Parser.this.parse(ctx, pos)
+            .match(
+                succ -> f.apply(succ.value).parse(ctx, pos+1),
+                fail -> fail.cast()
+            );
     }
 
     default Parser<I, CTX, A> chainl1(Parser<I, CTX, Op2<A>> op) {
@@ -118,27 +90,11 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> fail() {
-        return new Parser<I, CTX, A>() {
-            @Override public Result<I, A> parse(CTX ctx, int pos) {
-                return Result.failure(pos);
-            }
-
-            @Override public boolean accepts(Input<I> input, int pos) {
-                return true;
-            }
-        };
+        return (ctx, pos) -> Result.failure(pos);
     }
 
     static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> pure(A a) {
-        return new Parser<I, CTX, A>() {
-            @Override public Result<I, A> parse(CTX ctx, int pos) {
-                return Result.success(a, pos);
-            }
-
-            @Override public boolean accepts(Input<I> input, int pos) {
-                return true;
-            }
-        };
+        return (ctx, pos) -> Result.success(a, pos);
     }
 
     static <I, CTX extends Parser.Context<I>, A>
@@ -148,19 +104,11 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
 
     static <I, CTX extends Parser.Context<I>, A, B>
     Parser<I, CTX, B> ap(Parser<I, CTX, F<A, B>> pf, Parser<I, CTX, A> pa) {
-        return new Parser<I, CTX, B>() {
-            @Override public Result<I, B> parse(CTX ctx, int pos) {
-                return pf.parse(ctx, pos)
-                    .match(
-                        succ -> pa.parse(ctx, succ.next).map(succ.value),
-                        fail -> fail.cast()
-                    );
-            }
-
-            @Override public boolean accepts(I token) {
-                return pf.accepts(token);
-            }
-        };
+        return (ctx, pos) -> pf.parse(ctx, pos)
+            .match(
+                succ -> pa.parse(ctx, succ.next).map(succ.value),
+                fail -> fail.cast()
+            );
     }
 
     static <I, CTX extends Parser.Context<I>, A, B>
@@ -174,39 +122,21 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     static <I, CTX extends Parser.Context<I>> Parser<I, CTX, Unit> eof() {
-        return new Parser<I, CTX, Unit>() {
-            @Override public Result<I, Unit> parse(CTX ctx, int pos) {
-                return ctx.input().isEof(pos) ?
-                    Result.success(Unit.UNIT, pos) :
-                    Result.failure(pos);
-            }
-
-            @Override public boolean accepts(Input<I> input, int pos) {
-                return input.isEof(pos);
-            }
-
-            @Override public boolean accepts(I token) {
-                return false;
-            }
-        };
+        return (ctx, pos) -> ctx.input().isEof(pos) ?
+            Result.success(Unit.UNIT, pos) :
+            Result.failure(pos);
     }
 
     static <I, CTX extends Parser.Context<I>> Parser<I, CTX, I> satisfy(Predicate<I> pred) {
-        return new Parser<I, CTX, I>() {
-            @Override public Result<I, I> parse(CTX ctx, int pos) {
-                if (!ctx.input().isEof(pos)) {
-                    final I i = ctx.input().at(pos);
-                    if (pred.test(i)) {
-                        return Result.success(i, pos+1);
-                    }
+        return (ctx, pos) -> {
+            if (!ctx.input().isEof(pos)) {
+                final I i = ctx.input().at(pos);
+                if (pred.test(i)) {
+                    return Result.success(i, pos+1);
                 }
-
-                return Result.failure(pos);
             }
 
-            @Override public boolean accepts(I token) {
-                return pred.test(token);
-            }
+            return Result.failure(pos);
         };
     }
 
@@ -219,50 +149,38 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
 
     static <I, CTX extends Parser.Context<I>, A>
     Parser<I, CTX, IList<A>> many(Parser<I, CTX, A> p) {
-        return new Parser<I, CTX, IList<A>>() {
-            @Override public Result<I, IList<A>> parse(CTX ctx, int pos) {
-                IList<A> acc = IList.of();
-                while (true) {
-                    final Result<I, A> r = p.parse(ctx, pos);
-                    if (r.isSuccess()) {
-                        final Result.Success<I, A> succ = (Result.Success<I, A>) r;
-                        acc = acc.add(succ.value);
-                        pos = succ.next;
-                    } else {
-                        return Result.success(acc.reverse(), pos);
-                    }
+        return (ctx, pos) -> {
+            IList<A> acc = IList.of();
+            while (true) {
+                final Result<I, A> r = p.parse(ctx, pos);
+                if (r.isSuccess()) {
+                    final Result.Success<I, A> succ = (Result.Success<I, A>) r;
+                    acc = acc.add(succ.value);
+                    pos = succ.next;
+                } else {
+                    return Result.success(acc.reverse(), pos);
                 }
-            }
-
-            @Override public boolean accepts(I token) {
-                return p.accepts(token);
             }
         };
     }
 
     static <I, CTX extends Parser.Context<I>, A>
     Parser<I, CTX, IList.NonEmpty<A>> many1(Parser<I, CTX, A> p) {
-        return new Parser<I, CTX, IList.NonEmpty<A>>() {
-            @Override public Result<I, IList.NonEmpty<A>> parse(CTX ctx, int pos) {
-                IList<A> acc = IList.of();
-                while (true) {
-                    final Result<I, A> r = p.parse(ctx, pos);
-                    if (r.isSuccess()) {
-                        final Result.Success<I, A> succ = (Result.Success<I, A>) r;
-                        acc = acc.add(succ.value);
-                        pos = succ.next;
-                    } else {
-                        final int pos2 = pos;
-                        return acc.match(
-                            nel -> Result.success(nel.reverse(), pos2),
-                            empty -> Result.failure(pos2)
-                        );
-                    }
+        return (ctx, pos) -> {
+            IList<A> acc = IList.of();
+            while (true) {
+                final Result<I, A> r = p.parse(ctx, pos);
+                if (r.isSuccess()) {
+                    final Result.Success<I, A> succ = (Result.Success<I, A>) r;
+                    acc = acc.add(succ.value);
+                    pos = succ.next;
+                } else {
+                    final int pos2 = pos;
+                    return acc.match(
+                        nel -> Result.success(nel.reverse(), pos2),
+                        empty -> Result.failure(pos2)
+                    );
                 }
-            }
-
-            @Override public boolean accepts(I token) {
-                return p.accepts(token);
             }
         };
     }
@@ -270,21 +188,5 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     static <I, CTX extends Parser.Context<I>, A>
     Parser<I, CTX, Optional<A>> optional(Parser<I, CTX, A> p) {
         return p.map(Optional::of).or(pure(Optional.empty()));
-    }
-
-    abstract class Chain<I, CTX extends Context<I>, S, T> implements Parser<I, CTX, T> {
-        private final Parser<I, CTX, S> first;
-
-        protected Chain(Parser<I, CTX, S> first) {
-            this.first = first;
-        }
-
-        @Override public boolean accepts(Input<I> input, int pos) {
-            return first.accepts(input, pos);
-        }
-
-        @Override public boolean accepts(I token) {
-            return first.accepts(token);
-        }
     }
 }

@@ -8,7 +8,7 @@ import java.util.stream.*;
 
 /**
  * Simple recursive, immutable linked list.
- * This list type allows tails to be shared between lists.
+ * TIt allows tails to be shared between lists.
  * Null elements are not allowed.
  * @param <T> element type
  */
@@ -16,6 +16,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct an empty list.
+     * @param <T> element type
      */
     public static <T> IList<T> nil() {
         return Empty.EMPTY;
@@ -23,6 +24,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct an empty list.
+     * @param <T> element type
      */
     public static <T> IList<T> of() {
         return nil();
@@ -30,6 +32,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list with on element.
+     * @param <T> element type
      */
     public static <T> NonEmpty<T> of(T elem) {
         return IList.<T>nil().add(Objects.requireNonNull(elem));
@@ -37,6 +40,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list with multiple elements.
+     * @param <T> element type
      */
     public static <T> NonEmpty<T> of(T... elems) {
         IList<T> list = nil();
@@ -48,6 +52,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list from an Iterable.
+     * @param <T> element type
      */
     public static <T> IList<T> of(Iterable<T> elems) {
         IList<T> list = nil();
@@ -59,6 +64,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Concatenate two lists.
+     * @param <T> element type
      */
     public static <T> IList<T> concat(IList<? extends T> listA, IList<? extends T>  listB) {
         IList<T> list = (IList<T>)listB;
@@ -143,7 +149,9 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract T get(int index);
 
     /**
-     * Internal helper method.
+     * Append the contents of this list to a StringBuilder.
+     * @param sb the StringBuilder to be appended to
+     * @return the StringBuilder
      */
     public abstract StringBuilder append(StringBuilder sb);
 
@@ -173,6 +181,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a new list by appending an element to the end of this list.
+     * @return concatenated list
      */
     public abstract IList<T> append(IList<T> l);
 
@@ -188,36 +197,43 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Map a function over this list.
+     * @return mapped list
      */
     public abstract <U> IList<U> map(F<? super T, ? extends U> f);
 
     /**
      * Right-fold a function over this list.
+     * @return folded result
      */
     public abstract <U> U foldr(F2<T, U, U> f, U z);
 
     /**
      * Left-fold a function over this list.
+     * @return folded result
      */
     public abstract <U> U foldl(F2<U, T, U> f, U z);
 
     /**
      * Right-fold a function over this non-empty list.
+     * @return folded result
      */
     public abstract T foldr1(Op2<T> f);
 
     /**
      * Left-fold a function over this non-empty list.
+     * @return folded result
      */
     public abstract T foldl1(Op2<T> f);
 
     /**
      * Create a spliterator.
+     * @return the spliterator
      */
     public abstract Spliterator<T> spliterator();
 
     /**
      * Create a Stream onto this list.
+     * @return the stream
      */
     public Stream<T> stream() {
         return StreamSupport.stream(spliterator(), false);
@@ -225,6 +241,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a parallel Stream onto this list.
+     * @return the stream
      */
     public Stream<T> parallelStream() {
         return StreamSupport.stream(spliterator(), true);
@@ -232,6 +249,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create an iterator over this list.
+     * @return the iterator
      */
     public abstract Iterator<T> iterator();
 

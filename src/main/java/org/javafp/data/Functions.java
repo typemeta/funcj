@@ -5,6 +5,10 @@ package org.javafp.data;
  */
 public abstract class Functions {
 
+    /**
+     * Functions of arity 0.
+     * @param <R> return type
+     */
     @FunctionalInterface
     public interface F0<R> {
         static <R> F0<R> of(F0<R> f) {
@@ -18,6 +22,11 @@ public abstract class Functions {
         R apply();
     }
 
+    /**
+     * Functions of arity 1.
+     * @param <A> 1st argument type
+     * @param <R> return type
+     */
     @FunctionalInterface
     public interface F<A, R> {
         static <A, R> F<A, R> of(F<A, R> f) {
@@ -43,6 +52,12 @@ public abstract class Functions {
         }
     }
 
+    /**
+     * Functions of arity 2.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <R> return type
+     */
     @FunctionalInterface
     public interface F2<A, B, R> {
         static <A, B, R> F2<A, B, R> of(F2<A, B, R> f) {
@@ -80,6 +95,13 @@ public abstract class Functions {
         }
     }
 
+    /**
+     * Functions of arity 3.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <C> 3rd argument type
+     * @param <R> return type
+     */
     @FunctionalInterface
     public interface F3<A, B, C, R> {
         static <A, B, C, R> F3<A, B, C, R>of(F3<A, B, C, R> f) {
@@ -109,6 +131,14 @@ public abstract class Functions {
         }
     }
 
+    /**
+     * Functions of arity 4.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <C> 3rd argument type
+     * @param <D> 4th argument type
+     * @param <R> return type
+     */
     @FunctionalInterface
     public interface F4<A, B, C, D, R> {
         static <A, B, C, D, R> F4<A, B, C, D, R> of(F4<A, B, C, D, R> f) {
@@ -142,6 +172,15 @@ public abstract class Functions {
         }
     }
 
+    /**
+     * Functions of arity 5.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <C> 3rd argument type
+     * @param <D> 4th argument type
+     * @param <E> 5th argument type
+     * @param <R> return type
+     */
     @FunctionalInterface
     public interface F5<A, B, C, D, E, R> {
         static <A, B, C, D, E, R> F5<A, B, C, D, E, R> of(F5<A, B, C, D, E, R> f) {
@@ -179,6 +218,16 @@ public abstract class Functions {
         }
     }
 
+    /**
+     * Functions of arity 6.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <C> 3rd argument type
+     * @param <D> 4th argument type
+     * @param <E> 5th argument type
+     * @param <G> 6th argument type
+     * @param <R> return type
+     */
     @FunctionalInterface
     public interface F6<A, B, C, D, E, G, R> {
         static <A, B, C, D, E, G, R> F6<A, B, C, D, E, G, R> of(F6<A, B, C, D, E, G, R> f) {
@@ -219,9 +268,10 @@ public abstract class Functions {
             return a -> b -> c -> d -> e -> g -> apply(a, b, c, d, e, g);
         }
     }
+
     /**
      * Unary operator interface.
-     * @param <T>
+     * @param <T> operand type
      */
     @FunctionalInterface
     public interface Op<T> extends F<T, T> {
@@ -230,7 +280,7 @@ public abstract class Functions {
 
     /**
      * Binary operator interface.
-     * @param <T>
+     * @param <T> operand type
      */
     @FunctionalInterface
     public interface Op2<T> extends F2<T, T, T> {

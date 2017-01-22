@@ -22,45 +22,25 @@ public interface Parser<A> {
         return this.andL(eof()).parse(input, 0);
     }
 
-    default boolean accepts(Input input, int pos) {
-        return !input.isEof(pos) && accepts(input.at(pos));
-    }
-
-    default boolean accepts(char token) {
-        return true;
-    }
-
     default <B> Parser<B> map(F<A, B> f) {
-        return new Chain<A, B>(this) {
-            @Override public Result<B> parse(Input input, int pos) {
-                return Parser.this.parse(input, pos).map(f);
-            }
-        };
+        return (input, pos) -> Parser.this.parse(input, pos).map(f);
+    }
+
+    default <B> Parser<B> flatMap(F<A, Parser<B>> f) {
+        return (input, pos) -> Parser.this.parse(input, pos)
+            .match(
+                succ -> f.apply(succ.value).parse(input, pos+1),
+                fail -> fail.cast()
+            );
     }
 
     default Parser<A> or(Parser<A> rhs) {
-        return new Parser<A>() {
-            @Override public Result<A> parse(Input input, int pos) {
-                if (Parser.this.accepts(input, pos)) {
-                    final Result<A> r = Parser.this.parse(input, pos);
-                    if (r.isSuccess()) {
-                        return r;
-                    }
-                }
-
-                if (rhs.accepts(input, pos)) {
-                    return rhs.parse(input, pos);
-                } else {
-                    return Result.failure(pos);
-                }
-            }
-
-            @Override public boolean accepts(Input input, int pos) {
-                return Parser.this.accepts(input, pos) || rhs.accepts(input, pos);
-            }
-
-            @Override public boolean accepts(char token) {
-                return Parser.this.accepts(token) || rhs.accepts(token);
+        return (input, pos) -> {
+            final Result<A> r = Parser.this.parse(input, pos);
+            if (r.isSuccess()) {
+                return r;
+            } else {
+                return rhs.parse(input, pos);
             }
         };
     }
@@ -81,18 +61,6 @@ public interface Parser<A> {
         return new ApplyBuilder._2<A, B>(this, pb);
     }
 
-    default <B> Parser<B> flatMap(F<A, Parser<B>> f) {
-        return new Chain<A, B>(this) {
-            @Override public Result<B> parse(Input input, int pos) {
-                return Parser.this.parse(input, pos)
-                    .match(
-                        succ -> f.apply(succ.value).parse(input, pos+1),
-                        fail -> fail.cast()
-                    );
-            }
-        };
-    }
-
     default Parser<A> chainl1(Parser<Op2<A>> op) {
         final Parser<IList<Op<A>>> plf =
             many(op.and(this).map((f, y) -> x -> f.apply(x, y)));
@@ -100,27 +68,11 @@ public interface Parser<A> {
     }
 
     static <A> Parser<A> fail() {
-        return new Parser<A>() {
-            @Override public Result<A> parse(Input input, int pos) {
-                return Result.failure(pos);
-            }
-
-            @Override public boolean accepts(Input input, int pos) {
-                return true;
-            }
-        };
+        return (input, pos) -> Result.failure(pos);
     }
 
     static <A> Parser<A> pure(A a) {
-        return new Parser<A>() {
-            @Override public Result<A> parse(Input input, int pos) {
-                return Result.success(a, pos);
-            }
-
-            @Override public boolean accepts(Input input, int pos) {
-                return true;
-            }
-        };
+        return (input, pos) -> Result.success(a, pos);
     }
 
     static <A> Parser<A> pure(F0<A> fa) {
@@ -128,19 +80,11 @@ public interface Parser<A> {
     }
 
     static <A, B> Parser<B> ap(Parser<F<A, B>> pf, Parser<A> pa) {
-        return new Parser<B>() {
-            @Override public Result<B> parse(Input input, int pos) {
-                return pf.parse(input, pos)
-                    .match(
-                        succ -> pa.parse(input, succ.next).map(succ.value),
-                        fail -> fail.cast()
-                    );
-            }
-
-            @Override public boolean accepts(char token) {
-                return pf.accepts(token);
-            }
-        };
+        return (input, pos) -> pf.parse(input, pos)
+            .match(
+                succ -> pa.parse(input, succ.next).map(succ.value),
+                fail -> fail.cast()
+            );
     }
 
     static <A, B> F<Parser<A>, Parser<B>> liftA(F<A, B> f) {
@@ -152,39 +96,21 @@ public interface Parser<A> {
     }
 
     static Parser<Unit> eof() {
-        return new Parser<Unit>() {
-            @Override public Result<Unit> parse(Input input, int pos) {
-                return input.isEof(pos) ?
-                    Result.success(Unit.UNIT, pos) :
-                    Result.failure(pos);
-            }
-
-            @Override public boolean accepts(Input input, int pos) {
-                return input.isEof(pos);
-            }
-
-            @Override public boolean accepts(char token) {
-                return false;
-            }
-        };
+        return (input, pos) -> input.isEof(pos) ?
+            Result.success(Unit.UNIT, pos) :
+            Result.failure(pos);
     }
 
     static Parser<Character> satisfy(Predicate<Character> pred) {
-        return new Parser<Character>() {
-            @Override public Result<Character> parse(Input input, int pos) {
-                if (!input.isEof(pos)) {
-                    final Character i = input.at(pos);
-                    if (pred.test(i)) {
-                        return Result.success(i, pos+1);
-                    }
+        return (input, pos) -> {
+            if (!input.isEof(pos)) {
+                final Character i = input.at(pos);
+                if (pred.test(i)) {
+                    return Result.success(i, pos+1);
                 }
-
-                return Result.failure(pos);
             }
 
-            @Override public boolean accepts(char token) {
-                return pred.test(token);
-            }
+            return Result.failure(pos);
         };
     }
 
@@ -196,70 +122,42 @@ public interface Parser<A> {
     }
 
     static <A> Parser<IList<A>> many(Parser<A> p) {
-        return new Parser<IList<A>>() {
-            @Override public Result<IList<A>> parse(Input input, int pos) {
-                IList<A> acc = IList.of();
-                while (true) {
-                    final Result<A> r = p.parse(input, pos);
-                    if (r.isSuccess()) {
-                        final Result.Success<A> succ = (Result.Success<A>) r;
-                        acc = acc.add(succ.value);
-                        pos = succ.next;
-                    } else {
-                        return Result.success(acc.reverse(), pos);
-                    }
+        return (input, pos) -> {
+            IList<A> acc = IList.of();
+            while (true) {
+                final Result<A> r = p.parse(input, pos);
+                if (r.isSuccess()) {
+                    final Result.Success<A> succ = (Result.Success<A>) r;
+                    acc = acc.add(succ.value);
+                    pos = succ.next;
+                } else {
+                    return Result.success(acc.reverse(), pos);
                 }
-            }
-
-            @Override public boolean accepts(char token) {
-                return p.accepts(token);
             }
         };
     }
 
     static <A> Parser<IList.NonEmpty<A>> many1(Parser<A> p) {
-        return new Parser<IList.NonEmpty<A>>() {
-            @Override public Result<IList.NonEmpty<A>> parse(Input input, int pos) {
-                IList<A> acc = IList.of();
-                while (true) {
-                    final Result<A> r = p.parse(input, pos);
-                    if (r.isSuccess()) {
-                        final Result.Success<A> succ = (Result.Success<A>) r;
-                        acc = acc.add(succ.value);
-                        pos = succ.next;
-                    } else {
-                        final int pos2 = pos;
-                        return acc.match(
-                            nel -> Result.success(nel.reverse(), pos2),
-                            empty -> Result.failure(pos2)
-                        );
-                    }
+        return (input, pos) -> {
+            IList<A> acc = IList.of();
+            while (true) {
+                final Result<A> r = p.parse(input, pos);
+                if (r.isSuccess()) {
+                    final Result.Success<A> succ = (Result.Success<A>) r;
+                    acc = acc.add(succ.value);
+                    pos = succ.next;
+                } else {
+                    final int pos2 = pos;
+                    return acc.match(
+                        nel -> Result.success(nel.reverse(), pos2),
+                        empty -> Result.failure(pos2)
+                    );
                 }
-            }
-
-            @Override public boolean accepts(char token) {
-                return p.accepts(token);
             }
         };
     }
 
     static <A> Parser<Optional<A>> optional(Parser<A> p) {
         return p.map(Optional::of).or(pure(Optional.empty()));
-    }
-
-    abstract class Chain<S, T> implements Parser<T> {
-        private final Parser<S> first;
-
-        protected Chain(Parser<S> first) {
-            this.first = first;
-        }
-
-        @Override public boolean accepts(Input input, int pos) {
-            return first.accepts(input, pos);
-        }
-
-        @Override public boolean accepts(char token) {
-            return first.accepts(token);
-        }
     }
 }

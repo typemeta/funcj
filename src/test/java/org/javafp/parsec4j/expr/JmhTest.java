@@ -11,11 +11,6 @@ import java.io.IOException;
 
 public class JmhTest {
 
-//    public static void main(String[] args) throws IOException, RunnerException {
-//        System.in.read();
-//        new JmhTest().runJmh();
-//    }
-    @Test
     public void runJmh() throws RunnerException, IOException {
         final Options opt = new OptionsBuilder()
             .jvmArgs("-XX:+UnlockCommercialFeatures")
@@ -29,11 +24,6 @@ public class JmhTest {
 
     private static final Parser<Chr, Grammar.Ctx, Model.Expr> parser = Grammar.parser;
 
-    public static void main(String[] args) throws IOException {
-        System.out.println(testGood());
-        System.out.println(testBad());
-    }
-
     @Benchmark
     public static String testGood() {
         return Grammar.parse("3*-max(4%+(5bp+-x),-2bp)-1").toString();
@@ -43,5 +33,4 @@ public class JmhTest {
     public static String testBad() {
         return Grammar.parse("3*-max(4%+(5bp+-x)x,-2bp)-1z").toString();
     }
-
 }

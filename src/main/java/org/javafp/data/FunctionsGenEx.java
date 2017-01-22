@@ -5,6 +5,11 @@ package org.javafp.data;
  */
 public abstract class FunctionsGenEx {
 
+    /**
+     * Functions of arity 0.
+     * @param <R> return type
+     * @param <X> exception type
+     */
     @FunctionalInterface
     public interface F0<R, X extends Exception> {
         static <R, X extends Exception> F0<R, X> of(F0<R, X> f) {
@@ -18,6 +23,12 @@ public abstract class FunctionsGenEx {
         R apply() throws X;
     }
 
+    /**
+     * Functions of arity 1.
+     * @param <A> 1st argument type
+     * @param <R> return type
+     * @param <X> exception type
+     */
     @FunctionalInterface
     public interface F<A, R, X extends Exception> {
         static <A, R, X extends Exception> F<A, R, X> of(F<A, R, X> f) {
@@ -43,6 +54,13 @@ public abstract class FunctionsGenEx {
         }
     }
 
+    /**
+     * Functions of arity 2.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <R> return type
+     * @param <X> exception type
+     */
     @FunctionalInterface
     public interface F2<A, B, R, X extends Exception> {
         static <A, B, R, X extends Exception> F2<A, B, R, X> of(F2<A, B, R, X> f) {
@@ -80,6 +98,14 @@ public abstract class FunctionsGenEx {
         }
     }
 
+    /**
+     * Functions of arity 3.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <C> 3rd argument type
+     * @param <R> return type
+     * @param <X> exception type
+     */
     @FunctionalInterface
     public interface F3<A, B, C, R, X extends Exception> {
         static <A, B, C, R, X extends Exception> F3<A, B, C, R, X>of(F3<A, B, C, R, X> f) {
@@ -109,6 +135,15 @@ public abstract class FunctionsGenEx {
         }
     }
 
+    /**
+     * Functions of arity 4.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <C> 3rd argument type
+     * @param <D> 4th argument type
+     * @param <R> return type
+     * @param <X> exception type
+     */
     @FunctionalInterface
     public interface F4<A, B, C, D, R, X extends Exception> {
         static <A, B, C, D, R, X extends Exception> F4<A, B, C, D, R, X> of(F4<A, B, C, D, R, X> f) {
@@ -142,6 +177,16 @@ public abstract class FunctionsGenEx {
         }
     }
 
+    /**
+     * Functions of arity 5.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <C> 3rd argument type
+     * @param <D> 4th argument type
+     * @param <E> 5th argument type
+     * @param <R> return type
+     * @param <X> exception type
+     */
     @FunctionalInterface
     public interface F5<A, B, C, D, E, R, X extends Exception> {
         static <A, B, C, D, E, R, X extends Exception> F5<A, B, C, D, E, R, X> of(F5<A, B, C, D, E, R, X> f) {
@@ -179,6 +224,17 @@ public abstract class FunctionsGenEx {
         }
     }
 
+    /**
+     * Functions of arity 6.
+     * @param <A> 1st argument type
+     * @param <B> 2nd argument type
+     * @param <C> 3rd argument type
+     * @param <D> 4th argument type
+     * @param <E> 5th argument type
+     * @param <G> 6th argument type
+     * @param <R> return type
+     * @param <X> exception type
+     */
     @FunctionalInterface
     public interface F6<A, B, C, D, E, G, R, X extends Exception> {
         static <A, B, C, D, E, G, R, X extends Exception> F6<A, B, C, D, E, G, R, X> of(F6<A, B, C, D, E, G, R, X> f) {
@@ -219,9 +275,11 @@ public abstract class FunctionsGenEx {
             return a -> b -> c -> d -> e -> g -> apply(a, b, c, d, e, g);
         }
     }
+
     /**
      * Unary operator interface.
-     * @param <T>
+     * @param <T> operand type
+     * @param <X> exception type
      */
     @FunctionalInterface
     public interface Op<T, X extends Exception> extends F<T, T, X> {
@@ -230,7 +288,8 @@ public abstract class FunctionsGenEx {
 
     /**
      * Binary operator interface.
-     * @param <T>
+     * @param <T> operand type
+     * @param <X> exception type
      */
     @FunctionalInterface
     public interface Op2<T, X extends Exception> extends F2<T, T, T, X> {

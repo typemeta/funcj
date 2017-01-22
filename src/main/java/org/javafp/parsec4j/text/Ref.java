@@ -49,15 +49,4 @@ public class Ref<A> implements Parser<A> {
     public Result<A> parse(Input input, int pos) {
         return impl.parse(input, pos);
     }
-
-    @Override
-    public boolean accepts(Input input, int pos) {
-        return impl.accepts(input, pos);
-    }
-
-
-    @Override
-    public boolean accepts(char token) {
-        return impl.accepts(token);
-    }
 }

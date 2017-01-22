@@ -4,7 +4,6 @@ import org.javafp.data.Functions;
 
 /**
  * A parse result.
- * @param <I>
  * @param <A>
  */
 public interface Result<A> {

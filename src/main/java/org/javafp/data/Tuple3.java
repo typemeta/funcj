@@ -4,6 +4,12 @@ import org.javafp.data.Functions.F;
 
 import java.util.Objects;
 
+/**
+ * A 3-tuple of values
+ * @param <A> 1st value type
+ * @param <B> 2nd value type
+ * @param <C> 3rd value type
+ */
 public class Tuple3<A, B, C> {
     public static <A, B, C> Tuple3<A, B, C> of(A _1, B _2, C _3) {
         return new Tuple3<A, B, C>(_1, _2, _3);
