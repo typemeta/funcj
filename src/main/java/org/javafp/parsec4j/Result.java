@@ -1,6 +1,6 @@
 package org.javafp.parsec4j;
 
-import org.javafp.data.Functions;
+import org.javafp.util.Functions;
 
 /**
  * A parse result.

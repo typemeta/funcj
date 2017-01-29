@@ -1,5 +1,6 @@
 package org.javafp.data;
 
+import org.javafp.util.Unit;
 import org.junit.*;
 
 public class UnitTest {

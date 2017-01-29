@@ -1,8 +1,7 @@
 package org.javafp.parsec4j.expr;
 
-import org.javafp.data.Chr;
+import org.javafp.util.Chr;
 import org.javafp.parsec4j.*;
-import org.junit.*;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.*;
 import org.openjdk.jmh.runner.options.*;

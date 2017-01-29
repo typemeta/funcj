@@ -1,11 +1,11 @@
 package org.javafp.parsec4j;
 
-import org.javafp.data.Unit;
+import org.javafp.util.Unit;
 import org.javafp.parsec4j.Parser.Context;
 
 import java.util.Objects;
 
-public class Ref<I, CTX extends Parser.Context<I>, A>
+public class Ref<I, CTX extends Context<I>, A>
         implements Parser<I, CTX, A> {
 
     public static <I, CTX extends Context<I>, A> Ref<I, CTX, A> of() {

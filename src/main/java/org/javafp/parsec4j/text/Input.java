@@ -1,7 +1,5 @@
 package org.javafp.parsec4j.text;
 
-import org.javafp.data.Unit;
-
 public interface Input {
     static Input of(String s) {
         return new StringInput(s);

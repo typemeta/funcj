@@ -1,6 +1,6 @@
 package org.javafp.parsec4j.text;
 
-import org.javafp.data.Unit;
+import org.javafp.util.Unit;
 import org.junit.*;
 
 public class GrammarTest {

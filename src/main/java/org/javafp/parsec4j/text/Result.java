@@ -1,6 +1,6 @@
 package org.javafp.parsec4j.text;
 
-import org.javafp.data.Functions;
+import org.javafp.util.Functions;
 
 /**
  * A parse result.
@@ -121,7 +121,7 @@ public interface Result<A> {
 
         @Override
         public <B> Result<B> map(Functions.F<A, B> f) {
-            return this.cast();
+            return cast();
         }
 
         @Override

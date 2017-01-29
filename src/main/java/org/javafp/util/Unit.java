@@ -1,4 +1,4 @@
-package org.javafp.data;
+package org.javafp.util;
 
 /**
  * A type with a single value.

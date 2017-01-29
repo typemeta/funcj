@@ -1,5 +1,7 @@
 package org.javafp.data;
 
+import org.javafp.util.Functions;
+
 import java.util.Objects;
 
 public interface Lazy<T> extends Functions.F0<T> {

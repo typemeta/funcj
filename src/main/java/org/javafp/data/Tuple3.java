@@ -1,6 +1,6 @@
 package org.javafp.data;
 
-import org.javafp.data.Functions.F;
+import org.javafp.util.Functions.F;
 
 import java.util.Objects;
 
@@ -10,7 +10,7 @@ import java.util.Objects;
  * @param <B> 2nd value type
  * @param <C> 3rd value type
  */
-public class Tuple3<A, B, C> {
+final public class Tuple3<A, B, C> {
     public static <A, B, C> Tuple3<A, B, C> of(A _1, B _2, C _3) {
         return new Tuple3<A, B, C>(_1, _2, _3);
     }

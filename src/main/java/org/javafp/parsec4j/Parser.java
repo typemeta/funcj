@@ -1,12 +1,13 @@
 package org.javafp.parsec4j;
 
 import org.javafp.data.*;
-import org.javafp.data.Functions.*;
+import org.javafp.util.Functions.*;
+import org.javafp.util.Unit;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-import static org.javafp.data.Functions.F2.curry;
+import static org.javafp.util.Functions.F2.curry;
 
 /**
  * A parser is essentially a function from an input stream to a Result.
@@ -109,6 +110,11 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
                 succ -> pa.parse(ctx, succ.next).map(succ.value),
                 fail -> fail.cast()
             );
+    }
+
+    static <I, CTX extends Parser.Context<I>, A, B>
+    Parser<I, CTX, B> ap(F<A, B> f, Parser<I, CTX, A> pa) {
+        return (ctx, pos) -> pa.parse(ctx, pos).map(f);
     }
 
     static <I, CTX extends Parser.Context<I>, A, B>

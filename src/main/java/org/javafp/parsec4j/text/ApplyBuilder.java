@@ -1,6 +1,6 @@
 package org.javafp.parsec4j.text;
 
-import org.javafp.data.Functions.*;
+import org.javafp.util.Functions.*;
 
 import static org.javafp.parsec4j.text.Parser.ap;
 

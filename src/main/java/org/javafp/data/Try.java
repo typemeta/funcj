@@ -1,6 +1,7 @@
 package org.javafp.data;
 
-import org.javafp.data.Functions.*;
+import org.javafp.util.*;
+import org.javafp.util.Functions.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -8,10 +9,6 @@ import java.util.function.*;
 /**
  * Simple monadic wrapper for computations which result in either a successfully computed value
  * or an error.
- * {@code Try}, {@code Try.success}, and {@code Try.flatMap} satisfy the 3 monad laws:
- *      LI: success(a).flatMap(f) = f(a)
- *      RI: m.flatMap(success) = m
- *      AS: m.flatMap(f).flatMap(g) = m.flatMap(x -&gt; f(x).flatMap(g)
  * Try is effectively a discriminated union of Success (which wraps a value)
  * and Failure (which wraps an exception).
  */
@@ -42,13 +39,31 @@ public interface Try<T> {
         }
     }
 
+    static <A, B> Try<B> ap(Try<F<A, B>> tf, Try<A> ta) {
+        return ta.apply(tf);
+    }
+
+    static <A, B> Try<B> ap(F<A, B> f, Try<A> ta) {
+        return ta.apply(success(f));
+    }
+
     /**
-     * Standard monadic sequencing.
+     * Standard applicative traversal.
+     */
+    static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
+        return lt.foldr(
+                (t, tlt) -> f.apply(t).apply(tlt.apply(l -> l::add)),
+                success(IList.nil())
+        );
+    }
+
+    /**
+     * Standard applicative sequencing.
      */
     static <T> Try<IList<T>> sequence(IList<Try<T>> lt) {
         return lt.foldr(
-                (tt, tlt) -> tt.flatMap(t -> tlt.flatMap(l -> success((IList<T>)l.add(t)))),
-                Try.success(IList.nil())
+            (tt, tlt) -> tt.apply(tlt.apply(l -> l::add)),
+            success(IList.nil())
         );
     }
 
@@ -87,6 +102,12 @@ public interface Try<T> {
      * Apply the function to the value held within this result.
      */
     <R> Try<R> map(F<? super T, ? extends R> f);
+
+    <R> Try<R> apply(Try<F<T, R>> tf);
+
+    default <R> Try<R> apply(F<T, R> f) {
+        return apply(success(f));
+    }
 
     /**
      * If this is a success then apply the function to the value and return the result,
@@ -144,7 +165,12 @@ public interface Try<T> {
 
         @Override
         public <R> Try<R> map(F<? super T, ? extends R> f) {
-            return new Success<R>(f.apply(value));
+            return success(f.apply(value));
+        }
+
+        @Override
+        public <R> Try<R> apply(Try<F<T, R>> tf) {
+            return tf.map(f -> f.apply(value));
         }
 
         @Override
@@ -220,12 +246,17 @@ public interface Try<T> {
 
         @Override
         public <R> Try<R> map(F<? super T, ? extends R> f) {
-            return Try.failure(error);
+            return cast();
+        }
+
+        @Override
+        public <R> Try<R> apply(Try<F<T, R>> tf) {
+            return cast();
         }
 
         @Override
         public <R> Try<R> flatMap(F<? super T, Try<R>> f) {
-            return Try.failure(error);
+            return cast();
         }
 
         @Override
@@ -253,6 +284,10 @@ public interface Try<T> {
             // which means we get object equality. This is rarely useful so here
             // we instead compare the string representations.
             return error.toString().equals(rhs.error.toString());
+        }
+
+        private <U> Try<U> cast() {
+            return (Try<U>) this;
         }
     }
 }

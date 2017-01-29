@@ -1,16 +1,16 @@
 package org.javafp.parsec4j.text;
 
-import org.javafp.data.Functions.*;
+import org.javafp.util.Functions.*;
 import org.javafp.data.*;
+import org.javafp.util.Unit;
 
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static org.javafp.data.Functions.F2.curry;
+import static org.javafp.util.Functions.F2.curry;
 
 /**
  * A parser is essentially a function from an input stream to a Result.
- * The Parser type along with the pure and map functions constitute an applicative functor.
  * @param <A> Parse result type
  */
 @FunctionalInterface
@@ -64,7 +64,8 @@ public interface Parser<A> {
     default Parser<A> chainl1(Parser<Op2<A>> op) {
         final Parser<IList<Op<A>>> plf =
             many(op.and(this).map((f, y) -> x -> f.apply(x, y)));
-        return this.and(plf).map((a, lf) -> lf.foldl((acc, f) -> f.apply(acc), a));
+        return this.and(plf)
+            .map((a, lf) -> lf.foldl((acc, f) -> f.apply(acc), a));
     }
 
     static <A> Parser<A> fail() {
@@ -85,6 +86,10 @@ public interface Parser<A> {
                 succ -> pa.parse(input, succ.next).map(succ.value),
                 fail -> fail.cast()
             );
+    }
+
+    static <A, B> Parser<B> ap(F<A, B> f, Parser<A> pa) {
+        return (input, pos) -> pa.parse(input, pos).map(f);
     }
 
     static <A, B> F<Parser<A>, Parser<B>> liftA(F<A, B> f) {

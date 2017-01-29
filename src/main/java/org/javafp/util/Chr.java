@@ -1,4 +1,4 @@
-package org.javafp.data;
+package org.javafp.util;
 
 public final class Chr implements Comparable<Chr> {
 

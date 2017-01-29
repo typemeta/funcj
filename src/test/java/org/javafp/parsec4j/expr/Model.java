@@ -1,6 +1,6 @@
 package org.javafp.parsec4j.expr;
 
-import org.javafp.data.Functions;
+import org.javafp.util.Functions;
 
 /**
  * A model for simple mathematical expressions.

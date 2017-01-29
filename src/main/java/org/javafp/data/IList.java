@@ -1,6 +1,7 @@
 package org.javafp.data;
 
-import org.javafp.data.Functions.*;
+import org.javafp.util.Functions;
+import org.javafp.util.Functions.*;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -8,7 +9,7 @@ import java.util.stream.*;
 
 /**
  * Simple recursive, immutable linked list.
- * TIt allows tails to be shared between lists.
+ * It allows tails to be shared between lists.
  * Null elements are not allowed.
  * @param <T> element type
  */
@@ -43,11 +44,11 @@ public abstract class IList<T> implements Iterable<T> {
      * @param <T> element type
      */
     public static <T> NonEmpty<T> of(T... elems) {
-        IList<T> list = nil();
+        IList<T> r = nil();
         for (int i = elems.length - 1; i >= 0; --i) {
-            list = list.add(Objects.requireNonNull(elems[i]));
+            r = r.add(Objects.requireNonNull(elems[i]));
         }
-        return (NonEmpty<T>)list;
+        return (NonEmpty<T>)r;
     }
 
     /**
@@ -55,32 +56,32 @@ public abstract class IList<T> implements Iterable<T> {
      * @param <T> element type
      */
     public static <T> IList<T> of(Iterable<T> elems) {
-        IList<T> list = nil();
+        IList<T> r = nil();
         for (T elem : elems) {
-            list = list.add(Objects.requireNonNull(elem));
+            r = r.add(Objects.requireNonNull(elem));
         }
-        return list.reverse();
+        return r.reverse();
     }
 
     /**
      * Concatenate two lists.
      * @param <T> element type
      */
-    public static <T> IList<T> concat(IList<? extends T> listA, IList<? extends T>  listB) {
-        IList<T> list = (IList<T>)listB;
-        for (T elem : listA.reverse()) {
-            list = list.add(elem);
+    public static <T> IList<T> concat(IList<? extends T> l1, IList<? extends T>  l2) {
+        IList<T> r = (IList<T>)l2;
+        for (T elem : l1.reverse()) {
+            r = r.add(elem);
         }
-        return list;
+        return r;
     }
 
     /**
      * Convert a list of Characters into a String.
      */
-    public static String listToString(IList<Character> list) {
+    public static String listToString(IList<Character> l) {
         final StringBuilder sb = new StringBuilder();
-        for (; !list.isEmpty(); list = list.tail()) {
-            sb.append(list.head());
+        for (; !l.isEmpty(); l = l.tail()) {
+            sb.append(l.head());
         }
         return sb.toString();
     }
@@ -89,11 +90,11 @@ public abstract class IList<T> implements Iterable<T> {
      * Convert a String into a list of Characters.
      */
     public static IList<Character> listToString(String s) {
-        IList<Character> list = nil();
+        IList<Character> r = nil();
         for (int i = s.length() - 1; i >= 0; --i) {
-            list = list.add(s.charAt(i));
+            r = r.add(s.charAt(i));
         }
-        return list;
+        return r;
     }
 
     /**
@@ -106,17 +107,12 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Create a new list by adding multiple elements to the head of this list.
      */
-    public IList<T> addAll(IList<T> head) {
-
-        IList<T> l = head.reverse();
-        IList<T> res = this;
-
-        while(!l.isEmpty()) {
-            res = res.add(l.head());
-            l = l.tail();
+    public <S extends T> IList<T> addAll(IList<S> l) {
+        IList<T> r = this;
+        for(IList<S> next = l.reverse(); !next.isEmpty(); next = next.tail()) {
+            r = r.add(next.head());
         }
-
-        return res;
+        return r;
     }
 
     /**
@@ -175,7 +171,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Apply one of two functions depending on whether this list is empty or not.
-     * @return the result of applying the appropriate function.
+     * @return the r of applying the appropriate function.
      */
     public abstract <S> S match(F<NonEmpty<T>, S> nonEmpty, F<Empty<T>, S> empty);
 
@@ -202,26 +198,32 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract <U> IList<U> map(F<? super T, ? extends U> f);
 
     /**
+     * FlatMap a function over this list.
+     * @return mapped list
+     */
+    public abstract <U> IList<U> flatMap(F<? super T, IList<? extends U>> f);
+
+    /**
      * Right-fold a function over this list.
-     * @return folded result
+     * @return folded r
      */
     public abstract <U> U foldr(F2<T, U, U> f, U z);
 
     /**
      * Left-fold a function over this list.
-     * @return folded result
+     * @return folded r
      */
     public abstract <U> U foldl(F2<U, T, U> f, U z);
 
     /**
      * Right-fold a function over this non-empty list.
-     * @return folded result
+     * @return folded r
      */
     public abstract T foldr1(Op2<T> f);
 
     /**
      * Left-fold a function over this non-empty list.
-     * @return folded result
+     * @return folded r
      */
     public abstract T foldl1(Op2<T> f);
 
@@ -332,6 +334,11 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
+        public <U> IList<U> flatMap(F<? super T, IList<? extends U>> f) {
+            return EMPTY;
+        }
+
+        @Override
         public <U> U foldr(F2<T, U, U> f, U z) {
             return z;
         }
@@ -380,7 +387,6 @@ public abstract class IList<T> implements Iterable<T> {
         public Iterator<T> iterator() {
 
             return new Iterator<T>(){
-
                 @Override
                 public boolean hasNext() {
                     return false;
@@ -457,9 +463,9 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public String toString() {
-            final StringBuilder sb = new StringBuilder("[");
-            append(sb).setCharAt(sb.length() - 1, ']');
-            return sb.toString();
+            final StringBuilder r = new StringBuilder("[");
+            append(r).setCharAt(r.length() - 1, ']');
+            return r.toString();
         }
 
         @Override
@@ -508,22 +514,29 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public NonEmpty<T> reverse() {
-            IList<T> result = IList.of();
-            IList<T> next = this;
-            for (;!next.isEmpty(); next = next.tail()) {
-                result = result.add(next.head());
+            IList<T> r = IList.of();
+            for (IList<T> n = this; !n.isEmpty(); n = n.tail()) {
+                r = r.add(n.head());
             }
-            return (NonEmpty<T>)result;
+            return (NonEmpty<T>)r;
         }
 
         @Override
         public <U> IList<U> map(F<? super T, ? extends U> f) {
-            IList<U> result = IList.nil();
-            IList<T> next = this;
-            for (;!next.isEmpty(); next = next.tail()) {
-                result = result.add(f.apply(next.head()));
+            IList<U> r = nil();
+            for (IList<T> n = this; !n.isEmpty(); n = n.tail()) {
+                r = r.add(f.apply(n.head()));
             }
-            return result.reverse();
+            return r.reverse();
+        }
+
+        @Override
+        public <U> IList<U> flatMap(F<? super T, IList<? extends U>> f) {
+            final IList<U> r = nil();
+            for (IList<T> n = this; !n.isEmpty(); n = n.tail()) {
+                r.addAll(f.apply(n.head()));
+            }
+            return r;
         }
 
         @Override
@@ -534,8 +547,8 @@ public abstract class IList<T> implements Iterable<T> {
         @Override
         public <U> U foldl(F2<U, T, U> f, U z) {
             U r = z;
-            for (IList<T> l = this; !l.isEmpty(); l = l.tail()) {
-                r = f.apply(r, l.head());
+            for (IList<T> n = this; !n.isEmpty(); n = n.tail()) {
+                r = f.apply(r, n.head());
             }
             return r;
         }
@@ -567,17 +580,17 @@ public abstract class IList<T> implements Iterable<T> {
         public Iterator<T> iterator() {
             return new Iterator<T>(){
 
-                IList<T> pos = NonEmpty.this;
+                IList<T> n = NonEmpty.this;
 
                 @Override
                 public boolean hasNext() {
-                    return !pos.isEmpty();
+                    return !n.isEmpty();
                 }
 
                 @Override
                 public T next() {
-                    final T head = pos.head();
-                    pos = pos.tail();
+                    final T head = n.head();
+                    n = n.tail();
                     return head;
                 }
             };

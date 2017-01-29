@@ -1,6 +1,6 @@
 package org.javafp.parsec4j;
 
-import org.javafp.data.*;
+import org.javafp.util.*;
 
 public interface Input<I> {
     static Input<Chr> of(String s) {

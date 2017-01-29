@@ -1,7 +1,7 @@
 package org.javafp.parsec4j;
 
-import org.javafp.data.Chr;
-import org.javafp.data.Functions.*;
+import org.javafp.util.Chr;
+import org.javafp.util.Functions.*;
 
 import static org.javafp.parsec4j.Text.*;
 
