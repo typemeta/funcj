@@ -1,4 +1,4 @@
-package org.javafp.data;
+package org.javafp.util;
 
 import org.javafp.util.Unit;
 import org.junit.*;

@@ -4,10 +4,9 @@ public final class Chr implements Comparable<Chr> {
 
     private static final int N = 128;
 
-    private static final Chr[] chrs;
+    private static final Chr[] chrs = new Chr[N];
 
     static {
-        chrs = new Chr[N];
         for (int i = 0; i != N; ++i) {
             chrs[i] = new Chr(i);
         }

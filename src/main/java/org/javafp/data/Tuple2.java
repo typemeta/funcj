@@ -30,6 +30,14 @@ final public class Tuple2<A, B> {
         return _2;
     }
 
+    public <C> Tuple2<C, B> with1(C c) {
+        return Tuple2.of(c, _2);
+    }
+
+    public <C> Tuple2<A, C> with2(C c) {
+        return Tuple2.of(_1, c);
+    }
+
     public <T> Tuple2<T, B> map1(F<A, T> f) {
         return of(f.apply(_1), _2);
     }
