@@ -6,7 +6,7 @@ package org.javafp.util;
 public abstract class FunctionsEx {
 
     /**
-     * Functions of arity 0.
+     * Function of arity 0.
      * @param <R> return type
      */
     @FunctionalInterface
@@ -23,7 +23,7 @@ public abstract class FunctionsEx {
     }
 
     /**
-     * Functions of arity 1.
+     * Function of arity 1.
      * @param <A> 1st argument type
      * @param <R> return type
      */
@@ -53,7 +53,7 @@ public abstract class FunctionsEx {
     }
 
     /**
-     * Functions of arity 2.
+     * Function of arity 2.
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <R> return type
@@ -96,7 +96,7 @@ public abstract class FunctionsEx {
     }
 
     /**
-     * Functions of arity 3.
+     * Function of arity 3.
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -132,7 +132,7 @@ public abstract class FunctionsEx {
     }
 
     /**
-     * Functions of arity 4.
+     * Function of arity 4.
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -173,7 +173,7 @@ public abstract class FunctionsEx {
     }
 
     /**
-     * Functions of arity 5.
+     * Function of arity 5.
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -219,7 +219,7 @@ public abstract class FunctionsEx {
     }
 
     /**
-     * Functions of arity 6.
+     * Function of arity 6.
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type

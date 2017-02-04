@@ -15,14 +15,14 @@ import java.util.function.*;
 public interface Try<T> {
 
     /**
-     * Create a Success object.
+     * Create a Success value.
      */
     static <T> Try<T> success(T value) {
         return new Success<T>(value);
     }
 
     /**
-     * Create a Failure object.
+     * Create a Failure value.
      */
     static <T> Try<T> failure(Exception error) {
         return new Failure<T>(error);
@@ -99,7 +99,7 @@ public interface Try<T> {
 
     /**
      * Functor function application.
-     * Apply the function to the value held within this result.
+     * If this is a success then apply the function to the value.
      */
     <R> Try<R> map(F<? super T, ? extends R> f);
 

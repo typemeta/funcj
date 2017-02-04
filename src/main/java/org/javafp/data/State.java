@@ -6,9 +6,9 @@ import org.javafp.util.Functions.F;
 import static org.javafp.util.Unit.UNIT;
 
 /**
- * Standard state monad.
- * Each State instance is a state processor that takes a state,
- * and produces a new state plus a result.
+ * State monad.
+ * Each State instance is a state processor that takes a state of type S,
+ * and produces a new state plus a result of type A.
  * @param <S> type of state
  * @param <A> type of result
  */
