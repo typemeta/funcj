@@ -7,6 +7,7 @@ public abstract class Functions {
 
     /**
      * Function of arity 0.
+     *
      * @param <R> return type
      */
     @FunctionalInterface
@@ -24,6 +25,7 @@ public abstract class Functions {
 
     /**
      * Function of arity 1.
+     *
      * @param <A> 1st argument type
      * @param <R> return type
      */
@@ -54,6 +56,7 @@ public abstract class Functions {
 
     /**
      * Function of arity 2.
+     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <R> return type
@@ -97,6 +100,7 @@ public abstract class Functions {
 
     /**
      * Function of arity 3.
+     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -104,7 +108,7 @@ public abstract class Functions {
      */
     @FunctionalInterface
     public interface F3<A, B, C, R> {
-        static <A, B, C, R> F3<A, B, C, R>of(F3<A, B, C, R> f) {
+        static <A, B, C, R> F3<A, B, C, R> of(F3<A, B, C, R> f) {
             return f;
         }
 
@@ -133,6 +137,7 @@ public abstract class Functions {
 
     /**
      * Function of arity 4.
+     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -174,6 +179,7 @@ public abstract class Functions {
 
     /**
      * Function of arity 5.
+     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -220,6 +226,7 @@ public abstract class Functions {
 
     /**
      * Function of arity 6.
+     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -271,6 +278,7 @@ public abstract class Functions {
 
     /**
      * Unary operator interface.
+     *
      * @param <T> operand type
      */
     @FunctionalInterface
@@ -280,10 +288,19 @@ public abstract class Functions {
 
     /**
      * Binary operator interface.
+     *
      * @param <T> operand type
      */
     @FunctionalInterface
     public interface Op2<T> extends F2<T, T, T> {
         T apply(T l, T r);
+    }
+
+    /**
+     * Predicate interface
+     */
+    @FunctionalInterface
+    public interface Predicate<T> extends F<T, Boolean> {
+        Boolean apply(T t);
     }
 }

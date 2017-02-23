@@ -295,4 +295,12 @@ public abstract class FunctionsGenEx {
     public interface Op2<T, X extends Exception> extends F2<T, T, T, X> {
         T apply(T l, T r) throws X;
     }
+
+    /**
+     * Predicate interface
+     */
+    @FunctionalInterface
+    public interface Predicate<T, X extends Exception> extends F<T, Boolean, X> {
+        Boolean apply(T t) throws X;
+    }
 }
