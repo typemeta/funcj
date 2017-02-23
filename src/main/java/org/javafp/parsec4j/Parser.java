@@ -20,6 +20,14 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
 
     interface Context<I> {
         Input<I> input();
+
+        default boolean isEof(int pos) {
+            return input().isEof(pos);
+        }
+
+        default I at(int pos) {
+            return input().at(pos);
+        }
     }
 
     class Ctx<I> implements Context<I> {
@@ -90,6 +98,11 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
         return this.and(plf).map((a, lf) -> lf.foldl((acc, f) -> f.apply(acc), a));
     }
 
+    static <I, CTX extends Parser.Context<I>, A>
+    Parser<I, CTX, A> of(F2<CTX, Integer, Result<I, A>> f) {
+        return f::apply;
+    }
+
     static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> fail() {
         return (ctx, pos) -> Result.failure(pos);
     }
@@ -146,6 +159,23 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
         };
     }
 
+    static <I, CTX extends Parser.Context<I>> Parser<I, CTX, I> value(I val) {
+        return value(val, val);
+    }
+
+    static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> value(I val, A res) {
+        return (ctx, pos) -> {
+            if (!ctx.input().isEof(pos)) {
+                final I i = ctx.input().at(pos);
+                if (i.equals(val)) {
+                    return Result.success(res, pos+1);
+                }
+            }
+
+            return Result.failure(pos);
+        };
+    }
+
     static <I, CTX extends Parser.Context<I>> Parser<I, CTX, I> any() {
         return (ctx, pos) ->
             ctx.input().isEof(pos) ?
@@ -153,6 +183,58 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
                 Result.success(ctx.input().at(pos), pos+1);
     }
 
+    static <I, CTX extends Parser.Context<I>, A>
+    Parser<I, CTX, IList<A>> many(Parser<I, CTX, A> p) {
+        return Impl.many(p).map(IList::reverse);
+    }
+
+    static <I, CTX extends Parser.Context<I>, A>
+    Parser<I, CTX, IList.NonEmpty<A>> many1(Parser<I, CTX, A> p) {
+        return p.and(Impl.many(p))
+                .map(a -> l -> l.add(a))
+                .map(IList.NonEmpty::reverse);
+    }
+
+    static <I, CTX extends Parser.Context<I>, A, SEP>
+    Parser<I, CTX, IList<A>> sepBy(Parser<I, CTX, A> p, Parser<I, CTX, SEP> sep) {
+        return sepBy1(p, sep).or(pure(IList.nil()));
+    }
+
+    static <I, CTX extends Parser.Context<I>, A, SEP>
+    Parser<I, CTX, IList<A>> sepBy1(Parser<I, CTX, A> p, Parser<I, CTX, SEP> sep) {
+        return many(p.andL(sep))
+            .or(p.map(IList::of));
+    }
+
+    static <I, CTX extends Parser.Context<I>, A>
+    Parser<I, CTX, Optional<A>> optional(Parser<I, CTX, A> p) {
+        return p.map(Optional::of).or(pure(Optional.empty()));
+    }
+
+    static <I, CTX extends Parser.Context<I>, A, OPEN, CLOSE>
+    Parser<I, CTX, A> between(
+            Parser<I, CTX, OPEN> open,
+            Parser<I, CTX, CLOSE> close,
+            Parser<I, CTX, A> p) {
+        return open.andR(p).andL(close);
+    }
+
+    static <I, CTX extends Parser.Context<I>, A>
+    Parser<I, CTX, A> choice(Parser<I, CTX, A>... ps) {
+        return choice(IList.ofArray(ps));
+    }
+
+    static <I, CTX extends Parser.Context<I>, A>
+    Parser<I, CTX, A> choice(IList<Parser<I, CTX, A>> ps) {
+        if (ps.tail().isEmpty()) {
+            return ps.head();
+        } else {
+            return ps.head().or(choice(ps.tail()));
+        }
+    }
+}
+
+abstract class Impl {
     static <I, CTX extends Parser.Context<I>, A>
     Parser<I, CTX, IList<A>> many(Parser<I, CTX, A> p) {
         return (ctx, pos) -> {
@@ -164,35 +246,9 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
                     acc = acc.add(succ.value);
                     pos = succ.next;
                 } else {
-                    return Result.success(acc.reverse(), pos);
+                    return Result.success(acc, pos);
                 }
             }
         };
-    }
-
-    static <I, CTX extends Parser.Context<I>, A>
-    Parser<I, CTX, IList.NonEmpty<A>> many1(Parser<I, CTX, A> p) {
-        return (ctx, pos) -> {
-            IList<A> acc = IList.of();
-            while (true) {
-                final Result<I, A> r = p.parse(ctx, pos);
-                if (r.isSuccess()) {
-                    final Result.Success<I, A> succ = (Result.Success<I, A>) r;
-                    acc = acc.add(succ.value);
-                    pos = succ.next;
-                } else {
-                    final int pos2 = pos;
-                    return acc.match(
-                        nel -> Result.success(nel.reverse(), pos2),
-                        empty -> Result.failure(pos2)
-                    );
-                }
-            }
-        };
-    }
-
-    static <I, CTX extends Parser.Context<I>, A>
-    Parser<I, CTX, Optional<A>> optional(Parser<I, CTX, A> p) {
-        return p.map(Optional::of).or(pure(Optional.empty()));
     }
 }

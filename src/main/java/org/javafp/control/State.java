@@ -1,5 +1,6 @@
-package org.javafp.data;
+package org.javafp.control;
 
+import org.javafp.data.Tuple2;
 import org.javafp.util.*;
 import org.javafp.util.Functions.F;
 

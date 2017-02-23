@@ -59,7 +59,7 @@ public abstract class Grammar {
             open.andR(expr).andL(close);
 
         final Parser<Chr, Ctx, Expr> var =
-            Text.<Ctx>alpha().map(c -> Model.varExpr(c.charValue()));
+            Text.<Ctx>alpha().map(c -> Model.varExpr(c));
 
         // funcN = name { args | ε }
         final Parser<Chr, Ctx, Expr> funcN =

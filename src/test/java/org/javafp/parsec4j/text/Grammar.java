@@ -1,5 +1,6 @@
 package org.javafp.parsec4j.text;
 
+import org.javafp.util.Chr;
 import org.javafp.util.Functions.Op2;
 import org.javafp.parsec4j.expr.Model;
 
@@ -13,9 +14,9 @@ public abstract class Grammar {
         // To get around circular references.
         final Ref<Expr> expr = Ref.of();
 
-        final Parser<Character> open = chr('(');
-        final Parser<Character> close = chr(')');
-        final Parser<Character> comma = chr(',');
+        final Parser<Chr> open = chr('(');
+        final Parser<Chr> close = chr(')');
+        final Parser<Chr> comma = chr(',');
 
         final Parser<UnaryOp> plus = chr('+').andR(pure(UnaryOp.POS));
         final Parser<UnaryOp> minus = chr('-').andR(pure(UnaryOp.NEG));

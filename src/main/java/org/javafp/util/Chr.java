@@ -1,5 +1,7 @@
 package org.javafp.util;
 
+import org.javafp.data.IList;
+
 public final class Chr implements Comparable<Chr> {
 
     private static final int N = 128;
@@ -56,8 +58,34 @@ public final class Chr implements Comparable<Chr> {
         return c == ' ' || c == '\t' || c == '\r' || c == '\n';
     }
 
+    public static int getNumericValue(Chr c) {
+        return getNumericValue(c.charValue());
+    }
+
     public static int getNumericValue(char d) {
         return d - '0';
+    }
+
+    /**
+     * Convert a list of Characters into a String.
+     */
+    public static String listToString(IList<Chr> l) {
+        final StringBuilder sb = new StringBuilder();
+        for (; !l.isEmpty(); l = l.tail()) {
+            sb.append(l.head().charValue());
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Convert a String into a list of Characters.
+     */
+    public static IList<Chr> listToString(String s) {
+        IList<Chr> r = IList.nil();
+        for (int i = s.length() - 1; i >= 0; --i) {
+            r = r.add(Chr.valueOf(s.charAt(i)));
+        }
+        return r;
     }
 
     private final char value;
@@ -88,6 +116,10 @@ public final class Chr implements Comparable<Chr> {
     public boolean equals(Object rhs) {
         return rhs instanceof Chr &&
             value == ((Chr) rhs).charValue();
+    }
+
+    public boolean equals(char rhs) {
+        return value == rhs;
     }
 
     @Override

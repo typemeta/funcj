@@ -1,5 +1,6 @@
 package org.javafp.util;
 
+import org.javafp.control.State;
 import org.javafp.data.*;
 
 public interface RNG {

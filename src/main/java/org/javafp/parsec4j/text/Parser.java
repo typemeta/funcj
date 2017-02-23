@@ -1,8 +1,8 @@
 package org.javafp.parsec4j.text;
 
+import org.javafp.util.*;
 import org.javafp.util.Functions.*;
 import org.javafp.data.*;
-import org.javafp.util.Unit;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -106,12 +106,12 @@ public interface Parser<A> {
             Result.failure(pos);
     }
 
-    static Parser<Character> satisfy(Predicate<Character> pred) {
+    static Parser<Chr> satisfy(Predicate<Chr> pred) {
         return (input, pos) -> {
             if (!input.isEof(pos)) {
-                final Character i = input.at(pos);
-                if (pred.test(i)) {
-                    return Result.success(i, pos+1);
+                final Chr c = Chr.valueOf(input.at(pos));
+                if (pred.test(c)) {
+                    return Result.success(c, pos+1);
                 }
             }
 
@@ -119,50 +119,88 @@ public interface Parser<A> {
         };
     }
 
-    static Parser<Character> any() {
+    static Parser<Character> value(char chr) {
+        return value(chr, chr);
+    }
+
+    static <A> Parser<A> value(char chr, A res) {
+        return (input, pos) -> {
+            if (!input.isEof(pos)) {
+                final char c = input.at(pos);
+                if (c == chr) {
+                    return Result.success(res, pos+1);
+                }
+            }
+
+            return Result.failure(pos);
+        };
+    }
+
+    static Parser<Chr> any() {
         return (input, pos) ->
             input.isEof(pos) ?
                 Result.failure(pos) :
-                Result.success(input.at(pos), pos+1);
+                Result.success(Chr.valueOf(input.at(pos)), pos+1);
     }
 
     static <A> Parser<IList<A>> many(Parser<A> p) {
-        return (input, pos) -> {
-            IList<A> acc = IList.of();
-            while (true) {
-                final Result<A> r = p.parse(input, pos);
-                if (r.isSuccess()) {
-                    final Result.Success<A> succ = (Result.Success<A>) r;
-                    acc = acc.add(succ.value);
-                    pos = succ.next;
-                } else {
-                    return Result.success(acc.reverse(), pos);
-                }
-            }
-        };
+        return Impl.many(p).map(IList::reverse);
     }
 
     static <A> Parser<IList.NonEmpty<A>> many1(Parser<A> p) {
-        return (input, pos) -> {
-            IList<A> acc = IList.of();
-            while (true) {
-                final Result<A> r = p.parse(input, pos);
-                if (r.isSuccess()) {
-                    final Result.Success<A> succ = (Result.Success<A>) r;
-                    acc = acc.add(succ.value);
-                    pos = succ.next;
-                } else {
-                    final int pos2 = pos;
-                    return acc.match(
-                        nel -> Result.success(nel.reverse(), pos2),
-                        empty -> Result.failure(pos2)
-                    );
-                }
-            }
-        };
+        return p.and(Impl.many(p))
+            .map(a -> l -> l.add(a))
+            .map(IList.NonEmpty::reverse);
+    }
+
+    static <A, SEP> Parser<IList<A>> sepBy(Parser<A> p, Parser<SEP> sep) {
+        return sepBy1(p, sep).or(pure(IList.nil()));
+    }
+
+    static <A, SEP> Parser<IList<A>> sepBy1(Parser<A> p, Parser<SEP> sep) {
+        return many(p.andL(sep))
+            .or(p.map(IList::of));
     }
 
     static <A> Parser<Optional<A>> optional(Parser<A> p) {
         return p.map(Optional::of).or(pure(Optional.empty()));
+    }
+
+    static <A, OPEN, CLOSE> Parser<A> between(
+            Parser<OPEN> open,
+            Parser<CLOSE> close,
+            Parser<A> p) {
+        return open.andR(p).andL(close);
+    }
+
+
+    static <A> Parser<A> choice(Parser<A>... ps) {
+        return choice(IList.ofArray(ps));
+    }
+
+    static <A> Parser<A> choice(IList<Parser<A>> ps) {
+        if (ps.tail().isEmpty()) {
+            return ps.head();
+        } else {
+            return ps.head().or(choice(ps.tail()));
+        }
+    }
+}
+
+abstract class Impl {
+    static <A> Parser<IList<A>> many(Parser<A> p) {
+        return (in, pos) -> {
+            IList<A> acc = IList.of();
+            while (true) {
+                final Result<A> r = p.parse(in, pos);
+                if (r.isSuccess()) {
+                    final Result.Success<A> succ = (Result.Success<A>) r;
+                    acc = acc.add(succ.value);
+                    pos = succ.next;
+                } else {
+                    return Result.success(acc, pos);
+                }
+            }
+        };
     }
 }

@@ -32,7 +32,7 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Construct a list with on element.
+     * Construct a list with one element.
      * @param <T> element type
      */
     public static <T> NonEmpty<T> of(T elem) {
@@ -44,23 +44,31 @@ public abstract class IList<T> implements Iterable<T> {
      * @param <T> element type
      */
     public static <T> NonEmpty<T> of(T... elems) {
-        IList<T> r = nil();
-        for (int i = elems.length - 1; i >= 0; --i) {
-            r = r.add(Objects.requireNonNull(elems[i]));
-        }
-        return (NonEmpty<T>)r;
+        return (NonEmpty<T>)ofArray(elems);
     }
 
     /**
      * Construct a list from an Iterable.
      * @param <T> element type
      */
-    public static <T> IList<T> of(Iterable<T> elems) {
+    public static <T> IList<T> ofIterable(Iterable<T> elems) {
         IList<T> r = nil();
         for (T elem : elems) {
-            r = r.add(Objects.requireNonNull(elem));
+            r = r.add(elem);
         }
         return r.reverse();
+    }
+
+    /**
+     * Construct a list from an array.
+     * @param <T> element type
+     */
+    public static <T> IList<T> ofArray(T[] elems) {
+        IList<T> r = nil();
+        for (int i = elems.length-1; i >= 0; --i) {
+            r = r.add(elems[i]);
+        }
+        return r;
     }
 
     /**

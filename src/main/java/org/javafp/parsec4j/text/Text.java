@@ -1,38 +1,40 @@
 package org.javafp.parsec4j.text;
 
+import org.javafp.util.Chr;
+
 import static org.javafp.parsec4j.text.Parser.*;
 
 public class Text {
-    public static Parser<Character> anyChar() {
+    public static Parser<Chr> anyChar() {
         return any();
     }
 
-    public static Parser<Character> chr(char c) {
-        return satisfy(cc -> cc == c);
+    public static Parser<Chr> chr(char c) {
+        return satisfy(cc -> cc.equals(c));
     }
 
-    public static Parser<Character> notChr(char c) {
-        return satisfy(cc -> cc != c);
+    public static Parser<Chr> notChr(char c) {
+        return satisfy(cc -> !cc.equals(c));
     }
 
-    public static Parser<Character> alpha() {
-        return satisfy(Character::isLetter);
+    public static Parser<Chr> alpha() {
+        return satisfy(Chr::isLetter);
     }
 
-    public static Parser<Character> digit() {
-        return satisfy(Character::isDigit);
+    public static Parser<Chr> digit() {
+        return satisfy(Chr::isDigit);
     }
 
-    public static Parser<Character> alphaNum() {
-        return satisfy(Character::isLetterOrDigit);
+    public static Parser<Chr> alphaNum() {
+        return satisfy(Chr::isLetterOrDigit);
     }
 
-    public static Parser<Character> ws() {
-        return satisfy(Character::isWhitespace);
+    public static Parser<Chr> ws() {
+        return satisfy(Chr::isWhitespace);
     }
 
-    private static int digitToInt(char d) {
-        return Character.getNumericValue(d);
+    private static int digitToInt(Chr d) {
+        return Chr.getNumericValue(d);
     }
 
     public static Parser<Integer> uintr() {
@@ -41,9 +43,9 @@ public class Text {
     }
 
     public static Parser<Integer> intr() {
-        return chr('+').or(chr('-')).or(pure('+'))
+        return chr('+').or(chr('-')).or(pure(Chr.valueOf('+')))
             .and(uintr())
-            .map((sign, i) -> sign == '+' ? i : -i);
+            .map((sign, i) -> sign.charValue() == '+' ? i : -i);
     }
 
     public static Parser<Double> floating() {

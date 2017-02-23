@@ -1,6 +1,6 @@
 package org.javafp.parsec4j.expr;
 
-import org.javafp.util.Functions;
+import org.javafp.util.*;
 
 /**
  * A model for simple mathematical expressions.
@@ -11,7 +11,7 @@ public class Model {
         return new NumExpr(val, units);
     }
 
-    public static Expr varExpr(Character name) {
+    public static Expr varExpr(Chr name) {
         return new VarExpr(name);
     }
 
@@ -72,9 +72,9 @@ public class Model {
 
     public static class VarExpr extends Expr {
 
-        public final Character name;
+        public final Chr name;
 
-        public VarExpr(Character name) {
+        public VarExpr(Chr name) {
             this.name = name;
         }
 

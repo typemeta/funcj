@@ -1,5 +1,6 @@
 package org.javafp.data;
 
+import org.javafp.control.State;
 import org.junit.*;
 
 public class StateTest {

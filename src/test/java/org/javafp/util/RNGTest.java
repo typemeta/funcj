@@ -1,6 +1,6 @@
 package org.javafp.util;
 
-import org.javafp.data.State;
+import org.javafp.control.State;
 import org.junit.*;
 
 public class RNGTest {
