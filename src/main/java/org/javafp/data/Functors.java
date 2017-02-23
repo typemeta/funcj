@@ -14,7 +14,7 @@ public abstract class Functors {
      */
     public static <A, B> B[] map(A[] from, Functions.F<A, B> f, B[] to) {
         final int l = from.length;
-        if (l != from.length) {
+        if (to.length != l) {
             final Class<?> type = to.getClass();
             to = (type == Object[].class)
                 ? (B[]) new Object[l]
