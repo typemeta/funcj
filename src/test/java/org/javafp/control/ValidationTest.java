@@ -32,7 +32,7 @@ public class ValidationTest {
             parseInt("1234")
                 .and(parseDbl("1.2z"))
                 .map(i -> d -> i+d);
-        Assert.assertTrue("Validation is failure", r.isFailure());
+        Assert.assertFalse("Validation is failure", r.isSuccess());
     }
 
     @Test
@@ -41,7 +41,7 @@ public class ValidationTest {
             parseInt("1234z")
                 .and(parseDbl("1.2"))
                 .map(i -> d -> i+d);
-        Assert.assertTrue("Validation is failure", r.isFailure());
+        Assert.assertFalse("Validation is failure", r.isSuccess());
     }
 
     @Test
@@ -50,6 +50,6 @@ public class ValidationTest {
             parseInt("1234z")
                 .and(parseDbl("1.2z"))
                 .map(i -> d -> i+d);
-        Assert.assertTrue("Validation is failure", r.isFailure());
+        Assert.assertFalse("Validation is failure", r.isSuccess());
     }
 }

@@ -42,8 +42,6 @@ public interface Either<A, B> {
         );
     }
 
-    boolean isLeft();
-
     boolean isRight();
 
     Optional<A> left();
@@ -69,11 +67,6 @@ public interface Either<A, B> {
 
         private Right(B value) {
             this.value = Objects.requireNonNull(value);
-        }
-
-        @Override
-        public boolean isLeft() {
-            return false;
         }
 
         @Override
@@ -122,11 +115,6 @@ public interface Either<A, B> {
 
         private Left(A value) {
             this.value = Objects.requireNonNull(value);
-        }
-
-        @Override
-        public boolean isLeft() {
-            return true;
         }
 
         @Override

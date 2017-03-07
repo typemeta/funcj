@@ -32,8 +32,6 @@ public interface Validation<E, T> {
         return va.apply(vf);
     }
 
-    boolean isFailure();
-
     boolean isSuccess();
 
     void handle(Consumer<Success<E, T>> success, Consumer<Failure<E, T>> failure);
@@ -55,11 +53,6 @@ public interface Validation<E, T> {
 
         public Success(T value) {
             this.value = value;
-        }
-
-        @Override
-        public boolean isFailure() {
-            return false;
         }
 
         @Override
@@ -98,11 +91,6 @@ public interface Validation<E, T> {
 
         public Failure(IList<E> errors) {
             this.errors = errors;
-        }
-
-        @Override
-        public boolean isFailure() {
-            return true;
         }
 
         @Override
