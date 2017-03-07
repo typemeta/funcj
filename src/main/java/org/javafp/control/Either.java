@@ -64,8 +64,6 @@ public interface Either<A, B> {
 
     <T> Either<A, T> flatMap(F<? super B, Either<A, T>> f);
 
-    Either<B, A> swap();
-
     final class Right<A, B> implements Either<A, B> {
         public final B value;
 
@@ -116,11 +114,6 @@ public interface Either<A, B> {
         @Override
         public <T> Either<A, T> flatMap(F<? super B, Either<A, T>> f) {
             return f.apply(value);
-        }
-
-        @Override
-        public Either<B, A> swap() {
-            return Either.left(value);
         }
     }
 
@@ -174,11 +167,6 @@ public interface Either<A, B> {
         @Override
         public <T> Either<A, T> flatMap(F<? super B, Either<A, T>> f) {
             return cast();
-        }
-
-        @Override
-        public Either<B, A> swap() {
-            return Either.right(value);
         }
 
         private <C> Either<A, C> cast() {

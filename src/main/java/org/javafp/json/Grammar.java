@@ -39,7 +39,6 @@ public class Grammar {
     static {
         final Ref<Token, Ctx<Token>, Node> node = Ref.of();
 
-
         final Parser<Token, Ctx<Token>, Node> nulN =
             Parser.value(Token.TokenImpl.NULL, Node.NullNode.NULL);
         final Parser<Token, Ctx<Token>, Node> boolT =
@@ -58,7 +57,6 @@ public class Grammar {
             Parser.value(Token.TokenImpl.LEFT_BRACE);
         final Parser<Token, Ctx<Token>, Token> RIGHT_BRACE =
             Parser.value(Token.TokenImpl.RIGHT_BRACE);
-
 
         final Parser<Token, Ctx<Token>, Node> boolN = boolT.or(boolF);
 

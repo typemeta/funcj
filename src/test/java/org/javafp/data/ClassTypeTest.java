@@ -27,7 +27,7 @@ public class ClassTypeTest {
         final Object test = "test";
         assertTrue(
             ClassType.of(String.class)
-                .cast(test, "test"::equals, x -> false)
+                .match(test, "test"::equals, x -> false)
         );
     }
 
@@ -36,7 +36,7 @@ public class ClassTypeTest {
         final Object test = 1.234;
         assertFalse(
             ClassType.of(String.class)
-                .cast(test, "test"::equals, x -> false)
+                .match(test, "test"::equals, x -> false)
         );
     }
 }

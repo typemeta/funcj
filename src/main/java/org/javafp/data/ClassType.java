@@ -24,7 +24,7 @@ public class ClassType<T> {
         }
     }
 
-    public <S, R> R cast(S value, F<T, R> success, F<S, R> fail) {
+    public <S, R> R match(S value, F<T, R> success, F<S, R> fail) {
         if (clazz.isAssignableFrom(value.getClass())) {
             return success.apply((T)value);
         } else {
