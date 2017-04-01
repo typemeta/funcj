@@ -27,7 +27,7 @@ public interface Either<A, B> {
      */
     static <T, A, B> Either<A, IList<B>> traverse(IList<T> lt, F<T, Either<A, B>> f) {
         return lt.foldr(
-            (t, elt) -> f.apply(t).apply(elt.apply(l -> l::add)),
+            (t, elt) -> f.apply(t).apply(elt.map(l -> l::add)),
             right(IList.nil())
         );
     }
@@ -37,7 +37,7 @@ public interface Either<A, B> {
      */
     static <A, B> Either<A, IList<B>> sequence(IList<Either<A, B>> le) {
         return le.foldr(
-            (et, elt) -> et.apply(elt.apply(l -> l::add)),
+            (et, elt) -> et.apply(elt.map(l -> l::add)),
             right(IList.nil())
         );
     }
@@ -55,10 +55,6 @@ public interface Either<A, B> {
     <T> Either<A, T> map(F<? super B, ? extends T> f);
 
     <C> Either<A, C> apply(Either<A, F<B, C>> ef);
-
-    default <C> Either<A, C> apply(F<B, C> f) {
-        return apply(right(f));
-    }
 
     <T> Either<A, T> flatMap(F<? super B, Either<A, T>> f);
 

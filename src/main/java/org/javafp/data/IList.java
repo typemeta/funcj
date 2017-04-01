@@ -549,7 +549,7 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public <U> U foldr(F2<T, U, U> f, U z) {
-            return f.apply(head, tail.foldr(f, z));
+            return reverse().foldl(f.flip(), z);
         }
 
         @Override

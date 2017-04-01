@@ -53,7 +53,7 @@ public interface Try<T> {
      */
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
         return lt.foldr(
-                (t, tlt) -> f.apply(t).apply(tlt.apply(l -> l::add)),
+                (t, tlt) -> f.apply(t).apply(tlt.map(l -> l::add)),
                 success(IList.nil())
         );
     }
@@ -63,7 +63,7 @@ public interface Try<T> {
      */
     static <T> Try<IList<T>> sequence(IList<Try<T>> lt) {
         return lt.foldr(
-            (tt, tlt) -> tt.apply(tlt.apply(l -> l::add)),
+            (tt, tlt) -> tt.apply(tlt.map(l -> l::add)),
             success(IList.nil())
         );
     }
@@ -106,10 +106,6 @@ public interface Try<T> {
 
     <R> Try<R> apply(Try<F<T, R>> tf);
 
-    default <R> Try<R> apply(F<T, R> f) {
-        return apply(success(f));
-    }
-
     /**
      * If this is a success then apply the function to the value and return the result,
      * Otherwise return the failure result.
@@ -120,7 +116,7 @@ public interface Try<T> {
      * Variant of flatMap which ignores the supplied value.
      */
     default <R> Try<R> flatMap(F0<Try<R>> f) {
-        return flatMap(unused -> f.apply());
+        return flatMap(u -> f.apply());
     }
 
     /**

@@ -5,8 +5,8 @@ import org.javafp.data.*;
 
 public interface RNG {
 
-    static XorShiftRNG xorShiftRNG(long seed) {
-        return new XorShiftRNG(seed);
+    static RNG xorShiftRNG(long seed) {
+        return new Utils.XorShiftRNG(seed);
     }
 
     static State<RNG, Double> nextDbl() {
@@ -18,7 +18,7 @@ public interface RNG {
     }
 
     /**
-     * @return a random double in the range 0 to 1 inclusive.
+     * @return a random double value in the range 0 to 1 inclusive.
      */
     default Tuple2<RNG, Double> nextDouble0To1() {
         final Tuple2<RNG, Long> rngLng = nextLong();
@@ -27,7 +27,7 @@ public interface RNG {
     }
 
     /**
-     * @return a random double in the range 0 to 1 inclusive.
+     * @return a random long value.
      */
     default Tuple2<RNG, Long> nextLong() {
         final Tuple2<RNG, Double> rngDbl = nextDouble0To1();
@@ -35,7 +35,12 @@ public interface RNG {
         return rngDbl.with2(l);
     }
 
-    class XorShiftRNG implements RNG {
+}
+
+class Utils {
+    final static double SCALE = (double)Long.MAX_VALUE - (double)Long.MIN_VALUE + 1.0;
+
+    protected static class XorShiftRNG implements RNG {
         public final long seed;
 
         public XorShiftRNG(long seed) {
@@ -51,8 +56,4 @@ public interface RNG {
             return Tuple2.of(new XorShiftRNG(d), d * 2685821657736338717L);
         }
     }
-}
-
-class Utils {
-    final static double SCALE = (double)Long.MAX_VALUE - (double)Long.MIN_VALUE + 1.0;
 }

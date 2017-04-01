@@ -1,6 +1,6 @@
 package org.javafp.control;
 
-import org.javafp.data.Tuple2;
+import org.javafp.data.*;
 import org.javafp.util.*;
 import org.javafp.util.Functions.F;
 
@@ -40,7 +40,42 @@ public interface State<S, A> {
         );
     }
 
+    /**
+     * Standard applicative traversal.
+     */
+    static <S, A, B> State<S, IList<B>> traverse(IList<A> lt, F<A, State<S, B>> f) {
+        return lt.foldr(
+            (a, slb) -> f.apply(a).apply(slb.map(l -> l::add)),
+            result(IList.nil())
+        );
+    }
+
+    /**
+     * Standard applicative sequencing.
+     */
+    static <S, A> State<S, IList<A>> sequence(IList<? extends State<S, A>> lsa) {
+        return lsa.foldr(
+            (sa, sla) -> sa.apply(sla.map(l -> l::add)),
+            result(IList.nil())
+        );
+    }
+
     Tuple2<S, A> runState(S state);
+
+    default <B> State<S, B> map(F<? super A, ? extends B> f) {
+        return st -> {
+            final Tuple2<S, A> t2 = runState(st);
+            return t2.with2(f.apply(t2._2));
+        };
+    }
+
+    default <B> State<S, B> apply(State<S, F<A, B>> sf) {
+        return st -> {
+            final Tuple2<S, F<A, B>> t2F = sf.runState(st);
+            final Tuple2<S, A> t2A = this.runState(t2F._1);
+            return Tuple2.of(t2A._1, t2F._2.apply(t2A._2));
+        };
+    }
 
     default <B> State<S, B> flatMap(F<A, State<S, B>> f) {
         return st -> {
