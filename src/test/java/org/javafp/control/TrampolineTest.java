@@ -1,20 +1,29 @@
 package org.javafp.control;
 
-import org.junit.Test;
+import org.junit.*;
 
 public class TrampolineTest {
     @Test
-    public void test() {
-        int i = count(65536);
+    public void testCount() {
+        final int N = 65536;
+        int i = count(N);
 
-        System.out.println(i);
+        Assert.assertEquals("Count", N, i);
     }
 
-    public static int factorial(final int n) {
+    @Test
+    public void testFactorial() {
+        final int N = 5;
+        int i = factorial(5);
+
+        Assert.assertEquals("Factorial", 120, i);
+    }
+
+    private static int factorial(final int n) {
         return factorial(n, 1).compute();
     }
 
-    public static Trampoline<Integer> factorial(final int n, final int sum) {
+    private static Trampoline<Integer> factorial(final int n, final int sum) {
         if (n == 1) {
             return Trampoline.done(sum);
         } else {
@@ -22,11 +31,11 @@ public class TrampolineTest {
         }
     }
 
-    public static int count(final int n) {
+    private static int count(final int n) {
         return count(n, 1).compute();
     }
 
-    public static Trampoline<Integer> count(final int n, final int sum) {
+    private static Trampoline<Integer> count(final int n, final int sum) {
         if (n == 1) {
             return Trampoline.done(sum);
         } else {
