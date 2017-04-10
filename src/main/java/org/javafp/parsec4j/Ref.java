@@ -9,17 +9,27 @@ public class Ref<I, CTX extends Context<I>, A>
         implements Parser<I, CTX, A> {
 
     public static <I, CTX extends Context<I>, A> Ref<I, CTX, A> of() {
-        return new org.javafp.parsec4j.Ref<I, CTX, A>();
+        return new Ref<I, CTX, A>();
     }
 
     public static <I, CTX extends Context<I>, A> Ref<I, CTX, A> of(Parser<I, CTX, A> p) {
-        return new org.javafp.parsec4j.Ref<I, CTX, A>(p);
+        return new Ref<I, CTX, A>(p);
     }
 
     private enum Null implements Parser<Unit, Context<Unit>, Unit> {
         INSTANCE {
+            @Override
+            public boolean acceptsEmpty() {
+                throw new RuntimeException("Uninitialised lazy Parser reference");
+            }
+
+            @Override
+            public SymSet<Unit> firstSet() {
+                throw new RuntimeException("Uninitialised lazy Parser reference");
+            }
+
             public Result<Unit, Unit> parse(Context<Unit> ctx, int pos) {
-                throw new RuntimeException("Null Parser Reference");
+                throw new RuntimeException("Uninitialised lazy Parser reference");
             }
         };
 
@@ -45,6 +55,16 @@ public class Ref<I, CTX extends Context<I>, A>
             this.impl = Objects.requireNonNull(impl);
             return this;
         }
+    }
+
+    @Override
+    public boolean acceptsEmpty() {
+        return impl.acceptsEmpty();
+    }
+
+    @Override
+    public SymSet<I> firstSet() {
+        return impl.firstSet();
     }
 
     @Override

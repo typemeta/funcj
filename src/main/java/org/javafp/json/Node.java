@@ -8,6 +8,10 @@ import java.util.*;
 import static java.util.stream.Collectors.toMap;
 
 public interface Node {
+    static NullNode nul() {
+        return NullNode.NULL;
+    }
+
     static BoolNode bool(boolean value) {
         return value ? BoolNode.TRUE : BoolNode.FALSE;
     }
@@ -106,9 +110,7 @@ public interface Node {
 
         @Override
         public StringBuilder toJson(StringBuilder sb) {
-            sb.append("\"");
-            Utils.escape(value, sb);
-            return sb.append("\"");
+            return Utils.string(value, sb);
         }
 
         @Override
@@ -162,7 +164,7 @@ public interface Node {
                 } else {
                     sb.append(',');
                 }
-                sb.append(en.getKey()).append(':');
+                Utils.string(en.getKey(), sb).append(':');
                 en.getValue().toJson(sb);
             }
             return sb.append('}');
@@ -206,6 +208,12 @@ public interface Node {
 }
 
 class Utils {
+    static StringBuilder string(String s, StringBuilder sb) {
+        sb.append('"');
+        escape(s, sb);
+        return sb.append('"');
+    }
+
     static StringBuilder escape(String s, StringBuilder sb) {
         final int len = s.length();
         for (int i = 0; i < len; ++i) {

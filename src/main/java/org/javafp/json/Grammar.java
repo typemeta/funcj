@@ -2,92 +2,163 @@ package org.javafp.json;
 
 import org.javafp.data.*;
 import org.javafp.parsec4j.*;
-import org.javafp.parsec4j.Parser.Ctx;
-import org.javafp.util.Functions;
-import org.javafp.util.Functions.F2;
+import org.javafp.util.Chr;
+
+import java.util.*;
 
 import static org.javafp.parsec4j.Parser.*;
+import static org.javafp.parsec4j.Text.*;
 
+/**
+ * A grammar for JSON.
+ * Adapted from the Haskell Parsec-based JSON parser:
+ * https://hackage.haskell.org/package/json
+ */
 public class Grammar {
-
-    private static <T> T match(
-            Token token,
-            Functions.F<Token.TokenImpl, T> tokenImpl,
-            Functions.F<Token.Num, T> num,
-            Functions.F<Token.Str, T> str) {
-        return token.match(tokenImpl, num, str);
+    private static <T> Parser<Chr, Ctx<Chr>, T> tok(Parser<Chr, Ctx<Chr>, T> p) {
+        return p.andL(skipMany(ws()));
     }
 
-    private static Result<Token, Double> num(Ctx<Token> ctx, int pos) {
-        return match(
-            ctx.at(pos),
-            ti -> Result.failure(pos),
-            n -> Result.success(n.value, pos+1),
-            s -> Result.failure(pos)
-        );
+    private static LinkedHashMap<String, Node> toMap(IList<Tuple2<String, Node>> fields) {
+        final LinkedHashMap<String, Node> map = new LinkedHashMap<String, Node>();
+        fields.forEach(field -> map.put(field._1, field._2));
+        return map;
     }
 
-    private static Result<Token, String> str(Ctx<Token> ctx, int pos) {
-        return match(
-            ctx.at(pos),
-            ti -> Result.failure(pos),
-            n -> Result.failure(pos),
-            s -> Result.success(s.value, pos+1)
-        );
+    private static String listToString(IList<Chr> l) {
+        final StringBuilder sb = new StringBuilder();
+        for (; !l.isEmpty(); l = l.tail()) {
+            sb.append(l.head().charValue());
+        }
+        return sb.toString();
     }
 
     static {
-        final Ref<Token, Ctx<Token>, Node> node = Ref.of();
+        final Parser<Chr, Ctx<Chr>, Node> jnull = tok(string("null")).andR(pure(Node.nul()));
 
-        final Parser<Token, Ctx<Token>, Node> nulN =
-            Parser.value(Token.TokenImpl.NULL, Node.NullNode.NULL);
-        final Parser<Token, Ctx<Token>, Node> boolT =
-            Parser.value(Token.TokenImpl.TRUE, Node.BoolNode.TRUE);
-        final Parser<Token, Ctx<Token>, Node> boolF =
-            Parser.value(Token.TokenImpl.FALSE, Node.BoolNode.FALSE);
-        final Parser<Token, Ctx<Token>, Token> LEFT_SQR_BR =
-            Parser.value(Token.TokenImpl.LEFT_SQR_BR);
-        final Parser<Token, Ctx<Token>, Token> RIGHT_SQR_BR =
-            Parser.value(Token.TokenImpl.RIGHT_SQR_BR);
-        final Parser<Token, Ctx<Token>, Token> COMMA =
-            Parser.value(Token.TokenImpl.COMMA);
-        final Parser<Token, Ctx<Token>, Token> COLON =
-            Parser.value(Token.TokenImpl.COLON);
-        final Parser<Token, Ctx<Token>, Token> LEFT_BRACE =
-            Parser.value(Token.TokenImpl.LEFT_BRACE);
-        final Parser<Token, Ctx<Token>, Token> RIGHT_BRACE =
-            Parser.value(Token.TokenImpl.RIGHT_BRACE);
+        final Parser<Chr, Ctx<Chr>, Boolean> jtrue = tok(string("true")).andR(pure(Boolean.TRUE));
+        final Parser<Chr, Ctx<Chr>, Boolean> jfalse = tok(string("false")).andR(pure(Boolean.FALSE));
 
-        final Parser<Token, Ctx<Token>, Node> boolN = boolT.or(boolF);
+        final Parser<Chr, Ctx<Chr>, Node> jbool = tok(jtrue.or(jfalse)).map(Node::bool);
 
-        final Parser<Token, Ctx<Token>, Node> numN =
-            (ctx, pos) -> num(ctx, pos).map(Node::number);
+        final Parser<Chr, Ctx<Chr>, Node> jnumber = tok(dble()).map(Node::number);
 
-        final Parser<Token, Ctx<Token>, Node> strN =
-            (ctx, pos) -> str(ctx, pos).map(Node::string);
+        final Parser<Chr, Ctx<Chr>, Byte> hexDigit =
+            choice(
+                value(Chr.valueOf('0'), (byte)0),
+                value(Chr.valueOf('1'), (byte)1),
+                value(Chr.valueOf('2'), (byte)2),
+                value(Chr.valueOf('3'), (byte)3),
+                value(Chr.valueOf('4'), (byte)4),
+                value(Chr.valueOf('5'), (byte)5),
+                value(Chr.valueOf('6'), (byte)6),
+                value(Chr.valueOf('7'), (byte)7),
+                value(Chr.valueOf('8'), (byte)8),
+                value(Chr.valueOf('9'), (byte)9),
+                value(Chr.valueOf('a'), (byte)10),
+                value(Chr.valueOf('A'), (byte)10),
+                value(Chr.valueOf('b'), (byte)11),
+                value(Chr.valueOf('B'), (byte)11),
+                value(Chr.valueOf('c'), (byte)12),
+                value(Chr.valueOf('C'), (byte)12),
+                value(Chr.valueOf('d'), (byte)13),
+                value(Chr.valueOf('D'), (byte)13),
+                value(Chr.valueOf('e'), (byte)14),
+                value(Chr.valueOf('E'), (byte)14),
+                value(Chr.valueOf('f'), (byte)15),
+                value(Chr.valueOf('F'), (byte)15)
+            );
 
-        final Parser<Token, Ctx<Token>, Node> arrN =
+        final Parser<Chr, Ctx<Chr>, Chr> uni =
+            hexDigit
+                .and(hexDigit)
+                .and(hexDigit)
+                .and(hexDigit)
+                .map((d0, d1, d2, d3) -> (d0 << 0x3) & (d1 << 0x2) & (d2 << 0x1) & d0)
+                .map(Chr::valueOf);
+
+        final Parser<Chr, Ctx<Chr>, Chr> uChr = chr('u');
+        final Parser<Chr, Ctx<Chr>, Chr> bsChr = chr('\\');
+        final Parser<Chr, Ctx<Chr>, Chr> dqChr = chr('"');
+
+        final Parser<Chr, Ctx<Chr>, Chr> esc =
+            choice(
+                dqChr,
+                bsChr,
+                chr('/'),
+                value(Chr.valueOf('b'), Chr.valueOf('\b')),
+                value(Chr.valueOf('f'), Chr.valueOf('\f')),
+                value(Chr.valueOf('n'), Chr.valueOf('\n')),
+                value(Chr.valueOf('r'), Chr.valueOf('\r')),
+                value(Chr.valueOf('t'), Chr.valueOf('\t')),
+                uChr.andR(uni)
+            );
+
+        final Parser<Chr, Ctx<Chr>, Chr> stringChar =
+            (
+                bsChr.andR(esc)
+            ).or(
+                satisfy(c -> !c.equals('"') && !c.equals('\\'))
+            );
+
+        final Parser<Chr, Ctx<Chr>, String> jstring =
+            tok(between(
+                dqChr,
+                dqChr,
+                many(stringChar).map(Grammar::listToString)
+            ));
+
+        final Parser<Chr, Ctx<Chr>, Node> jtext =
+            jstring.map(Node::string);
+
+        final Ref<Chr, Ctx<Chr>, Node> jvalue = Ref.of();
+
+        final Parser<Chr, Ctx<Chr>, Node> jarray =
             between(
-                LEFT_SQR_BR,
-                RIGHT_SQR_BR,
-                sepBy(node, COMMA)
+                tok(chr('[')),
+                tok(chr(']')),
+                sepBy(
+                    jvalue,
+                    tok(chr(','))
+                )
             ).map(Node::array);
 
-        final Parser<Token, Ctx<Token>, Tuple2<String, Node>> field =
-            Parser.of(Grammar::str)
-                .andL(COLON)
-                .and(node)
-                .map(F2.of(Tuple2::of));
+        final Parser<Chr, Ctx<Chr>, Tuple2<String, Node>> jfield =
+            (jstring
+                .andL(tok(chr(':')))
+                .and(jvalue)
+                .map(Tuple2::new)
+            );
 
-        final Parser<Token, Ctx<Token>, Node> objN =
+        final Parser<Chr, Ctx<Chr>, Node> jobject =
             between(
-                LEFT_BRACE,
-                RIGHT_BRACE,
-                sepBy(field, COMMA)
-            ).map(Node::object);
+                tok(chr('{')),
+                tok(chr('}')),
+                sepBy(
+                    jfield,
+                    tok(chr(','))
+                ).map(lf -> Node.object(toMap(lf)))
+            );
 
-        node.set(
-            choice(nulN, boolN, numN, strN, arrN, objN)
+        jvalue.set(
+            choice(
+                jnull,
+                jbool,
+                jnumber,
+                jtext,
+                jarray,
+                jobject
+            )
         );
+
+        parser = tok(jvalue);
+    }
+
+    public static final Parser<Chr, Ctx<Chr>, Node> parser;
+
+    public static Result<Chr, Node> parse(String str) {
+        //return parser.run(new Ctx<>(Input.of(str)));
+        return skipMany(Text.<Ctx<Chr>>ws()).andR(parser).run(new Ctx<>(Input.of(str)));
     }
 }
+

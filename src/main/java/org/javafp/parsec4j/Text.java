@@ -12,12 +12,7 @@ public class Text {
 
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Chr> chr(char c) {
-        return satisfy(cc -> cc.charValue() == c);
-    }
-
-    public static <CTX extends Parser.Context<Chr>>
-    Parser<Chr, CTX, Chr> notChr(char c) {
-        return satisfy(cc -> cc.charValue() != c);
+        return value(new Chr(c));
     }
 
     public static <CTX extends Parser.Context<Chr>>
@@ -51,7 +46,7 @@ public class Text {
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Integer> uintr() {
         return many1(Text.<CTX>digit().map(Text::digitToInt))
-            .map(l -> l.foldl1((x, acc) -> x * 10 + acc));
+            .map(l -> l.foldl1((x, acc) -> x + acc * 10));
     }
 
     public static <CTX extends Parser.Context<Chr>>
@@ -79,17 +74,30 @@ public class Text {
             case 0: return fail();
             case 1: return Text.<CTX>chr(s.charAt(0)).map(Object::toString);
             default: {
-                return (ctx, pos) -> {
-                    int pos2 = pos;
-                    for (int i = 0; i < s.length(); ++i) {
-                        if (ctx.input().isEof(pos2) || ctx.input().at(pos2).charValue() != s.charAt(i)) {
-                            return Result.failure(pos);
-                        } else {
-                            pos2 = pos2+1;
-                        }
+                return new ParserImpl<Chr, CTX, String>() {
+                    @Override
+                    public boolean acceptsEmpty() {
+                        return false;
                     }
 
-                    return Result.success(s, pos2);
+                    @Override
+                    public SymSet<Chr> firstSetCalc() {
+                        return SymSet.value(Chr.valueOf(s.charAt(0)));
+                    }
+
+                    @Override
+                    public Result<Chr, String> parse(CTX ctx, int pos) {
+                        int pos2 = pos;
+                        for (int i = 0; i < s.length(); ++i) {
+                            if (ctx.input().isEof(pos2) || ctx.input().at(pos2).charValue() != s.charAt(i)) {
+                                return Result.failure(pos);
+                            } else {
+                                pos2 = pos2+1;
+                            }
+                        }
+
+                        return Result.success(s, pos2);
+                    }
                 };
             }
         }

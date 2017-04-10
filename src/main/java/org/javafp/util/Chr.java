@@ -21,6 +21,10 @@ public final class Chr implements Comparable<Chr> {
         return c < N ? chrs[c] : new Chr(c);
     }
 
+    public static Chr valueOf(int c) {
+        return c < N ? chrs[c] : new Chr(c);
+    }
+
     public static boolean isLetterOrDigit(Chr c) {
         return isLetterOrDigit(c.charValue());
     }
@@ -67,6 +71,37 @@ public final class Chr implements Comparable<Chr> {
 
     public static int getNumericValue(char d) {
         return d - '0';
+    }
+
+    private static final int ERROR = -1;
+
+    public static int digit(char digit, int radix) {
+        if (radix <= 10) {
+            final int r = digit - '0';
+            if (r < radix) {
+                return r;
+            } else {
+                return ERROR;
+            }
+        } else {
+            final int r;
+
+            if ('0' <= digit && digit <= '9') {
+                return digit - '0';
+            } else if ('a' <= digit && digit <= 'z') {
+                r = digit - 'a';
+            } else if ('A' <= digit && digit <= 'Z') {
+                r = digit - 'A';
+            } else {
+                return ERROR;
+            }
+
+            if (r < radix) {
+                return r;
+            } else {
+                return ERROR;
+            }
+        }
     }
 
     /**
