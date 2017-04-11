@@ -1,8 +1,7 @@
 package org.javafp.parsec4j;
 
-import org.javafp.data.IList;
+import org.javafp.util.*;
 import org.javafp.util.Functions.Predicate;
-import org.javafp.util.Unit;
 
 import java.util.*;
 
@@ -12,7 +11,7 @@ public interface SymSet<I> {
         ALL,
         VALUE,
         PRED,
-        COMP
+        UNION
     }
 
     static <I> SymSet<I> empty() {
@@ -78,11 +77,11 @@ public interface SymSet<I> {
                 case ALL:
                     return rhs;
                 case VALUE:
-                    return new Composition<I>(this, (Leaf<I>)rhs);
+                    return new Union<I>(this, (Leaf<I>)rhs);
                 case PRED:
-                    return new Composition<I>(this, (Leaf<I>)rhs);
-                case COMP:
-                    return new Composition<I>((Composition<I>)rhs, this);
+                    return new Union<I>(this, (Leaf<I>)rhs);
+                case UNION:
+                    return new Union<I>((Union<I>)rhs, this);
                 default:
                     throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
             }
@@ -128,33 +127,33 @@ public interface SymSet<I> {
         }
     }
 
-    class Composition<I> implements SymSet<I> {
+    class Union<I> implements SymSet<I> {
 
         public final Set<SymSet<I>> members;
 
-        public Composition(Set<SymSet<I>> members) {
+        public Union(Set<SymSet<I>> members) {
             this.members = members;
         }
 
-        public Composition(Leaf<I> memberA, Leaf<I> memberB) {
+        public Union(Leaf<I> memberA, Leaf<I> memberB) {
             this.members = new HashSet<SymSet<I>>();
             this.members.add(memberA);
             this.members.add(memberB);
         }
 
-        public Composition(Composition<I> comp, Leaf<I> member) {
+        public Union(Union<I> comp, Leaf<I> member) {
             this.members = new HashSet<SymSet<I>>(comp.members);
             this.members.add(member);
         }
 
-        public Composition(Composition<I> compA, Composition<I> compB) {
+        public Union(Union<I> compA, Union<I> compB) {
             this.members = new HashSet<SymSet<I>>(compA.members);
             this.members.addAll(compB.members);
         }
 
         @Override
         public Type type() {
-            return Type.COMP;
+            return Type.UNION;
         }
 
         @Override
@@ -176,11 +175,11 @@ public interface SymSet<I> {
                 case ALL:
                     return rhs;
                 case VALUE:
-                    return new Composition<I>(this, (Leaf<I>)rhs);
+                    return new Union<I>(this, (Leaf<I>)rhs);
                 case PRED:
-                    return new Composition<I>(this, (Leaf<I>)rhs);
-                case COMP:
-                    return new Composition<I>(this, (Composition<I>)rhs);
+                    return new Union<I>(this, (Leaf<I>)rhs);
+                case UNION:
+                    return new Union<I>(this, (Union<I>)rhs);
                 default:
                     throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
             }

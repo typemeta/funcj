@@ -1,6 +1,7 @@
 package org.javafp.parsec4j.text;
 
-import org.javafp.util.Unit;
+import org.javafp.parsec4j.SymSet;
+import org.javafp.util.*;
 
 import java.util.Objects;
 
@@ -16,8 +17,18 @@ public class Ref<A> implements Parser<A> {
 
     private enum Null implements Parser<Unit> {
         INSTANCE {
-            public Result<Unit> parse(Input input, int pos) {
-                throw new RuntimeException("Null Parser Reference");
+            @Override
+            public boolean acceptsEmpty() {
+                throw new RuntimeException("Uninitialised lazy Parser reference");
+            }
+
+            @Override
+            public SymSet<Chr> firstSet() {
+                throw new RuntimeException("Uninitialised lazy Parser reference");
+            }
+
+            public Result<Unit> parse(Input in, int pos) {
+                throw new RuntimeException("Uninitialised lazy Parser reference");
             }
         };
 
@@ -46,7 +57,17 @@ public class Ref<A> implements Parser<A> {
     }
 
     @Override
-    public Result<A> parse(Input input, int pos) {
-        return impl.parse(input, pos);
+    public boolean acceptsEmpty() {
+        return impl.acceptsEmpty();
+    }
+
+    @Override
+    public SymSet<Chr> firstSet() {
+        return impl.firstSet();
+    }
+
+    @Override
+    public Result<A> parse(Input in, int pos) {
+        return impl.parse(in, pos);
     }
 }

@@ -1,11 +1,11 @@
 package org.javafp.parsec4j.text;
 
+import org.javafp.parsec4j.SymSet;
 import org.javafp.util.*;
 import org.javafp.util.Functions.*;
 import org.javafp.data.*;
 
-import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.*;
 
 import static org.javafp.util.Functions.F2.curry;
 
@@ -13,35 +13,90 @@ import static org.javafp.util.Functions.F2.curry;
  * A parser is essentially a function from an input stream to a Result.
  * @param <A> Parse result type
  */
-@FunctionalInterface
 public interface Parser<A> {
 
-    Result<A> parse(Input input, int pos);
+    boolean acceptsEmpty();
 
-    default Result<A> run(Input input) {
-        return this.andL(eof()).parse(input, 0);
+    SymSet<Chr> firstSet();
+
+    Result<A> parse(Input in, int pos);
+
+    default Result<A> run(Input in) {
+        return this.andL(eof()).parse(in, 0);
+    }
+
+    static <A> Parser<A> pure(A a) {
+        return new ParserImpl<A>() {
+            @Override
+            public boolean acceptsEmpty() {
+                return true;
+            }
+
+            @Override
+            public SymSet<Chr> firstSet() {
+                return SymSet.empty();
+            }
+
+            @Override
+            public Result<A> parse(Input in, int pos) {
+                return Result.success(a, pos);
+            }
+        };
+    }
+
+    static <A>
+    Parser<A> pure(F0<A> fa) {
+        return pure(fa.apply());
     }
 
     default <B> Parser<B> map(F<A, B> f) {
-        return (input, pos) -> Parser.this.parse(input, pos).map(f);
-    }
+        return new ParserImpl<B>() {
+            @Override
+            public boolean acceptsEmptyCalc() {
+                return Parser.this.acceptsEmpty();
+            }
 
-    default <B> Parser<B> flatMap(F<A, Parser<B>> f) {
-        return (input, pos) -> Parser.this.parse(input, pos)
-            .match(
-                succ -> f.apply(succ.value).parse(input, pos+1),
-                fail -> fail.cast()
-            );
+            @Override
+            protected SymSet<Chr> firstSetCalc() {
+                return Parser.this.firstSet();
+            }
+
+            @Override
+            public Result<B> parse(Input in, int pos) {
+                return Parser.this.parse(in, pos).map(f);
+            }
+        };
     }
 
     default Parser<A> or(Parser<A> rhs) {
-        return (input, pos) -> {
-            final Result<A> r = Parser.this.parse(input, pos);
-            if (r.isSuccess()) {
-                return r;
-            } else {
-                return rhs.parse(input, pos);
+        return new ParserImpl<A>() {
+            @Override
+            public boolean acceptsEmptyCalc() {
+                return Parser.this.acceptsEmpty() || rhs.acceptsEmpty();
             }
+
+            @Override
+            protected SymSet<Chr> firstSetCalc() {
+                return Parser.this.firstSet().union(rhs.firstSet());
+            }
+
+            @Override
+            public Result<A> parse(Input in, int pos) {
+                final boolean isEof = in.isEof(pos);
+                final Chr c = isEof ? null : Chr.valueOf(in.at(pos));
+                if (acceptsEmpty() || (!isEof && firstSet().matches(c))) {
+                    final Result<A> r = Parser.this.parse(in, pos);
+                    if (r.isSuccess()) {
+                        return r;
+                    }
+                }
+
+                if (rhs.acceptsEmpty() || (!isEof && rhs.firstSet().matches(c))) {
+                    return rhs.parse(in, pos);
+                } else {
+                    return Result.failure(pos);
+                }
+            };
         };
     }
 
@@ -63,33 +118,77 @@ public interface Parser<A> {
 
     default Parser<A> chainl1(Parser<Op2<A>> op) {
         final Parser<IList<Op<A>>> plf =
-            many(op.and(this).map((f, y) -> x -> f.apply(x, y)));
+            many(op.and(this)
+                .map((f, y) -> x -> f.apply(x, y)));
         return this.and(plf)
             .map((a, lf) -> lf.foldl((acc, f) -> f.apply(acc), a));
     }
 
     static <A> Parser<A> fail() {
-        return (input, pos) -> Result.failure(pos);
+        return new ParserImpl<A>() {
+            @Override
+            public boolean acceptsEmpty() {
+                return true;
+            }
+
+            @Override
+            public SymSet<Chr> firstSet() {
+                return SymSet.empty();
+            }
+
+            @Override
+            public Result<A> parse(Input in, int pos) {
+                return Result.failure(pos);
+            }
+        };
     }
 
-    static <A> Parser<A> pure(A a) {
-        return (input, pos) -> Result.success(a, pos);
+    static <A, B>
+    Parser<B> ap(Parser<F<A, B>> pf, Parser<A> pa) {
+        return new ParserImpl<B>() {
+            @Override
+            public boolean acceptsEmptyCalc() {
+                return pf.acceptsEmpty() && pa.acceptsEmpty();
+            }
+
+            @Override
+            protected SymSet<Chr> firstSetCalc() {
+                if (pf.acceptsEmpty()) {
+                    return pf.firstSet().union(pa.firstSet());
+                } else {
+                    return pf.firstSet();
+                }
+            }
+
+            @Override
+            public Result<B> parse(Input in, int pos) {
+                return pf.parse(in, pos)
+                    .match(
+                        succ -> pa.parse(in, succ.next).map(succ.value),
+                        fail -> fail.cast()
+                    );
+            }
+        };
     }
 
-    static <A> Parser<A> pure(F0<A> fa) {
-        return pure(fa.apply());
-    }
+    static <A, B>
+    Parser<B> ap(F<A, B> f, Parser<A> pa) {
+        return new ParserImpl<B>() {
+            @Override
+            public boolean acceptsEmpty() {
+                return true;
+            }
 
-    static <A, B> Parser<B> ap(Parser<F<A, B>> pf, Parser<A> pa) {
-        return (input, pos) -> pf.parse(input, pos)
-            .match(
-                succ -> pa.parse(input, succ.next).map(succ.value),
-                fail -> fail.cast()
-            );
-    }
+            @Override
+            protected SymSet<Chr> firstSetCalc() {
+                return pa.firstSet();
+            }
 
-    static <A, B> Parser<B> ap(F<A, B> f, Parser<A> pa) {
-        return (input, pos) -> pa.parse(input, pos).map(f);
+            @Override
+            public Result<B> parse(Input in, int pos) {
+                return pa.parse(in, pos).map(f);
+            }
+        };
     }
 
     static <A, B> F<Parser<A>, Parser<B>> liftA(F<A, B> f) {
@@ -101,46 +200,101 @@ public interface Parser<A> {
     }
 
     static Parser<Unit> eof() {
-        return (input, pos) -> input.isEof(pos) ?
-            Result.success(Unit.UNIT, pos) :
-            Result.failure(pos);
-    }
-
-    static Parser<Chr> satisfy(Predicate<Chr> pred) {
-        return (input, pos) -> {
-            if (!input.isEof(pos)) {
-                final Chr c = Chr.valueOf(input.at(pos));
-                if (pred.test(c)) {
-                    return Result.success(c, pos+1);
-                }
+        return new ParserImpl<Unit>() {
+            @Override
+            public boolean acceptsEmpty() {
+                return true;
             }
 
-            return Result.failure(pos);
+            @Override
+            public SymSet<Chr> firstSetCalc() {
+                return SymSet.empty();
+            }
+
+            @Override
+            public Result<Unit> parse(Input in, int pos) {
+                return in.isEof(pos) ?
+                    Result.success(Unit.UNIT, pos) :
+                    Result.failure(pos);
+            }
         };
     }
 
-    static Parser<Character> value(char chr) {
-        return value(chr, chr);
-    }
-
-    static <A> Parser<A> value(char chr, A res) {
-        return (input, pos) -> {
-            if (!input.isEof(pos)) {
-                final char c = input.at(pos);
-                if (c == chr) {
-                    return Result.success(res, pos+1);
-                }
+    static Parser<Chr> satisfy(Predicate<Chr> pred) {
+        return new ParserImpl<Chr>() {
+            @Override
+            public boolean acceptsEmpty() {
+                return false;
             }
 
-            return Result.failure(pos);
+            @Override
+            protected SymSet<Chr> firstSetCalc() {
+                return SymSet.pred(pred);
+            }
+
+            @Override
+            public Result<Chr> parse(Input in, int pos) {
+                if (!in.isEof(pos)) {
+                    final Chr c = Chr.valueOf(in.at(pos));
+                    if (pred.apply(c)) {
+                        return Result.success(c, pos+1);
+                    }
+                }
+
+                return Result.failure(pos);
+            }
+        };
+    }
+
+    static Parser<Chr> value(char val) {
+        return value(val, Chr.valueOf(val));
+    }
+
+    static <A> Parser<A> value(char val, A res) {
+        return new ParserImpl<A>() {
+            @Override
+            public boolean acceptsEmpty() {
+                return false;
+            }
+
+            @Override
+            protected SymSet<Chr> firstSetCalc() {
+                return SymSet.value(Chr.valueOf(val));
+            }
+
+            @Override
+            public Result<A> parse(Input in, int pos) {
+                if (!in.isEof(pos)) {
+                    final char c = in.at(pos);
+                    if (c == val) {
+                        return Result.success(res, pos+1);
+                    }
+                }
+
+                return Result.failure(pos);
+            }
         };
     }
 
     static Parser<Chr> any() {
-        return (input, pos) ->
-            input.isEof(pos) ?
-                Result.failure(pos) :
-                Result.success(Chr.valueOf(input.at(pos)), pos+1);
+        return new ParserImpl<Chr>() {
+            @Override
+            public boolean acceptsEmpty() {
+                return true;
+            }
+
+            @Override
+            public SymSet<Chr> firstSetCalc() {
+                return SymSet.all();
+            }
+
+            @Override
+            public Result<Chr> parse(Input in, int pos) {
+                return in.isEof(pos) ?
+                    Result.failure(pos) :
+                    Result.success(Chr.valueOf(in.at(pos)), pos+1);
+            }
+        };
     }
 
     static <A> Parser<IList<A>> many(Parser<A> p) {
@@ -153,13 +307,17 @@ public interface Parser<A> {
             .map(IList.NonEmpty::reverse);
     }
 
+    static <A> Parser<Unit> skipMany(Parser<A> p) {
+        return Impl.many(p).map(u -> Unit.UNIT);
+    }
+
     static <A, SEP> Parser<IList<A>> sepBy(Parser<A> p, Parser<SEP> sep) {
         return sepBy1(p, sep).or(pure(IList.nil()));
     }
 
     static <A, SEP> Parser<IList<A>> sepBy1(Parser<A> p, Parser<SEP> sep) {
-        return many(p.andL(sep))
-            .or(p.map(IList::of));
+        return p.and(many(sep.andR(p)))
+            .map(a -> l -> l.add(a));
     }
 
     static <A> Parser<Optional<A>> optional(Parser<A> p) {
@@ -172,7 +330,6 @@ public interface Parser<A> {
             Parser<A> p) {
         return open.andR(p).andL(close);
     }
-
 
     static <A> Parser<A> choice(Parser<A>... ps) {
         return choice(IList.ofArray(ps));
@@ -187,18 +344,65 @@ public interface Parser<A> {
     }
 }
 
+abstract class ParserImpl<A> implements Parser<A> {
+
+    private Boolean acceptsEmpty;
+
+    private SymSet<Chr> firstSet;
+
+    protected ParserImpl() {
+        this.acceptsEmpty = null;
+        this.firstSet = null;
+    }
+
+    public boolean acceptsEmpty() {
+        if (acceptsEmpty == null) {
+            acceptsEmpty = Objects.requireNonNull(acceptsEmptyCalc());
+        }
+        return acceptsEmpty;
+    }
+
+    public SymSet<Chr> firstSet() {
+        if (firstSet == null) {
+            firstSet = Objects.requireNonNull(firstSetCalc());
+        }
+        return firstSet;
+    }
+
+    protected boolean acceptsEmptyCalc() {
+        throw new IllegalStateException("acceptsEmptyCalc() not implemented");
+    }
+
+    protected SymSet<Chr> firstSetCalc() {
+        throw new IllegalStateException("firstSetCalc() not implemented");
+    }
+}
+
 abstract class Impl {
-    static <A> Parser<IList<A>> many(Parser<A> p) {
-        return (in, pos) -> {
-            IList<A> acc = IList.of();
-            while (true) {
-                final Result<A> r = p.parse(in, pos);
-                if (r.isSuccess()) {
-                    final Result.Success<A> succ = (Result.Success<A>) r;
-                    acc = acc.add(succ.value);
-                    pos = succ.next;
-                } else {
-                    return Result.success(acc, pos);
+    static <A> ParserImpl<IList<A>> many(Parser<A> p) {
+        return new ParserImpl<IList<A>>() {
+            @Override
+            public boolean acceptsEmpty() {
+                return true;
+            }
+
+            @Override
+            protected SymSet<Chr> firstSetCalc() {
+                return p.firstSet();
+            }
+
+            @Override
+            public Result<IList<A>> parse(Input in, int pos) {
+                IList<A> acc = IList.of();
+                while (true) {
+                    final Result<A> r = p.parse(in, pos);
+                    if (r.isSuccess()) {
+                        final Result.Success<A> succ = (Result.Success<A>) r;
+                        acc = acc.add(succ.value);
+                        pos = succ.next;
+                    } else {
+                        return Result.success(acc, pos);
+                    }
                 }
             }
         };

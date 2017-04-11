@@ -46,7 +46,7 @@ public abstract class Grammar {
 
         // num = intr
         final Parser<Expr> num =
-            dble().and(units)
+            dble.and(units)
                 .map(NumExpr::new);
 
         // brackExpr = open expr close
@@ -54,7 +54,7 @@ public abstract class Grammar {
             open.andR(expr).andL(close);
 
         final Parser<Expr> var =
-            alpha().map(Model::varExpr);
+            alpha.map(Model::varExpr);
 
         // funcN = name { args | ε }
         final Parser<Expr> funcN =
