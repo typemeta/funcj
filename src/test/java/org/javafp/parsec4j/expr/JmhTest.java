@@ -14,14 +14,18 @@ public class JmhTest {
         final Options opt = new OptionsBuilder()
             .jvmArgs("-XX:+UnlockCommercialFeatures")
                 .include(JmhTest.class.getSimpleName())
-//                .warmupIterations(20)
-//                .measurementIterations(10)
+                .warmupIterations(20)
+                .measurementIterations(20)
                 .forks(1)
                 .build();
            new Runner(opt).run();
     }
 
-    private static final Parser<Chr, Grammar.Ctx, Model.Expr> parser = Grammar.parser;
+    static  {
+        System.out.println("Initialising...");
+        Grammar.parser.acceptsEmpty();
+        Grammar.parser.firstSet();
+    }
 
     @Benchmark
     public static String testGood() {

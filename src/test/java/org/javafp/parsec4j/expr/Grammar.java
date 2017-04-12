@@ -16,6 +16,10 @@ public abstract class Grammar {
         }
     }
 
+    private static <A> Parser<Chr, Ctx, A> pure(A a) {
+        return Parser.pure(a);
+    }
+
     static {
         // To get around circular references.
         final Ref<Chr, Ctx, Expr> expr = Ref.of();
@@ -36,7 +40,10 @@ public abstract class Grammar {
         final Parser<Chr, Ctx, NumExpr.Units> bps = Text.<Ctx>string("bp").andR(pure(NumExpr.Units.BPS));
 
         final Parser<Chr, Ctx, String> funcName =
-            Text.<Ctx>string("min").or(string("max"));
+            Text.<Ctx>chr('m')
+                .andR(
+                    (Text.<Ctx>string("in").map(u -> "min"))
+                        .or(Text.<Ctx>string("ax").map(u -> "max")));
 
         // addSub = add | sub
         final Parser<Chr, Ctx, Op2<Expr>> addSub =
@@ -59,7 +66,7 @@ public abstract class Grammar {
             open.andR(expr).andL(close);
 
         final Parser<Chr, Ctx, Expr> var =
-            Text.<Ctx>alpha().map(c -> Model.varExpr(c));
+            Text.<Ctx>alpha().map(Model::varExpr);
 
         // funcN = name { args | ε }
         final Parser<Chr, Ctx, Expr> funcN =
@@ -70,12 +77,12 @@ public abstract class Grammar {
         final Parser<Chr, Ctx, UnaryOp> sign = plus.or(minus);
 
         // signedExpr = sign expr
-        final Parser<Chr, Ctx, Expr> signedExpr =
-            sign.and(expr).map(Model::unaryOpExpr);
+//        final Parser<Chr, Ctx, Expr> signedExpr =
+//            sign.and(expr).map(Model::unaryOpExpr);
 
         // term = num | brackExpr | funcN | signedExpr
         final Parser<Chr, Ctx, Expr> term =
-            num.or(brackExpr).or(funcN).or(var).or(signedExpr);
+            num.or(brackExpr).or(funcN).or(var); //.or(signedExpr);
 
         // prod = term chainl1 multDiv
         final Parser<Chr, Ctx, Expr> prod = term.chainl1(multDiv);

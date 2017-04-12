@@ -82,21 +82,39 @@ public interface Parser<A> {
 
             @Override
             public Result<A> parse(Input in, int pos) {
-                final boolean isEof = in.isEof(pos);
-                final Chr c = isEof ? null : Chr.valueOf(in.at(pos));
-                if (acceptsEmpty() || (!isEof && firstSet().matches(c))) {
-                    final Result<A> r = Parser.this.parse(in, pos);
-                    if (r.isSuccess()) {
-                        return r;
+                if (in.isEof(pos)) {
+                    if (Parser.this.acceptsEmpty()) {
+                        return Parser.this.parse(in, pos);
+                    } else if (rhs.acceptsEmpty()) {
+                        return rhs.parse(in, pos);
+                    } else {
+                        return Result.failure(pos);
+                    }
+                } else {
+                    final Chr c = Chr.valueOf(in.at(pos));
+                    if (Parser.this.firstSet().matches(c)) {
+                        return Parser.this.parse(in, pos);
+                    } else if (rhs.firstSet().matches(c)) {
+                        return rhs.parse(in, pos);
+                    } else {
+                        if (Parser.this.acceptsEmpty()) {
+                            final Result<A> r = Parser.this.parse(in, pos);
+                            if (r.isSuccess()) {
+                                return r;
+                            }
+                        }
+
+                        if (rhs.acceptsEmpty()) {
+                            final Result<A> r = rhs.parse(in, pos);
+                            if (r.isSuccess()) {
+                                return r;
+                            }
+                        }
+
+                        return Result.failure(pos);
                     }
                 }
-
-                if (rhs.acceptsEmpty() || (!isEof && rhs.firstSet().matches(c))) {
-                    return rhs.parse(in, pos);
-                } else {
-                    return Result.failure(pos);
-                }
-            };
+            }
         };
     }
 

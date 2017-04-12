@@ -68,27 +68,7 @@ public interface SymSet<I> {
         }
     }
 
-    interface Leaf<I> extends SymSet<I> {
-        @Override
-        default SymSet<I> union(SymSet<I> rhs) {
-            switch(rhs.type()) {
-                case EMPTY:
-                    return this;
-                case ALL:
-                    return rhs;
-                case VALUE:
-                    return new Union<I>(this, (Leaf<I>)rhs);
-                case PRED:
-                    return new Union<I>(this, (Leaf<I>)rhs);
-                case UNION:
-                    return new Union<I>((Union<I>)rhs, this);
-                default:
-                    throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
-            }
-        }
-    }
-
-    class Value<I> implements Leaf<I> {
+    class Value<I> implements SymSet<I> {
 
         public final I value;
 
@@ -106,9 +86,26 @@ public interface SymSet<I> {
             return this.value.equals(value);
         }
 
+        @Override
+        public SymSet<I> union(SymSet<I> rhs) {
+            switch(rhs.type()) {
+                case EMPTY:
+                    return this;
+                case ALL:
+                    return rhs;
+                case VALUE:
+                    return new Union<I>(this, (Value<I>)rhs);
+                case PRED:
+                    return new Union<I>(this, (Pred<I>)rhs);
+                case UNION:
+                    return new Union<I>((Union<I>)rhs, this);
+                default:
+                    throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
+            }
+        }
     }
 
-    class Pred<I> implements Leaf<I> {
+    class Pred<I> implements SymSet<I> {
 
         public final Predicate<I> pred;
 
@@ -125,30 +122,67 @@ public interface SymSet<I> {
         public boolean matches(I value) {
             return pred.apply(value);
         }
+
+        @Override
+        public SymSet<I> union(SymSet<I> rhs) {
+            switch(rhs.type()) {
+                case EMPTY:
+                    return this;
+                case ALL:
+                    return rhs;
+                case VALUE:
+                    return new Union<I>((Value<I>)rhs, this);
+                case PRED:
+                    return new Union<I>(this, (Pred<I>)rhs);
+                case UNION:
+                    return new Union<I>((Union<I>)rhs, this);
+                default:
+                    throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
+            }
+        }
     }
 
     class Union<I> implements SymSet<I> {
 
-        public final Set<SymSet<I>> members;
+        public final Set<I> values;
+        public final List<Pred<I>> preds;
 
-        public Union(Set<SymSet<I>> members) {
-            this.members = members;
+        public Union(Union<I> unionA, Union<I> unionB) {
+            this.values = new HashSet<I>(unionA.values);
+            this.values.addAll(unionB.values);
+            this.preds = new ArrayList<Pred<I>>(unionA.preds);
+            this.preds.addAll(unionB.preds);
         }
 
-        public Union(Leaf<I> memberA, Leaf<I> memberB) {
-            this.members = new HashSet<SymSet<I>>();
-            this.members.add(memberA);
-            this.members.add(memberB);
+        public Union(Union<I> union, Value<I> value) {
+            this.values = new HashSet<I>(union.values);
+            this.values.add(value.value);
+            this.preds = union.preds;
         }
 
-        public Union(Union<I> comp, Leaf<I> member) {
-            this.members = new HashSet<SymSet<I>>(comp.members);
-            this.members.add(member);
+        public Union(Union<I> union, Pred<I> pred) {
+            this.values = union.values;
+            this.preds = new ArrayList<Pred<I>>(union.preds);
+            this.preds.add(pred);
         }
 
-        public Union(Union<I> compA, Union<I> compB) {
-            this.members = new HashSet<SymSet<I>>(compA.members);
-            this.members.addAll(compB.members);
+        public Union(Value<I> valueA, Value<I> valueB) {
+            this.values = new HashSet<I>();
+            this.values.add(valueA.value);
+            this.values.add(valueB.value);
+            this.preds = Collections.emptyList();
+        }
+
+        public Union(Value<I> value, Pred<I> pred) {
+            this.values = Collections.singleton(value.value);
+            this.preds = Collections.singletonList(pred);
+        }
+
+        public Union(Pred<I> predA, Pred<I> predB) {
+            this.values = Collections.emptySet();
+            this.preds = new ArrayList<Pred<I>>(2);
+            this.preds.add(predA);
+            this.preds.add(predB);
         }
 
         @Override
@@ -158,13 +192,17 @@ public interface SymSet<I> {
 
         @Override
         public boolean matches(I value) {
-            for (SymSet<I> ss : members) {
-                if (ss.matches(value)) {
-                    return true;
+            if (values.contains(value)) {
+                return true;
+            } else {
+                for (Pred<I> pred : preds) {
+                    if (pred.matches(value)) {
+                        return true;
+                    }
                 }
-            }
 
-            return false;
+                return false;
+            }
         }
 
         @Override
@@ -175,9 +213,9 @@ public interface SymSet<I> {
                 case ALL:
                     return rhs;
                 case VALUE:
-                    return new Union<I>(this, (Leaf<I>)rhs);
+                    return new Union<I>(this, (Value<I>)rhs);
                 case PRED:
-                    return new Union<I>(this, (Leaf<I>)rhs);
+                    return new Union<I>(this, (Pred<I>)rhs);
                 case UNION:
                     return new Union<I>(this, (Union<I>)rhs);
                 default:

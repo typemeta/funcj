@@ -106,23 +106,43 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
                 return Parser.this.firstSet().union(rhs.firstSet());
             }
 
+
             @Override
             public Result<I, A> parse(CTX ctx, int pos) {
                 final Input<I> in = ctx.input();
-                final boolean isEof = ctx.isEof(pos);
-                if (acceptsEmpty() || (!isEof && firstSet().matches(in.at(pos)))) {
-                    final Result<I, A> r = Parser.this.parse(ctx, pos);
-                    if (r.isSuccess()) {
-                        return r;
+                if (ctx.isEof(pos)) {
+                    if (Parser.this.acceptsEmpty()) {
+                        return Parser.this.parse(ctx, pos);
+                    } else if (rhs.acceptsEmpty()) {
+                        return rhs.parse(ctx, pos);
+                    } else {
+                        return Result.failure(pos);
+                    }
+                } else {
+                    final I i = in.at(pos);
+                    if (Parser.this.firstSet().matches(i)) {
+                        return Parser.this.parse(ctx, pos);
+                    } else if (rhs.firstSet().matches(i)) {
+                        return rhs.parse(ctx, pos);
+                    } else {
+                        if (Parser.this.acceptsEmpty()) {
+                            final Result<I, A> r = Parser.this.parse(ctx, pos);
+                            if (r.isSuccess()) {
+                                return r;
+                            }
+                        }
+
+                        if (rhs.acceptsEmpty()) {
+                            final Result<I, A> r = rhs.parse(ctx, pos);
+                            if (r.isSuccess()) {
+                                return r;
+                            }
+                        }
+
+                        return Result.failure(pos);
                     }
                 }
-
-                if (rhs.acceptsEmpty() || (!isEof && rhs.firstSet().matches(in.at(pos)))) {
-                    return rhs.parse(ctx, pos);
-                } else {
-                    return Result.failure(pos);
-                }
-            };
+            }
         };
     }
 

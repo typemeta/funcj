@@ -30,7 +30,10 @@ public abstract class Grammar {
         final Parser<NumExpr.Units> bps = string("bp").andR(pure(NumExpr.Units.BPS));
 
         final Parser<String> funcName =
-            string("min").or(string("max"));
+            chr('m')
+                .andR(
+                    (string("in").map(u -> "min"))
+                        .or(string("ax").map(u -> "max")));
 
         // addSub = add | sub
         final Parser<Op2<Expr>> addSub =
@@ -65,13 +68,13 @@ public abstract class Grammar {
         final Parser<UnaryOp> sign = plus.or(minus);
 
         // signedExpr = sign expr
-        final Parser<Expr> signedExpr =
-            sign.and(expr)
-                .map(UnaryOpExpr::new);
+//        final Parser<Expr> signedExpr =
+//            sign.and(expr)
+//                .map(UnaryOpExpr::new);
 
         // term = num | brackExpr | funcN | signedExpr
         final Parser<Expr> term =
-            num.or(brackExpr).or(funcN).or(var).or(signedExpr);
+            num.or(brackExpr).or(funcN).or(var); //.or(signedExpr);
 
         // prod = term chainl1 multDiv
         final Parser<Expr> prod = term.chainl1(multDiv);
