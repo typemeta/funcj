@@ -30,7 +30,7 @@ public class Text {
 
     public static final Parser<Integer> uintr =
         many1(digit.map(Text::digitToInt))
-            .map(l -> l.foldl1((x, acc) -> x*10 + acc));
+            .map(l -> l.foldl1((acc, x) -> acc * 10 + x));
 
     public static final Parser<Integer> intr =
         chr('+').or(chr('-')).or(pure(Chr.valueOf('+')))

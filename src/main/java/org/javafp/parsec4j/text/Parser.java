@@ -321,8 +321,7 @@ public interface Parser<A> {
 
     static <A> Parser<IList.NonEmpty<A>> many1(Parser<A> p) {
         return p.and(Impl.many(p))
-            .map(a -> l -> l.add(a))
-            .map(IList.NonEmpty::reverse);
+            .map(a -> l -> l.reverse().add(a));
     }
 
     static <A> Parser<Unit> skipMany(Parser<A> p) {

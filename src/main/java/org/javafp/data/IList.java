@@ -563,16 +563,16 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public T foldr1(Op2<T> f) {
-            return tail.nonEmpty()
-                .map(tl -> f.apply(head, tl.foldr1(f)))
-                .orElse(head);
+            return reverse().foldl1(f.flip());
         }
 
         @Override
         public T foldl1(Op2<T> f) {
-            return tail.nonEmpty()
-                .map(tl -> f.apply(head, tl.foldl1(f)))
-                .orElse(head);
+            T r = head;
+            for (IList<T> n = tail; !n.isEmpty(); n = n.tail()) {
+                r = f.apply(r, n.head());
+            }
+            return r;
         }
 
         @Override

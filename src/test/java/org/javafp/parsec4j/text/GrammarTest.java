@@ -23,8 +23,8 @@ public class GrammarTest {
     @Test
     public void testSuccess() throws Exception {
         assertSuccess(
-            "3*max(4%+(5bp+x),-2bp)-1",
-            "((3.0*max((4.0%+(5.0bp+x)),-2.0bp))-1.0)");
+            "123.456*max(4%+(5bp+x),-2bp)-1",
+            "((123.456*max((4.0%+(5.0bp+x)),-2.0bp))-1.0)");
     }
 
     @Test

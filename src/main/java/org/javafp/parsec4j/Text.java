@@ -55,7 +55,7 @@ public class Text {
 
     private static final Parser<Chr, Ctx<Chr>, Integer> uintr =
         many1(Text.<Ctx<Chr>>digit().map(Text::digitToInt))
-            .map(l -> l.foldl1((x, acc) -> x + acc * 10));
+            .map(l -> l.foldl1((acc, x) -> acc * 10 + x));
 
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Integer> uintr() {
