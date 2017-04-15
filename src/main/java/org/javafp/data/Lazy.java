@@ -5,11 +5,11 @@ import org.javafp.util.Functions;
 import java.util.Objects;
 
 public interface Lazy<T> extends Functions.F0<T> {
-    static <T> Lazy<T> ofUnsafe(Functions.F0<T> get) {
+    static <T> Lazy<T> of(Functions.F0<T> get) {
         return new LazyImpl<T>(get);
     }
 
-    static <T> Lazy<T> of(Functions.F0<T> get) {
+    static <T> Lazy<T> ofTS(Functions.F0<T> get) {
         return new LazyThreadSafeImpl<T>(get);
     }
 }
@@ -46,10 +46,10 @@ class LazyImpl<T> implements Lazy<T> {
 class LazyThreadSafeImpl<T> implements Lazy<T> {
 
     private class UnEval implements Functions.F0<T> {
-        transient Functions.F0<T> source;
+        Functions.F0<T> source;
 
         private UnEval(Functions.F0<T> source) {
-            this.source = source;
+            this.source = Objects.requireNonNull(source);
         }
 
         @Override

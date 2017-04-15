@@ -52,7 +52,7 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> pure(A a) {
-        return new ParserImpl<I, CTX, A>() {
+        return new ParserImpl<I, CTX, A>(true, SymSet::empty) {
             @Override
             public boolean acceptsEmpty() {
                 return true;
@@ -76,17 +76,7 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     default <B> Parser<I, CTX, B> map(F<A, B> f) {
-        return new ParserImpl<I, CTX, B>() {
-            @Override
-            public boolean acceptsEmptyCalc() {
-                return Parser.this.acceptsEmpty();
-            }
-
-            @Override
-            protected SymSet<I> firstSetCalc() {
-                return Parser.this.firstSet();
-            }
-
+        return new ParserImpl<I, CTX, B>(Parser.this::acceptsEmpty, Parser.this::firstSet) {
             @Override
             public Result<I, B> parse(CTX ctx, int pos) {
                 return Parser.this.parse(ctx, pos).map(f);
@@ -95,18 +85,10 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     default Parser<I, CTX, A> or(Parser<I, CTX, A> rhs) {
-        return new ParserImpl<I, CTX, A>() {
-            @Override
-            public boolean acceptsEmptyCalc() {
-                return Parser.this.acceptsEmpty() || rhs.acceptsEmpty();
-            }
-
-            @Override
-            protected SymSet<I> firstSetCalc() {
-                return Parser.this.firstSet().union(rhs.firstSet());
-            }
-
-
+        return new ParserImpl<I, CTX, A>(
+            () -> Parser.this.acceptsEmpty() || rhs.acceptsEmpty(),
+            () -> Parser.this.firstSet().union(rhs.firstSet())
+        ) {
             @Override
             public Result<I, A> parse(CTX ctx, int pos) {
                 final Input<I> in = ctx.input();
@@ -171,17 +153,7 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> fail() {
-        return new ParserImpl<I, CTX, A>() {
-            @Override
-            public boolean acceptsEmpty() {
-                return true;
-            }
-
-            @Override
-            public SymSet<I> firstSet() {
-                return SymSet.empty();
-            }
-
+        return new ParserImpl<I, CTX, A>(() -> true, SymSet::empty) {
             @Override
             public Result<I, A> parse(CTX ctx, int pos) {
                 return Result.failure(pos);
@@ -191,21 +163,14 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
 
     static <I, CTX extends Parser.Context<I>, A, B>
     Parser<I, CTX, B> ap(Parser<I, CTX, F<A, B>> pf, Parser<I, CTX, A> pa) {
-        return new ParserImpl<I, CTX, B>() {
-            @Override
-            public boolean acceptsEmptyCalc() {
-                return pf.acceptsEmpty() && pa.acceptsEmpty();
+        return new ParserImpl<I, CTX, B>(
+            () -> pf.acceptsEmpty() && pa.acceptsEmpty(),
+            () -> {
+                return pf.acceptsEmpty() ?
+                    pf.firstSet().union(pa.firstSet()) :
+                    pf.firstSet();
             }
-
-            @Override
-            protected SymSet<I> firstSetCalc() {
-                if (pf.acceptsEmpty()) {
-                    return pf.firstSet().union(pa.firstSet());
-                } else {
-                    return pf.firstSet();
-                }
-            }
-
+        ) {
             @Override
             public Result<I, B> parse(CTX ctx, int pos) {
                 return pf.parse(ctx, pos)
@@ -219,18 +184,8 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
 
     static <I, CTX extends Parser.Context<I>, A, B>
     Parser<I, CTX, B> ap(F<A, B> f, Parser<I, CTX, A> pa) {
-        return new ParserImpl<I, CTX, B>() {
-            @Override
-            public boolean acceptsEmpty() {
-                return true;
-            }
-
-            @Override
-            protected SymSet<I> firstSetCalc() {
-                return pa.firstSet();
-            }
-
-            @Override
+        return new ParserImpl<I, CTX, B>(true, pa::firstSet) {
+           @Override
             public Result<I, B> parse(CTX ctx, int pos) {
                 return pa.parse(ctx, pos).map(f);
             }
@@ -248,20 +203,10 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     static <I, CTX extends Parser.Context<I>> Parser<I, CTX, Unit> eof() {
-        return new ParserImpl<I, CTX, Unit>() {
-            @Override
-            public boolean acceptsEmpty() {
-                return true;
-            }
-
-            @Override
-            public SymSet<I> firstSetCalc() {
-                return SymSet.empty();
-            }
-
+        return new ParserImpl<I, CTX, Unit>(true, SymSet::empty) {
             @Override
             public Result<I, Unit> parse(CTX ctx, int pos) {
-                return ctx.input().isEof(pos) ?
+                return ctx.isEof(pos) ?
                     Result.success(Unit.UNIT, pos) :
                     Result.failure(pos);
             }
@@ -269,20 +214,10 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     static <I, CTX extends Parser.Context<I>> Parser<I, CTX, I> satisfy(Predicate<I> pred) {
-        return new ParserImpl<I, CTX, I>() {
-            @Override
-            public boolean acceptsEmpty() {
-                return false;
-            }
-
-            @Override
-            protected SymSet<I> firstSetCalc() {
-                return SymSet.pred(pred);
-            }
-
+        return new ParserImpl<I, CTX, I>(false, () -> SymSet.pred(pred)) {
             @Override
             public Result<I, I> parse(CTX ctx, int pos) {
-                if (!ctx.input().isEof(pos)) {
+                if (!ctx.isEof(pos)) {
                     final I i = ctx.input().at(pos);
                     if (pred.apply(i)) {
                         return Result.success(i, pos+1);
@@ -299,20 +234,10 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> value(I val, A res) {
-        return new ParserImpl<I, CTX, A>() {
-            @Override
-            public boolean acceptsEmpty() {
-                return false;
-            }
-
-            @Override
-            protected SymSet<I> firstSetCalc() {
-                return SymSet.value(val);
-            }
-
+        return new ParserImpl<I, CTX, A>(false, () -> SymSet.value(val)) {
             @Override
             public Result<I, A> parse(CTX ctx, int pos) {
-                if (!ctx.input().isEof(pos)) {
+                if (!ctx.isEof(pos)) {
                     final I i = ctx.input().at(pos);
                     if (i.equals(val)) {
                         return Result.success(res, pos+1);
@@ -325,20 +250,10 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     }
 
     static <I, CTX extends Parser.Context<I>> Parser<I, CTX, I> any() {
-        return new ParserImpl<I, CTX, I>() {
-            @Override
-            public boolean acceptsEmpty() {
-                return true;
-            }
-
-            @Override
-            public SymSet<I> firstSetCalc() {
-                return SymSet.all();
-            }
-
+        return new ParserImpl<I, CTX, I>(true, SymSet::all) {
             @Override
             public Result<I, I> parse(CTX ctx, int pos) {
-                return ctx.input().isEof(pos) ?
+                return ctx.isEof(pos) ?
                     Result.failure(pos) :
                     Result.success(ctx.input().at(pos), pos+1);
             }
@@ -402,64 +317,51 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
 
 abstract class ParserImpl<I, CTX extends Parser.Context<I>, A> implements Parser<I, CTX, A> {
 
-    private Boolean acceptsEmpty;
+    private final Lazy<Boolean> acceptsEmpty;
 
-    private SymSet<I> firstSet;
+    private final Lazy<SymSet<I>> firstSet;
 
-    protected ParserImpl() {
-        this.acceptsEmpty = null;
-        this.firstSet = null;
+    ParserImpl(F0<Boolean> acceptsEmpty, F0<SymSet<I>> firstSet) {
+        this.acceptsEmpty = Lazy.of(acceptsEmpty);
+        this.firstSet = Lazy.of(firstSet);
     }
 
+    ParserImpl(boolean acceptsEmpty, F0<SymSet<I>> firstSet) {
+        this.acceptsEmpty = () -> acceptsEmpty;
+        this.firstSet = Lazy.of(firstSet);
+    }
+    
     public boolean acceptsEmpty() {
-        if (acceptsEmpty == null) {
-            acceptsEmpty = Objects.requireNonNull(acceptsEmptyCalc());
-        }
-        return acceptsEmpty;
+        return acceptsEmpty.apply();
     }
 
     public SymSet<I> firstSet() {
-        if (firstSet == null) {
-            firstSet = Objects.requireNonNull(firstSetCalc());
-        }
-        return firstSet;
-    }
-
-    protected boolean acceptsEmptyCalc() {
-        throw new IllegalStateException("acceptsEmptyCalc() not implemented");
-    }
-
-    protected SymSet<I> firstSetCalc() {
-        throw new IllegalStateException("firstSetCalc() not implemented");
+        return firstSet.apply();
     }
 }
 
 abstract class Impl {
+
     static <I, CTX extends Parser.Context<I>, A>
     ParserImpl<I, CTX, IList<A>> many(Parser<I, CTX, A> p) {
-        return new ParserImpl<I, CTX, IList<A>>() {
-            @Override
-            public boolean acceptsEmpty() {
-                return true;
-            }
-
-            @Override
-            protected SymSet<I> firstSetCalc() {
-                return p.firstSet();
-            }
-
+        return new ParserImpl<I, CTX, IList<A>>(() -> true, p::firstSet) {
             @Override
             public Result<I, IList<A>> parse(CTX ctx, int pos) {
                 IList<A> acc = IList.of();
                 while (true) {
-                    final Result<I, A> r = p.parse(ctx, pos);
-                    if (r.isSuccess()) {
-                        final Result.Success<I, A> succ = (Result.Success<I, A>) r;
-                        acc = acc.add(succ.value);
-                        pos = succ.next;
-                    } else {
-                        return Result.success(acc, pos);
+                    if (!ctx.isEof(pos)) {
+                        final I i = ctx.input().at(pos);
+                        if (firstSet().matches(i)) {
+                            final Result<I, A> r = p.parse(ctx, pos);
+                            if (r.isSuccess()) {
+                                final Result.Success<I, A> succ = (Result.Success<I, A>) r;
+                                acc = acc.add(succ.value);
+                                pos = succ.next;
+                                continue;
+                            }
+                        }
                     }
+                    return Result.success(acc, pos);
                 }
             }
         };

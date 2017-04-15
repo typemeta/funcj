@@ -101,17 +101,10 @@ public class Text {
             case 0: return fail();
             case 1: return Text.<CTX>chr(s.charAt(0)).map(Object::toString);
             default: {
-                return new ParserImpl<Chr, CTX, String>() {
-                    @Override
-                    public boolean acceptsEmpty() {
-                        return false;
-                    }
-
-                    @Override
-                    public SymSet<Chr> firstSetCalc() {
-                        return SymSet.value(Chr.valueOf(s.charAt(0)));
-                    }
-
+                return new ParserImpl<Chr, CTX, String>(
+                    () -> false,
+                    () -> SymSet.value(Chr.valueOf(s.charAt(0)))
+                ) {
                     @Override
                     public Result<Chr, String> parse(CTX ctx, int pos) {
                         int pos2 = pos;

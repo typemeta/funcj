@@ -10,6 +10,10 @@ import java.io.IOException;
 
 public class JmhTest {
 
+    public static void main(String args[]) throws IOException, RunnerException {
+        new JmhTest().runJmh();
+    }
+
     public void runJmh() throws RunnerException, IOException {
         final Options opt = new OptionsBuilder()
             .jvmArgs("-XX:+UnlockCommercialFeatures")
