@@ -8,11 +8,11 @@ import java.io.IOException;
 
 public class JmhTest {
 
-    public static void main(String args[]) throws IOException, RunnerException {
+    public static void main(String args[]) throws RunnerException {
         new JmhTest().runJmh();
     }
 
-    public void runJmh() throws RunnerException, IOException {
+    public void runJmh() throws RunnerException {
         final Options opt = new OptionsBuilder()
             .jvmArgs("-XX:+UnlockCommercialFeatures")
                 .include(JmhTest.class.getSimpleName())

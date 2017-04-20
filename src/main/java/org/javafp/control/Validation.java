@@ -203,8 +203,8 @@ public interface Validation<E, T> {
                             return map(f.curry());
                         }
 
-                        public <G> _6<G> and(Validation<E, G> pg) {
-                            return new _6<G>(pg);
+                        public <H> _6<H> and(Validation<E, H> pg) {
+                            return new _6<H>(pg);
                         }
 
                         public class _6<H> {

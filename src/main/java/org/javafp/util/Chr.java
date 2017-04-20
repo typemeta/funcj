@@ -194,8 +194,8 @@ public final class Chr implements Comparable<Chr> {
         public static <A, B> List<B> map(List<A> l, Functions.F<A, B> f) {
             final int n = l.size();
             final List<B> r = new ArrayList<B>(n);
-            for (int i = 0; i < n; ++i) {
-                r.add(f.apply(l.get(i)));
+            for (A aL : l) {
+                r.add(f.apply(aL));
             }
 
             return r;

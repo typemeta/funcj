@@ -117,13 +117,13 @@ public abstract class SymSet<I> {
         @Override
         public StringBuilder append(StringBuilder sb) {
             // TODO: handle whitespace.
-            return sb.append(value);
+            return sb.append(value.toString());
         }
     }
 
     static class Pred<I> extends SymSet<I> {
 
-        public String name;
+        public final String name;
         public final Predicate<I> pred;
 
         public Pred(String name, Predicate<I> pred) {

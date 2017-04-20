@@ -11,7 +11,7 @@ public class GrammarTest {
         Grammar.parser.firstSet();
     }
 
-    private static void assertSuccess(String s, String expected) throws Exception {
+    private static void assertSuccess(String s, String expected) {
         final String result = Grammar.parse(s).getOrThrow().toString();
         Assert.assertEquals(expected, result);
         Assert.assertEquals(expected, Grammar.parse(result).getOrThrow().toString());

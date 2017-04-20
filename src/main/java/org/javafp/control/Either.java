@@ -92,7 +92,7 @@ public interface Either<A, B> {
 
         @Override
         public <T> Either<A, T> map(F<? super B, ? extends T> f) {
-            return Either.<A, T>right(f.apply(value));
+            return Either.right(f.apply(value));
         }
 
         @Override
