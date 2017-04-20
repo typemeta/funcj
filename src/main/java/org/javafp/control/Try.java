@@ -1,11 +1,11 @@
 package org.javafp.control;
 
 import org.javafp.data.IList;
-import org.javafp.util.*;
 import org.javafp.util.Functions.*;
+import org.javafp.util.FunctionsEx;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Simple monadic wrapper for computations which result in either a successfully computed value

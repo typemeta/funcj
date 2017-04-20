@@ -1,14 +1,23 @@
 package org.javafp.json;
 
-import org.javafp.parsec4j.*;
+import org.javafp.parsec4j.Result;
 import org.javafp.util.Chr;
 import org.junit.Test;
+import org.openjdk.jmh.annotations.Benchmark;
 
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
-public class GrammarTest {
+public class JmhTest {
+    static {
+        System.out.println("Initialising...");
+        Grammar.parser.acceptsEmpty();
+        Grammar.parser.firstSet();
+    }
+
     private static final String test0 = "null";
 
     private static final String test1 = "true";
@@ -46,9 +55,18 @@ public class GrammarTest {
         test0, test1, test2, test3, test4
     };
 
+    private static String loadFile(String name) throws IOException {
+        final InputStream is =
+            Optional.ofNullable(JmhTest.class.getResourceAsStream(name))
+                    .orElseThrow(() -> new RuntimeException("File '" + name + "' not found"));
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(is))) {
+            return buffer.lines().collect(Collectors.joining("\n"));
+        }
+    }
+
     @Test
     public void testRoundTrip() {
-        Arrays.stream(tests).forEach(GrammarTest::roundTrip);
+        Arrays.stream(tests).forEach(JmhTest::roundTrip);
     }
 
     private static void roundTrip(String json) {
@@ -63,8 +81,10 @@ public class GrammarTest {
     }
 
     @Test
-    public void testSuccessParse() {
-        final Result<Chr, Node> result = Grammar.parse(example5);
+    @Benchmark
+    public void testSuccessParse() throws IOException {
+        final String json = loadFile("/example.json");
+        final Result<Chr, Node> result = Grammar.parse(json);
         final Node node = result.getOrThrow();
     }
 }

@@ -1,8 +1,8 @@
 package org.javafp.control;
 
 import org.javafp.data.*;
-import org.javafp.util.*;
 import org.javafp.util.Functions.F;
+import org.javafp.util.Unit;
 
 import static org.javafp.util.Unit.UNIT;
 

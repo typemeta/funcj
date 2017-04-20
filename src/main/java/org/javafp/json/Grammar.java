@@ -4,7 +4,7 @@ import org.javafp.data.*;
 import org.javafp.parsec4j.*;
 import org.javafp.util.Chr;
 
-import java.util.*;
+import java.util.LinkedHashMap;
 
 import static org.javafp.parsec4j.Parser.*;
 import static org.javafp.parsec4j.Text.*;
@@ -98,7 +98,7 @@ public class Grammar {
             (
                 bsChr.andR(esc)
             ).or(
-                satisfy(c -> !c.equals('"') && !c.equals('\\'))
+                satisfy("schar", c -> !c.equals('"') && !c.equals('\\'))
             );
 
         final Parser<Chr, Ctx<Chr>, String> jstring =
@@ -157,7 +157,6 @@ public class Grammar {
     public static final Parser<Chr, Ctx<Chr>, Node> parser;
 
     public static Result<Chr, Node> parse(String str) {
-        //return parser.run(new Ctx<>(Input.of(str)));
         return skipMany(Text.<Ctx<Chr>>ws()).andR(parser).run(new Ctx<>(Input.of(str)));
     }
 }

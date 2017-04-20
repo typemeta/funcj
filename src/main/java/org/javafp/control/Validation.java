@@ -1,8 +1,8 @@
 package org.javafp.control;
 
 import org.javafp.data.IList;
-import org.javafp.util.*;
 import org.javafp.util.Functions.*;
+import org.javafp.util.FunctionsGenEx;
 
 import java.util.function.Consumer;
 

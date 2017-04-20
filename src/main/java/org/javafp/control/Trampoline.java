@@ -1,6 +1,6 @@
 package org.javafp.control;
 
-import org.javafp.data.*;
+import org.javafp.data.IList;
 import org.javafp.util.Functions;
 import org.javafp.util.Functions.F0;
 

@@ -1,12 +1,8 @@
 package org.javafp.json;
 
-import org.javafp.data.*;
 import org.javafp.parsec4j.*;
 import org.javafp.parsec4j.Parser.Ctx;
 import org.javafp.util.Functions;
-import org.javafp.util.Functions.F2;
-
-import static org.javafp.parsec4j.Parser.*;
 
 public class GrammarTokenised {
 

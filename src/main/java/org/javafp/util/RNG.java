@@ -1,7 +1,7 @@
 package org.javafp.util;
 
 import org.javafp.control.State;
-import org.javafp.data.*;
+import org.javafp.data.Tuple2;
 
 public interface RNG {
 

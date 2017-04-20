@@ -17,28 +17,28 @@ public class Text {
         return value(new Chr(c));
     }
 
-    private static final Parser<Chr, Ctx<Chr>, Chr> alpha = satisfy(Chr::isLetter);
+    private static final Parser<Chr, Ctx<Chr>, Chr> alpha = satisfy("letter", Chr::isLetter);
 
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Chr> alpha() {
         return (Parser<Chr, CTX, Chr>) alpha;
     }
 
-    private static final Parser<Chr, Ctx<Chr>, Chr> digit = satisfy(Chr::isDigit);
+    private static final Parser<Chr, Ctx<Chr>, Chr> digit = satisfy("digit", Chr::isDigit);
 
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Chr> digit() {
         return (Parser<Chr, CTX, Chr>) digit;
     }
 
-    private static final Parser<Chr, Ctx<Chr>, Chr> alphaNum = satisfy(Chr::isLetterOrDigit);
+    private static final Parser<Chr, Ctx<Chr>, Chr> alphaNum = satisfy("letterOrDigit", Chr::isLetterOrDigit);
 
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Chr> alphaNum() {
         return (Parser<Chr, CTX, Chr>) alphaNum;
     }
 
-    private static final Parser<Chr, Ctx<Chr>, Chr> ws = satisfy(Chr::isWhitespace);
+    private static final Parser<Chr, Ctx<Chr>, Chr> ws = satisfy("ws", Chr::isWhitespace);
 
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Chr> ws() {
@@ -76,7 +76,7 @@ public class Text {
     }
 
     private static final Parser<Chr, Ctx<Chr>, Double> floating =
-        many1(Text.<Ctx<Chr>>digit().map(Text::digitToInt))
+        many(Text.<Ctx<Chr>>digit().map(Text::digitToInt))
             .map(l -> l.foldr((d, acc) -> d + acc / 10.0, 0.0) / 10.0);
 
     public static <CTX extends Parser.Context<Chr>>
@@ -106,7 +106,7 @@ public class Text {
                     () -> SymSet.value(Chr.valueOf(s.charAt(0)))
                 ) {
                     @Override
-                    public Result<Chr, String> parse(CTX ctx, int pos) {
+                    public Result<Chr, String> parse(CTX ctx, int pos, SymSet<Chr> follow) {
                         int pos2 = pos;
                         for (int i = 0; i < s.length(); ++i) {
                             if (ctx.input().isEof(pos2) || ctx.input().at(pos2).charValue() != s.charAt(i)) {

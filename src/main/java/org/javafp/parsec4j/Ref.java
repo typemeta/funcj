@@ -1,7 +1,8 @@
 package org.javafp.parsec4j;
 
-import org.javafp.util.Unit;
+import org.javafp.data.Lazy;
 import org.javafp.parsec4j.Parser.Context;
+import org.javafp.util.Unit;
 
 import java.util.Objects;
 
@@ -19,16 +20,16 @@ public class Ref<I, CTX extends Context<I>, A>
     private enum Null implements Parser<Unit, Context<Unit>, Unit> {
         INSTANCE {
             @Override
-            public boolean acceptsEmpty() {
+            public Lazy<Boolean> acceptsEmpty() {
                 throw new RuntimeException("Uninitialised lazy Parser reference");
             }
 
             @Override
-            public SymSet<Unit> firstSet() {
+            public Lazy<SymSet<Unit>> firstSet() {
                 throw new RuntimeException("Uninitialised lazy Parser reference");
             }
 
-            public Result<Unit, Unit> parse(Context<Unit> ctx, int pos) {
+            public Result<Unit, Unit> parse(Context<Unit> ctx, int pos, SymSet<Unit> follow) {
                 throw new RuntimeException("Uninitialised lazy Parser reference");
             }
         };
@@ -58,17 +59,17 @@ public class Ref<I, CTX extends Context<I>, A>
     }
 
     @Override
-    public boolean acceptsEmpty() {
-        return impl.acceptsEmpty();
+    public Lazy<Boolean> acceptsEmpty() {
+        return () -> impl.acceptsEmpty().apply();
     }
 
     @Override
-    public SymSet<I> firstSet() {
-        return impl.firstSet();
+    public Lazy<SymSet<I>> firstSet() {
+        return () -> impl.firstSet().apply();
     }
 
     @Override
-    public Result<I, A> parse(CTX ctx, int pos) {
-        return impl.parse(ctx, pos);
+    public Result<I, A> parse(CTX ctx, int pos, SymSet<I> follow) {
+        return impl.parse(ctx, pos, follow);
     }
 }

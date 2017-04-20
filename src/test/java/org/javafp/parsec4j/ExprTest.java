@@ -1,9 +1,9 @@
 package org.javafp.parsec4j;
 
 import org.javafp.util.Chr;
-import org.javafp.util.Functions.*;
+import org.javafp.util.Functions.Op2;
 
-import static org.javafp.parsec4j.Text.*;
+import static org.javafp.parsec4j.Text.chr;
 
 public abstract class ExprTest {
     public static class Ctx extends Parser.Ctx<Chr> {

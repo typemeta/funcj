@@ -1,11 +1,10 @@
 package org.javafp.parsec4j.expr;
 
-import org.javafp.util.Chr;
 import org.javafp.parsec4j.*;
-import org.javafp.util.Functions.*;
+import org.javafp.util.Chr;
+import org.javafp.util.Functions.Op2;
 
-import static org.javafp.parsec4j.Parser.pure;
-import static org.javafp.parsec4j.Text.*;
+import static org.javafp.parsec4j.Text.chr;
 import static org.javafp.parsec4j.expr.Model.*;
 
 public abstract class Grammar {

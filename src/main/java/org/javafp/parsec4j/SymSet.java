@@ -1,11 +1,11 @@
 package org.javafp.parsec4j;
 
-import org.javafp.util.*;
 import org.javafp.util.Functions.Predicate;
+import org.javafp.util.Unit;
 
 import java.util.*;
 
-public interface SymSet<I> {
+public abstract class SymSet<I> {
     enum Type {
         EMPTY,
         ALL,
@@ -26,11 +26,11 @@ public interface SymSet<I> {
         return new Value<I>(value);
     }
 
-    static <I> SymSet<I> pred(Predicate<I> pred) {
-        return new Pred<I>(pred);
+    static <I> SymSet<I> pred(String name, Predicate<I> pred) {
+        return new Pred<I>(name, pred);
     }
 
-    class Empty<I> implements SymSet<I> {
+    static class Empty<I> extends SymSet<I> {
         static final Empty<Unit> INSTANCE = new Empty<Unit>();
 
         @Override
@@ -47,9 +47,14 @@ public interface SymSet<I> {
         public SymSet<I> union(SymSet<I> rhs) {
             return rhs;
         }
+
+        @Override
+        public StringBuilder append(StringBuilder sb) {
+            return sb.append("<empty>");
+        }
     }
 
-    class All<I> implements SymSet<I> {
+    static class All<I> extends SymSet<I> {
         static final All<Unit> INSTANCE = new All<Unit>();
 
         @Override
@@ -66,9 +71,14 @@ public interface SymSet<I> {
         public SymSet<I> union(SymSet<I> rhs) {
             return this;
         }
+
+        @Override
+        public StringBuilder append(StringBuilder sb) {
+            return sb.append("all");
+        }
     }
 
-    class Value<I> implements SymSet<I> {
+    static class Value<I> extends SymSet<I> {
 
         public final I value;
 
@@ -103,13 +113,21 @@ public interface SymSet<I> {
                     throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
             }
         }
+
+        @Override
+        public StringBuilder append(StringBuilder sb) {
+            // TODO: handle whitespace.
+            return sb.append(value);
+        }
     }
 
-    class Pred<I> implements SymSet<I> {
+    static class Pred<I> extends SymSet<I> {
 
+        public String name;
         public final Predicate<I> pred;
 
-        public Pred(Predicate<I> pred) {
+        public Pred(String name, Predicate<I> pred) {
+            this.name = name;
             this.pred = pred;
         }
 
@@ -140,9 +158,14 @@ public interface SymSet<I> {
                     throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
             }
         }
+
+        @Override
+        public StringBuilder append(StringBuilder sb) {
+            return sb.append('<').append(name).append('>');
+        }
     }
 
-    class Union<I> implements SymSet<I> {
+    static class Union<I> extends SymSet<I> {
 
         public final Set<I> values;
         public final List<Pred<I>> preds;
@@ -222,11 +245,41 @@ public interface SymSet<I> {
                     throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
             }
         }
+
+        @Override
+        public StringBuilder append(StringBuilder sb) {
+            boolean first = true;
+            for (I val : values) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(' ');
+                }
+                sb.append(val);
+            }
+            for (Pred<I> pred : preds) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(' ');
+                }
+                pred.append(sb);
+            }
+            return sb;
+        }
     }
 
-    Type type();
+    abstract Type type();
 
-    boolean matches(I value);
+    abstract boolean matches(I value);
 
-    SymSet<I> union(SymSet<I> rhs);
+    abstract SymSet<I> union(SymSet<I> rhs);
+
+    abstract StringBuilder append(StringBuilder sb);
+
+    @Override
+    public String toString() {
+        return append(new StringBuilder()).toString();
+    }
+
 }

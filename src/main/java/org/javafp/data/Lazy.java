@@ -41,6 +41,11 @@ class LazyImpl<T> implements Lazy<T> {
     public T apply() {
         return get.apply();
     }
+
+    @Override
+    public String toString() {
+        return "Lazy<" + apply() + '>';
+    }
 }
 
 class LazyThreadSafeImpl<T> implements Lazy<T> {
@@ -74,6 +79,11 @@ class LazyThreadSafeImpl<T> implements Lazy<T> {
     @Override
     public T apply() {
         return get.apply();
+    }
+
+    @Override
+    public String toString() {
+        return "Lazy<" + apply() + '>';
     }
 }
 
