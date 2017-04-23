@@ -4,8 +4,6 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.runner.*;
 import org.openjdk.jmh.runner.options.*;
 
-import java.io.IOException;
-
 public class JmhTest {
 
     public static void main(String args[]) throws RunnerException {

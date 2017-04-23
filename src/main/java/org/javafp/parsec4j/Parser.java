@@ -177,16 +177,6 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
     Parser<I, CTX, B> ap(F<A, B> f, Parser<I, CTX, A> pa) {
         return ap(pure(f), pa);
     }
-//
-//    static <I, CTX extends Parser.Context<I>, A, B>
-//    Parser<I, CTX, B> ap(F<A, B> f, Parser<I, CTX, A> pa) {
-//        return new ParserImpl<I, CTX, B>(true, pa::firstSet) {
-//           @Override
-//            public Result<I, B> parse(CTX ctx, int pos, SymSet<I> follow) {
-//                return pa.parse(ctx, pos, follow).map(f);
-//            }
-//        };
-//    }
 
     static <I, CTX extends Parser.Context<I>, A, B>
     F<Parser<I, CTX, A>, Parser<I, CTX, B>> liftA(F<A, B> f) {
@@ -258,13 +248,34 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
 
     static <I, CTX extends Parser.Context<I>, A>
     Parser<I, CTX, IList<A>> many(Parser<I, CTX, A> p) {
-        return
-            p.and(
-                LazyParser.of(() -> many(p))
-            ).map(
-                a -> l -> (IList<A>)l.add(a)
-            ).or(pure(IList.of()));
+        return new ParserImpl<I, CTX, IList<A>>(() -> true, p.firstSet()) {
+            @Override
+            public Result<I, IList<A>> parse(CTX ctx, int pos, SymSet<I> follow) {
+                IList<A> acc = IList.of();
+                final SymSet<I> follow2 = follow.union(p.firstSet().apply());
+                while (true) {
+                    if (!ctx.isEof(pos)) {
+                        final I i = ctx.input().at(pos);
+                        if (firstSet().apply().matches(i)) {
+                            final Result<I, A> r = p.parse(ctx, pos, follow2);
+                            if (r.isSuccess()) {
+                                final Result.Success<I, A> succ = (Result.Success<I, A>) r;
+                                acc = acc.add(succ.value);
+                                pos = succ.next;
+                                continue;
+                            }
+                        }
+                    }
+                    return Result.success(acc.reverse(), pos);
+                }
+            }
+        };
     }
+//            p.and(
+//                LazyParser.of(() -> many(p))
+//            ).map(
+//                a -> l -> (IList<A>)l.add(a)
+//            ).or(pure(IList.of()));
 
     static <I, CTX extends Parser.Context<I>, A>
     Parser<I, CTX, IList.NonEmpty<A>> many1(Parser<I, CTX, A> p) {
