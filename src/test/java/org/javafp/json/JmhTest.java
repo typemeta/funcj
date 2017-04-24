@@ -59,5 +59,6 @@ public class JmhTest {
         final String json = loadFile("/example.json");
         final Result<Chr, Node> result = Grammar.parse(json);
         final Node node = result.getOrThrow();
+        //System.out.println(node.toJson());
     }
 }
