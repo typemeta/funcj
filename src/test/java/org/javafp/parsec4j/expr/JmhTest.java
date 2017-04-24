@@ -1,5 +1,6 @@
 package org.javafp.parsec4j.expr;
 
+import org.javafp.jmh.FlightRecordingProfiler;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.runner.*;
 import org.openjdk.jmh.runner.options.*;
@@ -12,10 +13,11 @@ public class JmhTest {
 
     public void runJmh() throws RunnerException {
         final Options opt = new OptionsBuilder()
-            .jvmArgs("-XX:+UnlockCommercialFeatures")
+                .jvmArgs("-XX:+UnlockCommercialFeatures")
                 .include(JmhTest.class.getSimpleName())
                 .warmupIterations(20)
                 .measurementIterations(20)
+                .addProfiler(FlightRecordingProfiler.class)
                 .forks(1)
                 .build();
            new Runner(opt).run();

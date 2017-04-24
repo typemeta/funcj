@@ -53,6 +53,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
@@ -64,6 +65,12 @@
             <version>${jmh.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>com.github.biboudis</groupId>-->
+            <!--<artifactId>jmh-profilers</artifactId>-->
+            <!--<version>0.1.2</version>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>

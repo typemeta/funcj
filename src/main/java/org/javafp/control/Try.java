@@ -52,7 +52,7 @@ public interface Try<T> {
      * Standard applicative traversal.
      */
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
-        return lt.foldr(
+        return lt.foldRight(
                 (t, tlt) -> f.apply(t).apply(tlt.map(l -> l::add)),
                 success(IList.nil())
         );
@@ -62,7 +62,7 @@ public interface Try<T> {
      * Standard applicative sequencing.
      */
     static <T> Try<IList<T>> sequence(IList<Try<T>> lt) {
-        return lt.foldr(
+        return lt.foldRight(
             (tt, tlt) -> tt.apply(tlt.map(l -> l::add)),
             success(IList.nil())
         );

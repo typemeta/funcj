@@ -97,7 +97,7 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Convert a String into a list of Characters.
      */
-    public static IList<Character> listToString(String s) {
+    public static IList<Character> stringToList(String s) {
         IList<Character> r = nil();
         for (int i = s.length() - 1; i >= 0; --i) {
             r = r.add(s.charAt(i));
@@ -124,7 +124,7 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Is this list empty?.
+     * Is this list empty?
      */
     public abstract boolean isEmpty();
 
@@ -141,10 +141,20 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract T head();
 
     /**
+     * @return the head of this list or Option.empty.
+     */
+    public abstract Optional<T> headOpt();
+
+    /**
      * @return the tail of this list.
      * @throws UnsupportedOperationException if the list is empty.
      */
     public abstract IList<T> tail();
+
+    /**
+     * @return the tail of this list or Option.empty.
+     */
+    public abstract Optional<IList<T>> tailOpt();
 
     /**
      * @return the indexed element of this list.
@@ -215,25 +225,25 @@ public abstract class IList<T> implements Iterable<T> {
      * Right-fold a function over this list.
      * @return folded r
      */
-    public abstract <U> U foldr(F2<T, U, U> f, U z);
+    public abstract <U> U foldRight(F2<T, U, U> f, U z);
 
     /**
      * Left-fold a function over this list.
      * @return folded r
      */
-    public abstract <U> U foldl(F2<U, T, U> f, U z);
+    public abstract <U> U foldLeft(F2<U, T, U> f, U z);
 
     /**
      * Right-fold a function over this non-empty list.
      * @return folded r
      */
-    public abstract T foldr1(Op2<T> f);
+    public abstract T foldRight1(Op2<T> f);
 
     /**
      * Left-fold a function over this non-empty list.
      * @return folded r
      */
-    public abstract T foldl1(Op2<T> f);
+    public abstract T foldLeft1(Op2<T> f);
 
     /**
      * Create a spliterator.
@@ -291,8 +301,18 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
+        public Optional<T> headOpt() {
+            return Optional.empty();
+        }
+
+        @Override
         public IList<T> tail() {
             throw new UnsupportedOperationException("Cannot take the tail of an empty list");
+        }
+
+        @Override
+        public Optional<IList<T>> tailOpt() {
+            return Optional.empty();
         }
 
         @Override
@@ -347,23 +367,23 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <U> U foldr(F2<T, U, U> f, U z) {
+        public <U> U foldRight(F2<T, U, U> f, U z) {
             return z;
         }
 
         @Override
-        public <U> U foldl(F2<U, T, U> f, U z) {
+        public <U> U foldLeft(F2<U, T, U> f, U z) {
             return z;
         }
 
         @Override
-        public T foldr1(Op2<T> f) {
-            throw new UnsupportedOperationException("Cannot call foldr1(f) on an empty list");
+        public T foldRight1(Op2<T> f) {
+            throw new UnsupportedOperationException("Cannot call foldRight1(f) on an empty list");
         }
 
         @Override
-        public T foldl1(Op2<T> f) {
-            throw new UnsupportedOperationException("Cannot call foldl1(f) on an empty list");
+        public T foldLeft1(Op2<T> f) {
+            throw new UnsupportedOperationException("Cannot call foldLeft1(f) on an empty list");
         }
 
         @Override
@@ -439,8 +459,18 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
+        public Optional<T> headOpt() {
+            return Optional.of(head);
+        }
+
+        @Override
         public IList<T> tail() {
             return tail;
+        }
+
+        @Override
+        public Optional<IList<T>> tailOpt() {
+            return Optional.of(tail);
         }
 
         @Override
@@ -548,12 +578,12 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <U> U foldr(F2<T, U, U> f, U z) {
-            return reverse().foldl(f.flip(), z);
+        public <U> U foldRight(F2<T, U, U> f, U z) {
+            return reverse().foldLeft(f.flip(), z);
         }
 
         @Override
-        public <U> U foldl(F2<U, T, U> f, U z) {
+        public <U> U foldLeft(F2<U, T, U> f, U z) {
             U r = z;
             for (IList<T> n = this; !n.isEmpty(); n = n.tail()) {
                 r = f.apply(r, n.head());
@@ -562,12 +592,12 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public T foldr1(Op2<T> f) {
-            return reverse().foldl1(f.flip());
+        public T foldRight1(Op2<T> f) {
+            return reverse().foldLeft1(f.flip());
         }
 
         @Override
-        public T foldl1(Op2<T> f) {
+        public T foldLeft1(Op2<T> f) {
             T r = head;
             for (IList<T> n = tail; !n.isEmpty(); n = n.tail()) {
                 r = f.apply(r, n.head());

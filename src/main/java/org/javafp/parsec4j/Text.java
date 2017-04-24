@@ -14,7 +14,7 @@ public class Text {
 
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Chr> chr(char c) {
-        return value(new Chr(c));
+        return value(Chr.valueOf(c));
     }
 
     private static final Parser<Chr, Ctx<Chr>, Chr> alpha = satisfy("letter", Chr::isLetter);
@@ -55,7 +55,7 @@ public class Text {
 
     private static final Parser<Chr, Ctx<Chr>, Integer> uintr =
         many1(Text.<Ctx<Chr>>digit().map(Text::digitToInt))
-            .map(l -> l.foldl1((acc, x) -> acc * 10 + x));
+            .map(l -> l.foldLeft1((acc, x) -> acc * 10 + x));
 
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Integer> uintr() {
@@ -77,7 +77,7 @@ public class Text {
 
     private static final Parser<Chr, Ctx<Chr>, Double> floating =
         many(Text.<Ctx<Chr>>digit().map(Text::digitToInt))
-            .map(l -> l.foldr((d, acc) -> d + acc / 10.0, 0.0) / 10.0);
+            .map(l -> l.foldRight((d, acc) -> d + acc / 10.0, 0.0) / 10.0);
 
     public static <CTX extends Parser.Context<Chr>>
     Parser<Chr, CTX, Double> floating() {
@@ -109,7 +109,7 @@ public class Text {
                     public Result<Chr, String> parse(CTX ctx, int pos, SymSet<Chr> follow) {
                         int pos2 = pos;
                         for (int i = 0; i < s.length(); ++i) {
-                            if (ctx.input().isEof(pos2) || ctx.input().at(pos2).charValue() != s.charAt(i)) {
+                            if (ctx.input().isEof(pos2) || !ctx.input().at(pos2).equals(s.charAt(i))) {
                                 return Result.failure(pos);
                             } else {
                                 pos2 = pos2+1;

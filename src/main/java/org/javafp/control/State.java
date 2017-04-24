@@ -44,7 +44,7 @@ public interface State<S, A> {
      * Standard applicative traversal.
      */
     static <S, A, B> State<S, IList<B>> traverse(IList<A> lt, F<A, State<S, B>> f) {
-        return lt.foldr(
+        return lt.foldRight(
             (a, slb) -> f.apply(a).apply(slb.map(l -> l::add)),
             result(IList.nil())
         );
@@ -54,7 +54,7 @@ public interface State<S, A> {
      * Standard applicative sequencing.
      */
     static <S, A> State<S, IList<A>> sequence(IList<? extends State<S, A>> lsa) {
-        return lsa.foldr(
+        return lsa.foldRight(
             (sa, sla) -> sa.apply(sla.map(l -> l::add)),
             result(IList.nil())
         );

@@ -25,14 +25,6 @@ public class Grammar {
         return map;
     }
 
-    private static String listToString(IList<Chr> l) {
-        final StringBuilder sb = new StringBuilder();
-        for (; !l.isEmpty(); l = l.tail()) {
-            sb.append(l.head().charValue());
-        }
-        return sb.toString();
-    }
-
     static {
         final Parser<Chr, Ctx<Chr>, Node> jnull = tok(string("null")).andR(pure(Node.nul()));
 
@@ -105,7 +97,7 @@ public class Grammar {
             tok(between(
                 dqChr,
                 dqChr,
-                many(stringChar).map(Grammar::listToString)
+                many(stringChar).map(Chr::listToString)
             ));
 
         final Parser<Chr, Ctx<Chr>, Node> jtext =
@@ -137,7 +129,7 @@ public class Grammar {
                 sepBy(
                     jfield,
                     tok(chr(','))
-                ).map(lf -> Node.object(toMap(lf)))
+                ).map(Grammar::toMap).map(Node::object)
             );
 
         jvalue.set(

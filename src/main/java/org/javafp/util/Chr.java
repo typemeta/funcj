@@ -132,7 +132,7 @@ public final class Chr implements Comparable<Chr> {
         this.value = value;
     }
 
-    public Chr(int value) {
+    private Chr(int value) {
         this.value = (char)value;
     }
 
@@ -154,6 +154,10 @@ public final class Chr implements Comparable<Chr> {
     public boolean equals(Object rhs) {
         return rhs instanceof Chr &&
             value == ((Chr) rhs).charValue();
+    }
+
+    public boolean equals(Chr rhs) {
+        return value == rhs.value;
     }
 
     public boolean equals(char rhs) {

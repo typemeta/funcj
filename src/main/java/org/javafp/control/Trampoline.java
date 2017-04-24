@@ -75,7 +75,7 @@ public interface Trampoline<T> {
          * Standard applicative traversal.
          */
         static <E, T, U> Validated<E, IList<U>> traverse(IList<T> lt, Functions.F<T, Validated<E, U>> f) {
-            return lt.foldr(
+            return lt.foldRight(
                 (vt, vlu) -> f.apply(vt).apply(vlu.apply(l -> l::add)),
                 success(IList.nil())
             );
@@ -85,7 +85,7 @@ public interface Trampoline<T> {
          * Standard applicative sequencing.
          */
         static <E, T> Validated<E, IList<T>> sequence(IList<Validated<E, T>> lvt) {
-            return lvt.foldr(
+            return lvt.foldRight(
                 (vt, vlt) -> vt.apply(vlt.apply(l -> l::add)),
                 success(IList.nil())
             );

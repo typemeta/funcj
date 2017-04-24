@@ -26,7 +26,7 @@ public interface Either<A, B> {
      * Standard applicative traversal.
      */
     static <T, A, B> Either<A, IList<B>> traverse(IList<T> lt, F<T, Either<A, B>> f) {
-        return lt.foldr(
+        return lt.foldRight(
             (t, elt) -> f.apply(t).apply(elt.map(l -> l::add)),
             right(IList.nil())
         );
@@ -36,7 +36,7 @@ public interface Either<A, B> {
      * Standard applicative sequencing.
      */
     static <A, B> Either<A, IList<B>> sequence(IList<Either<A, B>> le) {
-        return le.foldr(
+        return le.foldRight(
             (et, elt) -> et.apply(elt.map(l -> l::add)),
             right(IList.nil())
         );
