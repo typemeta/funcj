@@ -330,12 +330,7 @@ abstract class ParserImpl<I, CTX extends Parser.Context<I>, A> implements Parser
         this.acceptsEmpty = acceptsEmpty;
         this.firstSet = firstSet;
     }
-//
-//    ParserImpl(boolean acceptsEmpty, F0<SymSet<I>> firstSet) {
-//        this.acceptsEmpty = () -> acceptsEmpty;
-//        this.firstSet = Lazy.of(firstSet);
-//    }
-//
+
     public Lazy<Boolean> acceptsEmpty() {
         return acceptsEmpty;
     }
