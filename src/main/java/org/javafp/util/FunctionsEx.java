@@ -285,6 +285,10 @@ public abstract class FunctionsEx {
     @FunctionalInterface
     public interface Op2<T> extends F2<T, T, T> {
         T apply(T l, T r) throws Exception;
+
+        default Op2<T> flip() {
+            return (b, a) -> apply(a, b);
+        }
     }
 
     /**
@@ -293,9 +297,5 @@ public abstract class FunctionsEx {
     @FunctionalInterface
     public interface Predicate<T> extends F<T, Boolean> {
         Boolean apply(T t) throws Exception;
-
-        default Op2<T> flip() {
-            return (b, a) -> apply(a, b);
-        }
     }
 }
