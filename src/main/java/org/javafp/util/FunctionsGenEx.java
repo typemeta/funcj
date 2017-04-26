@@ -295,7 +295,7 @@ public abstract class FunctionsGenEx {
     public interface Op2<T, X extends Exception> extends F2<T, T, T, X> {
         T apply(T l, T r) throws X;
 
-        default Op2<T. X> flip() {
+        default Op2<T, X> flip() {
             return (b, a) -> apply(a, b);
         }
     }
