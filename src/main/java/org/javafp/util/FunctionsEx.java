@@ -293,5 +293,9 @@ public abstract class FunctionsEx {
     @FunctionalInterface
     public interface Predicate<T> extends F<T, Boolean> {
         Boolean apply(T t) throws Exception;
+
+        default Op2<T> flip() {
+            return (b, a) -> apply(a, b);
+        }
     }
 }
