@@ -1,23 +1,21 @@
 package org.javafp.parsec4j;
 
 import org.javafp.data.Lazy;
-import org.javafp.parsec4j.Parser.Context;
 import org.javafp.util.Unit;
 
 import java.util.Objects;
 
-public class Ref<I, CTX extends Context<I>, A>
-        implements Parser<I, CTX, A> {
+public class Ref<I, A> implements Parser<I, A> {
 
-    public static <I, CTX extends Context<I>, A> Ref<I, CTX, A> of() {
-        return new Ref<I, CTX, A>();
+    public static <I, A> Ref<I, A> of() {
+        return new Ref<I, A>();
     }
 
-    public static <I, CTX extends Context<I>, A> Ref<I, CTX, A> of(Parser<I, CTX, A> p) {
-        return new Ref<I, CTX, A>(p);
+    public static <I, A> Ref<I, A> of(Parser<I, A> p) {
+        return new Ref<I, A>(p);
     }
 
-    private enum Null implements Parser<Unit, Context<Unit>, Unit> {
+    private enum Null implements Parser<Unit, Unit> {
         INSTANCE {
             @Override
             public Lazy<Boolean> acceptsEmpty() {
@@ -29,19 +27,19 @@ public class Ref<I, CTX extends Context<I>, A>
                 throw new RuntimeException("Uninitialised lazy Parser reference");
             }
 
-            public Result<Unit, Unit> parse(Context<Unit> ctx, int pos, SymSet<Unit> follow) {
+            public Result<Unit, Unit> parse(Input<Unit> ctx, int pos, SymSet<Unit> follow) {
                 throw new RuntimeException("Uninitialised lazy Parser reference");
             }
         };
 
-        static <I, CTX extends Context<I>, A> Parser<I, CTX, A> of() {
-            return (Parser<I, CTX, A>) INSTANCE;
+        static <I, A> Parser<I, A> of() {
+            return (Parser<I, A>) INSTANCE;
         }
     }
 
-    private Parser<I, CTX, A> impl;
+    private Parser<I, A> impl;
 
-    private Ref(Parser<I, CTX, A> p) {
+    private Ref(Parser<I, A> p) {
         this.impl = Objects.requireNonNull(impl);
     }
 
@@ -49,7 +47,7 @@ public class Ref<I, CTX extends Context<I>, A>
         this.impl = Null.of();
     }
 
-    public Parser<I, CTX, A> set(Parser<I, CTX, A> impl) {
+    public Parser<I, A> set(Parser<I, A> impl) {
         if (this.impl != Null.INSTANCE) {
             throw new IllegalStateException("Ref is already initialised");
         } else {
@@ -69,7 +67,7 @@ public class Ref<I, CTX extends Context<I>, A>
     }
 
     @Override
-    public Result<I, A> parse(CTX ctx, int pos, SymSet<I> follow) {
+    public Result<I, A> parse(Input<I> ctx, int pos, SymSet<I> follow) {
         return impl.parse(ctx, pos, follow);
     }
 }

@@ -17,91 +17,65 @@ import static org.javafp.util.Functions.F2.curry;
  * @param <I> Input stream symbol type.
  * @param <A> Parse result type
  */
-public interface Parser<I, CTX extends Parser.Context<I>, A> {
-
-    interface Context<I> {
-        Input<I> input();
-
-        default boolean isEof(int pos) {
-            return input().isEof(pos);
-        }
-
-        default I at(int pos) {
-            return input().at(pos);
-        }
-    }
-
-    class Ctx<I> implements Context<I> {
-        private final Input<I> input;
-
-        public Ctx(Input<I> input) {
-            this.input = input;
-        }
-
-        @Override
-        public Input<I> input() {
-            return input;
-        }
-    }
+public interface Parser<I, A> {
 
     Lazy<Boolean> acceptsEmpty();
 
     Lazy<SymSet<I>> firstSet();
 
-    Result<I, A> parse(CTX ctx, int pos, SymSet<I> follow);
+    Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow);
 
-    default Result<I, A> run(CTX ctx) {
-        return this.andL(eof()).parse(ctx, 0, SymSet.empty());
+    default Result<I, A> run(Input<I> in) {
+        return this.andL(eof()).parse(in, 0, SymSet.empty());
     }
 
-    static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> pure(A a) {
-        return new ParserImpl<I, CTX, A>(TRUE, SymSet::empty) {
+    static <I, A> Parser<I, A> pure(A a) {
+        return new ParserImpl<I, A>(TRUE, SymSet::empty) {
             @Override
-            public Result<I, A> parse(CTX ctx, int pos, SymSet<I> follow) {
+            public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
                 return Result.success(a, pos);
             }
         };
     }
 
-    default <B> Parser<I, CTX, B> map(F<A, B> f) {
-        return new ParserImpl<I, CTX, B>(
+    default <B> Parser<I, B> map(F<A, B> f) {
+        return new ParserImpl<I, B>(
             Parser.this.acceptsEmpty(),
             Parser.this.firstSet()
         ) {
             @Override
-            public Result<I, B> parse(CTX ctx, int pos, SymSet<I> follow) {
-                return Parser.this.parse(ctx, pos, follow).map(f);
+            public Result<I, B> parse(Input<I> in, int pos, SymSet<I> follow) {
+                return Parser.this.parse(in, pos, follow).map(f);
             }
         };
     }
 
-    default Parser<I, CTX, A> or(Parser<I, CTX, A> rhs) {
-        return new ParserImpl<I, CTX, A>(
+    default Parser<I, A> or(Parser<I, A> rhs) {
+        return new ParserImpl<I, A>(
             Impl.or(Parser.this.acceptsEmpty(), rhs.acceptsEmpty()),
             Impl.union(Parser.this.firstSet(), rhs.firstSet())
         ) {
             @Override
-            public Result<I, A> parse(CTX ctx, int pos, SymSet<I> follow) {
-                final Input<I> in = ctx.input();
-                if (ctx.isEof(pos)) {
+            public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
+                if (in.isEof(pos)) {
                     if (Parser.this.acceptsEmpty().apply()) {
-                        return Parser.this.parse(ctx, pos, follow);
+                        return Parser.this.parse(in, pos, follow);
                     } else if (rhs.acceptsEmpty().apply()) {
-                        return rhs.parse(ctx, pos, follow);
+                        return rhs.parse(in, pos, follow);
                     } else {
                         return Result.failure(pos);
                     }
                 } else {
                     final I i = in.at(pos);
                     if (Parser.this.firstSet().apply().matches(i)) {
-                        return Parser.this.parse(ctx, pos, follow);
+                        return Parser.this.parse(in, pos, follow);
                     } else if (rhs.firstSet().apply().matches(i)) {
-                        return rhs.parse(ctx, pos, follow);
+                        return rhs.parse(in, pos, follow);
                     } else if (follow.matches(i)) {
                         if (Parser.this.acceptsEmpty().apply()) {
-                            return Parser.this.parse(ctx, pos, follow);
+                            return Parser.this.parse(in, pos, follow);
                         } else if (rhs.acceptsEmpty().apply()) {
-                            return rhs.parse(ctx, pos, follow);
+                            return rhs.parse(in, pos, follow);
                         }
                     }
                     return Result.failure(pos);
@@ -110,58 +84,58 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
         };
     }
 
-    default <B> Parser<I, CTX, Tuple2<A, B>> product(Parser<I, CTX, B> pb) {
+    default <B> Parser<I, Tuple2<A, B>> product(Parser<I, B> pb) {
         return ap(this.map(curry(Tuple2::new)), pb);
     }
 
-    default <B> Parser<I, CTX, A> andL(Parser<I, CTX, B> pb) {
+    default <B> Parser<I, A> andL(Parser<I, B> pb) {
         return this.and(pb).map(F2.first());
     }
 
-    default <B> Parser<I, CTX, B> andR(Parser<I, CTX, B> pb) {
+    default <B> Parser<I, B> andR(Parser<I, B> pb) {
         return this.and(pb).map(F2.second());
     }
 
-    default <B> ApplyBuilder._2<I, CTX, A, B> and(Parser<I, CTX, B> pb) {
-        return new ApplyBuilder._2<I, CTX, A, B>(this, pb);
+    default <B> ApplyBuilder._2<I, A, B> and(Parser<I, B> pb) {
+        return new ApplyBuilder._2<I, A, B>(this, pb);
     }
 
-    default Parser<I, CTX, A> chainl1(Parser<I, CTX, Op2<A>> op) {
-        final Parser<I, CTX, IList<Op<A>>> plf =
+    default Parser<I, A> chainl1(Parser<I, Op2<A>> op) {
+        final Parser<I, IList<Op<A>>> plf =
             many(op.and(this)
                 .map((f, y) -> x -> f.apply(x, y)));
         return this.and(plf)
             .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
     }
 
-    static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> fail() {
-        return new ParserImpl<I, CTX, A>(() -> true, SymSet::empty) {
+    static <I, A> Parser<I, A> fail() {
+        return new ParserImpl<I, A>(() -> true, SymSet::empty) {
             @Override
-            public Result<I, A> parse(CTX ctx, int pos, SymSet<I> follow) {
+            public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
                 return Result.failure(pos);
             }
         };
     }
 
-    static <I, CTX extends Parser.Context<I>, A, B>
-    Parser<I, CTX, B> ap(Parser<I, CTX, F<A, B>> pf, Parser<I, CTX, A> pa) {
-        return new ParserImpl<I, CTX, B>(
+    static <I, A, B>
+    Parser<I, B> ap(Parser<I, F<A, B>> pf, Parser<I, A> pa) {
+        return new ParserImpl<I, B>(
             Impl.and(pf.acceptsEmpty(), pa.acceptsEmpty()),
             Impl.combine(pf.acceptsEmpty(), pf.firstSet(), pa.firstSet())
         ) {
             @Override
-            public Result<I, B> parse(CTX ctx, int pos, SymSet<I> follow) {
+            public Result<I, B> parse(Input<I> in, int pos, SymSet<I> follow) {
                 final SymSet<I> followF =
                     Impl.combine(
                         pa.acceptsEmpty().apply(),
                         pa.firstSet().apply(),
                         follow);
 
-                final Result<I, F<A, B>> r = pf.parse(ctx, pos, followF);
+                final Result<I, F<A, B>> r = pf.parse(in, pos, followF);
 
                 if (r.isSuccess()) {
                     final Result.Success<I, F<A, B>> succ = (Result.Success<I, F<A, B>>) r;
-                    final Result<I, A> r2 = pa.parse(ctx, succ.next, follow);
+                    final Result<I, A> r2 = pa.parse(in, succ.next, follow);
                     return r2.map(succ.value);
                 } else {
                     return ((Result.Failure<I, F<A, B>>) r).cast();
@@ -170,91 +144,94 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
         };
     }
 
-    static <I, CTX extends Parser.Context<I>, A, B>
-    Parser<I, CTX, B> ap(F<A, B> f, Parser<I, CTX, A> pa) {
+    static <I, A, B>
+    Parser<I, B> ap(F<A, B> f, Parser<I, A> pa) {
         return ap(pure(f), pa);
     }
 
-    static <I, CTX extends Parser.Context<I>, A, B>
-    F<Parser<I, CTX, A>, Parser<I, CTX, B>> liftA(F<A, B> f) {
+    static <I, A, B>
+    F<Parser<I, A>, Parser<I, B>> liftA(F<A, B> f) {
         return a -> a.map(f);
     }
 
-    static <I, CTX extends Parser.Context<I>, A, B, C>
-    F<Parser<I, CTX, A>, F<Parser<I, CTX, B>, Parser<I, CTX, C>>> liftA2(F<A, F<B, C>> f) {
+    static <I, A, B, C>
+    F<Parser<I, A>, F<Parser<I, B>, Parser<I, C>>> liftA2(F<A, F<B, C>> f) {
         return a -> b -> ap(a.map(f), b);
     }
 
-    static <I, CTX extends Parser.Context<I>> Parser<I, CTX, Unit> eof() {
-        return new ParserImpl<I, CTX, Unit>(TRUE, SymSet::empty) {
+    static <I> Parser<I, Unit> eof() {
+        return new ParserImpl<I, Unit>(TRUE, SymSet::empty) {
             @Override
-            public Result<I, Unit> parse(CTX ctx, int pos, SymSet<I> follow) {
-                return ctx.isEof(pos) ?
+            public Result<I, Unit> parse(Input<I> in, int pos, SymSet<I> follow) {
+                return in.isEof(pos) ?
                     Result.success(Unit.UNIT, pos) :
                     Result.failure(pos);
             }
         };
     }
 
-    static <I, CTX extends Parser.Context<I>> Parser<I, CTX, I> satisfy(String name, Predicate<I> pred) {
-        return new ParserImpl<I, CTX, I>(FALSE, () -> SymSet.pred(name, pred)) {
+    static <I> Parser<I, I> satisfy(String name, Predicate<I> pred) {
+        return new ParserImpl<I, I>(FALSE, () -> SymSet.pred(name, pred)) {
             @Override
-            public Result<I, I> parse(CTX ctx, int pos, SymSet<I> follow) {
-                if (!ctx.isEof(pos)) {
-                    final I i = ctx.input().at(pos);
-                    if (pred.apply(i)) {
-                        return Result.success(i, pos+1);
-                    }
-                }
-
-                return Result.failure(pos);
+            public Result<I, I> parse(Input<I> in, int pos, SymSet<I> follow) {
+                final I i = in.at(pos);
+                return Result.success(i, pos+1);
+//                if (!in.isEof(pos)) {
+//                    final I i = in.at(pos);
+//                    if (pred.apply(i)) {
+//                        return Result.success(i, pos+1);
+//                    }
+//                }
+//
+//                return Result.failure(pos);
             }
         };
     }
 
-    static <I, CTX extends Parser.Context<I>> Parser<I, CTX, I> value(I val) {
+    static <I> Parser<I, I> value(I val) {
         return value(val, val);
     }
 
-    static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> value(I val, A res) {
-        return new ParserImpl<I, CTX, A>(FALSE, () -> SymSet.value(val)) {
+    static <I, A> Parser<I, A> value(I val, A res) {
+        return new ParserImpl<I, A>(FALSE, () -> SymSet.value(val)) {
             @Override
-            public Result<I, A> parse(CTX ctx, int pos, SymSet<I> follow) {
-                if (!ctx.isEof(pos)) {
-                    final I i = ctx.input().at(pos);
-                    if (i.equals(val)) {
-                        return Result.success(res, pos+1);
-                    }
-                }
-
-                return Result.failure(pos);
+            public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
+                return Result.success(res, pos+1);
+//                if (!in.isEof(pos)) {
+//                    final I i = in.at(pos);
+//                    if (i.equals(val)) {
+//                        return Result.success(res, pos+1);
+//                    }
+//                }
+//
+//                return Result.failure(pos);
             }
         };
     }
 
-    static <I, CTX extends Parser.Context<I>> Parser<I, CTX, I> any() {
-        return new ParserImpl<I, CTX, I>(TRUE, SymSet::all) {
+    static <I> Parser<I, I> any() {
+        return new ParserImpl<I, I>(TRUE, SymSet::all) {
             @Override
-            public Result<I, I> parse(CTX ctx, int pos, SymSet<I> follow) {
-                return ctx.isEof(pos) ?
+            public Result<I, I> parse(Input<I> in, int pos, SymSet<I> follow) {
+                return in.isEof(pos) ?
                     Result.failure(pos) :
-                    Result.success(ctx.input().at(pos), pos+1);
+                    Result.success(in.at(pos), pos+1);
             }
         };
     }
 
-    static <I, CTX extends Parser.Context<I>, A>
-    Parser<I, CTX, IList<A>> many(Parser<I, CTX, A> p) {
-        return new ParserImpl<I, CTX, IList<A>>(TRUE, p.firstSet()) {
+    static <I, A>
+    Parser<I, IList<A>> many(Parser<I, A> p) {
+        return new ParserImpl<I, IList<A>>(TRUE, p.firstSet()) {
             @Override
-            public Result<I, IList<A>> parse(CTX ctx, int pos, SymSet<I> follow) {
+            public Result<I, IList<A>> parse(Input<I> in, int pos, SymSet<I> follow) {
                 IList<A> acc = IList.of();
                 final SymSet<I> follow2 = follow.union(p.firstSet().apply());
                 while (true) {
-                    if (!ctx.isEof(pos)) {
-                        final I i = ctx.input().at(pos);
+                    if (!in.isEof(pos)) {
+                        final I i = in.at(pos);
                         if (firstSet().apply().matches(i)) {
-                            final Result<I, A> r = p.parse(ctx, pos, follow2);
+                            final Result<I, A> r = p.parse(in, pos, follow2);
                             if (r.isSuccess()) {
                                 final Result.Success<I, A> succ = (Result.Success<I, A>) r;
                                 acc = acc.add(succ.value);
@@ -274,53 +251,53 @@ public interface Parser<I, CTX extends Parser.Context<I>, A> {
 //                a -> l -> (IList<A>)l.add(a)
 //            ).or(pure(IList.of()));
 
-    static <I, CTX extends Parser.Context<I>, A>
-    Parser<I, CTX, IList.NonEmpty<A>> many1(Parser<I, CTX, A> p) {
+    static <I, A>
+    Parser<I, IList.NonEmpty<A>> many1(Parser<I, A> p) {
         return p.and(many(p))
             .map(a -> l -> l.add(a));
     }
 
-    static <I, CTX extends Parser.Context<I>, A>
-    Parser<I, CTX, Unit> skipMany(Parser<I, CTX, A> p) {
+    static <I, A>
+    Parser<I, Unit> skipMany(Parser<I, A> p) {
         return many(p).map(u -> Unit.UNIT);
     }
 
-    static <I, CTX extends Parser.Context<I>, A, SEP>
-    Parser<I, CTX, IList<A>> sepBy(Parser<I, CTX, A> p, Parser<I, CTX, SEP> sep) {
+    static <I, A, SEP>
+    Parser<I, IList<A>> sepBy(Parser<I, A> p, Parser<I, SEP> sep) {
         return sepBy1(p, sep).or(pure(IList.nil()));
     }
 
-    static <I, CTX extends Parser.Context<I>, A, SEP>
-    Parser<I, CTX, IList<A>> sepBy1(Parser<I, CTX, A> p, Parser<I, CTX, SEP> sep) {
+    static <I, A, SEP>
+    Parser<I, IList<A>> sepBy1(Parser<I, A> p, Parser<I, SEP> sep) {
         return p.and(many(sep.andR(p)))
             .map(a -> l -> l.add(a));
     }
 
-    static <I, CTX extends Parser.Context<I>, A>
-    Parser<I, CTX, Optional<A>> optional(Parser<I, CTX, A> p) {
+    static <I, A>
+    Parser<I, Optional<A>> optional(Parser<I, A> p) {
         return p.map(Optional::of).or(pure(Optional.empty()));
     }
 
-    static <I, CTX extends Parser.Context<I>, A, OPEN, CLOSE>
-    Parser<I, CTX, A> between(
-            Parser<I, CTX, OPEN> open,
-            Parser<I, CTX, CLOSE> close,
-            Parser<I, CTX, A> p) {
+    static <I, A, OPEN, CLOSE>
+    Parser<I, A> between(
+            Parser<I, OPEN> open,
+            Parser<I, CLOSE> close,
+            Parser<I, A> p) {
         return open.andR(p).andL(close);
     }
 
-    static <I, CTX extends Parser.Context<I>, A>
-    Parser<I, CTX, A> choice(Parser<I, CTX, A>... ps) {
+    static <I, A>
+    Parser<I, A> choice(Parser<I, A>... ps) {
         return choice(IList.ofArray(ps));
     }
 
-    static <I, CTX extends Parser.Context<I>, A>
-    Parser<I, CTX, A> choice(IList<Parser<I, CTX, A>> ps) {
+    static <I, A>
+    Parser<I, A> choice(IList<Parser<I, A>> ps) {
         return ps.foldLeft1(Parser::or);
     }
 }
 
-abstract class ParserImpl<I, CTX extends Parser.Context<I>, A> implements Parser<I, CTX, A> {
+abstract class ParserImpl<I, A> implements Parser<I, A> {
 
     private final Lazy<Boolean> acceptsEmpty;
 

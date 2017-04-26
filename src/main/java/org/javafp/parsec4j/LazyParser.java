@@ -3,15 +3,15 @@ package org.javafp.parsec4j;
 import org.javafp.data.Lazy;
 import org.javafp.util.Functions;
 
-class LazyParser<I, CTX extends Parser.Context<I>, A> implements Parser<I, CTX, A> {
+class LazyParser<I, A> implements Parser<I, A> {
 
-    static <I, CTX extends Parser.Context<I>, A> Parser<I, CTX, A> of(Functions.F0<Parser<I, CTX, A>> parserSupplier) {
-        return new LazyParser<I, CTX, A>(parserSupplier);
+    static <I, A> Parser<I, A> of(Functions.F0<Parser<I, A>> parserSupplier) {
+        return new LazyParser<I, A>(parserSupplier);
     }
 
-    private final Functions.F0<Parser<I, CTX, A>> parserSupplier;
+    private final Functions.F0<Parser<I, A>> parserSupplier;
 
-    LazyParser(Functions.F0<Parser<I, CTX, A>> parserSupplier) {
+    LazyParser(Functions.F0<Parser<I, A>> parserSupplier) {
         this.parserSupplier = parserSupplier;
     }
 
@@ -26,7 +26,7 @@ class LazyParser<I, CTX extends Parser.Context<I>, A> implements Parser<I, CTX, 
     }
 
     @Override
-    public Result<I, A> parse(CTX ctx, int pos, SymSet<I> follow) {
-        return parserSupplier.apply().parse(ctx, pos, follow);
+    public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
+        return parserSupplier.apply().parse(in, pos, follow);
     }
 }

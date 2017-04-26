@@ -1,5 +1,6 @@
 package org.javafp.json;
 
+import org.javafp.control.Try;
 import org.javafp.parsec4j.Result;
 import org.javafp.util.Chr;
 import org.junit.Test;
@@ -28,13 +29,15 @@ public class JmhTest {
         test0, test1, test2, test3, test4, test5
     };
 
-    private static String loadFile(String name) throws IOException {
+    private static Try<String> loadFile(String name) {
         final InputStream is =
             Optional.ofNullable(JmhTest.class.getResourceAsStream(name))
                     .orElseThrow(() -> new RuntimeException("File '" + name + "' not found"));
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(is))) {
-            return buffer.lines().collect(Collectors.joining("\n"));
-        }
+        return Try.of(() -> {
+            try (BufferedReader buffer = new BufferedReader(new InputStreamReader(is))) {
+                return buffer.lines().collect(Collectors.joining("\n"));
+            }
+        });
     }
 
     @Test
@@ -53,10 +56,11 @@ public class JmhTest {
         assertEquals(json, json2);
     }
 
+    private static final String json = loadFile("/example.json").get();
+
     @Test
     @Benchmark
     public void testSuccessParse() throws IOException {
-        final String json = loadFile("/example.json");
         final Result<Chr, Node> result = Grammar.parse(json);
         final Node node = result.getOrThrow();
         //System.out.println(node.toJson());

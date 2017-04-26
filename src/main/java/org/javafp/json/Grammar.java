@@ -15,8 +15,8 @@ import static org.javafp.parsec4j.Text.*;
  * https://hackage.haskell.org/package/json
  */
 public class Grammar {
-    private static <T> Parser<Chr, Ctx<Chr>, T> tok(Parser<Chr, Ctx<Chr>, T> p) {
-        return p.andL(skipMany(ws()));
+    private static <T> Parser<Chr, T> tok(Parser<Chr, T> p) {
+        return p.andL(skipMany(ws));
     }
 
     private static LinkedHashMap<String, Node> toMap(IList<Tuple2<String, Node>> fields) {
@@ -26,16 +26,16 @@ public class Grammar {
     }
 
     static {
-        final Parser<Chr, Ctx<Chr>, Node> jnull = tok(string("null")).andR(pure(Node.nul()));
+        final Parser<Chr, Node> jnull = tok(string("null")).andR(pure(Node.nul()));
 
-        final Parser<Chr, Ctx<Chr>, Boolean> jtrue = tok(string("true")).andR(pure(Boolean.TRUE));
-        final Parser<Chr, Ctx<Chr>, Boolean> jfalse = tok(string("false")).andR(pure(Boolean.FALSE));
+        final Parser<Chr, Boolean> jtrue = tok(string("true")).andR(pure(Boolean.TRUE));
+        final Parser<Chr, Boolean> jfalse = tok(string("false")).andR(pure(Boolean.FALSE));
 
-        final Parser<Chr, Ctx<Chr>, Node> jbool = tok(jtrue.or(jfalse)).map(Node::bool);
+        final Parser<Chr, Node> jbool = tok(jtrue.or(jfalse)).map(Node::bool);
 
-        final Parser<Chr, Ctx<Chr>, Node> jnumber = tok(dble()).map(Node::number);
+        final Parser<Chr, Node> jnumber = tok(dble).map(Node::number);
 
-        final Parser<Chr, Ctx<Chr>, Byte> hexDigit =
+        final Parser<Chr, Byte> hexDigit =
             choice(
                 value(Chr.valueOf('0'), (byte)0),
                 value(Chr.valueOf('1'), (byte)1),
@@ -61,7 +61,7 @@ public class Grammar {
                 value(Chr.valueOf('F'), (byte)15)
             );
 
-        final Parser<Chr, Ctx<Chr>, Chr> uni =
+        final Parser<Chr, Chr> uni =
             hexDigit
                 .and(hexDigit)
                 .and(hexDigit)
@@ -69,11 +69,11 @@ public class Grammar {
                 .map((d0, d1, d2, d3) -> (d0 << 0x3) & (d1 << 0x2) & (d2 << 0x1) & d0)
                 .map(Chr::valueOf);
 
-        final Parser<Chr, Ctx<Chr>, Chr> uChr = chr('u');
-        final Parser<Chr, Ctx<Chr>, Chr> bsChr = chr('\\');
-        final Parser<Chr, Ctx<Chr>, Chr> dqChr = chr('"');
+        final Parser<Chr, Chr> uChr = chr('u');
+        final Parser<Chr, Chr> bsChr = chr('\\');
+        final Parser<Chr, Chr> dqChr = chr('"');
 
-        final Parser<Chr, Ctx<Chr>, Chr> esc =
+        final Parser<Chr, Chr> esc =
             choice(
                 dqChr,
                 bsChr,
@@ -86,26 +86,26 @@ public class Grammar {
                 uChr.andR(uni)
             );
 
-        final Parser<Chr, Ctx<Chr>, Chr> stringChar =
+        final Parser<Chr, Chr> stringChar =
             (
                 bsChr.andR(esc)
             ).or(
                 satisfy("schar", c -> !c.equals('"') && !c.equals('\\'))
             );
 
-        final Parser<Chr, Ctx<Chr>, String> jstring =
+        final Parser<Chr, String> jstring =
             tok(between(
                 dqChr,
                 dqChr,
                 many(stringChar).map(Chr::listToString)
             ));
 
-        final Parser<Chr, Ctx<Chr>, Node> jtext =
+        final Parser<Chr, Node> jtext =
             jstring.map(Node::string);
 
-        final Ref<Chr, Ctx<Chr>, Node> jvalue = Ref.of();
+        final Ref<Chr, Node> jvalue = Ref.of();
 
-        final Parser<Chr, Ctx<Chr>, Node> jarray =
+        final Parser<Chr, Node> jarray =
             between(
                 tok(chr('[')),
                 tok(chr(']')),
@@ -115,14 +115,14 @@ public class Grammar {
                 )
             ).map(Node::array);
 
-        final Parser<Chr, Ctx<Chr>, Tuple2<String, Node>> jfield =
+        final Parser<Chr, Tuple2<String, Node>> jfield =
             (jstring
                 .andL(tok(chr(':')))
                 .and(jvalue)
                 .map(Tuple2::new)
             );
 
-        final Parser<Chr, Ctx<Chr>, Node> jobject =
+        final Parser<Chr, Node> jobject =
             between(
                 tok(chr('{')),
                 tok(chr('}')),
@@ -146,10 +146,10 @@ public class Grammar {
         parser = tok(jvalue);
     }
 
-    public static final Parser<Chr, Ctx<Chr>, Node> parser;
+    public static final Parser<Chr, Node> parser;
 
     public static Result<Chr, Node> parse(String str) {
-        return skipMany(Text.<Ctx<Chr>>ws()).andR(parser).run(new Ctx<>(Input.of(str)));
+        return skipMany(ws).andR(parser).run(Input.of(str));
     }
 }
 
