@@ -23,17 +23,17 @@ public interface Parser<I, A> {
 
     Lazy<SymSet<I>> firstSet();
 
-    Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow);
+    Result<I, A> parse(Input<I> in, SymSet<I> follow);
 
     default Result<I, A> run(Input<I> in) {
-        return this.andL(eof()).parse(in, 0, SymSet.empty());
+        return this.andL(eof()).parse(in, SymSet.empty());
     }
 
     static <I, A> Parser<I, A> pure(A a) {
         return new ParserImpl<I, A>(TRUE, SymSet::empty) {
             @Override
-            public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
-                return Result.success(a, pos);
+            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+                return Result.success(a, in);
             }
         };
     }
@@ -44,8 +44,8 @@ public interface Parser<I, A> {
             Parser.this.firstSet()
         ) {
             @Override
-            public Result<I, B> parse(Input<I> in, int pos, SymSet<I> follow) {
-                return Parser.this.parse(in, pos, follow).map(f);
+            public Result<I, B> parse(Input<I> in, SymSet<I> follow) {
+                return Parser.this.parse(in, follow).map(f);
             }
         };
     }
@@ -56,29 +56,29 @@ public interface Parser<I, A> {
             Impl.union(Parser.this.firstSet(), rhs.firstSet())
         ) {
             @Override
-            public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
-                if (in.isEof(pos)) {
+            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+                if (in.isEof()) {
                     if (Parser.this.acceptsEmpty().apply()) {
-                        return Parser.this.parse(in, pos, follow);
+                        return Parser.this.parse(in, follow);
                     } else if (rhs.acceptsEmpty().apply()) {
-                        return rhs.parse(in, pos, follow);
+                        return rhs.parse(in, follow);
                     } else {
-                        return Result.failure(pos);
+                        return Result.failure(in);
                     }
                 } else {
-                    final I i = in.at(pos);
+                    final I i = in.get();
                     if (Parser.this.firstSet().apply().matches(i)) {
-                        return Parser.this.parse(in, pos, follow);
+                        return Parser.this.parse(in, follow);
                     } else if (rhs.firstSet().apply().matches(i)) {
-                        return rhs.parse(in, pos, follow);
+                        return rhs.parse(in, follow);
                     } else if (follow.matches(i)) {
                         if (Parser.this.acceptsEmpty().apply()) {
-                            return Parser.this.parse(in, pos, follow);
+                            return Parser.this.parse(in, follow);
                         } else if (rhs.acceptsEmpty().apply()) {
-                            return rhs.parse(in, pos, follow);
+                            return rhs.parse(in, follow);
                         }
                     }
-                    return Result.failure(pos);
+                    return Result.failure(in);
                 }
             }
         };
@@ -111,8 +111,8 @@ public interface Parser<I, A> {
     static <I, A> Parser<I, A> fail() {
         return new ParserImpl<I, A>(() -> true, SymSet::empty) {
             @Override
-            public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
-                return Result.failure(pos);
+            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+                return Result.failure(in);
             }
         };
     }
@@ -124,19 +124,19 @@ public interface Parser<I, A> {
             Impl.combine(pf.acceptsEmpty(), pf.firstSet(), pa.firstSet())
         ) {
             @Override
-            public Result<I, B> parse(Input<I> in, int pos, SymSet<I> follow) {
+            public Result<I, B> parse(Input<I> in, SymSet<I> follow) {
                 final SymSet<I> followF =
                     Impl.combine(
                         pa.acceptsEmpty().apply(),
                         pa.firstSet().apply(),
                         follow);
 
-                final Result<I, F<A, B>> r = pf.parse(in, pos, followF);
+                final Result<I, F<A, B>> r = pf.parse(in, followF);
 
                 if (r.isSuccess()) {
                     final Result.Success<I, F<A, B>> succ = (Result.Success<I, F<A, B>>) r;
-                    final Result<I, A> r2 = pa.parse(in, succ.next, follow);
-                    return r2.map(succ.value);
+                    final Result<I, A> r2 = pa.parse(succ.next(), follow);
+                    return r2.map(succ.value());
                 } else {
                     return ((Result.Failure<I, F<A, B>>) r).cast();
                 }
@@ -162,10 +162,10 @@ public interface Parser<I, A> {
     static <I> Parser<I, Unit> eof() {
         return new ParserImpl<I, Unit>(TRUE, SymSet::empty) {
             @Override
-            public Result<I, Unit> parse(Input<I> in, int pos, SymSet<I> follow) {
-                return in.isEof(pos) ?
-                    Result.success(Unit.UNIT, pos) :
-                    Result.failure(pos);
+            public Result<I, Unit> parse(Input<I> in, SymSet<I> follow) {
+                return in.isEof() ?
+                    Result.success(Unit.UNIT, in) :
+                    Result.failure(in);
             }
         };
     }
@@ -173,17 +173,9 @@ public interface Parser<I, A> {
     static <I> Parser<I, I> satisfy(String name, Predicate<I> pred) {
         return new ParserImpl<I, I>(FALSE, () -> SymSet.pred(name, pred)) {
             @Override
-            public Result<I, I> parse(Input<I> in, int pos, SymSet<I> follow) {
-                final I i = in.at(pos);
-                return Result.success(i, pos+1);
-//                if (!in.isEof(pos)) {
-//                    final I i = in.at(pos);
-//                    if (pred.apply(i)) {
-//                        return Result.success(i, pos+1);
-//                    }
-//                }
-//
-//                return Result.failure(pos);
+            public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
+                final I i = in.get();
+                return Result.success(i, in.next());
             }
         };
     }
@@ -195,16 +187,9 @@ public interface Parser<I, A> {
     static <I, A> Parser<I, A> value(I val, A res) {
         return new ParserImpl<I, A>(FALSE, () -> SymSet.value(val)) {
             @Override
-            public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
-                return Result.success(res, pos+1);
-//                if (!in.isEof(pos)) {
-//                    final I i = in.at(pos);
-//                    if (i.equals(val)) {
-//                        return Result.success(res, pos+1);
-//                    }
-//                }
-//
-//                return Result.failure(pos);
+            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+                return Result.success(res, in.next());
+
             }
         };
     }
@@ -212,10 +197,10 @@ public interface Parser<I, A> {
     static <I> Parser<I, I> any() {
         return new ParserImpl<I, I>(TRUE, SymSet::all) {
             @Override
-            public Result<I, I> parse(Input<I> in, int pos, SymSet<I> follow) {
-                return in.isEof(pos) ?
-                    Result.failure(pos) :
-                    Result.success(in.at(pos), pos+1);
+            public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
+                return in.isEof() ?
+                    Result.failure(in) :
+                    Result.success(in.get(), in.next());
             }
         };
     }
@@ -224,32 +209,29 @@ public interface Parser<I, A> {
     Parser<I, IList<A>> many(Parser<I, A> p) {
         return new ParserImpl<I, IList<A>>(TRUE, p.firstSet()) {
             @Override
-            public Result<I, IList<A>> parse(Input<I> in, int pos, SymSet<I> follow) {
+            public Result<I, IList<A>> parse(Input<I> in, SymSet<I> follow) {
                 IList<A> acc = IList.of();
                 final SymSet<I> follow2 = follow.union(p.firstSet().apply());
                 while (true) {
-                    if (!in.isEof(pos)) {
-                        final I i = in.at(pos);
+                    if (!in.isEof()) {
+                        final I i = in.get();
                         if (firstSet().apply().matches(i)) {
-                            final Result<I, A> r = p.parse(in, pos, follow2);
+                            final Result<I, A> r = p.parse(in, follow2);
                             if (r.isSuccess()) {
                                 final Result.Success<I, A> succ = (Result.Success<I, A>) r;
-                                acc = acc.add(succ.value);
-                                pos = succ.next;
+                                acc = acc.add(succ.value());
+                                in = succ.next();
                                 continue;
+                            } else {
+                                return ((Result.Failure<I, A>)r).cast();
                             }
                         }
                     }
-                    return Result.success(acc.reverse(), pos);
+                    return Result.success(acc.reverse(), in);
                 }
             }
         };
     }
-//            p.and(
-//                LazyParser.of(() -> many(p))
-//            ).map(
-//                a -> l -> (IList<A>)l.add(a)
-//            ).or(pure(IList.of()));
 
     static <I, A>
     Parser<I, IList.NonEmpty<A>> many1(Parser<I, A> p) {

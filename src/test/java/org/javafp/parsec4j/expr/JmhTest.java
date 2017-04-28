@@ -28,12 +28,12 @@ public class JmhTest {
         Grammar.parser.firstSet();
     }
 
-    //@Benchmark
+    @Benchmark
     public static String testGood() {
         return Grammar.parse("3*-max(4%+(5bp+-x),-2bp)-1").toString();
     }
 
-    //@Benchmark
+    @Benchmark
     public static String testBad() {
         return Grammar.parse("3*-max(4%+(5bp+-x)x,-2bp)-1z").toString();
     }

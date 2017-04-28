@@ -4,6 +4,7 @@ import org.javafp.data.IList;
 import org.javafp.util.Functions.F;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Standard tagged union type over two types.
@@ -48,6 +49,8 @@ public interface Either<A, B> {
 
     Optional<B> right();
 
+    void handle(Consumer<Left<A, B>> left, Consumer<Right<A, B>> right);
+
     <T> T match(F<Left<A, B>, ? extends T> left, F<Right<A, B>, ? extends T> right);
 
     <T> Either<T, B> mapLeft(F<? super A, ? extends T> f);
@@ -78,6 +81,11 @@ public interface Either<A, B> {
         @Override
         public Optional<B> right() {
             return Optional.of(value);
+        }
+
+        @Override
+        public void handle(Consumer<Left<A, B>> left, Consumer<Right<A, B>> right) {
+            right.accept(this);
         }
 
         @Override
@@ -126,6 +134,11 @@ public interface Either<A, B> {
         @Override
         public Optional<B> right() {
             return Optional.empty();
+        }
+
+        @Override
+        public void handle(Consumer<Left<A, B>> left, Consumer<Right<A, B>> right) {
+            left.accept(this);
         }
 
         @Override

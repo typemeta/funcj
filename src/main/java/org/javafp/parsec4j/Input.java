@@ -3,58 +3,68 @@ package org.javafp.parsec4j;
 import org.javafp.util.*;
 
 public interface Input<I> {
+    static Input<Chr> of(char[] data) {
+        return new StringInput(data);
+    }
+
     static Input<Chr> of(String s) {
-        return new StringInput(s);
+        return new StringInput(s.toCharArray());
     }
 
-    default boolean isEof(int pos) {
-        return false;
-    }
+    boolean isEof();
 
-    I at(int pos);
-}
+    I get();
 
-enum EofInput implements Input<Unit> {
-    EOF {
-        @Override
-        public boolean isEof(int pos) {
-            return true;
-        }
+    Input<I> next();
 
-        @Override
-        public Unit at(int pos) {
-            return Unit.UNIT;
-        }
-    };
-
-    public static <I> Input<I> of() {
-        return (Input<I>)EOF;
-    }
+    String position();
 }
 
 class StringInput implements Input<Chr> {
-    protected final char[] s;
 
-    StringInput(String s) {
-        this.s = s.toCharArray();
+    private StringInput other;
+    private final char[] data;
+    private int pos;
+
+    StringInput(StringInput other, char[] data) {
+        this.other = other;
+        this.data = data;
+        this.pos = 0;
     }
 
-    StringInput(char[] s) {
-        this.s = s;
+    StringInput(char[] data) {
+        this.other = new StringInput(this, data);
+        this.data = data;
+        this.pos = 0;
+    }
+
+    private StringInput setPos(int pos) {
+        this.pos = pos;
+        return this;
     }
 
     @Override
     public String toString() {
-        return new String(s);
+        return new String(data);
     }
 
     @Override
-    public boolean isEof(int pos) {
-        return pos >= s.length;
+    public boolean isEof() {
+        return pos >= data.length;
     }
 
     @Override
-    public Chr at(int pos) {
-        return Chr.valueOf(s[pos]);
+    public Chr get() {
+        return Chr.valueOf(data[pos]);
+    }
+
+    @Override
+    public Input<Chr> next() {
+        return other.setPos(pos+1);
+    }
+
+    @Override
+    public String position() {
+        return String.valueOf(pos);
     }
 }

@@ -27,7 +27,7 @@ public class Ref<I, A> implements Parser<I, A> {
                 throw new RuntimeException("Uninitialised lazy Parser reference");
             }
 
-            public Result<Unit, Unit> parse(Input<Unit> ctx, int pos, SymSet<Unit> follow) {
+            public Result<Unit, Unit> parse(Input<Unit> in, SymSet<Unit> follow) {
                 throw new RuntimeException("Uninitialised lazy Parser reference");
             }
         };
@@ -67,7 +67,7 @@ public class Ref<I, A> implements Parser<I, A> {
     }
 
     @Override
-    public Result<I, A> parse(Input<I> ctx, int pos, SymSet<I> follow) {
-        return impl.parse(ctx, pos, follow);
+    public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+        return impl.parse(in, follow);
     }
 }

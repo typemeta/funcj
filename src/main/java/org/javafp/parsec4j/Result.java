@@ -1,6 +1,9 @@
 package org.javafp.parsec4j;
 
 import org.javafp.util.Functions;
+import org.javafp.util.Functions.*;
+
+import java.util.function.Consumer;
 
 /**
  * A parse result.
@@ -8,36 +11,46 @@ import org.javafp.util.Functions;
  * @param <A>
  */
 public interface Result<I, A> {
-    static <I, A> Result<I, A> success(A result, int next) {
+    static <I, A> Result<I, A> success(A result, Input<I> next) {
         return new Success<I, A>(result, next);
     }
 
-    static <I, A> Result<I, A> failure(int pos) {
-        return new Failure<I, A>(pos);
+    static <I, A> Result<I, A> failure(Input<I> in) {
+        return new Failure<I, A>(in);
     }
 
     boolean isSuccess();
 
     A getOrThrow();
 
-    <B> Result<I, B> map(Functions.F<A, B> f);
+    <B> Result<I, B> map(F<A, B> f);
 
-    <B> B match(Functions.F<Success<I, A>, B> success, Functions.F<Failure<I, A>, B> failure);
+    void handle(Consumer<Success<I, A>> success, Consumer<Failure<I, A>> failure);
+
+    <B> B match(F<Success<I, A>, B> success, F<Failure<I, A>, B> failure);
 
     class Success<I, A> implements Result<I, A> {
-        public final A value;
-        public final int next;
+        private final A value;
+        private final Input<I> next;
 
-        public Success(A value, int next) {
+        public Success(A value, Input<I> next) {
             this.value = value;
             this.next = next;
+        }
+
+        public A value() {
+            return value;
+        }
+
+        public Input<I> next() {
+            return next;
         }
 
         @Override
         public String toString() {
             return "Success{" +
                 "value=" + value +
-                ", next=" + next +
+                ", next=" + next.position() +
                 '}';
         }
 
@@ -53,7 +66,7 @@ public interface Result<I, A> {
 
         @Override
         public int hashCode() {
-            return 31 * value.hashCode() + next;
+            return 31 * value.hashCode() + next.position().hashCode();
         }
 
         @Override
@@ -67,27 +80,36 @@ public interface Result<I, A> {
         }
 
         @Override
-        public <B> Result<I, B> map(Functions.F<A, B> f) {
+        public <B> Result<I, B> map(F<A, B> f) {
             return success(f.apply(value), next);
         }
 
         @Override
-        public <B> B match(Functions.F<Success<I, A>, B> success, Functions.F<Failure<I, A>, B> failure) {
+        public void handle(Consumer<Success<I, A>> success, Consumer<Failure<I, A>> failure) {
+            success.accept(this);
+        }
+
+        @Override
+        public <B> B match(F<Success<I, A>, B> success, F<Failure<I, A>, B> failure) {
             return success.apply(this);
         }
     }
 
     class Failure<I, A> implements Result<I, A> {
-        public final int pos;
+        private final Input<I> input;
 
-        public Failure(int pos) {
-            this.pos = pos;
+        public Failure(Input<I> input) {
+            this.input = input;
+        }
+
+        public Input<I> input() {
+            return input;
         }
 
         @Override
         public String toString() {
             return "Failure{" +
-                "pos=" + pos +
+                "pos=" + input.position() +
                 '}';
         }
 
@@ -98,7 +120,7 @@ public interface Result<I, A> {
 
             Failure<?, ?> rhsT = (Failure<?, ?>) rhs;
 
-            return pos == rhsT.pos;
+            return input == rhsT.input;
         }
 
         public <T> Failure<I, T> cast() {
@@ -107,7 +129,7 @@ public interface Result<I, A> {
 
         @Override
         public int hashCode() {
-            return pos;
+            return input.hashCode();
         }
 
         @Override
@@ -117,16 +139,21 @@ public interface Result<I, A> {
 
         @Override
         public A getOrThrow() {
-            throw new RuntimeException("Failure at position " + pos);
+            throw new RuntimeException("Failure at position " + input.position());
         }
 
         @Override
-        public <B> Result<I, B> map(Functions.F<A, B> f) {
+        public <B> Result<I, B> map(F<A, B> f) {
             return this.cast();
         }
 
         @Override
-        public <B> B match(Functions.F<Success<I, A>, B> success, Functions.F<Failure<I, A>, B> failure) {
+        public void handle(Consumer<Success<I, A>> success, Consumer<Failure<I, A>> failure) {
+            failure.accept(this);
+        }
+
+        @Override
+        public <B> B match(F<Success<I, A>, B> success, F<Failure<I, A>, B> failure) {
             return failure.apply(this);
         }
     }

@@ -26,7 +26,7 @@ class LazyParser<I, A> implements Parser<I, A> {
     }
 
     @Override
-    public Result<I, A> parse(Input<I> in, int pos, SymSet<I> follow) {
-        return parserSupplier.apply().parse(in, pos, follow);
+    public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+        return parserSupplier.apply().parse(in, follow);
     }
 }

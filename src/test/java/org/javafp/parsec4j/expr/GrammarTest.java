@@ -17,12 +17,14 @@ public class GrammarTest {
         Assert.assertEquals(expected, Grammar.parse(result).getOrThrow().toString());
     }
 
-    private static void assertFailure(String s) {
-        Grammar.parse(s).match(
+    private static void assertFailure(String s, String position) {
+        Grammar.parse(s).handle(
             ok -> {
                 throw new RuntimeException("Expected parse to fail");
             },
-            error -> Unit.UNIT
+            error -> {
+                Assert.assertEquals("", error.input().position(), position);
+            }
         );
     }
 
@@ -35,6 +37,6 @@ public class GrammarTest {
 
     @Test
     public void testFailure() throws Exception {
-        assertFailure("3*max(4%+(5bp+),-2bp)-1");
+        assertFailure("3*max(4%+(5bp+),-2bp)-1", "14");
     }
 }

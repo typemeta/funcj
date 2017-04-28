@@ -58,17 +58,16 @@ public class Text {
                     () -> SymSet.value(Chr.valueOf(s.charAt(0)))
                 ) {
                     @Override
-                    public Result<Chr, String> parse(Input<Chr> in, int pos, SymSet<Chr> follow) {
-                        int pos2 = pos;
+                    public Result<Chr, String> parse(Input<Chr> in, SymSet<Chr> follow) {
                         for (int i = 0; i < s.length(); ++i) {
-                            if (in.isEof(pos2) || !in.at(pos2).equals(s.charAt(i))) {
-                                return Result.failure(pos);
+                            if (in.isEof() || !in.get().equals(s.charAt(i))) {
+                                return Result.failure(in);
                             } else {
-                                pos2 = pos2+1;
+                                in = in.next();
                             }
                         }
 
-                        return Result.success(s, pos2);
+                        return Result.success(s, in);
                     }
                 };
             }
