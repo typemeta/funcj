@@ -21,6 +21,10 @@ public final class Chr implements Comparable<Chr> {
         return c < N ? chrs[c] : new Chr(c);
     }
 
+    public static Chr valueOf(int c) {
+        return c < N ? chrs[c] : new Chr(c);
+    }
+
     public static boolean isLetterOrDigit(Chr c) {
         return isLetterOrDigit(c.charValue());
     }
@@ -69,6 +73,37 @@ public final class Chr implements Comparable<Chr> {
         return d - '0';
     }
 
+    private static final int ERROR = -1;
+
+    public static int digit(char digit, int radix) {
+        if (radix <= 10) {
+            final int r = digit - '0';
+            if (r < radix) {
+                return r;
+            } else {
+                return ERROR;
+            }
+        } else {
+            final int r;
+
+            if ('0' <= digit && digit <= '9') {
+                return digit - '0';
+            } else if ('a' <= digit && digit <= 'z') {
+                r = digit - 'a';
+            } else if ('A' <= digit && digit <= 'Z') {
+                r = digit - 'A';
+            } else {
+                return ERROR;
+            }
+
+            if (r < radix) {
+                return r;
+            } else {
+                return ERROR;
+            }
+        }
+    }
+
     /**
      * Convert a list of Characters into a String.
      */
@@ -97,7 +132,7 @@ public final class Chr implements Comparable<Chr> {
         this.value = value;
     }
 
-    public Chr(int value) {
+    private Chr(int value) {
         this.value = (char)value;
     }
 
@@ -119,6 +154,10 @@ public final class Chr implements Comparable<Chr> {
     public boolean equals(Object rhs) {
         return rhs instanceof Chr &&
             value == ((Chr) rhs).charValue();
+    }
+
+    public boolean equals(Chr rhs) {
+        return value == rhs.value;
     }
 
     public boolean equals(char rhs) {
@@ -159,8 +198,8 @@ public final class Chr implements Comparable<Chr> {
         public static <A, B> List<B> map(List<A> l, Functions.F<A, B> f) {
             final int n = l.size();
             final List<B> r = new ArrayList<B>(n);
-            for (int i = 0; i < n; ++i) {
-                r.add(f.apply(l.get(i)));
+            for (A aL : l) {
+                r.add(f.apply(aL));
             }
 
             return r;

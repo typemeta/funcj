@@ -1,11 +1,11 @@
 package org.javafp.control;
 
 import org.javafp.data.IList;
-import org.javafp.util.*;
 import org.javafp.util.Functions.*;
+import org.javafp.util.FunctionsEx;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Simple monadic wrapper for computations which result in either a successfully computed value
@@ -52,7 +52,7 @@ public interface Try<T> {
      * Standard applicative traversal.
      */
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
-        return lt.foldr(
+        return lt.foldRight(
                 (t, tlt) -> f.apply(t).apply(tlt.map(l -> l::add)),
                 success(IList.nil())
         );
@@ -62,7 +62,7 @@ public interface Try<T> {
      * Standard applicative sequencing.
      */
     static <T> Try<IList<T>> sequence(IList<Try<T>> lt) {
-        return lt.foldr(
+        return lt.foldRight(
             (tt, tlt) -> tt.apply(tlt.map(l -> l::add)),
             success(IList.nil())
         );

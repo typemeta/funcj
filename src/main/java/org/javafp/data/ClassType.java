@@ -17,7 +17,7 @@ public class ClassType<T> {
     }
 
     public Optional<T> cast(Object value) {
-        if (clazz.isAssignableFrom(value.getClass())) {
+        if (clazz.isInstance(value)) {
             return Optional.of((T)value);
         } else {
             return Optional.empty();
@@ -25,7 +25,7 @@ public class ClassType<T> {
     }
 
     public <S, R> R match(S value, F<T, R> success, F<S, R> fail) {
-        if (clazz.isAssignableFrom(value.getClass())) {
+        if (clazz.isInstance(value)) {
             return success.apply((T)value);
         } else {
             return fail.apply(value);

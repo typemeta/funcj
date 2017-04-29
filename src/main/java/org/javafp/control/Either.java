@@ -1,9 +1,10 @@
 package org.javafp.control;
 
 import org.javafp.data.IList;
-import org.javafp.util.Functions.*;
+import org.javafp.util.Functions.F;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Standard tagged union type over two types.
@@ -26,7 +27,7 @@ public interface Either<A, B> {
      * Standard applicative traversal.
      */
     static <T, A, B> Either<A, IList<B>> traverse(IList<T> lt, F<T, Either<A, B>> f) {
-        return lt.foldr(
+        return lt.foldRight(
             (t, elt) -> f.apply(t).apply(elt.map(l -> l::add)),
             right(IList.nil())
         );
@@ -36,7 +37,7 @@ public interface Either<A, B> {
      * Standard applicative sequencing.
      */
     static <A, B> Either<A, IList<B>> sequence(IList<Either<A, B>> le) {
-        return le.foldr(
+        return le.foldRight(
             (et, elt) -> et.apply(elt.map(l -> l::add)),
             right(IList.nil())
         );
@@ -47,6 +48,8 @@ public interface Either<A, B> {
     Optional<A> left();
 
     Optional<B> right();
+
+    void handle(Consumer<Left<A, B>> left, Consumer<Right<A, B>> right);
 
     <T> T match(F<Left<A, B>, ? extends T> left, F<Right<A, B>, ? extends T> right);
 
@@ -81,6 +84,11 @@ public interface Either<A, B> {
         }
 
         @Override
+        public void handle(Consumer<Left<A, B>> left, Consumer<Right<A, B>> right) {
+            right.accept(this);
+        }
+
+        @Override
         public <T> T match(F<Left<A, B>, ? extends T> left, F<Right<A, B>, ? extends T> right) {
             return right.apply(this);
         }
@@ -92,7 +100,7 @@ public interface Either<A, B> {
 
         @Override
         public <T> Either<A, T> map(F<? super B, ? extends T> f) {
-            return Either.<A, T>right(f.apply(value));
+            return Either.right(f.apply(value));
         }
 
         @Override
@@ -126,6 +134,11 @@ public interface Either<A, B> {
         @Override
         public Optional<B> right() {
             return Optional.empty();
+        }
+
+        @Override
+        public void handle(Consumer<Left<A, B>> left, Consumer<Right<A, B>> right) {
+            left.accept(this);
         }
 
         @Override

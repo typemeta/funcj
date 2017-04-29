@@ -33,14 +33,14 @@ public class IListTest {
 
     @Test
     public void testFoldl() {
-        Assert.assertEquals("foldl for an empty list", 0, empty.foldl((x, y) -> x - y, 0).intValue());
-        Assert.assertEquals("foldl for a non-empty list", (((10-1)-2)-3)-4, l.foldl((x, y) -> x - y, 10).intValue());
+        Assert.assertEquals("foldLeft for an empty list", 0, empty.foldLeft((x, y) -> x - y, 0).intValue());
+        Assert.assertEquals("foldLeft for a non-empty list", (((10-1)-2)-3)-4, l.foldLeft((x, y) -> x - y, 10).intValue());
     }
 
     @Test
     public void testFoldr() {
-        Assert.assertEquals("foldr for an empty list", 0, empty.foldr((x, y) -> x - y, 0).intValue());
-        Assert.assertEquals("foldr for a non-empty list", 1-(2-(3-(4-10))), l.foldr((x, y) -> x - y, 10).intValue());
+        Assert.assertEquals("foldRight for an empty list", 0, empty.foldRight((x, y) -> x - y, 0).intValue());
+        Assert.assertEquals("foldRight for a non-empty list", 1-(2-(3-(4-10))), l.foldRight((x, y) -> x - y, 10).intValue());
     }
 
     @Test

@@ -8,6 +8,10 @@ import java.util.*;
 import static java.util.stream.Collectors.toMap;
 
 public interface Node {
+    static NullNode nul() {
+        return NullNode.NULL;
+    }
+
     static BoolNode bool(boolean value) {
         return value ? BoolNode.TRUE : BoolNode.FALSE;
     }
@@ -42,7 +46,7 @@ public interface Node {
     }
 
     final class NullNode implements Node {
-        public static NullNode NULL = new NullNode();
+        public static final NullNode NULL = new NullNode();
 
         private NullNode() {
         }
@@ -59,8 +63,8 @@ public interface Node {
     }
 
     final class BoolNode implements Node {
-        public static BoolNode TRUE = new BoolNode(true);
-        public static BoolNode FALSE = new BoolNode(false);
+        public static final BoolNode TRUE = new BoolNode(true);
+        public static final BoolNode FALSE = new BoolNode(false);
 
         public final boolean value;
 
@@ -106,9 +110,7 @@ public interface Node {
 
         @Override
         public StringBuilder toJson(StringBuilder sb) {
-            sb.append("\"");
-            Utils.escape(value, sb);
-            return sb.append("\"");
+            return Utils.string(value, sb);
         }
 
         @Override
@@ -162,7 +164,7 @@ public interface Node {
                 } else {
                     sb.append(',');
                 }
-                sb.append(en.getKey()).append(':');
+                Utils.string(en.getKey(), sb).append(':');
                 en.getValue().toJson(sb);
             }
             return sb.append('}');
@@ -206,6 +208,12 @@ public interface Node {
 }
 
 class Utils {
+    static StringBuilder string(String s, StringBuilder sb) {
+        sb.append('"');
+        escape(s, sb);
+        return sb.append('"');
+    }
+
     static StringBuilder escape(String s, StringBuilder sb) {
         final int len = s.length();
         for (int i = 0; i < len; ++i) {
@@ -236,10 +244,10 @@ class Utils {
                     sb.append("\\t");
                     break;
                 default:
-                    if ((c >= '\u0000' && c <= '\u001F') ||
-                        (c >= '\u007F' && c <= '\u009F') ||
-                        (c >= '\u2000' && c <= '\u20FF')) {
-                        sb.append("\\u" + Integer.toHexString(c | 0x10000).substring(1));
+                    if (c <= '\u001F' ||
+                        c >= '\u007F' && c <= '\u009F' ||
+                        c >= '\u2000' && c <= '\u20FF') {
+                        sb.append("\\u").append(Integer.toHexString(c | 0x10000).substring(1));
                     } else {
                         sb.append(c);
                     }

@@ -33,11 +33,12 @@ public class RNGTest {
             Assert.assertTrue("Random double is in range 0 to 1", 0 <= d || d <= 1);
         });
 
-        final double m = result.foldl((x, y) -> x + y, 0.0) / N;
-        final double sd = Math.sqrt(result
-            .map(x -> (x-m)*(x-m))
-            .foldl((x, y) -> x + y, 0.0)
-            / N);
+        final double m = result.foldLeft((x, y) -> x + y, 0.0) / N;
+        final double sd = Math.sqrt(
+            result.map(x -> (x-m)*(x-m))
+                    .foldLeft((x, y) -> x + y, 0.0)
+                    / N
+        );
         Assert.assertEquals("Mean", 0.5, m, 0.05);
         Assert.assertEquals("Standard deviation", 1.0/Math.sqrt(12.0), sd, 0.05);
     }

@@ -1,36 +1,45 @@
 package org.javafp.parsec4j;
 
+import org.javafp.data.Lazy;
 import org.javafp.util.Unit;
-import org.javafp.parsec4j.Parser.Context;
 
 import java.util.Objects;
 
-public class Ref<I, CTX extends Context<I>, A>
-        implements Parser<I, CTX, A> {
+public class Ref<I, A> implements Parser<I, A> {
 
-    public static <I, CTX extends Context<I>, A> Ref<I, CTX, A> of() {
-        return new org.javafp.parsec4j.Ref<I, CTX, A>();
+    public static <I, A> Ref<I, A> of() {
+        return new Ref<I, A>();
     }
 
-    public static <I, CTX extends Context<I>, A> Ref<I, CTX, A> of(Parser<I, CTX, A> p) {
-        return new org.javafp.parsec4j.Ref<I, CTX, A>(p);
+    public static <I, A> Ref<I, A> of(Parser<I, A> p) {
+        return new Ref<I, A>(p);
     }
 
-    private enum Null implements Parser<Unit, Context<Unit>, Unit> {
+    private enum Null implements Parser<Unit, Unit> {
         INSTANCE {
-            public Result<Unit, Unit> parse(Context<Unit> ctx, int pos) {
-                throw new RuntimeException("Null Parser Reference");
+            @Override
+            public Lazy<Boolean> acceptsEmpty() {
+                throw new RuntimeException("Uninitialised lazy Parser reference");
+            }
+
+            @Override
+            public Lazy<SymSet<Unit>> firstSet() {
+                throw new RuntimeException("Uninitialised lazy Parser reference");
+            }
+
+            public Result<Unit, Unit> parse(Input<Unit> in, SymSet<Unit> follow) {
+                throw new RuntimeException("Uninitialised lazy Parser reference");
             }
         };
 
-        static <I, CTX extends Context<I>, A> Parser<I, CTX, A> of() {
-            return (Parser<I, CTX, A>) INSTANCE;
+        static <I, A> Parser<I, A> of() {
+            return (Parser<I, A>) INSTANCE;
         }
     }
 
-    private Parser<I, CTX, A> impl;
+    private Parser<I, A> impl;
 
-    private Ref(Parser<I, CTX, A> p) {
+    private Ref(Parser<I, A> p) {
         this.impl = Objects.requireNonNull(impl);
     }
 
@@ -38,7 +47,7 @@ public class Ref<I, CTX extends Context<I>, A>
         this.impl = Null.of();
     }
 
-    public Parser<I, CTX, A> set(Parser<I, CTX, A> impl) {
+    public Parser<I, A> set(Parser<I, A> impl) {
         if (this.impl != Null.INSTANCE) {
             throw new IllegalStateException("Ref is already initialised");
         } else {
@@ -48,7 +57,17 @@ public class Ref<I, CTX extends Context<I>, A>
     }
 
     @Override
-    public Result<I, A> parse(CTX ctx, int pos) {
-        return impl.parse(ctx, pos);
+    public Lazy<Boolean> acceptsEmpty() {
+        return () -> impl.acceptsEmpty().apply();
+    }
+
+    @Override
+    public Lazy<SymSet<I>> firstSet() {
+        return () -> impl.firstSet().apply();
+    }
+
+    @Override
+    public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+        return impl.parse(in, follow);
     }
 }

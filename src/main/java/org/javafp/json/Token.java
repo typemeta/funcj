@@ -1,8 +1,8 @@
 package org.javafp.json;
 
-
-import org.javafp.util.Functions;
 import org.javafp.util.Functions.F;
+
+import java.util.*;
 
 public interface Token {
     enum TokenImpl implements Token {
@@ -21,18 +21,18 @@ public interface Token {
         }
     }
 
-        class Num implements Token {
+    class Num implements Token {
         public final double value;
 
         public Num(double value) {
             this.value = value;
         }
 
-            @Override
-            public <T> T match(F<TokenImpl, T> tokenImpl, F<Num, T> num, F<Str, T> str) {
-                return num.apply(this);
-            }
+        @Override
+        public <T> T match(F<TokenImpl, T> tokenImpl, F<Num, T> num, F<Str, T> str) {
+            return num.apply(this);
         }
+    }
 
     class Str implements Token {
         public final String value;
@@ -48,4 +48,9 @@ public interface Token {
     }
 
     <T> T match(F<TokenImpl, T> tokenImpl, F<Num, T> num, F<Str, T> str);
+
+    static List<Token> tokenise(String s) {
+        final List<Token> tokens = new ArrayList<>();
+        return tokens;
+    }
 }

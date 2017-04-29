@@ -1,27 +1,32 @@
 package org.javafp.parsec4j.expr;
 
-import org.javafp.util.Chr;
-import org.javafp.parsec4j.*;
-import org.openjdk.jmh.annotations.*;
+import org.javafp.jmh.FlightRecordingProfiler;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.runner.*;
 import org.openjdk.jmh.runner.options.*;
 
-import java.io.IOException;
-
 public class JmhTest {
 
-    public void runJmh() throws RunnerException, IOException {
+    public static void main(String args[]) throws RunnerException {
+        new JmhTest().runJmh();
+    }
+
+    public void runJmh() throws RunnerException {
         final Options opt = new OptionsBuilder()
-            .jvmArgs("-XX:+UnlockCommercialFeatures")
+                .jvmArgs("-XX:+UnlockCommercialFeatures")
                 .include(JmhTest.class.getSimpleName())
-//                .warmupIterations(20)
-//                .measurementIterations(10)
+                .warmupIterations(20)
+                .measurementIterations(20)
+                .addProfiler(FlightRecordingProfiler.class)
                 .forks(1)
                 .build();
            new Runner(opt).run();
     }
 
-    private static final Parser<Chr, Grammar.Ctx, Model.Expr> parser = Grammar.parser;
+    static  {
+        Grammar.parser.acceptsEmpty();
+        Grammar.parser.firstSet();
+    }
 
     @Benchmark
     public static String testGood() {
