@@ -29,6 +29,10 @@ public interface Parser<I, A> {
         return this.andL(eof()).parse(in, SymSet.empty());
     }
 
+    default Result<I, A> failure(Input<I> in) {
+        return Result.failure(in, firstSet().apply());
+    }
+
     static <I, A> Parser<I, A> pure(A a) {
         return new ParserImpl<I, A>(TRUE, SymSet::empty) {
             @Override
@@ -63,7 +67,7 @@ public interface Parser<I, A> {
                     } else if (rhs.acceptsEmpty().apply()) {
                         return rhs.parse(in, follow);
                     } else {
-                        return Result.failure(in);
+                        return failure(in);
                     }
                 } else {
                     final I i = in.get();
@@ -78,7 +82,7 @@ public interface Parser<I, A> {
                             return rhs.parse(in, follow);
                         }
                     }
-                    return Result.failure(in);
+                    return failure(in);
                 }
             }
         };
@@ -112,7 +116,7 @@ public interface Parser<I, A> {
         return new ParserImpl<I, A>(() -> true, SymSet::empty) {
             @Override
             public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
-                return Result.failure(in);
+                return failure(in);
             }
         };
     }
@@ -165,7 +169,7 @@ public interface Parser<I, A> {
             public Result<I, Unit> parse(Input<I> in, SymSet<I> follow) {
                 return in.isEof() ?
                     Result.success(Unit.UNIT, in) :
-                    Result.failure(in);
+                    failure(in);
             }
         };
     }
@@ -174,8 +178,7 @@ public interface Parser<I, A> {
         return new ParserImpl<I, I>(FALSE, () -> SymSet.pred(name, pred)) {
             @Override
             public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
-                final I i = in.get();
-                return Result.success(i, in.next());
+                return Result.success(in.get(), in.next());
             }
         };
     }
@@ -199,7 +202,7 @@ public interface Parser<I, A> {
             @Override
             public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
                 return in.isEof() ?
-                    Result.failure(in) :
+                    failure(in) :
                     Result.success(in.get(), in.next());
             }
         };

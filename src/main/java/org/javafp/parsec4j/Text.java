@@ -61,7 +61,7 @@ public class Text {
                     public Result<Chr, String> parse(Input<Chr> in, SymSet<Chr> follow) {
                         for (int i = 0; i < s.length(); ++i) {
                             if (in.isEof() || !in.get().equals(s.charAt(i))) {
-                                return Result.failure(in);
+                                return failure(in);
                             } else {
                                 in = in.next();
                             }

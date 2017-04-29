@@ -15,8 +15,8 @@ public interface Result<I, A> {
         return new Success<I, A>(result, next);
     }
 
-    static <I, A> Result<I, A> failure(Input<I> in) {
-        return new Failure<I, A>(in);
+    static <I, A> Result<I, A> failure(Input<I> in, SymSet<I> expected) {
+        return new Failure<I, A>(in, expected);
     }
 
     boolean isSuccess();
@@ -50,7 +50,7 @@ public interface Result<I, A> {
         public String toString() {
             return "Success{" +
                 "value=" + value +
-                ", next=" + next.position() +
+                ", next=" + next +
                 '}';
         }
 
@@ -97,19 +97,26 @@ public interface Result<I, A> {
 
     class Failure<I, A> implements Result<I, A> {
         private final Input<I> input;
+        private final SymSet<I> expected;
 
-        public Failure(Input<I> input) {
+        public Failure(Input<I> input, SymSet<I> expected) {
             this.input = input;
+            this.expected = expected;
         }
 
         public Input<I> input() {
             return input;
         }
 
+        public SymSet<I> expected() {
+            return expected;
+        }
+
         @Override
         public String toString() {
             return "Failure{" +
-                "pos=" + input.position() +
+                "input=" + input +
+                ", expected=" + expected +
                 '}';
         }
 

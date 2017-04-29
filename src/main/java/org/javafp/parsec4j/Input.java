@@ -45,7 +45,7 @@ class StringInput implements Input<Chr> {
 
     @Override
     public String toString() {
-        return new String(data);
+        return "{pos=" + pos + "}";
     }
 
     @Override
