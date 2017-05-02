@@ -1,6 +1,6 @@
-package org.funcj.parsec4j;
+package org.funcj.parser;
 
-import org.funcj.util.*;
+import org.funcj.data.Chr;
 
 public interface Input<I> {
     static Input<Chr> of(char[] data) {

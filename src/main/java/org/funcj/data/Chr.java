@@ -1,6 +1,6 @@
-package org.funcj.util;
+package org.funcj.data;
 
-import org.funcj.data.IList;
+import org.funcj.util.Functions;
 
 import java.lang.reflect.Array;
 import java.util.*;

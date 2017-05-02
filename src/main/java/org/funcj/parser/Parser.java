@@ -1,14 +1,14 @@
-package org.funcj.parsec4j;
+package org.funcj.parser;
 
 import org.funcj.data.*;
 import org.funcj.util.Functions.*;
-import org.funcj.util.Unit;
+import org.funcj.data.Unit;
 
 import java.util.Optional;
 
-import static org.funcj.parsec4j.Impl.FALSE;
-import static org.funcj.parsec4j.Impl.TRUE;
-import static org.funcj.parsec4j.Parser.pure;
+import static org.funcj.parser.Impl.FALSE;
+import static org.funcj.parser.Impl.TRUE;
+import static org.funcj.parser.Parser.pure;
 import static org.funcj.util.Functions.F2.curry;
 
 /**

@@ -1,11 +1,11 @@
-package org.funcj.parsec4j.expr;
+package org.funcj.parser.expr;
 
-import org.funcj.parsec4j.*;
-import org.funcj.util.Chr;
+import org.funcj.parser.*;
+import org.funcj.data.Chr;
 import org.funcj.util.Functions.Op2;
 
-import static org.funcj.parsec4j.Text.*;
-import static org.funcj.parsec4j.expr.Model.*;
+import static org.funcj.parser.Text.*;
+import static org.funcj.parser.expr.Model.*;
 
 public abstract class Grammar {
 

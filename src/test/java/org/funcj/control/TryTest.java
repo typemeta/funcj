@@ -1,4 +1,4 @@
-package org.funcj.data;
+package org.funcj.control;
 
 public class TryTest {
 }

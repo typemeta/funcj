@@ -1,8 +1,8 @@
-package org.funcj.parsec4j;
+package org.funcj.parser;
 
-import org.funcj.util.Chr;
+import org.funcj.data.Chr;
 
-import static org.funcj.parsec4j.Parser.*;
+import static org.funcj.parser.Parser.*;
 
 public class Text {
     public static final Parser<Chr, Chr> anyChar = any();

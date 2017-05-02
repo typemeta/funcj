@@ -1,4 +1,4 @@
-package org.funcj.parsec4j;
+package org.funcj.parser;
 
 import org.funcj.util.Functions.*;
 

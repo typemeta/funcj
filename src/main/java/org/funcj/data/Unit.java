@@ -1,4 +1,4 @@
-package org.funcj.util;
+package org.funcj.data;
 
 /**
  * A type with a single value.

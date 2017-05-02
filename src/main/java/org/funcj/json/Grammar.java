@@ -1,13 +1,13 @@
 package org.funcj.json;
 
 import org.funcj.data.*;
-import org.funcj.parsec4j.*;
-import org.funcj.util.Chr;
+import org.funcj.parser.*;
+import org.funcj.data.Chr;
 
 import java.util.LinkedHashMap;
 
-import static org.funcj.parsec4j.Parser.*;
-import static org.funcj.parsec4j.Text.*;
+import static org.funcj.parser.Parser.*;
+import static org.funcj.parser.Text.*;
 
 /**
  * A grammar for JSON.
@@ -116,11 +116,10 @@ public class Grammar {
             ).map(Node::array);
 
         final Parser<Chr, Tuple2<String, Node>> jfield =
-            (jstring
+            jstring
                 .andL(tok(chr(':')))
                 .and(jvalue)
-                .map(Tuple2::new)
-            );
+                .map(Tuple2::new);
 
         final Parser<Chr, Node> jobject =
             between(

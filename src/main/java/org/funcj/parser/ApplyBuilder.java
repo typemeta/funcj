@@ -1,8 +1,8 @@
-package org.funcj.parsec4j;
+package org.funcj.parser;
 
 import org.funcj.util.Functions.*;
 
-import static org.funcj.parsec4j.Parser.ap;
+import static org.funcj.parser.Parser.ap;
 
 public class ApplyBuilder {
     public static class _2<I, A, B> {

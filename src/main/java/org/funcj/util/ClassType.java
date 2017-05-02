@@ -1,4 +1,4 @@
-package org.funcj.data;
+package org.funcj.util;
 
 import org.funcj.util.Functions.F;
 

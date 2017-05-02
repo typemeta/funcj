@@ -2,9 +2,9 @@ package org.funcj.control;
 
 import org.funcj.data.*;
 import org.funcj.util.Functions.F;
-import org.funcj.util.Unit;
+import org.funcj.data.Unit;
 
-import static org.funcj.util.Unit.UNIT;
+import static org.funcj.data.Unit.UNIT;
 
 /**
  * State monad.

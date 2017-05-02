@@ -20,7 +20,7 @@ public class RNGTest {
             );
     }
 
-    private static final int N = 10000;
+    private static final int N = 1000;
 
     @Test
     public void testSequence() {

@@ -1,10 +1,10 @@
-package org.funcj.parsec4j;
+package org.funcj.parser;
 
-import org.funcj.util.Chr;
+import org.funcj.data.Chr;
 import org.funcj.util.Functions.Op2;
 
-import static org.funcj.parsec4j.Text.chr;
-import static org.funcj.parsec4j.Text.dble;
+import static org.funcj.parser.Text.chr;
+import static org.funcj.parser.Text.dble;
 
 public abstract class ExprTest {
 

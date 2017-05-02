@@ -1,4 +1,4 @@
-package org.funcj.data;
+package org.funcj.control;
 
 import org.funcj.control.State;
 import org.junit.*;

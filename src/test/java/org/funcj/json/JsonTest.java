@@ -1,8 +1,8 @@
 package org.funcj.json;
 
 import org.funcj.control.Try;
-import org.funcj.parsec4j.Result;
-import org.funcj.util.Chr;
+import org.funcj.parser.Result;
+import org.funcj.data.Chr;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 
@@ -12,18 +12,18 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
-public class JmhTest {
+public class JsonTest {
     private static final String test0 = "null";
 
     private static final String test1 = "true";
 
-    private static final String test2 = "12.0";
+    private static final String test2 = "12";
 
     private static final String test3 = "[]";
 
     private static final String test4 = "[]";
 
-    private static final String test5 = "{\"key\":[1.0,\"value\",true,null]}";
+    private static final String test5 = "{\"key\":[1.1,\"value\",true,null]}";
 
     private static final String[] tests = {
         test0, test1, test2, test3, test4, test5
@@ -31,7 +31,7 @@ public class JmhTest {
 
     private static Try<String> loadFile(String name) {
         final InputStream is =
-            Optional.ofNullable(JmhTest.class.getResourceAsStream(name))
+            Optional.ofNullable(JsonTest.class.getResourceAsStream(name))
                     .orElseThrow(() -> new RuntimeException("File '" + name + "' not found"));
         return Try.of(() -> {
             try (BufferedReader buffer = new BufferedReader(new InputStreamReader(is))) {
@@ -42,7 +42,7 @@ public class JmhTest {
 
     @Test
     public void testRoundTrip() {
-        Arrays.stream(tests).forEach(JmhTest::roundTrip);
+        Arrays.stream(tests).forEach(JsonTest::roundTrip);
     }
 
     private static void roundTrip(String json) {
@@ -50,10 +50,10 @@ public class JmhTest {
         final Result<Chr, Node> result = Grammar.parse(json);
         final Node node = result.getOrThrow();
 
-        final String json2 = node.toJson();
+        final String json2 = node.toString();
         //System.out.println(json2);
 
-        assertEquals(json, json2);
+        assertEquals("Round-tripped JSON", json, json2);
     }
 
     private static final String json = loadFile("/example.json").get();
@@ -63,6 +63,9 @@ public class JmhTest {
     public void testSuccessParse() throws IOException {
         final Result<Chr, Node> result = Grammar.parse(json);
         final Node node = result.getOrThrow();
-        //System.out.println(node.toJson());
+        final String json2 = node.toJson(100);
+
+        System.out.println(node.toString());
+        assertEquals("Round-tripped JSON", json, json2);
     }
 }

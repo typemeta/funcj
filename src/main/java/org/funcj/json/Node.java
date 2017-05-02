@@ -2,6 +2,7 @@ package org.funcj.json;
 
 
 import org.funcj.data.*;
+import org.funcj.document.*;
 
 import java.util.*;
 
@@ -9,7 +10,7 @@ import static java.util.stream.Collectors.toMap;
 
 public interface Node {
     static NullNode nul() {
-        return NullNode.NULL;
+        return NullNode.INSTANCE;
     }
 
     static BoolNode bool(boolean value) {
@@ -28,32 +29,54 @@ public interface Node {
         return new ArrayNode(values);
     }
 
-    static ObjectNode object(LinkedHashMap<String, Node> values) {
-        return new ObjectNode(values);
+    static ArrayNode array(Node... values) {
+        return new ArrayNode(IList.of(values));
+    }
+
+    static Tuple2<String, Node> entry(String name, Node node) {
+        return Tuple2.of(name, node);
+    }
+
+    static ObjectNode object(Tuple2<String, Node>... fields) {
+        return object(IList.of(fields));
     }
 
     static ObjectNode object(IList<Tuple2<String, Node>> fields) {
         final LinkedHashMap<String, Node> m =
-            fields.stream().collect(
-                toMap(
-                    f -> f._1,
-                    f -> f._2,
-                    (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); },
-                    LinkedHashMap::new
-                )
-            );
+                fields.stream().collect(
+                        toMap(
+                                Tuple2::get1,
+                                Tuple2::get2,
+                                Utils::duplicateKeyError,
+                                LinkedHashMap::new
+                        )
+                );
         return new ObjectNode(m);
     }
 
+    static ObjectNode object(LinkedHashMap<String, Node> values) {
+        return new ObjectNode(values);
+    }
+
     final class NullNode implements Node {
-        public static final NullNode NULL = new NullNode();
+        public static final NullNode INSTANCE = new NullNode();
 
         private NullNode() {
         }
 
         @Override
-        public StringBuilder toJson(StringBuilder sb) {
-            return sb.append("null");
+        public String toString() {
+            return "null";
+        }
+
+        @Override
+        public Document toDocument() {
+            return API.text(toString());
+        }
+
+        @Override
+        public StringBuilder toString(StringBuilder sb) {
+            return sb.append(toString());
         }
 
         @Override
@@ -62,19 +85,29 @@ public interface Node {
         }
     }
 
-    final class BoolNode implements Node {
-        public static final BoolNode TRUE = new BoolNode(true);
-        public static final BoolNode FALSE = new BoolNode(false);
+    enum BoolNode implements Node {
+        TRUE(true),
+        FALSE(false);
 
         public final boolean value;
 
-        public BoolNode(boolean value) {
+        BoolNode(boolean value) {
             this.value = value;
         }
 
         @Override
-        public StringBuilder toJson(StringBuilder sb) {
-            return sb.append(Boolean.toString(value));
+        public String toString() {
+            return Boolean.toString(value);
+        }
+
+        @Override
+        public Document toDocument() {
+            return API.text(toString());
+        }
+
+        @Override
+        public StringBuilder toString(StringBuilder sb) {
+            return sb.append(toString());
         }
 
         @Override
@@ -91,8 +124,18 @@ public interface Node {
         }
 
         @Override
-        public StringBuilder toJson(StringBuilder sb) {
-            return sb.append(Double.toString(value));
+        public String toString() {
+            return Utils.format(value);
+        }
+
+        @Override
+        public Document toDocument() {
+            return API.text(toString());
+        }
+
+        @Override
+        public StringBuilder toString(StringBuilder sb) {
+            return sb.append(toString());
         }
 
         @Override
@@ -109,8 +152,18 @@ public interface Node {
         }
 
         @Override
-        public StringBuilder toJson(StringBuilder sb) {
-            return Utils.string(value, sb);
+        public String toString() {
+            return Utils.format(value);
+        }
+
+        @Override
+        public Document toDocument() {
+            return API.text(toString());
+        }
+
+        @Override
+        public StringBuilder toString(StringBuilder sb) {
+            return Utils.format(value, sb);
         }
 
         @Override
@@ -127,7 +180,22 @@ public interface Node {
         }
 
         @Override
-        public StringBuilder toJson(StringBuilder sb) {
+        public String toString() {
+            return toString(new StringBuilder()).toString();
+        }
+
+        @Override
+        public Document toDocument() {
+            return API.enclose(
+                    API.text('['),
+                    API.text(", "),
+                    API.text(']'),
+                    values.map(Node::toDocument)
+            );
+        }
+
+        @Override
+        public StringBuilder toString(StringBuilder sb) {
             sb.append('[');
             boolean first = true;
             for (Node n : values) {
@@ -136,7 +204,7 @@ public interface Node {
                 } else {
                     sb.append(',');
                 }
-                n.toJson(sb);
+                n.toString(sb);
             }
             return sb.append(']');
         }
@@ -148,24 +216,39 @@ public interface Node {
     }
 
     final class ObjectNode implements Node {
-        public final LinkedHashMap<String, Node> values;
+        public final LinkedHashMap<String, Node> fields;
 
-        public ObjectNode(LinkedHashMap<String, Node> values) {
-            this.values = values;
+        public ObjectNode(LinkedHashMap<String, Node> fields) {
+            this.fields = fields;
         }
 
         @Override
-        public StringBuilder toJson(StringBuilder sb) {
+        public String toString() {
+            return toString(new StringBuilder()).toString();
+        }
+
+        @Override
+        public Document toDocument() {
+            return API.enclose(
+                    API.text('{'),
+                    API.text(", "),
+                    API.text('}'),
+                    Functors.map(Utils::toDoc, fields.entrySet())
+            );
+        }
+
+        @Override
+        public StringBuilder toString(StringBuilder sb) {
             sb.append('{');
             boolean first = true;
-            for (Map.Entry<String, Node> en : values.entrySet()) {
+            for (Map.Entry<String, Node> en : fields.entrySet()) {
                 if (first) {
                     first = false;
                 } else {
                     sb.append(',');
                 }
-                Utils.string(en.getKey(), sb).append(':');
-                en.getValue().toJson(sb);
+                Utils.format(en.getKey(), sb).append(':');
+                en.getValue().toString(sb);
             }
             return sb.append('}');
         }
@@ -176,11 +259,13 @@ public interface Node {
         }
     }
 
-    StringBuilder toJson(StringBuilder sb);
+    Document toDocument();
 
-    default String toJson() {
-        return toJson(new StringBuilder()).toString();
+    default String toJson(int width) {
+        return DocWriter.format(width, toDocument());
     }
+
+    StringBuilder toString(StringBuilder sb);
 
     default NullNode nullNode() {
         throw new RuntimeException(getClass().getSimpleName() + " is not a NullNode");
@@ -208,7 +293,24 @@ public interface Node {
 }
 
 class Utils {
-    static StringBuilder string(String s, StringBuilder sb) {
+    static Node duplicateKeyError(Node u, Node v) {
+        throw new IllegalStateException("Duplicate keys");
+    }
+
+    static String format(double d) {
+        final long ld = (long)d;
+        if (d == ld) {
+            return String.format("%d", ld);
+        } else {
+            return String.format("%s", d);
+        }
+    }
+
+    static String format(String s) {
+        return format(s, new StringBuilder()).toString();
+    }
+
+    static StringBuilder format(String s, StringBuilder sb) {
         sb.append('"');
         escape(s, sb);
         return sb.append('"');
@@ -225,9 +327,9 @@ class Utils {
                 case '\\':
                     sb.append("\\\\");
                     break;
-                case '/':
-                    sb.append("\\/");
-                    break;
+//                case '/':
+//                    sb.append("\\/");
+//                    break;
                 case '\b':
                     sb.append("\\b");
                     break;
@@ -245,8 +347,8 @@ class Utils {
                     break;
                 default:
                     if (c <= '\u001F' ||
-                        c >= '\u007F' && c <= '\u009F' ||
-                        c >= '\u2000' && c <= '\u20FF') {
+                            c >= '\u007F' && c <= '\u009F' ||
+                            c >= '\u2000' && c <= '\u20FF') {
                         sb.append("\\u").append(Integer.toHexString(c | 0x10000).substring(1));
                     } else {
                         sb.append(c);
@@ -255,5 +357,13 @@ class Utils {
         }
 
         return sb;
+    }
+
+    static Document toDoc(Map.Entry<String, Node> field) {
+        return API.concat(
+                API.text("\"" + field.getKey() + "\""),
+                API.text(" : "),
+                field.getValue().toDocument()
+        );
     }
 }
