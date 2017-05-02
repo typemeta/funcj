@@ -1,7 +1,7 @@
 package org.funcj.parser;
 
-import org.funcj.util.Functions.Predicate;
 import org.funcj.data.Unit;
+import org.funcj.util.Functions.Predicate;
 
 import java.util.*;
 

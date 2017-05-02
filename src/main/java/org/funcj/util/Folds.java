@@ -1,9 +1,8 @@
 package org.funcj.util;
 
-import org.funcj.util.Functions.F2;
-import org.funcj.util.Functions.Op2;
+import org.funcj.util.Functions.*;
 
-import java.util.*;
+import java.util.List;
 
 public abstract class Folds {
     /**

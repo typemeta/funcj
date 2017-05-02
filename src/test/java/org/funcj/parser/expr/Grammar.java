@@ -1,7 +1,7 @@
 package org.funcj.parser.expr;
 
-import org.funcj.parser.*;
 import org.funcj.data.Chr;
+import org.funcj.parser.*;
 import org.funcj.util.Functions.Op2;
 
 import static org.funcj.parser.Text.*;

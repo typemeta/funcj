@@ -1,6 +1,5 @@
 package org.funcj.util;
 
-import org.funcj.util.ClassType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

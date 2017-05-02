@@ -1,20 +1,14 @@
 package org.funcj.jmh;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.management.ManagementFactory;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.profile.ExternalProfiler;
 import org.openjdk.jmh.results.*;
 import org.openjdk.jmh.util.FileUtils;
+
+import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.util.*;
 
 public class FlightRecordingProfiler implements ExternalProfiler {
     private String startFlightRecordingOptions = "duration=60s,name=profile,settings=profile,";

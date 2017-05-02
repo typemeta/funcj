@@ -1,6 +1,6 @@
 package org.funcj.parser;
 
-import org.funcj.util.Functions.*;
+import org.funcj.util.Functions.F;
 
 import java.util.function.Consumer;
 

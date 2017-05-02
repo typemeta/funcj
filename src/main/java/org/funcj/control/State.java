@@ -2,7 +2,6 @@ package org.funcj.control;
 
 import org.funcj.data.*;
 import org.funcj.util.Functions.F;
-import org.funcj.data.Unit;
 
 import static org.funcj.data.Unit.UNIT;
 

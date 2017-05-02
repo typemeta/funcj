@@ -1,6 +1,5 @@
 package org.funcj.control;
 
-import org.funcj.control.State;
 import org.junit.*;
 
 public class StateTest {

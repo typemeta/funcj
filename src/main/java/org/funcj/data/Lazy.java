@@ -1,8 +1,8 @@
 package org.funcj.data;
 
-import static org.funcj.util.Functions.*;
-
 import java.util.Objects;
+
+import static org.funcj.util.Functions.*;
 
 public interface Lazy<T> extends F0<T> {
     static <T> Lazy<T> of(F0<T> get) {

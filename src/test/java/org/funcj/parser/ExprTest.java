@@ -3,8 +3,7 @@ package org.funcj.parser;
 import org.funcj.data.Chr;
 import org.funcj.util.Functions.Op2;
 
-import static org.funcj.parser.Text.chr;
-import static org.funcj.parser.Text.dble;
+import static org.funcj.parser.Text.*;
 
 public abstract class ExprTest {
 

@@ -1,8 +1,8 @@
 package org.funcj.json;
 
 import org.funcj.control.Try;
-import org.funcj.parser.Result;
 import org.funcj.data.Chr;
+import org.funcj.parser.Result;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 

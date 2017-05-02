@@ -1,7 +1,7 @@
 package org.funcj.parser.expr;
 
 import org.funcj.data.Chr;
-import org.funcj.util.*;
+import org.funcj.util.Functions;
 
 /**
  * A model for simple mathematical expressions.

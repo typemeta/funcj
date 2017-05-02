@@ -2,7 +2,6 @@ package org.funcj.json;
 
 import org.funcj.data.*;
 import org.funcj.parser.*;
-import org.funcj.data.Chr;
 
 import java.util.LinkedHashMap;
 
