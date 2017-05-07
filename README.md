@@ -1,2 +1,3 @@
-# parsec4j
-Parser Combinator Framework for Java
+# FuncJ
+
+Assorted functional-oriented data structures and algorithms for Java.
