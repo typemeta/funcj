@@ -1,11 +1,11 @@
 package org.funcj.parser.expr;
 
 import org.junit.*;
+import org.openjdk.jmh.annotations.Benchmark;
 
 public class GrammarTest {
 
     static  {
-        System.out.println("Initialising...");
         Grammar.parser.acceptsEmpty();
         Grammar.parser.firstSet();
     }
@@ -37,5 +37,16 @@ public class GrammarTest {
     @Test
     public void testFailure() throws Exception {
         assertFailure("3*max(4%+(5bp+),-2bp)-1", 14);
+    }
+
+
+    @Benchmark
+    public static String testGood() {
+        return Grammar.parse("3*-max(4%+(5bp+-x),-2bp)-1").toString();
+    }
+
+    @Benchmark
+    public static String testBad() {
+        return Grammar.parse("3*-max(4%+(5bp+-x)x,-2bp)-1z").toString();
     }
 }
