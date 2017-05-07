@@ -141,13 +141,13 @@ public class Grammar {
             )
         );
 
-        parser = tok(jvalue);
+        parser = skipMany(ws).andR(tok(jvalue));
     }
 
     public static final Parser<Chr, Node> parser;
 
     public static Result<Chr, Node> parse(String str) {
-        return skipMany(ws).andR(parser).run(Input.of(str));
+        return parser.run(Input.of(str));
     }
 }
 

@@ -3,6 +3,8 @@ package org.funcj.json;
 
 import org.funcj.data.*;
 import org.funcj.document.*;
+import org.funcj.util.*;
+import org.funcj.util.Functions.F;
 
 import java.util.*;
 
@@ -58,11 +60,8 @@ public interface Node {
         return new ObjectNode(values);
     }
 
-    final class NullNode implements Node {
-        public static final NullNode INSTANCE = new NullNode();
-
-        private NullNode() {
-        }
+    enum NullNode implements Node {
+        INSTANCE;
 
         @Override
         public String toString() {
@@ -80,8 +79,14 @@ public interface Node {
         }
 
         @Override
-        public NullNode nullNode() {
-            return this;
+        public <T> T match(
+                F<NullNode, T> nln,
+                F<BoolNode, T> bn,
+                F<NumberNode, T> nmn,
+                F<StringNode, T> sn,
+                F<ArrayNode, T> an,
+                F<ObjectNode, T> on) {
+            return nln.apply(this);
         }
     }
 
@@ -111,8 +116,14 @@ public interface Node {
         }
 
         @Override
-        public BoolNode boolNode() {
-            return this;
+        public <T> T match(
+                F<NullNode, T> nln,
+                F<BoolNode, T> bn,
+                F<NumberNode, T> nmn,
+                F<StringNode, T> sn,
+                F<ArrayNode, T> an,
+                F<ObjectNode, T> on) {
+            return bn.apply(this);
         }
     }
 
@@ -139,8 +150,14 @@ public interface Node {
         }
 
         @Override
-        public NumberNode numberNode() {
-            return this;
+        public <T> T match(
+                F<NullNode, T> nln,
+                F<BoolNode, T> bn,
+                F<NumberNode, T> nmn,
+                F<StringNode, T> sn,
+                F<ArrayNode, T> an,
+                F<ObjectNode, T> on) {
+            return nmn.apply(this);
         }
     }
 
@@ -167,8 +184,14 @@ public interface Node {
         }
 
         @Override
-        public StringNode stringNode() {
-            return this;
+        public <T> T match(
+                F<NullNode, T> nln,
+                F<BoolNode, T> bn,
+                F<NumberNode, T> nmn,
+                F<StringNode, T> sn,
+                F<ArrayNode, T> an,
+                F<ObjectNode, T> on) {
+            return sn.apply(this);
         }
     }
 
@@ -210,8 +233,14 @@ public interface Node {
         }
 
         @Override
-        public ArrayNode arrayNode() {
-            return this;
+        public <T> T match(
+                F<NullNode, T> nln,
+                F<BoolNode, T> bn,
+                F<NumberNode, T> nmn,
+                F<StringNode, T> sn,
+                F<ArrayNode, T> an,
+                F<ObjectNode, T> on) {
+            return an.apply(this);
         }
     }
 
@@ -254,8 +283,14 @@ public interface Node {
         }
 
         @Override
-        public ObjectNode objectNode() {
-            return this;
+        public <T> T match(
+                F<NullNode, T> nln,
+                F<BoolNode, T> bn,
+                F<NumberNode, T> nmn,
+                F<StringNode, T> sn,
+                F<ArrayNode, T> an,
+                F<ObjectNode, T> on) {
+            return on.apply(this);
         }
     }
 
@@ -267,29 +302,14 @@ public interface Node {
 
     StringBuilder toString(StringBuilder sb);
 
-    default NullNode nullNode() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not a NullNode");
-    }
-
-    default BoolNode boolNode() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not a BoolNode");
-    }
-
-    default NumberNode numberNode() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not a NumberNode");
-    }
-
-    default StringNode stringNode() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not a StringNode");
-    }
-
-    default ArrayNode arrayNode() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not a ArrayNode");
-    }
-
-    default ObjectNode objectNode() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not a ObjectNode");
-    }
+    <T> T match(
+        F<NullNode, T> nln,
+        F<BoolNode, T> bn,
+        F<NumberNode, T> nmn,
+        F<StringNode, T> sn,
+        F<ArrayNode, T> an,
+        F<ObjectNode, T> on
+    );
 }
 
 class Utils {

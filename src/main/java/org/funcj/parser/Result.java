@@ -18,6 +18,10 @@ public interface Result<I, A> {
         return new Failure<I, A>(in, expected);
     }
 
+    static <I, A> Result<I, A> eof(Input<I> in, SymSet<I> expected) {
+        return new Failure<I, A>(in, expected);
+    }
+
     boolean isSuccess();
 
     A getOrThrow();
@@ -145,7 +149,9 @@ public interface Result<I, A> {
 
         @Override
         public A getOrThrow() {
-            throw new RuntimeException("Failure at position " + input.position());
+            throw new RuntimeException(
+                "Failure at position " + input.position() + ", expected=" + expected
+            );
         }
 
         @Override

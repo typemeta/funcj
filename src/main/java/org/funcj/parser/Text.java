@@ -5,8 +5,6 @@ import org.funcj.data.Chr;
 import static org.funcj.parser.Parser.*;
 
 public class Text {
-    public static final Parser<Chr, Chr> anyChar = any();
-
     public static Parser<Chr, Chr> chr(char c) {
         return value(Chr.valueOf(c));
     }
@@ -60,7 +58,9 @@ public class Text {
                     @Override
                     public Result<Chr, String> parse(Input<Chr> in, SymSet<Chr> follow) {
                         for (int i = 0; i < s.length(); ++i) {
-                            if (in.isEof() || !in.get().equals(s.charAt(i))) {
+                            if (in.isEof()) {
+                                return failureEof(in);
+                            } else if(!in.get().equals(s.charAt(i))) {
                                 return failure(in);
                             } else {
                                 in = in.next();

@@ -31,6 +31,10 @@ public interface Parser<I, A> {
         return Result.failure(in, firstSet().apply());
     }
 
+    default Result<I, A> failureEof(Input<I> in) {
+        return Result.eof(in, firstSet().apply());
+    }
+
     static <I, A> Parser<I, A> pure(A a) {
         return new ParserImpl<I, A>(TRUE, SymSet::empty) {
             @Override
@@ -65,7 +69,7 @@ public interface Parser<I, A> {
                     } else if (rhs.acceptsEmpty().apply()) {
                         return rhs.parse(in, follow);
                     } else {
-                        return failure(in);
+                        return failureEof(in);
                     }
                 } else {
                     final I i = in.get();
@@ -200,7 +204,7 @@ public interface Parser<I, A> {
             @Override
             public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
                 return in.isEof() ?
-                    failure(in) :
+                    failureEof(in) :
                     Result.success(in.get(), in.next());
             }
         };
