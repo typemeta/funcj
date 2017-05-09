@@ -4,6 +4,12 @@ import org.funcj.data.*;
 
 import java.util.Objects;
 
+/**
+ * A reference to a parser. Typically used to allow parsers with circular
+ * dependencies to be constructed.
+ * @param <I> input stream symbol type
+ * @param <A> parse result type
+ */
 public class Ref<I, A> implements Parser<I, A> {
 
     public static <I, A> Ref<I, A> of() {

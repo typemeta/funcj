@@ -4,25 +4,33 @@ import java.util.Objects;
 
 import static org.funcj.util.Functions.*;
 
+/**
+ * Interface for values which are acquired lazily.
+ * @param <T> type of value
+ */
 public interface Lazy<T> extends F0<T> {
+    /**
+     * Construct a lazy value from value supplier.
+     * The lazy value is not thead-safe, meaning the supplier may be invoked
+     * multiple times if the <code>Lazy</code> value is passed to multiple threads.
+     * @param get supplier of the value
+     * @param <T> value type
+     * @return lazy value
+     */
     static <T> Lazy<T> of(F0<T> get) {
         return new LazyImpl<T>(get);
     }
 
+    /**
+     * Construct a lazy value from value supplier.
+     * The lazy value is thead-safe, meaning the supplier will only be invoked
+     * once, even if the <code>Lazy</code> value is passed to multiple threads.
+     * @param get supplier of the value
+     * @param <T> value type
+     * @return lazy value
+     */
     static <T> Lazy<T> ofTS(F0<T> get) {
         return new LazyThreadSafeImpl<T>(get);
-    }
-
-    static <A, R> F<Lazy<A>, Lazy<R>> lift(F<A, R> f) {
-        return lt -> Lazy.of(() -> f.apply(lt.apply()));
-    }
-
-    static <A, B, R> F2<Lazy<A>, Lazy<B>, Lazy<R>> lift(F2<A, B, R> f) {
-        return (la, lb) -> Lazy.of(() -> f.apply(la.apply(), lb.apply()));
-    }
-
-    static <A, B, C, R> F3<Lazy<A>, Lazy<B>, Lazy<C>, Lazy<R>> lift(F3<A, B, C, R> f) {
-        return (la, lb, lc) -> Lazy.of(() -> f.apply(la.apply(), lb.apply(), lc.apply()));
     }
 }
 

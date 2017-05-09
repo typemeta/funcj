@@ -4,6 +4,9 @@ import org.funcj.data.Chr;
 
 import static org.funcj.parser.Parser.*;
 
+/**
+ * Parser combinators for working with Chr streams.
+ */
 public class Text {
     public static Parser<Chr, Chr> chr(char c) {
         return value(Chr.valueOf(c));

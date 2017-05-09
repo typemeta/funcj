@@ -5,9 +5,9 @@ import org.funcj.util.Functions.F;
 import java.util.function.Consumer;
 
 /**
- * A parse result.
- * @param <I>
- * @param <A>
+ * A parse result. Either a <code>Success</code> or a <code>Failure</code>
+ * @param <I> input stream symbol type
+ * @param <A> parse result type
  */
 public interface Result<I, A> {
     static <I, A> Result<I, A> success(A result, Input<I> next) {
@@ -18,7 +18,7 @@ public interface Result<I, A> {
         return new Failure<I, A>(in, expected);
     }
 
-    static <I, A> Result<I, A> eof(Input<I> in, SymSet<I> expected) {
+    static <I, A> Result<I, A> failureEof(Input<I> in, SymSet<I> expected) {
         return new Failure<I, A>(in, expected);
     }
 

@@ -5,36 +5,71 @@ import org.funcj.util.Functions.*;
 
 import java.util.Optional;
 
-import static org.funcj.parser.Impl.*;
+import static org.funcj.parser.ParserUtils.*;
 import static org.funcj.parser.Parser.pure;
 import static org.funcj.util.Functions.F2.curry;
 
 /**
  * A parser is essentially a function from an input stream to a Result.
- * The ParserImpl type along with the pure and map functions constitute an applicative functor.
- * @param <I> Input stream symbol type.
- * @param <A> Parse result type
+ * The Parser type along with the pure and ap functions constitute an applicative functor.
+ * @param <I> input stream symbol type
+ * @param <A> parse result type
  */
 public interface Parser<I, A> {
 
+    /**
+     * Does this parser accept the empty symbol.
+     * @return lazy boolean
+     */
     Lazy<Boolean> acceptsEmpty();
 
+    /**
+     * The first set for this parser.
+     * @return lazy symbol set
+     */
     Lazy<SymSet<I>> firstSet();
 
+    /**
+     * Apply this parser to the input stream.
+     * @param in input stream
+     * @param follow dynamic follow set
+     * @return the parser result
+     */
     Result<I, A> parse(Input<I> in, SymSet<I> follow);
 
+    /**
+     * Apply this parser to the input stream.
+     * @param in input stream
+     * @return the parser result
+     */
+    default Result<I, A> parse(Input<I> in) {
+        return this.parse(in, SymSet.empty());
+    }
+
+    /**
+     * Apply this parser to the input stream. Fail if eof isn't reached.
+     * @param in input stream
+     * @return the parser result
+     */
     default Result<I, A> run(Input<I> in) {
         return this.andL(eof()).parse(in, SymSet.empty());
     }
 
-    default Result<I, A> failure(Input<I> in) {
+    /*private*/ default Result<I, A> failure(Input<I> in) {
         return Result.failure(in, firstSet().apply());
     }
 
-    default Result<I, A> failureEof(Input<I> in) {
-        return Result.eof(in, firstSet().apply());
+    /*private*/ default Result<I, A> failureEof(Input<I> in) {
+        return Result.failureEof(in, firstSet().apply());
     }
 
+    /**
+     * Applicative unit/pure function.
+     * @param a value
+     * @param <I> input stream symbol type
+     * @param <A> parse result type
+     * @return a parser that always returns the supplied value
+     */
     static <I, A> Parser<I, A> pure(A a) {
         return new ParserImpl<I, A>(TRUE, SymSet::empty) {
             @Override
@@ -44,6 +79,12 @@ public interface Parser<I, A> {
         };
     }
 
+    /**
+     * Functor map operation.
+     * @param f funtion to be mapped over this parser
+     * @param <B> function return type
+     * @return a parser that returns <code>f</code> mapped over this parser's result
+     */
     default <B> Parser<I, B> map(F<A, B> f) {
         return new ParserImpl<I, B>(
             Parser.this.acceptsEmpty(),
@@ -56,10 +97,70 @@ public interface Parser<I, A> {
         };
     }
 
+    /**
+     * Applicative application.
+     * Given a parser that returns a function, and a parser that returns
+     * a value, construct a parser that returns the result of applying
+     * the function to the value.
+     * @param pf parser that returns a function result
+     * @param pa parser that returns a value result
+     * @param <I> input stream symbol type
+     * @param <A> input type of the function
+     * @param <B> return type of the function
+     * @return a parser that returns the result of applying the function to the value
+     */
+    static <I, A, B>
+    Parser<I, B> ap(Parser<I, F<A, B>> pf, Parser<I, A> pa) {
+        return new ParserImpl<I, B>(
+            ParserUtils.and(pf.acceptsEmpty(), pa.acceptsEmpty()),
+            ParserUtils.combine(pf.acceptsEmpty(), pf.firstSet(), pa.firstSet())
+        ) {
+            @Override
+            public Result<I, B> parse(Input<I> in, SymSet<I> follow) {
+                final SymSet<I> followF =
+                    ParserUtils.combine(
+                        pa.acceptsEmpty().apply(),
+                        pa.firstSet().apply(),
+                        follow);
+
+                final Result<I, F<A, B>> r = pf.parse(in, followF);
+
+                if (r.isSuccess()) {
+                    final Result.Success<I, F<A, B>> succ = (Result.Success<I, F<A, B>>) r;
+                    final Result<I, A> r2 = pa.parse(succ.next(), follow);
+                    return r2.map(succ.value());
+                } else {
+                    return ((Result.Failure<I, F<A, B>>) r).cast();
+                }
+            }
+        };
+    }
+
+    /**
+     * Applicative application.
+     * @param f a function
+     * @param pa parser that returns a value result
+     * @param <I> input stream symbol type
+     * @param <A> input type of the function
+     * @param <B> return type of the function
+     * @return a parser that returns the result of applying the function to the value
+     */
+    static <I, A, B>
+    Parser<I, B> ap(F<A, B> f, Parser<I, A> pa) {
+        return ap(pure(f), pa);
+    }
+
+    /**
+     * Alternative.
+     * Construct a parser which returns the result of either this parser or,
+     * if it fails, then the result of the <code><rhs/code> parser.
+     * @param rhs alternative parser
+     * @return a parser which returns the result of either parser.
+     */
     default Parser<I, A> or(Parser<I, A> rhs) {
         return new ParserImpl<I, A>(
-            Impl.or(Parser.this.acceptsEmpty(), rhs.acceptsEmpty()),
-            Impl.union(Parser.this.firstSet(), rhs.firstSet())
+            ParserUtils.or(Parser.this.acceptsEmpty(), rhs.acceptsEmpty()),
+            ParserUtils.union(Parser.this.firstSet(), rhs.firstSet())
         ) {
             @Override
             public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
@@ -121,38 +222,6 @@ public interface Parser<I, A> {
                 return failure(in);
             }
         };
-    }
-
-    static <I, A, B>
-    Parser<I, B> ap(Parser<I, F<A, B>> pf, Parser<I, A> pa) {
-        return new ParserImpl<I, B>(
-            Impl.and(pf.acceptsEmpty(), pa.acceptsEmpty()),
-            Impl.combine(pf.acceptsEmpty(), pf.firstSet(), pa.firstSet())
-        ) {
-            @Override
-            public Result<I, B> parse(Input<I> in, SymSet<I> follow) {
-                final SymSet<I> followF =
-                    Impl.combine(
-                        pa.acceptsEmpty().apply(),
-                        pa.firstSet().apply(),
-                        follow);
-
-                final Result<I, F<A, B>> r = pf.parse(in, followF);
-
-                if (r.isSuccess()) {
-                    final Result.Success<I, F<A, B>> succ = (Result.Success<I, F<A, B>>) r;
-                    final Result<I, A> r2 = pa.parse(succ.next(), follow);
-                    return r2.map(succ.value());
-                } else {
-                    return ((Result.Failure<I, F<A, B>>) r).cast();
-                }
-            }
-        };
-    }
-
-    static <I, A, B>
-    Parser<I, B> ap(F<A, B> f, Parser<I, A> pa) {
-        return ap(pure(f), pa);
     }
 
     static <I, A, B>
@@ -284,6 +353,11 @@ public interface Parser<I, A> {
     }
 }
 
+/**
+ * Base class for <code>Parser</code> implementations.
+ * @param <I> input stream symbol type
+ * @param <A> parse result type
+ */
 abstract class ParserImpl<I, A> implements Parser<I, A> {
 
     private final Lazy<Boolean> acceptsEmpty;
@@ -312,7 +386,7 @@ abstract class ParserImpl<I, A> implements Parser<I, A> {
     }
 }
 
-abstract class Impl {
+abstract class ParserUtils {
 
     static final Lazy<Boolean> TRUE = () -> true;
     static final Lazy<Boolean> FALSE = () -> false;

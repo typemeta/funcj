@@ -5,6 +5,9 @@ import org.funcj.util.Functions;
 import java.lang.reflect.Array;
 import java.util.*;
 
+/**
+ * Simplified boxed equivalent of <code>chr</code> primitive type.
+ */
 public final class Chr implements Comparable<Chr> {
 
     private static final int N = 128;
@@ -73,7 +76,7 @@ public final class Chr implements Comparable<Chr> {
         return d - '0';
     }
 
-    private static final int ERROR = -1;
+    public static final int ERROR = -1;
 
     public static int digit(char digit, int radix) {
         if (radix <= 10) {

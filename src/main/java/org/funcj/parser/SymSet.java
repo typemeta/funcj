@@ -5,7 +5,15 @@ import org.funcj.util.Functions.Predicate;
 
 import java.util.*;
 
-public abstract class SymSet<I> {
+import static org.funcj.parser.SymSetUtils.typeError;
+
+/**
+ * A set of "symbols", used for first sets and follow sets.
+ * We include support for predicates to avoid having to enumerate
+ * every symbol that satisfies the predicate.
+ * @param <I>
+ */
+public interface SymSet<I> {
     enum Type {
         EMPTY,
         ALL,
@@ -30,8 +38,8 @@ public abstract class SymSet<I> {
         return new Pred<I>(name, pred);
     }
 
-    static class Empty<I> extends SymSet<I> {
-        static final Empty<Unit> INSTANCE = new Empty<Unit>();
+    class Empty<I> implements SymSet<I> {
+        static final Empty<Unit> INSTANCE = new Empty<>();;
 
         @Override
         public Type type() {
@@ -49,13 +57,18 @@ public abstract class SymSet<I> {
         }
 
         @Override
+        public String toString() {
+            return "<empty>";
+        }
+
+        @Override
         public StringBuilder append(StringBuilder sb) {
-            return sb.append("<empty>");
+            return sb.append(toString());
         }
     }
 
-    static class All<I> extends SymSet<I> {
-        static final All<Unit> INSTANCE = new All<Unit>();
+    class All<I> implements SymSet<I> {
+        static final All<Unit> INSTANCE = new All<>();
 
         @Override
         public Type type() {
@@ -73,12 +86,17 @@ public abstract class SymSet<I> {
         }
 
         @Override
+        public String toString() {
+            return "all";
+        }
+
+        @Override
         public StringBuilder append(StringBuilder sb) {
-            return sb.append("all");
+            return sb.append(toString());
         }
     }
 
-    static class Value<I> extends SymSet<I> {
+    class Value<I> implements SymSet<I> {
 
         public final I value;
 
@@ -110,18 +128,23 @@ public abstract class SymSet<I> {
                 case UNION:
                     return new Union<I>((Union<I>)rhs, this);
                 default:
-                    throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
+                    throw typeError(rhs.type());
             }
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
         }
 
         @Override
         public StringBuilder append(StringBuilder sb) {
             // TODO: handle whitespace.
-            return sb.append(value.toString());
+            return sb.append(toString());
         }
     }
 
-    static class Pred<I> extends SymSet<I> {
+    class Pred<I> implements SymSet<I> {
 
         public final String name;
         public final Predicate<I> pred;
@@ -155,8 +178,13 @@ public abstract class SymSet<I> {
                 case UNION:
                     return new Union<I>((Union<I>)rhs, this);
                 default:
-                    throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
+                    throw typeError(rhs.type());
             }
+        }
+
+        @Override
+        public String toString() {
+            return append(new StringBuilder()).toString();
         }
 
         @Override
@@ -165,7 +193,7 @@ public abstract class SymSet<I> {
         }
     }
 
-    static class Union<I> extends SymSet<I> {
+    class Union<I> implements SymSet<I> {
 
         public final Set<I> values;
         public final List<Pred<I>> preds;
@@ -242,8 +270,13 @@ public abstract class SymSet<I> {
                 case UNION:
                     return new Union<I>(this, (Union<I>)rhs);
                 default:
-                    throw new IllegalArgumentException("SymSet rhs has unrecognised type - " + rhs.type());
+                    throw typeError(rhs.type());
             }
+        }
+
+        @Override
+        public String toString() {
+            return append(new StringBuilder()).toString();
         }
 
         @Override
@@ -269,17 +302,17 @@ public abstract class SymSet<I> {
         }
     }
 
-    abstract Type type();
+    Type type();
 
-    abstract boolean matches(I value);
+    boolean matches(I value);
 
-    abstract SymSet<I> union(SymSet<I> rhs);
+    SymSet<I> union(SymSet<I> rhs);
 
-    abstract StringBuilder append(StringBuilder sb);
+    StringBuilder append(StringBuilder sb);
+}
 
-    @Override
-    public String toString() {
-        return append(new StringBuilder()).toString();
+abstract class SymSetUtils {
+    static RuntimeException typeError(SymSet.Type type) {
+        return new IllegalArgumentException("SymSet rhs has unrecognised type - " + type);
     }
-
 }

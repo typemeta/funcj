@@ -4,6 +4,9 @@ import org.funcj.util.Functions.*;
 
 import java.util.List;
 
+/**
+ * Fold operations.
+ */
 public abstract class Folds {
     /**
      * Left-fold a function over an Iterable.
