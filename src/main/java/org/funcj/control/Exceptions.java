@@ -52,4 +52,8 @@ public abstract class Exceptions {
             }
         };
     }
+
+    public static RuntimeException TODO() {
+        return new RuntimeException("TODO");
+    }
 }

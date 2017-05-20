@@ -35,6 +35,10 @@ public interface Node {
         return new ArrayNode(IList.of(values));
     }
 
+    static ArrayNode array(Iterable<Node> values) {
+        return new ArrayNode(IList.ofIterable(values));
+    }
+
     static Tuple2<String, Node> entry(String name, Node node) {
         return Tuple2.of(name, node);
     }
@@ -88,6 +92,66 @@ public interface Node {
                 F<ObjectNode, T> on) {
             return nln.apply(this);
         }
+
+        @Override
+        public boolean isNull() {
+            return true;
+        }
+
+        @Override
+        public boolean isBool() {
+            return false;
+        }
+
+        @Override
+        public boolean isNumber() {
+            return false;
+        }
+
+        @Override
+        public boolean isString() {
+            return false;
+        }
+
+        @Override
+        public boolean isArray() {
+            return false;
+        }
+
+        @Override
+        public boolean isObject() {
+            return false;
+        }
+
+        @Override
+        public NullNode asNull() {
+            return this;
+        }
+
+        @Override
+        public BoolNode asBool() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public NumberNode asNumber() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public StringNode asString() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ArrayNode asArray() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ObjectNode asObject() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
     }
 
     enum BoolNode implements Node {
@@ -125,6 +189,66 @@ public interface Node {
                 F<ObjectNode, T> on) {
             return bn.apply(this);
         }
+
+        @Override
+        public boolean isNull() {
+            return false;
+        }
+
+        @Override
+        public boolean isBool() {
+            return true;
+        }
+
+        @Override
+        public boolean isNumber() {
+            return false;
+        }
+
+        @Override
+        public boolean isString() {
+            return false;
+        }
+
+        @Override
+        public boolean isArray() {
+            return false;
+        }
+
+        @Override
+        public boolean isObject() {
+            return false;
+        }
+
+        @Override
+        public NullNode asNull() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public BoolNode asBool() {
+            return this;
+        }
+
+        @Override
+        public NumberNode asNumber() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public StringNode asString() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ArrayNode asArray() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ObjectNode asObject() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
     }
 
     final class NumberNode implements Node {
@@ -159,6 +283,66 @@ public interface Node {
                 F<ObjectNode, T> on) {
             return nmn.apply(this);
         }
+
+        @Override
+        public boolean isNull() {
+            return false;
+        }
+
+        @Override
+        public boolean isBool() {
+            return false;
+        }
+
+        @Override
+        public boolean isNumber() {
+            return true;
+        }
+
+        @Override
+        public boolean isString() {
+            return false;
+        }
+
+        @Override
+        public boolean isArray() {
+            return false;
+        }
+
+        @Override
+        public boolean isObject() {
+            return false;
+        }
+
+        @Override
+        public NullNode asNull() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public BoolNode asBool() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public NumberNode asNumber() {
+            return this;
+        }
+
+        @Override
+        public StringNode asString() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ArrayNode asArray() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ObjectNode asObject() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
     }
 
     final class StringNode implements Node {
@@ -192,6 +376,66 @@ public interface Node {
                 F<ArrayNode, T> an,
                 F<ObjectNode, T> on) {
             return sn.apply(this);
+        }
+
+        @Override
+        public boolean isNull() {
+            return false;
+        }
+
+        @Override
+        public boolean isBool() {
+            return false;
+        }
+
+        @Override
+        public boolean isNumber() {
+            return false;
+        }
+
+        @Override
+        public boolean isString() {
+            return true;
+        }
+
+        @Override
+        public boolean isArray() {
+            return false;
+        }
+
+        @Override
+        public boolean isObject() {
+            return false;
+        }
+
+        @Override
+        public NullNode asNull() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public BoolNode asBool() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public NumberNode asNumber() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public StringNode asString() {
+            return this;
+        }
+
+        @Override
+        public ArrayNode asArray() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ObjectNode asObject() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
         }
     }
 
@@ -241,6 +485,66 @@ public interface Node {
                 F<ArrayNode, T> an,
                 F<ObjectNode, T> on) {
             return an.apply(this);
+        }
+
+        @Override
+        public boolean isNull() {
+            return false;
+        }
+
+        @Override
+        public boolean isBool() {
+            return false;
+        }
+
+        @Override
+        public boolean isNumber() {
+            return false;
+        }
+
+        @Override
+        public boolean isString() {
+            return false;
+        }
+
+        @Override
+        public boolean isArray() {
+            return true;
+        }
+
+        @Override
+        public boolean isObject() {
+            return false;
+        }
+
+        @Override
+        public NullNode asNull() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public BoolNode asBool() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public NumberNode asNumber() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public StringNode asString() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ArrayNode asArray() {
+            return this;
+        }
+
+        @Override
+        public ObjectNode asObject() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
         }
     }
 
@@ -292,6 +596,66 @@ public interface Node {
                 F<ObjectNode, T> on) {
             return on.apply(this);
         }
+
+        @Override
+        public boolean isNull() {
+            return false;
+        }
+
+        @Override
+        public boolean isBool() {
+            return false;
+        }
+
+        @Override
+        public boolean isNumber() {
+            return false;
+        }
+
+        @Override
+        public boolean isString() {
+            return false;
+        }
+
+        @Override
+        public boolean isArray() {
+            return false;
+        }
+
+        @Override
+        public boolean isObject() {
+            return true;
+        }
+
+        @Override
+        public NullNode asNull() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public BoolNode asBool() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public NumberNode asNumber() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public StringNode asString() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ArrayNode asArray() {
+            throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
+        }
+
+        @Override
+        public ObjectNode asObject() {
+            return this;
+        }
     }
 
     Document toDocument();
@@ -310,6 +674,21 @@ public interface Node {
         F<ArrayNode, T> an,
         F<ObjectNode, T> on
     );
+
+    boolean isNull();
+    boolean isBool();
+    boolean isNumber();
+    boolean isString();
+    boolean isArray();
+    boolean isObject();
+
+    NullNode asNull();
+    BoolNode asBool();
+    NumberNode asNumber();
+    StringNode asString();
+    ArrayNode asArray();
+    ObjectNode asObject();
+
 }
 
 class Utils {
