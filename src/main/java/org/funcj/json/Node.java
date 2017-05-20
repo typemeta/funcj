@@ -624,7 +624,7 @@ public interface Node {
 
         @Override
         public boolean isObject() {
-            return true;
+            return true ;
         }
 
         @Override

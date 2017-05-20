@@ -4,7 +4,7 @@ import org.funcj.json.Node;
 import org.junit.*;
 
 public class JsonCodecTest {
-    final Codec.Registry<Node> codec = new JsonCodec();
+    final Codec.DynamicCodec<Node> codec = new JsonCodec();
 
     @Test
     public void roundTrip() {
@@ -12,7 +12,7 @@ public class JsonCodecTest {
         final Node node = codec.encode(val, null);
         System.out.println(node.toJson(40));
 
-        final Example.Derived val2 = codec.decode(node, Example.Derived.class);
+        final Example.Derived val2 = (Example.Derived)codec.decode(node, Example.Derived.class);
 
         Assert.assertEquals(val, val2);
     }

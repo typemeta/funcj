@@ -7,10 +7,9 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.BinaryOperator;
 
-import static java.util.stream.Collectors.toMap;
 import static org.funcj.control.Exceptions.TODO;
 
-public class JsonCodec extends Codec.Registry<Node> {
+public class JsonCodec extends Codec.DynamicCodec<Node> {
 
     private final Codec.BooleanCodec<Node> booleanCodec = new Codec.BooleanCodec<Node>() {
 
@@ -59,10 +58,10 @@ public class JsonCodec extends Codec.Registry<Node> {
     }
 
     @Override
-    protected <T> Codec.BoxedArrayCodec<T, Node> boxedArrayCodec(
+    protected <T> Codec.ObjectArrayCodec<T, Node> objectArrayCodec(
             Class<T> elemClass,
             Codec<T, Node> elemCodec) {
-        return new Codec.BoxedArrayCodec<T, Node>(elemCodec) {
+        return new Codec.ObjectArrayCodec<T, Node>(elemCodec) {
             @Override
             public Node encode(T[] vals, Node out) {
                 final List<Node> nodes = new ArrayList<>(vals.length);
@@ -118,7 +117,6 @@ public class JsonCodec extends Codec.Registry<Node> {
     }
 
     private final Codec.NullCodec<Node> nullCodec = new Codec.NullCodec<Node>() {
-
         @Override
         public boolean isNull(Node in) {
             return in.isNull();
@@ -141,9 +139,15 @@ public class JsonCodec extends Codec.Registry<Node> {
         return nullCodec;
     }
 
-    private static <T> BinaryOperator<T> throwingMerger() {
-        return (u, v) -> {
-            throw new IllegalStateException(String.format("Duplicate key %s", u));
-        };
+    @Override
+    public Object decode(Node in) {
+        if (in.isNull()) {
+            return nullCodec.decode(in);
+        } else {
+            final Node.ObjectNode objNode = in.asObject();
+            final String typeName = objNode.fields.get(typeFieldName()).asString().value;
+            final Class<?> clazz = nameToClass(typeName);
+            return decode(in, clazz);
+        }
     }
 }

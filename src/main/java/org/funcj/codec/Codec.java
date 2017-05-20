@@ -36,24 +36,24 @@ public interface Codec<T, E> {
         boolean[] decode(E in);
     }
 
-    abstract class BoxedArrayCodec<T, E> implements Codec<T[], E> {
+    abstract class ObjectArrayCodec<T, E> implements Codec<T[], E> {
         private final Codec<T, E> elemCodec;
 
-        protected BoxedArrayCodec(Codec<T, E> elemCodec) {
+        protected ObjectArrayCodec(Codec<T, E> elemCodec) {
             this.elemCodec = elemCodec;
         }
     }
 
     abstract class ObjectCodec<T, E> implements Codec<T, E> {
 
-        protected final Map<String, Registry.FieldCodec<E>> fieldCodecs;
+        protected final Map<String, DynamicCodec.FieldCodec<E>> fieldCodecs;
 
-        public ObjectCodec(Map<String, Registry.FieldCodec<E>> fieldCodecs) {
+        public ObjectCodec(Map<String, DynamicCodec.FieldCodec<E>> fieldCodecs) {
             this.fieldCodecs = fieldCodecs;
         }
     }
 
-    abstract class Registry<E> {
+    abstract class DynamicCodec<E> implements Codec<Object, E> {
         static abstract class FieldCodec<E> {
             protected final Field field;
             protected boolean isFinal;
@@ -143,16 +143,17 @@ public interface Codec<T, E> {
 
         protected final Map<String, Codec<?, E>> codecs = new HashMap<>();
 
-        public <T> E encode(T val, E out) {
+        @Override
+        public E encode(Object val, E out) {
             if (val == null) {
                 return nullCodec().encode(val, out);
             } else {
-                final Codec<T, E> codec = objectCodec((Class)val.getClass());
+                final Codec<Object, E> codec = objectCodec((Class)val.getClass());
                 return codec.encode(val, out);
             }
         }
 
-        public <T> T decode(E in, Class<T> clazz) {
+        public Object decode(E in, Class<?> clazz) {
             return objectCodec(clazz).decode(in);
         }
 
@@ -193,11 +194,10 @@ public interface Codec<T, E> {
 
         protected <T> Codec<T, E> getCodec(
                 Class<T> clazz,
-                Map<String, Registry.FieldCodec<E>> fieldCodecs) {
+                Map<String, DynamicCodec.FieldCodec<E>> fieldCodecs) {
             final Codec<T, E> codec = getCodecImpl (clazz, fieldCodecs);
             final NullCodec<E> nullCodec = nullCodec();
             return new Codec<T, E>() {
-
                 @Override
                 public E encode(T val, E out) {
                     if (val == null) {
@@ -220,7 +220,7 @@ public interface Codec<T, E> {
 
         protected abstract <T> Codec<T, E> getCodecImpl(
                 Class<T> clazz,
-                Map<String, Registry.FieldCodec<E>> fieldCodecs);
+                Map<String, DynamicCodec.FieldCodec<E>> fieldCodecs);
 
         protected FieldCodec<E> getFieldCodec(Field field) {
             final Class<?> type = field.getType();
@@ -236,17 +236,21 @@ public interface Codec<T, E> {
                     return new BooleanArrayFieldCodec<E>(field, booleanArrayCodec());
                 } else {
                     if (elemType.equals(Boolean.class)) {
-                        final BoxedArrayCodec<Boolean, E> codec = boxedArrayCodec(Boolean.class, booleanCodec());
+                        final ObjectArrayCodec<Boolean, E> codec = objectArrayCodec(Boolean.class, booleanCodec());
                         return new ObjectFieldCodec<Boolean[], E>(field, codec);
                     } else {
-                        throw TODO();
+                        final ObjectArrayCodec<Object, E> codec =
+                                objectArrayCodec(
+                                        (Class)elemType,
+                                        DynamicCodec.this);
+                        return new ObjectFieldCodec<Object[], E>(field, codec);
                     }
                 }
             } else {
                 if (type.equals(Boolean.class)) {
                     return new ObjectFieldCodec<Boolean, E>(field, booleanCodec());
                 } else {
-                    final Codec<Object, E> codec = objectCodec((Class)type);
+                    final Codec<Object, E> codec = DynamicCodec.this;
                     return new ObjectFieldCodec<Object, E>(field, codec);
                 }
             }
@@ -262,7 +266,7 @@ public interface Codec<T, E> {
             return getCodec(clazz);
         }
 
-        protected abstract <T> BoxedArrayCodec<T, E> boxedArrayCodec(
+        protected abstract <T> ObjectArrayCodec<T, E> objectArrayCodec(
                 Class<T> elemClass,
                 Codec<T, E> elemCodec);
 
