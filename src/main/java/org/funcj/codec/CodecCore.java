@@ -13,6 +13,7 @@ public abstract class CodecCore<E> {
 
     protected void initialise() {
         codecs.put(classToName(Boolean.class), booleanCodec());
+        //codecs.put(classToName(new boolean[0].getClass()), booleanArrayCodec());
     }
 
     public <T> E encode(Class<T> stcClass, T val, E out) {
@@ -87,11 +88,12 @@ public abstract class CodecCore<E> {
             } else {
                 throw TODO();
             }
-//        } else if (type.isArray()) {
-//            final Class<?> elemType = type.getComponentType();
-//            if (elemType.equals(boolean.class)) {
-//                return new FieldCodec.BooleanArrayFieldCodec<E>(field, booleanArrayCodec());
-//            } else {
+        } else if (type.isArray()) {
+            final Class<?> elemType = type.getComponentType();
+            if (elemType.equals(boolean.class)) {
+                return new FieldCodec.BooleanArrayFieldCodec<E>(field, booleanArrayCodec());
+            } else {
+                throw TODO();
 //                if (elemType.equals(Boolean.class)) {
 //                    final Codec.ObjectArrayCodec<Boolean, E> codec = objectArrayCodec(Boolean.class, booleanCodec());
 //                    return new FieldCodec.ObjectFieldCodec<Boolean[], E>(field, codec);
@@ -105,7 +107,7 @@ public abstract class CodecCore<E> {
 //                                    elemCodec);
 //                    return new FieldCodec.ObjectFieldCodec<Object[], E>(field, codec);
 //                }
-//            }
+            }
         } else {
             if (type.equals(Boolean.class)) {
                 return new FieldCodec.ObjectFieldCodec<Boolean, E>(field, booleanCodec());
