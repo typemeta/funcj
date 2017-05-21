@@ -27,13 +27,13 @@ public interface Codec<T, E> {
         abstract E encodePrim(boolean val, E out);
 
         abstract boolean decodePrim(E in);
-
     }
 
     interface BooleanArrayCodec<E> {
         E encode(boolean[] vals, E out);
         boolean[] decode(E in);
     }
+
 
     abstract class ObjectArrayCodec<T, E> implements Codec<T[], E> {
         private final Codec<T, E> elemCodec;

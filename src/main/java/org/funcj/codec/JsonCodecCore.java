@@ -3,9 +3,8 @@ package org.funcj.codec;
 import org.funcj.control.Exceptions;
 import org.funcj.json.Node;
 
+import java.lang.reflect.Array;
 import java.util.*;
-
-import static org.funcj.control.Exceptions.TODO;
 
 public class JsonCodecCore extends CodecCore<Node> {
 
@@ -49,7 +48,7 @@ public class JsonCodecCore extends CodecCore<Node> {
 
         @Override
         public boolean decodePrim(Node in) {
-            return ((Node.BoolNode)in).value;
+            return in.asBool().value;
         }
     };
 
@@ -84,6 +83,52 @@ public class JsonCodecCore extends CodecCore<Node> {
     @Override
     protected Codec.BooleanArrayCodec<Node> booleanArrayCodec() {
         return booleanArrayCodec;
+    }
+
+    private final Codec.IntegerCodec<Node> integerCodec = new Codec.IntegerCodec<Node>() {
+
+        @Override
+        Node encodePrim(int val, Node out) {
+            return Node.number(val);
+        }
+
+        @Override
+        public int decodePrim(Node in) {
+            return (int)in.asNumber().value;
+        }
+    };
+
+    @Override
+    protected Codec.IntegerCodec<Node> integerCodec() {
+        return integerCodec;
+    }
+
+    private final Codec.IntegerArrayCodec<Node> integerArrayCodec = new Codec.IntegerArrayCodec<Node>() {
+
+        @Override
+        public Node encode(int[] vals, Node out) {
+            final List<Node> nodes = new ArrayList<>(vals.length);
+            for (int val : vals) {
+                nodes.add(integerCodec.encode(val, out));
+            }
+            return Node.array(nodes);
+        }
+
+        @Override
+        public int[] decode(Node in) {
+            final Node.ArrayNode arrNode = in.asArray();
+            final int[] vals = new int[arrNode.values.size()];
+            int i = 0;
+            for (Node node : arrNode.values) {
+                vals[i++] = integerCodec.decode(node);
+            }
+            return vals;
+        }
+    };
+
+    @Override
+    protected Codec.IntegerArrayCodec<Node> integerArrayCodec() {
+        return integerArrayCodec;
     }
 
     @Override
@@ -145,7 +190,27 @@ public class JsonCodecCore extends CodecCore<Node> {
 
     @Override
     protected <T> Codec.ObjectArrayCodec<T, Node> objectArrayCodec(Class<T> elemClass, Codec<T, Node> elemCodec) {
-        throw TODO();
+        return new Codec.ObjectArrayCodec<T, Node>() {
+            @Override
+            public Node encode(T[] vals, Node out) {
+                final List<Node> nodes = new ArrayList<>(vals.length);
+                for (T val : vals) {
+                    nodes.add(elemCodec.encode(val, out));
+                }
+                return Node.array(nodes);
+            }
+
+            @Override
+            public T[] decode(Node in) {
+                final Node.ArrayNode arrNode = in.asArray();
+                final T[] vals = (T[]) Array.newInstance(elemClass, arrNode.values.size());
+                int i = 0;
+                for (Node node : arrNode.values) {
+                    vals[i++] = elemCodec.decode(node);
+                }
+                return vals;
+            }
+        };
     }
 
     @Override

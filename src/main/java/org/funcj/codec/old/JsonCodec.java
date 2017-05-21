@@ -58,7 +58,7 @@ public class JsonCodec extends Codec.DynamicCodec<Node> {
     protected <T> Codec.ObjectArrayCodec<T, Node> objectArrayCodec(
             Class<T> elemClass,
             Codec<T, Node> elemCodec) {
-        return new Codec.ObjectArrayCodec<T, Node>(elemCodec) {
+        return new Codec.ObjectArrayCodec<T, Node>(null) {
             @Override
             public Node encode(T[] vals, Node out) {
                 final List<Node> nodes = new ArrayList<>(vals.length);

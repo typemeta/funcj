@@ -27,6 +27,27 @@ public interface Codec<T, E> {
         boolean[] decode(E in);
     }
 
+    abstract class IntegerCodec<E> implements Codec<Integer, E> {
+
+        @Override
+        public E encode(Integer val, E out) {
+            return encodePrim(val, out) ;
+        }
+
+        public Integer decode(E in) {
+            return decodePrim(in);
+        }
+
+        abstract E encodePrim(int val, E out);
+
+        abstract int decodePrim(E in);
+    }
+
+    interface IntegerArrayCodec<E> extends Codec<int[], E> {
+        E encode(int[] vals, E out);
+        int[] decode(E in);
+    }
+
     abstract class DynamicCodec<T, E> implements Codec<T, E> {
 
         protected final Class<T> stcClass;
@@ -56,12 +77,7 @@ public interface Codec<T, E> {
         protected abstract Class<? extends T> getType(E in);
     }
 
-    abstract class ObjectArrayCodec<T, E> implements Codec<T[], E> {
-        private final Codec<T, E> elemCodec;
-
-        protected ObjectArrayCodec(Codec<T, E> elemCodec) {
-            this.elemCodec = elemCodec;
-        }
+    interface ObjectArrayCodec<T, E> extends Codec<T[], E> {
     }
 
     E encode(T val, E out);

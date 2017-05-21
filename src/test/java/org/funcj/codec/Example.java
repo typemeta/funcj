@@ -81,30 +81,87 @@ public abstract class Example {
 
     static class Simple {
         static Simple create() {
-            return new Simple(new Simple(Boolean.TRUE, false, new boolean[]{false, true}), true, new boolean[]{true, false});
+            return new Simple(
+                    new Simple(
+                            Boolean.TRUE,
+                            false,
+                            new Boolean[]{Boolean.TRUE, Boolean.FALSE},
+                            new boolean[]{false, true},
+                            new int[]{0, 1},
+                            new Integer[]{2, 3, 4},
+                            new Number[]{5, 6, 4}
+                    ), true,
+                    new Boolean[]{Boolean.FALSE, Boolean.TRUE},
+                    new boolean[]{true, false},
+                    new int[]{10, 11},
+                    new Integer[]{12, 13, 14},
+                    new Number[]{15, 16, 14}
+            );
         }
 
         Object o;
         Boolean b;
-        Object ba;
+        Boolean[] bba;
+        Object oba;
+        int[] ia;
+        Integer[] bia;
+        Number[] bna;
 
         Simple() {
         }
 
-        Simple(Object o, Boolean b, Object ba) {
+        Simple(
+                Object o,
+                Boolean b,
+                Boolean[] bba,
+                Object oba,
+                int[] ia,
+                Integer[] bia,
+                Number[] bna) {
             this.o = o;
             this.b = b;
-            this.ba = ba;
+            this.bba = bba;
+            this.oba = oba;
+            this.ia = ia;
+            this.bia = bia;
+            this.bna = bna;
         }
 
         @Override
-        public boolean equals(Object o1) {
-            if (this == o1) return true;
-            if (o1 == null || getClass() != o1.getClass()) return false;
-            Simple simple = (Simple) o1;
-            return Objects.equals(o, simple.o) &&
-                    Objects.equals(b, simple.b) &&
-                    Arrays.equals((boolean[])ba, (boolean[])simple.ba);
+        public boolean equals(Object rhsO) {
+            if (this == rhsO) return true;
+            if (rhsO == null || getClass() != rhsO.getClass()) return false;
+            Simple rhs = (Simple) rhsO;
+            return Objects.equals(o, rhs.o) &&
+                    Objects.equals(b, rhs.b) &&
+                    Arrays.equals(bba, rhs.bba) &&
+                    Arrays.equals((boolean[])oba, (boolean[])rhs.oba) &&
+                    Arrays.equals(ia, rhs.ia) &&
+                    Arrays.equals(bia, rhs.bia) &&
+                    Arrays.equals(bna, rhs.bna);
         }
     }
+
+//    static class Simple {
+//        static Simple create() {
+//            return new Simple(new int[]{5, 6, 4});
+//        }
+//
+//        int[] ia;
+//
+//        Simple() {
+//        }
+//
+//        Simple(int[] ia) {
+//            this.ia = ia;
+//        }
+//
+//        @Override
+//        public boolean equals(Object rhsO) {
+//            if (this == rhsO) return true;
+//            if (rhsO == null || getClass() != rhsO.getClass()) return false;
+//            Simple rhs = (Simple) rhsO;
+//            return Arrays.equals(ia, rhs.ia);
+//        }
+//    }
 }

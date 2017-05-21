@@ -51,6 +51,51 @@ public abstract class FieldCodec<E> {
         }
     }
 
+    static class IntegerFieldCodec<E> extends FieldCodec<E> {
+
+        protected final Codec.IntegerCodec<E> codec;
+
+        IntegerFieldCodec(Field field, Codec.IntegerCodec<E> codec) {
+            super(field);
+            this.codec = codec;
+        }
+
+        @Override
+        public E encode(Object obj, E out) {
+            final int fieldVal = Exceptions.wrap(() -> field.getInt(obj));
+            return codec.encode(fieldVal, out);
+        }
+
+        public void decode(Object obj, E in) {
+            final int fieldVal = codec.decode(in);
+            setAccessible(true);
+            Exceptions.wrap(() -> field.setInt(obj, fieldVal));
+            setAccessible(false);
+        }
+    }
+
+    static class IntegerArrayFieldCodec<E> extends FieldCodec<E> {
+
+        protected final Codec.IntegerArrayCodec<E> codec;
+
+        IntegerArrayFieldCodec(Field field, Codec.IntegerArrayCodec<E> codec) {
+            super(field);
+            this.codec = codec;
+        }
+
+        @Override
+        public E encode(Object obj, E out) {
+            final int[] fieldVal = (int[])Exceptions.wrap(() -> field.get(obj));
+            return codec.encode(fieldVal, out);
+        }
+
+        @Override
+        public void decode(Object obj, E in) {
+            final int[] fieldVal = codec.decode(in);
+            Exceptions.wrap(() -> field.set(obj, fieldVal));
+        }
+    }
+
     static class ObjectFieldCodec<T, E> extends FieldCodec<E> {
 
         protected final Codec<T, E> codec;
@@ -69,6 +114,28 @@ public abstract class FieldCodec<E> {
         @Override
         public void decode(Object obj, E in) {
             final T fieldVal = codec.decode(in);
+            Exceptions.wrap(() -> field.set(obj, fieldVal));
+        }
+    }
+
+    static class ObjectArrayFieldCodec<T, E> extends FieldCodec<E> {
+
+        protected final Codec<T[], E> codec;
+
+        protected ObjectArrayFieldCodec(Field field, Codec<T[], E> codec) {
+            super(field);
+            this.codec = codec;
+        }
+
+        @Override
+        public E encode(Object obj, E out) {
+            final T[] fieldVal = (T[])Exceptions.wrap(() -> field.get(obj));
+            return codec.encode(fieldVal, out);
+        }
+
+        @Override
+        public void decode(Object obj, E in) {
+            final T[] fieldVal = codec.decode(in);
             Exceptions.wrap(() -> field.set(obj, fieldVal));
         }
     }
