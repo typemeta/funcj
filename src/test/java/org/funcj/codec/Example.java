@@ -80,16 +80,21 @@ public abstract class Example {
     }
 
     static class Simple {
-        Object o;
-        Boolean b = Boolean.FALSE;
-        boolean[] ba = {false, true};
-
-        Simple() {
-            this.o = new Simple(Boolean.TRUE);
+        static Simple create() {
+            return new Simple(new Simple(Boolean.TRUE, false, new boolean[]{false, true}), true, new boolean[]{true, false});
         }
 
-        Simple(Object o) {
+        Object o;
+        Boolean b;
+        Object ba;
+
+        Simple() {
+        }
+
+        Simple(Object o, Boolean b, Object ba) {
             this.o = o;
+            this.b = b;
+            this.ba = ba;
         }
 
         @Override
@@ -99,7 +104,7 @@ public abstract class Example {
             Simple simple = (Simple) o1;
             return Objects.equals(o, simple.o) &&
                     Objects.equals(b, simple.b) &&
-                    Arrays.equals(ba, simple.ba);
+                    Arrays.equals((boolean[])ba, (boolean[])simple.ba);
         }
     }
 }

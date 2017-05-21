@@ -12,7 +12,7 @@ public abstract class CodecCore<E> {
     protected final Map<String, Codec<?, E>> codecs = new HashMap<>();
 
     protected void initialise() {
-        codecs.put(classToName(Boolean.class), booleanCodec());
+        //codecs.put(classToName(Boolean.class), booleanCodec());
         //codecs.put(classToName(new boolean[0].getClass()), booleanArrayCodec());
     }
 
@@ -46,8 +46,41 @@ public abstract class CodecCore<E> {
             Codec<T, E> elemCodec);
 
     protected <T> Codec<T, E> getCodec(Class<T> stcClass, Class<? extends T> dynClass) {
-        final String name = classToName(dynClass);
-        return (Codec<T, E>)codecs.computeIfAbsent(name, n -> createObjectCodec(stcClass, dynClass));
+        final Class<?> type = dynClass;
+        if (type.isPrimitive()) {
+            if (type.equals(boolean.class)) {
+                return (Codec<T, E>)booleanCodec();
+            } else {
+                throw TODO();
+            }
+        } else if (type.isArray()) {
+            final Class<?> elemType = type.getComponentType();
+            if (elemType.equals(boolean.class)) {
+                return (Codec<T, E>)booleanArrayCodec();
+            } else {
+                throw TODO();
+//                if (elemType.equals(Boolean.class)) {
+//                    final Codec.ObjectArrayCodec<Boolean, E> codec = objectArrayCodec(Boolean.class, booleanCodec());
+//                    return new FieldCodec.ObjectFieldCodec<Boolean[], E>(field, codec);
+//                } else {
+//                    final Codec<Object, E> elemCodec = new FieldObjectCodec<Object, E>(
+//                            (Class<Object>)elemType,
+//                            DynamicCodec.this);
+//                    final ObjectArrayCodec<Object, E> codec =
+//                            objectArrayCodec(
+//                                    (Class)elemType,
+//                                    elemCodec);
+//                    return new FieldCodec.ObjectFieldCodec<Object[], E>(field, codec);
+//                }
+            }
+        } else {
+            if (type.equals(Boolean.class)) {
+                return (Codec<T, E>)booleanCodec();
+            } else {
+                final String name = classToName(dynClass);
+                return (Codec<T, E>)codecs.computeIfAbsent(name, n -> createObjectCodec(stcClass, dynClass));
+            }
+        }
     }
 
     protected <T> Codec<T, E> createObjectCodec(Class<T> stcClass, Class<? extends T> dynClass) {

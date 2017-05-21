@@ -22,7 +22,7 @@ public interface Codec<T, E> {
         abstract boolean decodePrim(E in);
     }
 
-    interface BooleanArrayCodec<E> {
+    interface BooleanArrayCodec<E> extends Codec<boolean[], E> {
         E encode(boolean[] vals, E out);
         boolean[] decode(E in);
     }

@@ -25,7 +25,7 @@ public class JsonCodecTest {
 
     @Test
     public void roundTrip() {
-        final Example.Simple val = new Example.Simple();
+        final Example.Simple val = Example.Simple.create();
         final Node node = codec.encode(Example.Simple.class, val, null);
         System.out.println(node.toJson(40));
 
