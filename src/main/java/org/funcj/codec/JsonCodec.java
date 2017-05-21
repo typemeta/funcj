@@ -87,23 +87,42 @@ public class JsonCodec extends Codec.DynamicCodec<Node> {
 
     @Override
     protected <T> Codec<T, Node> getCodecImpl(
-            Class<T> dynClass,
+            Class<T> stcClass,
             Map<String, FieldCodec<Node>> fieldCodecs) {
         return new Codec<T, Node>() {
             @Override
             public Node encode(T val, Node out) {
-                final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
-                fields.put(typeFieldName(), Node.string(classToName(dynClass)));
-                fieldCodecs.forEach((name, codec) -> fields.put(name, codec.encode(val, out)));
-                return Node.object(fields);
+                if (val == null) {
+                    return nullCodec.encode(val, out);
+                } else {
+                    final Class<? extends T> dynClass = (Class<? extends T>)val.getClass();
+                    final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
+                    if (!dynClass.equals(stcClass)) {
+                        fields.put(typeFieldName(), Node.string(classToName(dynClass)));
+                    } else {
+                        int i = 0;
+                    }
+                    fieldCodecs.forEach((name, codec) -> fields.put(name, codec.encode(val, out)));
+                    return Node.object(fields);
+                }
             }
 
             @Override
             public T decode(Node in) {
                 final Node.ObjectNode objNode = in.asObject();
-                final T val = (T)Exceptions.wrap(() -> dynClass.newInstance());
+                final String typeFieldName = typeFieldName();
+                final Class<? extends T> type;
+                final Node typeNode = objNode.fields.get(typeFieldName);
+                if (typeNode != null) {
+                    type = nameToClass(typeNode.asString().value);
+                } else {
+                    type = stcClass;
+                }
+                final T val = (T)Exceptions.wrap(() -> type.newInstance());
                 fieldCodecs.forEach((name, codec) -> {
-                    codec.decode(val, objNode.fields.get(name));
+                    if (!name.equals(typeFieldName)) {
+                        codec.decode(val, objNode.fields.get(name));
+                    }
                 });
                 return val;
             }

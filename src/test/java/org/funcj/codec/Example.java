@@ -78,4 +78,8 @@ public abstract class Example {
                     "\n}";
         }
     }
+
+    static class Simple {
+        Object s = Boolean.TRUE;
+    }
 }
