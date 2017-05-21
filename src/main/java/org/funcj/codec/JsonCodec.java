@@ -5,9 +5,6 @@ import org.funcj.json.Node;
 
 import java.lang.reflect.Array;
 import java.util.*;
-import java.util.function.BinaryOperator;
-
-import static org.funcj.control.Exceptions.TODO;
 
 public class JsonCodec extends Codec.DynamicCodec<Node> {
 
@@ -84,22 +81,19 @@ public class JsonCodec extends Codec.DynamicCodec<Node> {
         };
     }
 
-    @Override
-    protected <T> Codec<T[], Node> objectArrayCodec() {
-        throw TODO();
-    }
-
     protected String typeFieldName() {
         return "@type";
     }
 
     @Override
-    protected <T> Codec<T, Node> getCodecImpl(Class<T> clazz, Map<String, FieldCodec<Node>> fieldCodecs) {
+    protected <T> Codec<T, Node> getCodecImpl(
+            Class<T> dynClass,
+            Map<String, FieldCodec<Node>> fieldCodecs) {
         return new Codec<T, Node>() {
             @Override
             public Node encode(T val, Node out) {
                 final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
-                fields.put(typeFieldName(), Node.string(classToName(clazz)));
+                fields.put(typeFieldName(), Node.string(classToName(dynClass)));
                 fieldCodecs.forEach((name, codec) -> fields.put(name, codec.encode(val, out)));
                 return Node.object(fields);
             }
@@ -107,7 +101,7 @@ public class JsonCodec extends Codec.DynamicCodec<Node> {
             @Override
             public T decode(Node in) {
                 final Node.ObjectNode objNode = in.asObject();
-                final T val = (T)Exceptions.wrap(() -> clazz.newInstance());
+                final T val = (T)Exceptions.wrap(() -> dynClass.newInstance());
                 fieldCodecs.forEach((name, codec) -> {
                     codec.decode(val, objNode.fields.get(name));
                 });

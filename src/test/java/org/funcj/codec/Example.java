@@ -37,16 +37,17 @@ public abstract class Example {
 
         ZBase nul = null;
         ZBase z = new ZBase();
+        Object o = new ZBase();
 
         public Derived() {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
-            Derived derived = (Derived) o;
+        public boolean equals(Object rhs) {
+            if (this == rhs) return true;
+            if (rhs == null || getClass() != rhs.getClass()) return false;
+            if (!super.equals(rhs)) return false;
+            Derived derived = (Derived) rhs;
             return fb == derived.fb &&
                     b == derived.b &&
                     Objects.equals(bb, derived.bb) &&
@@ -55,7 +56,8 @@ public abstract class Example {
                     Arrays.equals(za, derived.za) &&
                     Arrays.equals(oa, derived.oa) &&
                     Objects.equals(nul, derived.nul) &&
-                    Objects.equals(z, derived.z);
+                    Objects.equals(z, derived.z) &&
+                    Objects.equals(o, derived.o);
         }
 
         @Override
@@ -72,6 +74,7 @@ public abstract class Example {
                     ", \n\toa=" + Arrays.toString(oa) +
                     ", \n\tnul=" + nul +
                     ", \n\tz=" + z +
+                    ", \n\to=" + o +
                     "\n}";
         }
     }

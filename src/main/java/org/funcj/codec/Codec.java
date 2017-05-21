@@ -44,102 +44,11 @@ public interface Codec<T, E> {
         }
     }
 
-    abstract class ObjectCodec<T, E> implements Codec<T, E> {
+    interface EnumCodec<EN extends Enum<EN>, E> extends Codec<EN, E> {
 
-        protected final Map<String, DynamicCodec.FieldCodec<E>> fieldCodecs;
-
-        public ObjectCodec(Map<String, DynamicCodec.FieldCodec<E>> fieldCodecs) {
-            this.fieldCodecs = fieldCodecs;
-        }
     }
 
     abstract class DynamicCodec<E> implements Codec<Object, E> {
-        static abstract class FieldCodec<E> {
-            protected final Field field;
-            protected boolean isFinal;
-
-            protected FieldCodec(Field field) {
-                this.field = field;
-                this.isFinal = Modifier.isFinal(field.getModifiers());
-            }
-
-            protected void setAccessible(boolean flag) {
-                if (isFinal) {
-                    field.setAccessible(flag);
-                }
-            }
-
-            public abstract E encode(Object obj, E out);
-
-            public abstract void decode(Object obj, E in);
-        }
-
-        static class BooleanFieldCodec<E> extends FieldCodec<E> {
-
-            protected final BooleanCodec<E> codec;
-
-            BooleanFieldCodec(Field field, BooleanCodec<E> codec) {
-                super(field);
-                this.codec = codec;
-            }
-
-            @Override
-            public E encode(Object obj, E out) {
-                final boolean fieldVal = Exceptions.wrap(() -> field.getBoolean(obj));
-                return codec.encode(fieldVal, out);
-            }
-
-            public void decode(Object obj, E in) {
-                final boolean fieldVal = codec.decode(in);
-                setAccessible(true);
-                Exceptions.wrap(() -> field.setBoolean(obj, fieldVal));
-                setAccessible(false);
-            }
-        }
-
-        static class BooleanArrayFieldCodec<E> extends FieldCodec<E> {
-
-            protected final BooleanArrayCodec<E> codec;
-
-            BooleanArrayFieldCodec(Field field, BooleanArrayCodec<E> codec) {
-                super(field);
-                this.codec = codec;
-            }
-
-            @Override
-            public E encode(Object obj, E out) {
-                final boolean[] fieldVal = (boolean[])Exceptions.wrap(() -> field.get(obj));
-                return codec.encode(fieldVal, out);
-            }
-
-            @Override
-            public void decode(Object obj, E in) {
-                final boolean[] fieldVal = codec.decode(in);
-                Exceptions.wrap(() -> field.set(obj, fieldVal));
-            }
-        }
-
-        static class ObjectFieldCodec<T, E> extends FieldCodec<E> {
-
-            protected final Codec<T, E> codec;
-
-            protected ObjectFieldCodec(Field field, Codec<T, E> codec) {
-                super(field);
-                this.codec = codec;
-            }
-
-            @Override
-            public E encode(Object obj, E out) {
-                final T fieldVal = (T)Exceptions.wrap(() -> field.get(obj));
-                return codec.encode(fieldVal, out);
-            }
-
-            @Override
-            public void decode(Object obj, E in) {
-                final T fieldVal = codec.decode(in);
-                Exceptions.wrap(() -> field.set(obj, fieldVal));
-            }
-        }
 
         protected final Map<String, Codec<?, E>> codecs = new HashMap<>();
 
@@ -165,37 +74,37 @@ public interface Codec<T, E> {
             return (Class<T>)Exceptions.wrap(() -> Class.forName(name));
         }
 
-        protected <T> Codec<T, E> getCodec(Class<T> clazz) {
-            final String name = classToName(clazz);
+        protected <T> Codec<T, E> getCodec(Class<T> dynClass) {
+            final String name = classToName(dynClass);
             return (Codec<T, E>)codecs.computeIfAbsent(name, n -> {
                 final Map<String, FieldCodec<E>> fieldCodecs = new LinkedHashMap<>();
-                Class<?> cl = clazz;
-                for (int depth = 0; !cl.equals(Object.class); depth++) {
-                    final Field[] fields = cl.getDeclaredFields();
+                Class<?> clazz = dynClass;
+                for (int depth = 0; !clazz.equals(Object.class); depth++) {
+                    final Field[] fields = clazz.getDeclaredFields();
                     for (Field field : fields) {
-                        final String fieldName = getFieldName(field, depth, fieldCodecs.keySet());
-                        fieldCodecs.put(fieldName, getFieldCodec(field));
+                        if (!Modifier.isTransient(field.getModifiers())) {
+                            final String fieldName = getFieldName(field, depth, fieldCodecs.keySet());
+                            fieldCodecs.put(fieldName, getFieldCodec(field));
+                        }
                     }
-                    cl = cl.getSuperclass();
+                    clazz = clazz.getSuperclass();
                 }
-                return getCodec(clazz, fieldCodecs);
+                return getCodec(dynClass, fieldCodecs);
             });
         }
 
         protected String getFieldName(Field field, int depth, Set<String> existingNames) {
             String name = field.getName();
-
             while (existingNames.contains(name)) {
                 name = "*" + name;
             }
-
             return name;
         }
 
         protected <T> Codec<T, E> getCodec(
-                Class<T> clazz,
-                Map<String, DynamicCodec.FieldCodec<E>> fieldCodecs) {
-            final Codec<T, E> codec = getCodecImpl (clazz, fieldCodecs);
+                Class<T> dynClass,
+                Map<String, FieldCodec<E>> fieldCodecs) {
+            final Codec<T, E> codec = getCodecImpl(dynClass, fieldCodecs);
             final NullCodec<E> nullCodec = nullCodec();
             return new Codec<T, E>() {
                 @Override
@@ -219,39 +128,39 @@ public interface Codec<T, E> {
         }
 
         protected abstract <T> Codec<T, E> getCodecImpl(
-                Class<T> clazz,
-                Map<String, DynamicCodec.FieldCodec<E>> fieldCodecs);
+                Class<T> dynClass,
+                Map<String, FieldCodec<E>> fieldCodecs);
 
         protected FieldCodec<E> getFieldCodec(Field field) {
             final Class<?> type = field.getType();
             if (type.isPrimitive()) {
                 if (type.equals(boolean.class)) {
-                    return new BooleanFieldCodec<E>(field, booleanCodec());
+                    return new FieldCodec.BooleanFieldCodec<E>(field, booleanCodec());
                 } else {
                     throw TODO();
                 }
             } else if (type.isArray()) {
                 final Class<?> elemType = type.getComponentType();
                 if (elemType.equals(boolean.class)) {
-                    return new BooleanArrayFieldCodec<E>(field, booleanArrayCodec());
+                    return new FieldCodec.BooleanArrayFieldCodec<E>(field, booleanArrayCodec());
                 } else {
                     if (elemType.equals(Boolean.class)) {
                         final ObjectArrayCodec<Boolean, E> codec = objectArrayCodec(Boolean.class, booleanCodec());
-                        return new ObjectFieldCodec<Boolean[], E>(field, codec);
+                        return new FieldCodec.ObjectFieldCodec<Boolean[], E>(field, codec);
                     } else {
                         final ObjectArrayCodec<Object, E> codec =
                                 objectArrayCodec(
                                         (Class)elemType,
                                         DynamicCodec.this);
-                        return new ObjectFieldCodec<Object[], E>(field, codec);
+                        return new FieldCodec.ObjectFieldCodec<Object[], E>(field, codec);
                     }
                 }
             } else {
                 if (type.equals(Boolean.class)) {
-                    return new ObjectFieldCodec<Boolean, E>(field, booleanCodec());
+                    return new FieldCodec.ObjectFieldCodec<Boolean, E>(field, booleanCodec());
                 } else {
                     final Codec<Object, E> codec = DynamicCodec.this;
-                    return new ObjectFieldCodec<Object, E>(field, codec);
+                    return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
                 }
             }
         }
@@ -262,15 +171,13 @@ public interface Codec<T, E> {
 
         protected abstract BooleanArrayCodec<E> booleanArrayCodec();
 
-        protected <T> Codec<T, E> objectCodec(Class<T> clazz) {
-            return getCodec(clazz);
+        protected <T> Codec<T, E> objectCodec(Class<T> dynClass) {
+            return getCodec(dynClass);
         }
 
         protected abstract <T> ObjectArrayCodec<T, E> objectArrayCodec(
                 Class<T> elemClass,
                 Codec<T, E> elemCodec);
-
-        protected abstract <T> Codec<T[], E> objectArrayCodec();
     }
 
     E encode(T val, E out);
