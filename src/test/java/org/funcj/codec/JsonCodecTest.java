@@ -1,10 +1,11 @@
 package org.funcj.codec;
 
+import org.funcj.codec.*;
 import org.funcj.json.Node;
 import org.junit.*;
 
 public class JsonCodecTest {
-    final static Codec.DynamicCodec<Node> codec = new JsonCodec();
+    final static JsonCodecCore codec = new JsonCodecCore();
 
     static {
         codec.initialise();
@@ -13,10 +14,10 @@ public class JsonCodecTest {
     @Test
     public void roundTrip2() {
         final Example.Derived val = new Example.Derived();
-        final Node node = codec.encode(val, null);
+        final Node node = codec.encode(Example.Derived.class, val, null);
         System.out.println(node.toJson(40));
 
-        final Example.Derived val2 = (Example.Derived)codec.decode(node, Example.Derived.class);
+        final Example.Derived val2 = (Example.Derived)codec.decode(Example.Derived.class, node);
 
         Assert.assertEquals(val, val2);
     }
@@ -25,10 +26,10 @@ public class JsonCodecTest {
     @Test
     public void roundTrip() {
         final Example.Simple val = new Example.Simple();
-        final Node node = codec.encode(val, null);
+        final Node node = codec.encode(Example.Simple.class, val, null);
         System.out.println(node.toJson(40));
 
-        final Example.Simple val2 = (Example.Simple)codec.decode(node, Example.Simple.class);
+        final Example.Simple val2 = codec.decode(Example.Simple.class, node);
 
         Assert.assertEquals(val, val2);
     }

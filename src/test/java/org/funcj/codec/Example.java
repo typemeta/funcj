@@ -80,6 +80,33 @@ public abstract class Example {
     }
 
     static class Simple {
-        Object s = Boolean.TRUE;
+        Object o;
+        Boolean b = Boolean.FALSE;
+
+        Simple() {
+            this.o = new Simple(Boolean.TRUE);
+        }
+
+        Simple(Object o) {
+            this.o = o;
+        }
+
+        @Override
+        public boolean equals(Object o1) {
+            if (this == o1) return true;
+            if (o1 == null || getClass() != o1.getClass()) return false;
+
+            Simple simple = (Simple) o1;
+
+            if (o != null ? !o.equals(simple.o) : simple.o != null) return false;
+            return b != null ? b.equals(simple.b) : simple.b == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = o != null ? o.hashCode() : 0;
+            result = 31 * result + (b != null ? b.hashCode() : 0);
+            return result;
+        }
     }
 }

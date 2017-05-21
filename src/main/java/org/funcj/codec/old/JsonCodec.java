@@ -1,4 +1,4 @@
-package org.funcj.codec;
+package org.funcj.codec.old;
 
 import org.funcj.control.Exceptions;
 import org.funcj.json.Node;
