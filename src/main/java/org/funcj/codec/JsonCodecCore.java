@@ -236,22 +236,26 @@ public class JsonCodecCore extends CodecCore<Node> {
 
             @Override
             public T decode(Node in) {
-                final Node.ObjectNode objNode = in.asObject();
-                final String typeFieldName = typeFieldName();
-                final Class<? extends T> type;
-                final Node typeNode = objNode.fields.get(typeFieldName);
-                if (typeNode != null) {
-                    type = nameToClass(typeNode.asString().value);
+                if (in.isNull()) {
+                    return (T)nullCodec.decode(in);
                 } else {
-                    type = stcClass;
-                }
-                final T val = (T)Exceptions.wrap(() -> type.newInstance());
-                fieldCodecs.forEach((name, codec) -> {
-                    if (!name.equals(typeFieldName)) {
-                        codec.decode(val, objNode.fields.get(name));
+                    final Node.ObjectNode objNode = in.asObject();
+                    final String typeFieldName = typeFieldName();
+                    final Class<? extends T> type;
+                    final Node typeNode = objNode.fields.get(typeFieldName);
+                    if (typeNode != null) {
+                        type = nameToClass(typeNode.asString().value);
+                    } else {
+                        type = stcClass;
                     }
-                });
-                return val;
+                    final T val = (T) Exceptions.wrap(() -> type.newInstance());
+                    fieldCodecs.forEach((name, codec) -> {
+                        if (!name.equals(typeFieldName)) {
+                            codec.decode(val, objNode.fields.get(name));
+                        }
+                    });
+                    return val;
+                }
             }
         };
     }
