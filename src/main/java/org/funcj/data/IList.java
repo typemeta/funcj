@@ -36,15 +36,15 @@ public abstract class IList<T> implements Iterable<T> {
      * @param <T> element type
      */
     public static <T> NonEmpty<T> of(T elem) {
-        return IList.<T>nil().add(Objects.requireNonNull(elem));
+        return IList.<T>nil().add(elem);
     }
 
     /**
      * Construct a list with multiple elements.
      * @param <T> element type
      */
-    public static <T> NonEmpty<T> of(T... elems) {
-        return (NonEmpty<T>)ofArray(elems);
+    public static <T> NonEmpty<T> of(T elem, T... elems) {
+        return ofArray(elems).add(elem);
     }
 
     /**

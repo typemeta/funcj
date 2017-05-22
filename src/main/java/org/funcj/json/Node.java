@@ -32,7 +32,7 @@ public interface Node {
     }
 
     static ArrayNode array(Node... values) {
-        return new ArrayNode(IList.of(values));
+        return new ArrayNode(IList.ofArray(values));
     }
 
     static ArrayNode array(Iterable<Node> values) {
@@ -44,7 +44,7 @@ public interface Node {
     }
 
     static ObjectNode object(Tuple2<String, Node>... fields) {
-        return object(IList.of(fields));
+        return object(IList.ofArray(fields));
     }
 
     static ObjectNode object(IList<Tuple2<String, Node>> fields) {

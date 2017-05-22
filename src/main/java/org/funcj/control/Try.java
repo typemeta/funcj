@@ -4,7 +4,7 @@ import org.funcj.data.IList;
 import org.funcj.util.Functions.*;
 import org.funcj.util.FunctionsEx;
 
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -40,12 +40,18 @@ public interface Try<T> {
         }
     }
 
+    /**
+     * Applicative function application.
+     */
     static <A, B> Try<B> ap(Try<F<A, B>> tf, Try<A> ta) {
         return ta.apply(tf);
     }
 
+    /**
+     * Applicative function application.
+     */
     static <A, B> Try<B> ap(F<A, B> f, Try<A> ta) {
-        return ta.apply(success(f));
+        return ta.map(f);
     }
 
     /**
@@ -104,9 +110,13 @@ public interface Try<T> {
      */
     <R> Try<R> map(F<? super T, ? extends R> f);
 
+    /**
+     * Applicative function application.
+     */
     <R> Try<R> apply(Try<F<T, R>> tf);
 
     /**
+     * Monadic bind/flatMap.
      * If this is a success then apply the function to the value and return the result,
      * Otherwise return the failure result.
      */
@@ -118,6 +128,11 @@ public interface Try<T> {
     default <R> Try<R> flatMap(F0<Try<R>> f) {
         return flatMap(u -> f.apply());
     }
+
+    /**
+     * Convert the value into an Optional.
+     */
+    Optional<T> asOptional();
 
     /**
      * Successful result type, which wraps the result value.
@@ -173,6 +188,11 @@ public interface Try<T> {
         @Override
         public <R> Try<R> flatMap(F<? super T, Try<R>> f) {
             return f.apply(value);
+        }
+
+        @Override
+        public Optional<T> asOptional() {
+            return Optional.of(value);
         }
 
         @Override
@@ -254,6 +274,11 @@ public interface Try<T> {
         @Override
         public <R> Try<R> flatMap(F<? super T, Try<R>> f) {
             return cast();
+        }
+
+        @Override
+        public Optional<T> asOptional() {
+            return Optional.empty();
         }
 
         @Override

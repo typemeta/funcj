@@ -62,7 +62,7 @@ public abstract class API {
      * Concatenate multiple document elements.
      */
     public static Document concat(Document... docs) {
-        return new Document.Concat(IList.of(docs));
+        return new Document.Concat(IList.ofArray(docs));
     }
 
     /**
@@ -87,7 +87,7 @@ public abstract class API {
      * Concatenate multiple document elements, that can be split as separate lines if needed.
      */
     public static Document lines(Document... docs) {
-        return lines(IList.of(docs));
+        return lines(IList.ofArray(docs));
     }
 
     /**
