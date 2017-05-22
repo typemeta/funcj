@@ -3,6 +3,89 @@ package org.funcj.codec;
 import java.util.*;
 
 public abstract class Example {
+    public interface IFace<T> {
+        T value();
+    }
+
+    public static class Impl<T> implements IFace<T> {
+
+        final T value;
+
+        public Impl() {
+            this.value = null;
+        }
+
+        public Impl(T value) {
+            this.value = value;
+        }
+
+        @Override
+        public T value() {
+            return null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Impl<?> impl = (Impl<?>) o;
+            return Objects.equals(value, impl.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
+        }
+
+        @Override
+        public String toString() {
+            return "Impl{" +
+                    "value=" + value +
+                    '}';
+        }
+    }
+
+    public static class TestObj {
+        static TestObj create() {
+            return new TestObj(true, false);
+        }
+
+        IFace<Boolean> iface;
+        Impl<Boolean> impl;
+
+        public TestObj() {
+            iface = null;
+            impl = null;
+        }
+
+        public TestObj(boolean iface, boolean impl) {
+            this.iface = new Impl<>(iface);
+            this.impl = new Impl<>(impl);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TestObj testObj = (TestObj) o;
+            return Objects.equals(iface, testObj.iface) &&
+                    Objects.equals(impl, testObj.impl);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(iface, impl);
+        }
+
+        @Override
+        public String toString() {
+            return "TestObj{" +
+                    "iface=" + iface +
+                    ", impl=" + impl +
+                    '}';
+        }
+    }
+
     public static class ZBase {
         boolean b = false;
         boolean b2 = true;

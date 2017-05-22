@@ -12,7 +12,7 @@ public class JsonCodecTest {
     }
 
     @Test
-    public void roundTrip2() {
+    public void roundTrip() {
         final Example.Derived val = new Example.Derived();
         final Node node = codec.encode(Example.Derived.class, val, null);
         System.out.println(node.toJson(40));
@@ -22,14 +22,24 @@ public class JsonCodecTest {
         Assert.assertEquals(val, val2);
     }
 
-
     @Test
-    public void roundTrip() {
+    public void roundTrip2() {
         final Example.Simple val = Example.Simple.create();
         final Node node = codec.encode(Example.Simple.class, val, null);
         System.out.println(node.toJson(40));
 
         final Example.Simple val2 = codec.decode(Example.Simple.class, node);
+
+        Assert.assertEquals(val, val2);
+    }
+
+    @Test
+    public void roundTrip3() {
+        final Example.TestObj val = Example.TestObj.create();
+        final Node node = codec.encode(Example.TestObj.class, val, null);
+        System.out.println(node.toJson(40));
+
+        final Example.TestObj val2 = codec.decode(Example.TestObj.class, node);
 
         Assert.assertEquals(val, val2);
     }
