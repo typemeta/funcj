@@ -78,9 +78,9 @@ public abstract class FieldCodec<E> {
 
     static class IntegerArrayFieldCodec<E> extends FieldCodec<E> {
 
-        protected final Codec.IntegerArrayCodec<E> codec;
+        protected final Codec<int[], E> codec;
 
-        IntegerArrayFieldCodec(Field field, Codec.IntegerArrayCodec<E> codec) {
+        IntegerArrayFieldCodec(Field field, Codec<int[], E> codec) {
             super(field);
             this.codec = codec;
         }

@@ -1,15 +1,23 @@
 package org.funcj.codec;
 
 import org.funcj.control.Exceptions;
+import org.funcj.data.IList;
 import org.funcj.json.Node;
 
 import java.lang.reflect.Array;
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
+import static org.funcj.control.Exceptions.TODO;
+
 public class JsonCodecCore extends CodecCore<Node> {
 
     protected String typeFieldName() {
         return "@type";
+    }
+
+    protected String keyFieldName() {
+        return "@key";
     }
 
     protected String valueFieldName() {
@@ -103,7 +111,7 @@ public class JsonCodecCore extends CodecCore<Node> {
         return integerCodec;
     }
 
-    private final Codec.IntegerArrayCodec<Node> integerArrayCodec = new Codec.IntegerArrayCodec<Node>() {
+    private final Codec<int[], Node> integerArrayCodec = new Codec<int[], Node>() {
 
         @Override
         public Node encode(int[] vals, Node out) {
@@ -127,14 +135,47 @@ public class JsonCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.IntegerArrayCodec<Node> integerArrayCodec() {
+    protected Codec<int[], Node> integerArrayCodec() {
         return integerArrayCodec;
+    }
+
+    @Override
+    protected <K, V> Codec<Map<K, V>, Node> mapCodec(Class<Map<K, V>> stcClass, CodecCore<Node> core) {
+        return new Codec.CodecBase<Map<K, V>, Node>(stcClass, core) {
+            @Override
+            public Node encode(Map<K, V> val, Node out) {
+                if (val == null) {
+                    return core.nullCodec().encode(val, out);
+                } else {
+                    final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
+                    fields.put(typeFieldName(), Node.string(classToName(val.getClass())));
+
+                    final List<Node> nodes = val.entrySet().stream()
+                            .map(en -> {
+                                final LinkedHashMap<String, Node> elemFields = new LinkedHashMap<>();
+                                elemFields.put(keyFieldName(), core.encode(null, en.getKey(), out));
+                                elemFields.put(valueFieldName(), core.encode(null, en.getValue(), out));
+                                return Node.object(elemFields);
+                            }).collect(toList());
+                    fields.put(valueFieldName(), Node.array(nodes));
+                    return Node.object(fields);
+                }
+            }
+
+            @Override
+            public Map<K, V> decode(Node in) {
+                if (in.isNull()) {
+                    return (Map<K, V>)nullCodec.decode(in);
+                } else {
+                    throw TODO();
+                }
+            }
+        };
     }
 
     @Override
     protected <T> Codec.DynamicCodec<T, Node> dynamicCodec(Class<T> stcClass) {
         return new Codec.DynamicCodec<T, Node>(stcClass, this) {
-
             @Override
             public Node encode(T val, Node out) {
                 if (val == null) {
@@ -156,7 +197,9 @@ public class JsonCodecCore extends CodecCore<Node> {
             @Override
             public T decode(Node in) {
                 Class<? extends T> dynClass = stcClass;
-                if (in.isObject()) {
+                if (in.isNull()) {
+                    return (T)nullCodec.decode(in);
+                } else if (in.isObject()) {
                     final Node.ObjectNode objNode = in.asObject();
                     final Node typeNode = objNode.fields.get(typeFieldName());
                     if (typeNode != null) {
@@ -189,8 +232,8 @@ public class JsonCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <T> Codec.ObjectArrayCodec<T, Node> objectArrayCodec(Class<T> elemClass, Codec<T, Node> elemCodec) {
-        return new Codec.ObjectArrayCodec<T, Node>() {
+    protected <T> Codec<T[], Node> objectArrayCodec(Class<T> elemClass, Codec<T, Node> elemCodec) {
+        return new Codec<T[], Node>() {
             @Override
             public Node encode(T[] vals, Node out) {
                 final List<Node> nodes = new ArrayList<>(vals.length);

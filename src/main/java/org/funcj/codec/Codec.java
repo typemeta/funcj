@@ -1,5 +1,7 @@
 package org.funcj.codec;
 
+import java.util.Map;
+
 public interface Codec<T, E> {
 
     interface NullCodec<E> extends Codec<Object, E> {
@@ -43,19 +45,21 @@ public interface Codec<T, E> {
         abstract int decodePrim(E in);
     }
 
-    interface IntegerArrayCodec<E> extends Codec<int[], E> {
-        E encode(int[] vals, E out);
-        int[] decode(E in);
-    }
-
-    abstract class DynamicCodec<T, E> implements Codec<T, E> {
+    abstract class CodecBase<T, E> implements Codec<T, E> {
 
         protected final Class<T> stcClass;
         protected final CodecCore<E> core;
 
-        public DynamicCodec(Class<T> stcClass, CodecCore<E> core) {
+        protected CodecBase(Class<T> stcClass, CodecCore<E> core) {
             this.stcClass = stcClass;
             this.core = core;
+        }
+    }
+
+    abstract class DynamicCodec<T, E> extends CodecBase<T, E> {
+
+        public DynamicCodec(Class<T> stcClass, CodecCore<E> core) {
+            super(stcClass, core);
         }
 
         @Override
@@ -75,9 +79,6 @@ public interface Codec<T, E> {
         }
 
         protected abstract Class<? extends T> getType(E in);
-    }
-
-    interface ObjectArrayCodec<T, E> extends Codec<T[], E> {
     }
 
     E encode(T val, E out);

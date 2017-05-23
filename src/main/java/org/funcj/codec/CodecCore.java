@@ -5,6 +5,7 @@ import org.funcj.control.Exceptions;
 import java.lang.reflect.*;
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
 import static org.funcj.control.Exceptions.TODO;
 
 public abstract class CodecCore<E> {
@@ -41,26 +42,29 @@ public abstract class CodecCore<E> {
 
     protected abstract Codec.IntegerCodec<E> integerCodec();
 
-    protected abstract Codec.IntegerArrayCodec<E> integerArrayCodec();
+    protected abstract Codec<int[], E> integerArrayCodec();
+
+    protected abstract <K, V> Codec<Map<K, V>, E> mapCodec(
+            Class<Map<K, V>> stcClass,
+            CodecCore<E> core);
 
     protected abstract <T> Codec.DynamicCodec<T, E> dynamicCodec(Class<T> stcClass);
 
-    protected abstract <T> Codec.ObjectArrayCodec<T, E> objectArrayCodec(
+    protected abstract <T> Codec<T[], E> objectArrayCodec(
             Class<T> elemClass,
             Codec<T, E> elemCodec);
 
     protected <T> Codec<T, E> getCodec(Class<T> stcClass, Class<? extends T> dynClass) {
-        final Class<?> type = dynClass;
-        if (type.isPrimitive()) {
-            if (type.equals(boolean.class)) {
+        if (dynClass.isPrimitive()) {
+            if (dynClass.equals(boolean.class)) {
                 return (Codec<T, E>)booleanCodec();
-            } else if (type.equals(int.class)) {
+            } else if (dynClass.equals(int.class)) {
                 return (Codec<T, E>)integerCodec();
             } else {
                 throw TODO();
             }
-        } else if (type.isArray()) {
-            final Class<?> elemType = type.getComponentType();
+        } else if (dynClass.isArray()) {
+            final Class<?> elemType = dynClass.getComponentType();
             if (elemType.equals(boolean.class)) {
                 return (Codec<T, E>)booleanArrayCodec();
             } else if (elemType.equals(int.class)) {
@@ -71,18 +75,28 @@ public abstract class CodecCore<E> {
                 } else if (elemType.equals(Integer.class)) {
                     return (Codec<T, E>)objectArrayCodec(Integer.class, integerCodec());
                 } else {
-                    final Codec<Object, E> elemCodec = dynamicCodec((Class<Object>)type);
+                    final Codec<Object, E> elemCodec = dynamicCodec((Class<Object>)dynClass);
                     return (Codec<T, E>)objectArrayCodec((Class<Object>)elemType, elemCodec);
                 }
             }
         } else {
-            if (type.equals(Boolean.class)) {
+            if (dynClass.equals(Boolean.class)) {
                 return (Codec<T, E>)booleanCodec();
-            } else if (type.equals(Integer.class)) {
+            } else if (dynClass.equals(Integer.class)) {
                 return (Codec<T, E>)integerCodec();
             } else {
-                final String name = classToName(dynClass);
-                return (Codec<T, E>)codecs.computeIfAbsent(name, n -> createObjectCodec(stcClass, dynClass));
+                final List<Class> ifaces =
+                        Arrays.stream(dynClass.getGenericInterfaces())
+                                .peek(System.out::println)
+                                .filter(t -> t instanceof ParameterizedType)
+                                .map(t -> (Class)((ParameterizedType)t).getRawType())
+                                .collect(toList());
+                if (ifaces.contains(Map.class)) {
+                    return (Codec<T, E>)mapCodec((Class)stcClass, this);
+                } else {
+                    final String name = classToName(dynClass);
+                    return (Codec<T, E>) codecs.computeIfAbsent(name, n -> createObjectCodec(stcClass, dynClass));
+                }
             }
         }
     }
@@ -125,7 +139,7 @@ public abstract class CodecCore<E> {
             } else if (type.equals(int.class)) {
                 return new FieldCodec.IntegerFieldCodec<E>(field, integerCodec());
             } else {
-                throw TODO();
+                throw new RuntimeException(type.getName());
             }
         } else if (type.isArray()) {
             final Class<?> elemType = type.getComponentType();
@@ -135,10 +149,10 @@ public abstract class CodecCore<E> {
                 return new FieldCodec.IntegerArrayFieldCodec<E>(field, integerArrayCodec());
             } else {
                 if (elemType.equals(Boolean.class)) {
-                    final Codec.ObjectArrayCodec<Boolean, E> codec = objectArrayCodec(Boolean.class, booleanCodec());
+                    final Codec<Boolean[], E> codec = objectArrayCodec(Boolean.class, booleanCodec());
                     return new FieldCodec.ObjectFieldCodec<Boolean[], E>(field, codec);
                 } else if (elemType.equals(Integer.class)) {
-                    final Codec.ObjectArrayCodec<Integer, E> codec = objectArrayCodec(Integer.class, integerCodec());
+                    final Codec<Integer[], E> codec = objectArrayCodec(Integer.class, integerCodec());
                     return new FieldCodec.ObjectFieldCodec<Integer[], E>(field, codec);
                 } else {
                     final Codec<Object, E> elemCodec = dynamicCodec((Class<Object>)elemType);
@@ -149,9 +163,17 @@ public abstract class CodecCore<E> {
         } else {
             if (type.equals(Boolean.class)) {
                 return new FieldCodec.ObjectFieldCodec<Boolean, E>(field, booleanCodec());
+            } else if (type.equals(Integer.class)) {
+                return new FieldCodec.ObjectFieldCodec<Integer, E>(field, integerCodec());
             } else {
-                final Codec<Object, E> codec = dynamicCodec((Class<Object>)type);
-                return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
+                final List<Type> ifaces = Arrays.asList(type.getGenericInterfaces());
+                if (type.equals(Map.class) || ifaces.contains(Map.class)) {
+                    final Codec<Object, E> codec = mapCodec((Class)type, this);
+                    return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
+                } else {
+                    final Codec<Object, E> codec = dynamicCodec((Class<Object>) type);
+                    return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
+                }
             }
         }
     }

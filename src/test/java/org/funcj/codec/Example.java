@@ -109,20 +109,77 @@ public abstract class Example {
     }
 
     public static class Derived extends ZBase {
-        final boolean fb = false;
+        public static Derived create() {
+            final Map<Boolean, Integer> m = new HashMap<>();
+            m.put(true, 123);
+            m.put(false, 456);
+            return new Derived(
+                    true,
+                    false,
+                    Boolean.TRUE,
+                    new boolean[]{true, false},
+                    new Boolean[]{false, true},
+                    new ZBase[]{new ZBase()},
+                    new Object[]{2, 3},
+                    null,
+                    new ZBase(),
+                    new Integer(123),
+                    m
+            );
+        }
 
-        boolean b = true;
-        Boolean bb = Boolean.FALSE;
-        boolean[] ba = {true, false};
-        Boolean[] bba = {false, true, false};
-        ZBase[] za = {new ZBase()};
-        Object[] oa = {new ZBase()};
+        final boolean fb;
 
-        ZBase nul = null;
-        ZBase z = new ZBase();
-        Object o = new ZBase();
+        final boolean b;
+        final Boolean bb;
+        final boolean[] ba;
+        final Boolean[] bba;
+        final ZBase[] za;
+        final Object[] oa;
+
+        final ZBase nul;
+        final ZBase z;
+        final Object o;
+
+        final Map<Boolean, Integer> m;
 
         public Derived() {
+            this.fb = true;
+            this.b = false;
+            this.bb = null;
+            this.ba = null;
+            this.bba = null;
+            this.za = null;
+            this.oa = null;
+            this.nul = null;
+            this.z = null;
+            this.o = null;
+            this.m = null;
+        }
+
+        public Derived(
+                boolean fb,
+                boolean b,
+                Boolean bb,
+                boolean[] ba,
+                Boolean[] bba,
+                ZBase[] za,
+                Object[] oa,
+                ZBase nul,
+                ZBase z,
+                Object o,
+                Map<Boolean, Integer> m) {
+            this.fb = fb;
+            this.b = b;
+            this.bb = bb;
+            this.ba = ba;
+            this.bba = bba;
+            this.za = za;
+            this.oa = oa;
+            this.nul = nul;
+            this.z = z;
+            this.o = o;
+            this.m = m;
         }
 
         @Override
@@ -140,7 +197,8 @@ public abstract class Example {
                     Arrays.equals(oa, derived.oa) &&
                     Objects.equals(nul, derived.nul) &&
                     Objects.equals(z, derived.z) &&
-                    Objects.equals(o, derived.o);
+                    Objects.equals(o, derived.o) &&
+                    m.equals(derived.m);
         }
 
         @Override
@@ -158,6 +216,7 @@ public abstract class Example {
                     ", \n\tnul=" + nul +
                     ", \n\tz=" + z +
                     ", \n\to=" + o +
+                    ", \n\tm=" + m +
                     "\n}";
         }
     }
