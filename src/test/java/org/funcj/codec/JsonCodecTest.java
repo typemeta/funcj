@@ -7,6 +7,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import static java.lang.System.out;
+import static java.util.stream.Collectors.toList;
 
 public class JsonCodecTest {
     final static JsonCodecCore codec = new JsonCodecCore();
@@ -53,14 +54,52 @@ public class JsonCodecTest {
     }
 
     static abstract class GenMapImpl<K, V> implements Map<K, V> {
-
+        Map<String, Double> d;
     }
 
     @Test
-    public void stuff() {
-        //Field field = MapImpl.class.getField("iface");
+    public void stuff() throws NoSuchFieldException {
+
         //dump(MapImpl.class);
-        dump(HashMap.class);
+        getTypeParams(HashMap.class, Map.class).forEach(out::println);
+        getTypeParams(MapImpl.class, Map.class).forEach(out::println);
+        getTypeParams(GenMapImpl.class.getDeclaredField("d"), Map.class).forEach(out::println);
+        //getTypes(, Map.class);//.forEach(out::println);
+        //dump(HashMap.class);
+    }
+
+    static List<Class<?>> getTypeParams(Field field, Class iface) {
+        out.println("Field: " + field);
+        Type type = field.getGenericType();
+        if (type instanceof ParameterizedType) {
+            final ParameterizedType pt =(ParameterizedType)type;
+            final Type rawType = pt.getRawType();
+            if (rawType.equals(iface)) {
+                return getGenTypeParams(pt);
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    static List<Class<?>> getTypeParams(Class implClass, Class iface) {
+        out.println("Class: " + implClass);
+        final List<ParameterizedType> genIfaces =
+                Arrays.stream(implClass.getGenericInterfaces())
+                        .filter(t -> t instanceof ParameterizedType)
+                        .map(t -> (ParameterizedType) t)
+                        .collect(toList());
+        return genIfaces.stream()
+                .filter(pt -> pt.getRawType().equals(iface))
+                .findFirst()
+                .map(pt -> getGenTypeParams(pt))
+                .orElseThrow(() -> new RuntimeException(""));
+    }
+
+    static List<Class<?>> getGenTypeParams(ParameterizedType type) {
+        return Arrays.stream(type.getActualTypeArguments())
+                .filter(t -> t instanceof Class)
+                .map(t -> (Class<?>)t)
+                .collect(toList());
     }
 
     static void dump(Class<?> clazz) {
@@ -87,4 +126,5 @@ public class JsonCodecTest {
         Arrays.stream(typeVars).forEach(out::println);
         out.println();
     }
+
 }

@@ -46,20 +46,19 @@ public interface Codec<T, E> {
     }
 
     abstract class CodecBase<T, E> implements Codec<T, E> {
-
-        protected final Class<T> stcClass;
         protected final CodecCore<E> core;
+        protected final Class<T> stcClass;
 
-        protected CodecBase(Class<T> stcClass, CodecCore<E> core) {
-            this.stcClass = stcClass;
+        protected CodecBase(CodecCore<E> core, Class<T> stcClass) {
             this.core = core;
+            this.stcClass = stcClass;
         }
     }
 
     abstract class DynamicCodec<T, E> extends CodecBase<T, E> {
 
-        public DynamicCodec(Class<T> stcClass, CodecCore<E> core) {
-            super(stcClass, core);
+        public DynamicCodec(CodecCore<E> core, Class<T> stcClass) {
+            super(core, stcClass);
         }
 
         @Override

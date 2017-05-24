@@ -140,21 +140,28 @@ public class JsonCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <K, V> Codec<Map<K, V>, Node> mapCodec(Class<Map<K, V>> stcClass, CodecCore<Node> core) {
-        return new Codec.CodecBase<Map<K, V>, Node>(stcClass, core) {
+    protected <K, V> Codec<Map<K, V>, Node> mapCodec(
+            CodecCore<Node> core,
+            Class<Map<K, V>> stcClass,
+            Class<K> stcKeyClass,
+            Class<V> stcValClass) {
+        return new Codec.CodecBase<Map<K, V>, Node>(core, stcClass) {
             @Override
             public Node encode(Map<K, V> val, Node out) {
                 if (val == null) {
                     return core.nullCodec().encode(val, out);
                 } else {
+                    final String typeFieldName = typeFieldName();
+                    final String keyFieldName = keyFieldName();
+                    final String valueFieldName = valueFieldName();
                     final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
-                    fields.put(typeFieldName(), Node.string(classToName(val.getClass())));
+                    fields.put(typeFieldName, Node.string(classToName(val.getClass())));
 
                     final List<Node> nodes = val.entrySet().stream()
                             .map(en -> {
                                 final LinkedHashMap<String, Node> elemFields = new LinkedHashMap<>();
-                                elemFields.put(keyFieldName(), core.encode(null, en.getKey(), out));
-                                elemFields.put(valueFieldName(), core.encode(null, en.getValue(), out));
+                                elemFields.put(keyFieldName, core.encode(stcKeyClass, en.getKey(), out));
+                                elemFields.put(valueFieldName, core.encode(stcValClass, en.getValue(), out));
                                 return Node.object(elemFields);
                             }).collect(toList());
                     fields.put(valueFieldName(), Node.array(nodes));
@@ -167,7 +174,19 @@ public class JsonCodecCore extends CodecCore<Node> {
                 if (in.isNull()) {
                     return (Map<K, V>)nullCodec.decode(in);
                 } else {
-                    throw TODO();
+                    final String typeFieldName = typeFieldName();
+                    final String keyFieldName = keyFieldName();
+                    final String valueFieldName = valueFieldName();
+                    final Node.ObjectNode objNode = in.asObject();
+                    final Class<?> clazz = nameToClass(objNode.fields.get(typeFieldName).asString().value);
+                    final Map<K, V> map = (Map<K, V>) Exceptions.wrap(() -> clazz.newInstance());
+                    objNode.fields.get(valueFieldName()).asArray().values.forEach(elemNode -> {
+                        final Node.ObjectNode elemObjNode = elemNode.asObject();
+                        final K key = core.decode(stcKeyClass, elemObjNode.fields.get(keyFieldName));
+                        final V val = core.decode(stcValClass, elemObjNode.fields.get(valueFieldName));
+                        map.put(key, val);
+                    });
+                    return map;
                 }
             }
         };
@@ -175,7 +194,7 @@ public class JsonCodecCore extends CodecCore<Node> {
 
     @Override
     protected <T> Codec.DynamicCodec<T, Node> dynamicCodec(Class<T> stcClass) {
-        return new Codec.DynamicCodec<T, Node>(stcClass, this) {
+        return new Codec.DynamicCodec<T, Node>(this, stcClass) {
             @Override
             public Node encode(T val, Node out) {
                 if (val == null) {
