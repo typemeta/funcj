@@ -45,14 +45,6 @@ public interface Codec<T, E> {
         abstract int decodePrim(E in);
     }
 
-    abstract class CodecBase<T, E> implements Codec<T, E> {
-        protected final Class<T> stcClass;
-
-        protected CodecBase(Class<T> stcClass) {
-            this.stcClass = stcClass;
-        }
-    }
-
     E encode(T val, E out);
     T decode(E in);
 }

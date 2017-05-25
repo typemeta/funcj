@@ -170,92 +170,9 @@ public class JsonCodecCore extends CodecCore<Node> {
             Class<K> stcKeyClass,
             Class<V> stcValClass) {
         if (stcKeyClass.equals(String.class)) {
-            return new Codec.CodecBase<Map<K, V>, Node>(stcClass) {
-                @Override
-                public Node encode(Map<K, V> val, Node out) {
-                    if (val == null) {
-                        return JsonCodecCore.this.nullCodec().encode(val, out);
-                    } else {
-                        final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
-                        fields.put(typeFieldName(), Node.string(classToName(val.getClass())));
-
-                        val.forEach((k, v) -> {
-                            final String key = (String)k;
-                            final Node value = JsonCodecCore.this.encode(stcValClass, v, out);
-                               fields.put(key, value);
-                        });
-
-                        return Node.object(fields);
-                    }
-                }
-
-                @Override
-                public Map<K, V> decode(Node in) {
-                    if (in.isNull()) {
-                        return (Map<K, V>) JsonCodecCore.this.nullCodec().decode(in);
-                    } else {
-                        final String typeFieldName = typeFieldName();
-                        final Node.ObjectNode objNode = in.asObject();
-                        final Class<?> clazz = nameToClass(objNode.fields.get(typeFieldName).asString().value);
-                        final Map<String, V> map = (Map<String, V>) Exceptions.wrap(() -> clazz.newInstance());
-
-                        objNode.fields.forEach((k, v) -> {
-                            if (!typeFieldName.equals(k)) {
-                                final V value = JsonCodecCore.this.decode(stcValClass, v);
-                                map.put(k, value);
-                            }
-                        });
-
-                        return (Map<K, V>)map;
-                    }
-                }
-            };
+            return (Codec)new JsonMapCodecs.StringMapCodec<V>(this, (Class)stcClass, stcValClass);
         } else {
-            return new Codec.CodecBase<Map<K, V>, Node>(stcClass) {
-                @Override
-                public Node encode(Map<K, V> val, Node out) {
-                    if (val == null) {
-                        return JsonCodecCore.this.nullCodec().encode(val, out);
-                    } else {
-                        final String typeFieldName = typeFieldName();
-                        final String keyFieldName = keyFieldName();
-                        final String valueFieldName = valueFieldName();
-                        final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
-                        fields.put(typeFieldName, Node.string(classToName(val.getClass())));
-
-                        final List<Node> nodes = val.entrySet().stream()
-                                .map(en -> {
-                                    final LinkedHashMap<String, Node> elemFields = new LinkedHashMap<>();
-                                    elemFields.put(keyFieldName, JsonCodecCore.this.encode(stcKeyClass, en.getKey(), out));
-                                    elemFields.put(valueFieldName, JsonCodecCore.this.encode(stcValClass, en.getValue(), out));
-                                    return Node.object(elemFields);
-                                }).collect(toList());
-                        fields.put(valueFieldName(), Node.array(nodes));
-                        return Node.object(fields);
-                    }
-                }
-
-                @Override
-                public Map<K, V> decode(Node in) {
-                    if (in.isNull()) {
-                        return (Map<K, V>) JsonCodecCore.this.nullCodec().decode(in);
-                    } else {
-                        final String typeFieldName = typeFieldName();
-                        final String keyFieldName = keyFieldName();
-                        final String valueFieldName = valueFieldName();
-                        final Node.ObjectNode objNode = in.asObject();
-                        final Class<?> clazz = nameToClass(objNode.fields.get(typeFieldName).asString().value);
-                        final Map<K, V> map = (Map<K, V>) Exceptions.wrap(() -> clazz.newInstance());
-                        objNode.fields.get(valueFieldName).asArray().values.forEach(elemNode -> {
-                            final Node.ObjectNode elemObjNode = elemNode.asObject();
-                            final K key = JsonCodecCore.this.decode(stcKeyClass, elemObjNode.fields.get(keyFieldName));
-                            final V val = JsonCodecCore.this.decode(stcValClass, elemObjNode.fields.get(valueFieldName));
-                            map.put(key, val);
-                        });
-                        return map;
-                    }
-                }
-            };
+            return new JsonMapCodecs.MapCodec<K, V>(this, stcClass, stcKeyClass, stcValClass);
         }
     }
 
