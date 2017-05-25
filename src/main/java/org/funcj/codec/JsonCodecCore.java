@@ -170,9 +170,9 @@ public class JsonCodecCore extends CodecCore<Node> {
             Class<K> stcKeyClass,
             Class<V> stcValClass) {
         if (stcKeyClass.equals(String.class)) {
-            return (Codec)new JsonMapCodecs.StringMapCodec<V>(this, (Class)stcClass, stcValClass);
+            return (Codec)new JsonMapCodecs.StringMapCodec<V>(this, stcValClass);
         } else {
-            return new JsonMapCodecs.MapCodec<K, V>(this, stcClass, stcKeyClass, stcValClass);
+            return new JsonMapCodecs.MapCodec<K, V>(this, stcKeyClass, stcValClass);
         }
     }
 
