@@ -113,6 +113,9 @@ public abstract class Example {
             final Map<Boolean, Integer> m = new HashMap<>();
             m.put(true, 123);
             m.put(false, 456);
+            final Map<String, Integer> ms = new HashMap<String, Integer>();
+            ms.put("abc", 123);
+            ms.put("def", 456);
             return new Derived(
                     true,
                     false,
@@ -124,7 +127,8 @@ public abstract class Example {
                     null,
                     new ZBase(),
                     new Integer(123),
-                    m
+                    m,
+                    ms
             );
         }
 
@@ -142,6 +146,7 @@ public abstract class Example {
         final Object o;
 
         final Map<Boolean, Integer> m;
+        final Map<String, Integer> ms;
 
         public Derived() {
             this.fb = true;
@@ -155,6 +160,7 @@ public abstract class Example {
             this.z = null;
             this.o = null;
             this.m = null;
+            this.ms = null;
         }
 
         public Derived(
@@ -168,7 +174,8 @@ public abstract class Example {
                 ZBase nul,
                 ZBase z,
                 Object o,
-                Map<Boolean, Integer> m) {
+                Map<Boolean, Integer> m,
+                Map<String, Integer> ms) {
             this.fb = fb;
             this.b = b;
             this.bb = bb;
@@ -180,6 +187,7 @@ public abstract class Example {
             this.z = z;
             this.o = o;
             this.m = m;
+            this.ms = ms;
         }
 
         @Override
@@ -198,6 +206,7 @@ public abstract class Example {
                     Objects.equals(nul, derived.nul) &&
                     Objects.equals(z, derived.z) &&
                     Objects.equals(o, derived.o) &&
+                    m.equals(derived.m) &&
                     m.equals(derived.m);
         }
 

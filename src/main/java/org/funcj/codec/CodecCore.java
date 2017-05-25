@@ -44,13 +44,14 @@ public abstract class CodecCore<E> {
 
     protected abstract Codec<int[], E> integerArrayCodec();
 
+    protected abstract Codec<String, E> stringCodec();
+
     protected abstract <K, V> Codec<Map<K, V>, E> mapCodec(
-            CodecCore<E> core,
             Class<Map<K, V>> stcClass,
             Class<K> stcKeyClass,
             Class<V> stcValClass);
 
-    protected abstract <T> Codec.DynamicCodec<T, E> dynamicCodec(Class<T> stcClass);
+    protected abstract <T> Codec<T, E> dynamicCodec(Class<T> stcClass);
 
     protected abstract <T> Codec<T[], E> objectArrayCodec(
             Class<T> elemClass,
@@ -86,6 +87,8 @@ public abstract class CodecCore<E> {
                 return (Codec<T, E>)booleanCodec();
             } else if (dynClass.equals(Integer.class)) {
                 return (Codec<T, E>)integerCodec();
+            } else if (dynClass.equals(String.class)) {
+                return (Codec<T, E>)stringCodec();
             } else {
                 final List<Class> ifaces =
                         Arrays.stream(dynClass.getGenericInterfaces())
@@ -96,7 +99,7 @@ public abstract class CodecCore<E> {
                     final List<Class<?>> typeArgs = ReflectionUtils.getTypeArgs(dynClass, Map.class);
                     final Class<?> stcKeyClass = typeArgs.size() == 2 ? typeArgs.get(0) : null;
                     final Class<?> stcValClass = typeArgs.size() == 2 ? typeArgs.get(1) : null;
-                    return (Codec<T, E>)mapCodec(this, (Class)stcClass, stcKeyClass, stcValClass);
+                    return (Codec<T, E>)mapCodec((Class)stcClass, stcKeyClass, stcValClass);
                 } else {
                     final String name = classToName(dynClass);
                     return (Codec<T, E>) codecs.computeIfAbsent(name, n -> createObjectCodec(stcClass, dynClass));
@@ -169,13 +172,15 @@ public abstract class CodecCore<E> {
                 return new FieldCodec.ObjectFieldCodec<Boolean, E>(field, booleanCodec());
             } else if (type.equals(Integer.class)) {
                 return new FieldCodec.ObjectFieldCodec<Integer, E>(field, integerCodec());
+            } else if (type.equals(String.class)) {
+                return new FieldCodec.ObjectFieldCodec<String, E>(field, stringCodec());
             } else {
                 final List<Type> ifaces = Arrays.asList(type.getGenericInterfaces());
                 if (type.equals(Map.class) || ifaces.contains(Map.class)) {
                     final List<Class<?>> typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
                     final Class<?> stcKeyClass = typeArgs.size() == 2 ? typeArgs.get(0) : null;
                     final Class<?> stcValClass = typeArgs.size() == 2 ? typeArgs.get(1) : null;
-                    final Codec<Object, E> codec = mapCodec(this, (Class)type, stcKeyClass, stcValClass);
+                    final Codec<Object, E> codec = mapCodec((Class)type, stcKeyClass, stcValClass);
                     return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
                 } else {
                     final Codec<Object, E> codec = dynamicCodec((Class<Object>) type);
