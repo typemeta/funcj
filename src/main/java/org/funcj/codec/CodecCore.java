@@ -46,6 +46,10 @@ public abstract class CodecCore<E> {
 
     protected abstract Codec<String, E> stringCodec();
 
+    protected abstract <EM extends Enum<EM>> Codec<EM, E> enumCodec(
+            Class<? super EM> stcClass,
+            Class<EM> dynClass);
+
     protected abstract <K, V> Codec<Map<K, V>, E> mapCodec(
             Class<Map<K, V>> stcClass,
             Class<K> stcKeyClass,
@@ -69,19 +73,21 @@ public abstract class CodecCore<E> {
         } else if (dynClass.isArray()) {
             final Class<?> elemType = dynClass.getComponentType();
             if (elemType.equals(boolean.class)) {
-                return (Codec<T, E>)booleanArrayCodec();
+                return (Codec<T, E>) booleanArrayCodec();
             } else if (elemType.equals(int.class)) {
-                return (Codec<T, E>)integerArrayCodec();
+                return (Codec<T, E>) integerArrayCodec();
             } else {
                 if (elemType.equals(Boolean.class)) {
-                    return (Codec<T, E>)objectArrayCodec(Boolean.class, booleanCodec());
+                    return (Codec<T, E>) objectArrayCodec(Boolean.class, booleanCodec());
                 } else if (elemType.equals(Integer.class)) {
-                    return (Codec<T, E>)objectArrayCodec(Integer.class, integerCodec());
+                    return (Codec<T, E>) objectArrayCodec(Integer.class, integerCodec());
                 } else {
-                    final Codec<Object, E> elemCodec = dynamicCodec((Class<Object>)dynClass);
-                    return (Codec<T, E>)objectArrayCodec((Class<Object>)elemType, elemCodec);
+                    final Codec<Object, E> elemCodec = dynamicCodec((Class<Object>) dynClass);
+                    return (Codec<T, E>) objectArrayCodec((Class<Object>) elemType, elemCodec);
                 }
             }
+        } else if (dynClass.isEnum()) {
+            return enumCodec((Class)stcClass, (Class)dynClass);
         } else {
             if (dynClass.equals(Boolean.class)) {
                 return (Codec<T, E>)booleanCodec();
@@ -114,7 +120,8 @@ public abstract class CodecCore<E> {
         for (int depth = 0; !clazz.equals(Object.class); depth++) {
             final Field[] fields = clazz.getDeclaredFields();
             for (Field field : fields) {
-                if (!Modifier.isTransient(field.getModifiers())) {
+                final int fm = field.getModifiers();
+                if (!Modifier.isStatic(fm) && !Modifier.isTransient(fm)) {
                     final String fieldName = getFieldName(field, depth, fieldCodecs.keySet());
                     fieldCodecs.put(fieldName, getFieldCodec(field));
                 }

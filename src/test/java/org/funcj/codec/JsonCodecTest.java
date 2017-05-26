@@ -29,11 +29,11 @@ public class JsonCodecTest {
 
     @Test
     public void roundTrip2() {
-        final Example.Simple val = Example.Simple.create();
-        final Node node = codec.encode(Example.Simple.class, val, null);
+        final Example.Simple2 val = Example.Simple2.create();
+        final Node node = codec.encode(Example.Simple2.class, val, null);
         out.println(node.toJson(40));
 
-        final Example.Simple val2 = codec.decode(Example.Simple.class, node);
+        final Example.Simple2 val2 = codec.decode(Example.Simple2.class, node);
 
         Assert.assertEquals(val, val2);
     }

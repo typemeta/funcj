@@ -5,6 +5,7 @@ import org.funcj.json.Node;
 import org.funcj.util.Functions;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
 
@@ -67,29 +68,27 @@ public abstract class JsonMapCodecs {
                 final String keyFieldName = core.keyFieldName();
                 final String valueFieldName = core.valueFieldName();
 
+                final Functions.F<Map<K, V>, Consumer<Node>> decodeM = m -> elemNode -> {
+                    final Node.ObjectNode elemObjNode = elemNode.asObject();
+                    final K key = core.decode(stcKeyClass, elemObjNode.fields.get(keyFieldName));
+                    final V val = core.decode(stcValClass, elemObjNode.fields.get(valueFieldName));
+                    m.put(key, val);
+                };
+
                 final Map<K, V> map;
 
                 if (in.isObject()) {
                     final Node.ObjectNode objNode = in.asObject();
                     final Class<?> mapClass = core.nameToClass(objNode.fields.get(typeFieldName).asString().value);
                     map = (Map<K, V>) Exceptions.wrap(() -> mapClass.newInstance());
+                    final Consumer<Node> decode = decodeM.apply(map);
                     objNode.fields.get(valueFieldName).asArray().values
-                            .forEach(elemNode -> {
-                                final Node.ObjectNode elemObjNode = elemNode.asObject();
-                                final K key = core.decode(stcKeyClass, elemObjNode.fields.get(keyFieldName));
-                                final V val = core.decode(stcValClass, elemObjNode.fields.get(valueFieldName));
-                                map.put(key, val);
-                            });
+                            .forEach(decode);
                 } else {
                     final Node.ArrayNode objNode = in.asArray();
                     map = new HashMap<>();
-                    objNode.values
-                            .forEach(elemNode -> {
-                                final Node.ObjectNode elemObjNode = elemNode.asObject();
-                                final K key = core.decode(stcKeyClass, elemObjNode.fields.get(keyFieldName));
-                                final V val = core.decode(stcValClass, elemObjNode.fields.get(valueFieldName));
-                                map.put(key, val);
-                            });
+                    final Consumer<Node> decode = decodeM.apply(map);
+                    objNode.values.forEach(decode);
                 }
 
                 return map;

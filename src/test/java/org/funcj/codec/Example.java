@@ -3,6 +3,10 @@ package org.funcj.codec;
 import java.util.*;
 
 public abstract class Example {
+    enum Colour {
+        RED, GREEN, BLUE
+    }
+
     public interface IFace<T> {
         T value();
     }
@@ -128,7 +132,9 @@ public abstract class Example {
                     new ZBase(),
                     new Integer(123),
                     m,
-                    ms
+                    ms,
+                    Colour.BLUE,
+                    Colour.RED
             );
         }
 
@@ -144,6 +150,9 @@ public abstract class Example {
         final ZBase nul;
         final ZBase z;
         final Object o;
+
+        final Colour en;
+        final Object eno;
 
         final Map<Boolean, Integer> m;
         final Map<String, Integer> ms;
@@ -161,6 +170,8 @@ public abstract class Example {
             this.o = null;
             this.m = null;
             this.ms = null;
+            this.en = null;
+            this.eno = null;
         }
 
         public Derived(
@@ -175,7 +186,9 @@ public abstract class Example {
                 ZBase z,
                 Object o,
                 Map<Boolean, Integer> m,
-                Map<String, Integer> ms) {
+                Map<String, Integer> ms,
+                Colour en,
+                Colour eno) {
             this.fb = fb;
             this.b = b;
             this.bb = bb;
@@ -188,6 +201,8 @@ public abstract class Example {
             this.o = o;
             this.m = m;
             this.ms = ms;
+            this.en = en;
+            this.eno = eno;
         }
 
         @Override
@@ -293,26 +308,36 @@ public abstract class Example {
         }
     }
 
-//    static class Simple {
-//        static Simple create() {
-//            return new Simple(new int[]{5, 6, 4});
-//        }
-//
-//        int[] ia;
-//
-//        Simple() {
-//        }
-//
-//        Simple(int[] ia) {
-//            this.ia = ia;
-//        }
-//
-//        @Override
-//        public boolean equals(Object rhsO) {
-//            if (this == rhsO) return true;
-//            if (rhsO == null || getClass() != rhsO.getClass()) return false;
-//            Simple rhs = (Simple) rhsO;
-//            return Arrays.equals(ia, rhs.ia);
-//        }
-//    }
+    static class Simple2 {
+        static Simple2 create() {
+            return new Simple2(Colour.RED, Colour.GREEN);
+        }
+
+        final Colour en;
+        final Object eno;
+
+        Simple2() {
+            en = null;
+            eno = null;
+        }
+
+        Simple2(Colour en, Colour eno) {
+            this.en = en;
+            this.eno = eno;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Simple2 simple2 = (Simple2) o;
+            return en == simple2.en &&
+                    Objects.equals(eno, simple2.eno);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(en, eno);
+        }
+    }
 }

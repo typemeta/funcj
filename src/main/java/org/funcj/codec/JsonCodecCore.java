@@ -1,13 +1,11 @@
 package org.funcj.codec;
 
 import org.funcj.control.Exceptions;
-import org.funcj.data.IList;
 import org.funcj.json.Node;
 
 import java.lang.reflect.Array;
 import java.util.*;
 
-import static java.util.stream.Collectors.toList;
 import static org.funcj.control.Exceptions.TODO;
 
 public class JsonCodecCore extends CodecCore<Node> {
@@ -143,7 +141,7 @@ public class JsonCodecCore extends CodecCore<Node> {
         @Override
         public Node encode(String val, Node out) {
             if (val == null) {
-                return JsonCodecCore.this.nullCodec().encode(val, out);
+                return JsonCodecCore.this.nullCodec().encode(null, out);
             } else {
                 return Node.string(val);
             }
@@ -165,6 +163,31 @@ public class JsonCodecCore extends CodecCore<Node> {
     }
 
     @Override
+    protected <EM extends Enum<EM>> Codec<EM, Node> enumCodec(
+            Class<? super EM> stcClass,
+            Class<EM> dynClass) {
+        return new Codec<EM, Node>() {
+            @Override
+            public Node encode(EM val, Node out) {
+                if (val == null) {
+                    return JsonCodecCore.this.nullCodec().encode(null, out);
+                } else {
+                    return Node.string(val.name());
+                }
+            }
+
+            @Override
+            public EM decode(Node in) {
+                if (in.isNull()) {
+                    return (EM) JsonCodecCore.this.nullCodec().decode(in);
+                } else {
+                    return EM.valueOf((Class<EM>)dynClass, in.asString().value);
+                }
+            }
+        };
+    }
+
+    @Override
     protected <K, V> Codec<Map<K, V>, Node> mapCodec(
             Class<Map<K, V>> stcClass,
             Class<K> stcKeyClass,
@@ -182,7 +205,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             @Override
             public Node encode(T val, Node out) {
                 if (val == null) {
-                    return JsonCodecCore.this.nullCodec().encode(val, out);
+                    return JsonCodecCore.this.nullCodec().encode(null, out);
                 } else {
                     final Class<? extends T> dynClass = (Class<? extends T>)val.getClass();
                     final Codec<Object, Node> codec = JsonCodecCore.this.getCodec(stcClass, (Class)val.getClass());
@@ -201,7 +224,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             public T decode(Node in) {
                 Class<? extends T> dynClass = stcClass;
                 if (in.isNull()) {
-                    return (T)nullCodec.decode(in);
+                    return (T)JsonCodecCore.this.nullCodec().decode(in);
                 } else if (in.isObject()) {
                     final Node.ObjectNode objNode = in.asObject();
                     final Node typeNode = objNode.fields.get(typeFieldName());
@@ -254,7 +277,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             @Override
             public Node encode(T val, Node out) {
                 if (val == null) {
-                    return nullCodec.encode(val, out);
+                    return JsonCodecCore.this.nullCodec().encode(null, out);
                 } else {
                     final Class<? extends T> dynClass = (Class<? extends T>)val.getClass();
                     final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
@@ -269,7 +292,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             @Override
             public T decode(Node in) {
                 if (in.isNull()) {
-                    return (T)nullCodec.decode(in);
+                    return (T)JsonCodecCore.this.nullCodec().decode(in);
                 } else {
                     final Node.ObjectNode objNode = in.asObject();
                     final String typeFieldName = typeFieldName();
