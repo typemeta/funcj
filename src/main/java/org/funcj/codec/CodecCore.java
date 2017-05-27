@@ -21,7 +21,7 @@ public abstract class CodecCore<E> {
         return dynamicCodec(stcClass).encode(val, out);
     }
 
-    public <T> T decode(Class<T> stcClass, E in) {
+    public <T> T                                                                                                                                                                                                                                                                        decode(Class<T> stcClass, E in) {
         return dynamicCodec(stcClass).decode(in);
     }
 
@@ -96,12 +96,7 @@ public abstract class CodecCore<E> {
             } else if (dynClass.equals(String.class)) {
                 return (Codec<T, E>)stringCodec();
             } else {
-                final List<Class> ifaces =
-                        Arrays.stream(dynClass.getGenericInterfaces())
-                                .filter(t -> t instanceof ParameterizedType)
-                                .map(t -> (Class)((ParameterizedType)t).getRawType())
-                                .collect(toList());
-                if (ifaces.contains(Map.class)) {
+                if (Map.class.isAssignableFrom(dynClass)) {
                     final List<Class<?>> typeArgs = ReflectionUtils.getTypeArgs(dynClass, Map.class);
                     final Class<?> stcKeyClass = typeArgs.size() == 2 ? typeArgs.get(0) : null;
                     final Class<?> stcValClass = typeArgs.size() == 2 ? typeArgs.get(1) : null;
@@ -174,6 +169,9 @@ public abstract class CodecCore<E> {
                     return new FieldCodec.ObjectArrayFieldCodec<Object, E>(field, codec);
                 }
             }
+        } else if (type.isEnum()) {
+            final Codec<Object, E> codec = enumCodec((Class)type, null);
+            return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
         } else {
             if (type.equals(Boolean.class)) {
                 return new FieldCodec.ObjectFieldCodec<Boolean, E>(field, booleanCodec());
@@ -182,8 +180,7 @@ public abstract class CodecCore<E> {
             } else if (type.equals(String.class)) {
                 return new FieldCodec.ObjectFieldCodec<String, E>(field, stringCodec());
             } else {
-                final List<Type> ifaces = Arrays.asList(type.getGenericInterfaces());
-                if (type.equals(Map.class) || ifaces.contains(Map.class)) {
+                if (Map.class.isAssignableFrom(type)) {
                     final List<Class<?>> typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
                     final Class<?> stcKeyClass = typeArgs.size() == 2 ? typeArgs.get(0) : null;
                     final Class<?> stcValClass = typeArgs.size() == 2 ? typeArgs.get(1) : null;

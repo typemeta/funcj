@@ -130,7 +130,8 @@ public abstract class Example {
                     new Object[]{2, 3},
                     null,
                     new ZBase(),
-                    new Integer(123),
+                    "str",
+                    "objStr",
                     m,
                     ms,
                     Colour.BLUE,
@@ -149,7 +150,9 @@ public abstract class Example {
 
         final ZBase nul;
         final ZBase z;
-        final Object o;
+
+        final String s;
+        final Object os;
 
         final Colour en;
         final Object eno;
@@ -167,7 +170,8 @@ public abstract class Example {
             this.oa = null;
             this.nul = null;
             this.z = null;
-            this.o = null;
+            this.s = null;
+            this.os = null;
             this.m = null;
             this.ms = null;
             this.en = null;
@@ -184,7 +188,8 @@ public abstract class Example {
                 Object[] oa,
                 ZBase nul,
                 ZBase z,
-                Object o,
+                String s,
+                String os,
                 Map<Boolean, Integer> m,
                 Map<String, Integer> ms,
                 Colour en,
@@ -198,7 +203,8 @@ public abstract class Example {
             this.oa = oa;
             this.nul = nul;
             this.z = z;
-            this.o = o;
+            this.s = s;
+            this.os = os;
             this.m = m;
             this.ms = ms;
             this.en = en;
@@ -220,7 +226,8 @@ public abstract class Example {
                     Arrays.equals(oa, derived.oa) &&
                     Objects.equals(nul, derived.nul) &&
                     Objects.equals(z, derived.z) &&
-                    Objects.equals(o, derived.o) &&
+                    Objects.equals(s, derived.s) &&
+                    Objects.equals(os, derived.os) &&
                     m.equals(derived.m) &&
                     m.equals(derived.m);
         }
@@ -239,7 +246,8 @@ public abstract class Example {
                     ", \n\toa=" + Arrays.toString(oa) +
                     ", \n\tnul=" + nul +
                     ", \n\tz=" + z +
-                    ", \n\to=" + o +
+                    ", \n\ts=" + s +
+                    ", \n\tos=" + os +
                     ", \n\tm=" + m +
                     "\n}";
         }
@@ -310,34 +318,34 @@ public abstract class Example {
 
     static class Simple2 {
         static Simple2 create() {
-            return new Simple2(Colour.RED, Colour.GREEN);
+            final Map<String, Integer> m = new TreeMap<>();
+            m.put("abc", 123);
+            return new Simple2(m);
         }
 
-        final Colour en;
-        final Object eno;
+        final Object value;
 
         Simple2() {
-            en = null;
-            eno = null;
+            value = null;
         }
 
-        Simple2(Colour en, Colour eno) {
-            this.en = en;
-            this.eno = eno;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Simple2 simple2 = (Simple2) o;
-            return en == simple2.en &&
-                    Objects.equals(eno, simple2.eno);
+        Simple2(Object value) {
+            this.value = value;
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(en, eno);
+        public boolean equals(Object rhs) {
+            if (this == rhs) return true;
+            if (rhs == null || getClass() != rhs.getClass()) return false;
+            Simple2 simple2 = (Simple2) rhs;
+            return Objects.equals(value, simple2.value);
+        }
+
+        @Override
+        public String toString() {
+            return "Simple2{" +
+                    "value=" + value +
+                    '}';
         }
     }
 }

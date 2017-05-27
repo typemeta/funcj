@@ -166,6 +166,7 @@ public class JsonCodecCore extends CodecCore<Node> {
     protected <EM extends Enum<EM>> Codec<EM, Node> enumCodec(
             Class<? super EM> stcClass,
             Class<EM> dynClass) {
+        final Class<EM> emClass = dynClass == null ? (Class<EM>)stcClass : dynClass;
         return new Codec<EM, Node>() {
             @Override
             public Node encode(EM val, Node out) {
@@ -181,7 +182,7 @@ public class JsonCodecCore extends CodecCore<Node> {
                 if (in.isNull()) {
                     return (EM) JsonCodecCore.this.nullCodec().decode(in);
                 } else {
-                    return EM.valueOf((Class<EM>)dynClass, in.asString().value);
+                    return EM.valueOf(emClass, in.asString().value);
                 }
             }
         };
@@ -192,7 +193,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             Class<Map<K, V>> stcClass,
             Class<K> stcKeyClass,
             Class<V> stcValClass) {
-        if (stcKeyClass.equals(String.class)) {
+        if (String.class.equals(stcKeyClass)) {
             return (Codec)new JsonMapCodecs.StringMapCodec<V>(this, stcValClass);
         } else {
             return new JsonMapCodecs.MapCodec<K, V>(this, stcKeyClass, stcValClass);
