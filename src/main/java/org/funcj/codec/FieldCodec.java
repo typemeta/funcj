@@ -23,8 +23,9 @@ public abstract class FieldCodec<E> {
             return codec.encode(fieldVal, out);
         }
 
+        @Override
         public void decode(Object obj, E in) {
-            final boolean fieldVal = codec.decode(in);
+            final boolean fieldVal = codec.decode(boolean.class, in);
             setAccessible(true);
             Exceptions.wrap(() -> field.setBoolean(obj, fieldVal));
             setAccessible(false);
@@ -50,7 +51,7 @@ public abstract class FieldCodec<E> {
 
         @Override
         public void decode(Object obj, E in) {
-            final boolean[] fieldVal = codec.decode(in);
+            final boolean[] fieldVal = codec.decode(boolean[].class, in);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
@@ -127,7 +128,7 @@ public abstract class FieldCodec<E> {
 
         @Override
         public void decode(Object obj, E in) {
-            final T fieldVal = codec.decode(in);
+            final T fieldVal = codec.decode((Class<T>)field.getType(), in);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
@@ -153,7 +154,7 @@ public abstract class FieldCodec<E> {
 
         @Override
         public void decode(Object obj, E in) {
-            final T[] fieldVal = codec.decode(in);
+            final T[] fieldVal = codec.decode((Class<T[]>)field.getType(), in);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);

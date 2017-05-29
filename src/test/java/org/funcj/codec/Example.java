@@ -318,8 +318,8 @@ public abstract class Example {
 
     static class Simple2 {
         static Simple2 create() {
-            final Map<String, Integer> m = new TreeMap<>();
-            m.put("abc", 123);
+            final Map<String, String> m = new TreeMap<>();
+            m.put("abc", "123");
             return new Simple2(m);
         }
 

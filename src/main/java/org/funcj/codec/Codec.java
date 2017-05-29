@@ -1,7 +1,5 @@
 package org.funcj.codec;
 
-import java.util.Map;
-
 public interface Codec<T, E> {
 
     interface NullCodec<E> extends Codec<Object, E> {
@@ -15,6 +13,7 @@ public interface Codec<T, E> {
             return encodePrim(val, out) ;
         }
 
+        @Override
         public Boolean decode(E in) {
             return decodePrim(in);
         }
@@ -36,6 +35,7 @@ public interface Codec<T, E> {
             return encodePrim(val, out) ;
         }
 
+        @Override
         public Integer decode(E in) {
             return decodePrim(in);
         }
@@ -45,6 +45,18 @@ public interface Codec<T, E> {
         abstract int decodePrim(E in);
     }
 
+    interface IntegerArrayCodec<E> extends Codec<int[], E> {
+        E encode(int[] vals, E out);
+        int[] decode(E in);
+    }
+
     E encode(T val, E out);
-    T decode(E in);
+
+    default T decode(Class<T> dynType, E in) {
+        return decode(in);
+    }
+
+    default T decode(E in) {
+        throw new IllegalStateException();
+    }
 }
