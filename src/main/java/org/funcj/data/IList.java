@@ -331,6 +331,10 @@ public abstract class IList<T> implements Iterable<T> {
             return rhs.isEmpty();
         }
 
+        public int hashCode() {
+            return 0;
+        }
+
         @Override
         public StringBuilder append(StringBuilder sb) {
             return sb;
@@ -526,6 +530,14 @@ public abstract class IList<T> implements Iterable<T> {
 
                 return rhs.isEmpty();
             }
+        }
+
+        public int hashCode() {
+            int hashCode = 1;
+            for(IList<T> next = this; !next.isEmpty(); next = next.tail()) {
+                hashCode = 31 * hashCode + next.head().hashCode();
+            }
+            return hashCode;
         }
 
         @Override

@@ -29,11 +29,11 @@ public class OldJsonCodecTest {
 
     @Test
     public void roundTrip2() {
-        final Example.Simple2 val = Example.Simple2.create();
-        final Node node = codec.encode(Example.Simple2.class, val, null);
+        final Example.Derived2 val = Example.Derived2.create();
+        final Node node = codec.encode(Example.Derived2.class, val, null);
         out.println(node.toJson(40));
 
-        final Example.Simple2 val2 = codec.decode(Example.Simple2.class, node);
+        final Example.Derived2 val2 = codec.decode(Example.Derived2.class, node);
 
         Assert.assertEquals(val, val2);
     }

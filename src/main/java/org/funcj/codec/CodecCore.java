@@ -32,11 +32,13 @@ public abstract class CodecCore<E> {
         return (Class<T>) Exceptions.wrap(() -> Class.forName(name));
     }
 
+    protected abstract <T> Codec<T, E> nullSafeCodec(Codec<T, E> codec);
+
     protected abstract Codec.NullCodec<E> nullCodec();
 
     protected abstract Codec.BooleanCodec<E> booleanCodec();
 
-    protected abstract Codec.BooleanArrayCodec<E> booleanArrayCodec();
+    protected abstract Codec<boolean[], E> booleanArrayCodec();
 
     protected abstract Codec.IntegerCodec<E> integerCodec();
 
@@ -54,6 +56,10 @@ public abstract class CodecCore<E> {
             Class<T> elemType,
             Codec<T, E> elemCodec);
 
+    protected abstract <T> Codec<T, E> dynamicCodec(Class<T> stcType);
+
+    protected abstract <T> Codec<T, E> dynamicCodec(Codec<T, E> codec, Class<T> stcType);
+
     protected <T> Codec<T, E> getCodec(Class<T> dynType) {
         if (dynType.isPrimitive()) {
             if (dynType.equals(boolean.class)) {
@@ -63,42 +69,46 @@ public abstract class CodecCore<E> {
             } else {
                 throw TODO();
             }
-        } else if (dynType.isArray()) {
-            final Class<?> elemType = dynType.getComponentType();
-            if (elemType.equals(boolean.class)) {
-                return (Codec<T, E>) booleanArrayCodec();
-            } else if (elemType.equals(int.class)) {
-                return (Codec<T, E>) integerArrayCodec();
-            } else {
-                if (elemType.equals(Boolean.class)) {
-                    return (Codec<T, E>) objectArrayCodec(Boolean.class, booleanCodec());
-                } else if (elemType.equals(Integer.class)) {
-                    return (Codec<T, E>) objectArrayCodec(Integer.class, integerCodec());
-                } else {
-                    final Codec<Object, E> elemCodec = dynamicCodec((Class<Object>) elemType);
-                    return (Codec<T, E>) objectArrayCodec((Class<Object>) elemType, elemCodec);
-                }
-            }
-        } else if (dynType.isEnum()) {
-            return enumCodec((Class)dynType);
         } else {
-            if (dynType.equals(Boolean.class)) {
-                return (Codec<T, E>)booleanCodec();
-            } else if (dynType.equals(Integer.class)) {
-                return (Codec<T, E>)integerCodec();
-            } else if (dynType.equals(String.class)) {
-                return (Codec<T, E>)stringCodec();
-            } else {
-                if (Map.class.isAssignableFrom(dynType)) {
-                    final List<Class<?>> typeArgs = ReflectionUtils.getTypeArgs(dynType, Map.class);
-                    final Class<?> keyType = typeArgs.size() == 2 ? typeArgs.get(0) : null;
-                    final Class<?> valueType = typeArgs.size() == 2 ? typeArgs.get(1) : null;
-                    return (Codec<T, E>)mapCodec(keyType, valueType);
+            final Codec<T, E> codec;
+            if (dynType.isArray()) {
+                final Class<?> elemType = dynType.getComponentType();
+                if (elemType.equals(boolean.class)) {
+                    codec =  (Codec<T, E>) booleanArrayCodec();
+                } else if (elemType.equals(int.class)) {
+                    codec =  (Codec<T, E>) integerArrayCodec();
                 } else {
-                    final String name = classToName(dynType);
-                    return (Codec<T, E>) codecs.computeIfAbsent(name, n -> createObjectCodec(dynType));
+                    if (elemType.equals(Boolean.class)) {
+                        codec =  (Codec<T, E>) objectArrayCodec(Boolean.class, booleanCodec());
+                    } else if (elemType.equals(Integer.class)) {
+                        codec =  (Codec<T, E>) objectArrayCodec(Integer.class, integerCodec());
+                    } else {
+                        final Codec<Object, E> elemCodec = dynamicCodec((Class<Object>) elemType);
+                        codec =  (Codec<T, E>) objectArrayCodec((Class<Object>) elemType, elemCodec);
+                    }
+                }
+            } else if (dynType.isEnum()) {
+                codec =  enumCodec((Class)dynType);
+            } else {
+                if (dynType.equals(Boolean.class)) {
+                    codec =  (Codec<T, E>)booleanCodec();
+                } else if (dynType.equals(Integer.class)) {
+                    codec =  (Codec<T, E>)integerCodec();
+                } else if (dynType.equals(String.class)) {
+                    codec =  (Codec<T, E>)stringCodec();
+                } else {
+                    if (Map.class.isAssignableFrom(dynType)) {
+                        final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(dynType, Map.class);
+                        final Class<?> keyType = typeArgs.get(0);
+                        final Class<?> valueType = typeArgs.get(1);
+                        codec =  (Codec<T, E>)mapCodec(keyType, valueType);
+                    } else {
+                        final String name = classToName(dynType);
+                        codec =  (Codec<T, E>) codecs.computeIfAbsent(name, n -> createObjectCodec(dynType));
+                    }
                 }
             }
+            return nullSafeCodec(codec);
         }
     }
 
@@ -123,10 +133,6 @@ public abstract class CodecCore<E> {
     protected abstract <T> Codec<T, E> createObjectCodec(
             Class<T> type,
             Map<String, FieldCodec<E>> fieldCodecs);
-
-    protected abstract <T> Codec<T, E> dynamicCodec(Class<T> stcType);
-
-    protected abstract <T> Codec<T, E> dynamicCodec(Codec<T, E> codec, Class<T> stcType);
 
     protected String getFieldName(Field field, int depth, Set<String> existingNames) {
         String name = field.getName();
@@ -153,41 +159,41 @@ public abstract class CodecCore<E> {
             } else {
                 if (elemType.equals(Boolean.class)) {
                     final Codec<Boolean[], E> codec = objectArrayCodec(Boolean.class, booleanCodec());
-                    return new FieldCodec.ObjectFieldCodec<Boolean[], E>(field, codec);
+                    return new FieldCodec.ObjectFieldCodec<Boolean[], E>(field, nullSafeCodec(codec));
                 } else if (elemType.equals(Boolean.class)) {
                     final Codec<Integer[], E> codec = objectArrayCodec(Integer.class, integerCodec());
-                    return new FieldCodec.ObjectFieldCodec<Integer[], E>(field, codec);
+                    return new FieldCodec.ObjectFieldCodec<Integer[], E>(field, nullSafeCodec(codec));
                 } else {
                     final Codec<Object, E> elemCodec = dynamicCodec((Class<Object>)elemType);
                     final Codec<Object[], E> codec = objectArrayCodec((Class<Object>)elemType, elemCodec);
-                    return new FieldCodec.ObjectArrayFieldCodec<Object, E>(field, codec);
+                    return new FieldCodec.ObjectArrayFieldCodec<Object, E>(field, nullSafeCodec(codec));
                 }
             }
         } else if (stcType.isEnum()) {
             final Codec<Object, E> codec = enumCodec((Class)stcType);
-            return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
+            return new FieldCodec.ObjectFieldCodec<Object, E>(field, nullSafeCodec(codec));
         } else {
             if (stcType.equals(Boolean.class)) {
-                return new FieldCodec.ObjectFieldCodec<Boolean, E>(field, booleanCodec());
+                return new FieldCodec.ObjectFieldCodec<Boolean, E>(field, nullSafeCodec(booleanCodec()));
             } else if (stcType.equals(Integer.class)) {
-                return new FieldCodec.ObjectFieldCodec<Integer, E>(field, integerCodec());
+                return new FieldCodec.ObjectFieldCodec<Integer, E>(field, nullSafeCodec(integerCodec()));
             } else if (stcType.equals(String.class)) {
-                return new FieldCodec.ObjectFieldCodec<String, E>(field, stringCodec());
+                return new FieldCodec.ObjectFieldCodec<String, E>(field, nullSafeCodec(stringCodec()));
             } else {
                 if (Map.class.isAssignableFrom(stcType)) {
-                    final List<Class<?>> typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
-                    final Class keyType = typeArgs.size() == 2 ? typeArgs.get(0) : Object.class;
-                    final Class valType = typeArgs.size() == 2 ? typeArgs.get(1) : Object.class;
+                    final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
+                    final Class keyType = typeArgs.get(0);
+                    final Class valType = typeArgs.get(1);
                     final Codec<Map, E> mapCodec = mapCodec(keyType, valType);
                     if (Modifier.isFinal(stcType.getModifiers())) {
                         return new FieldCodec.ObjectFieldCodec<Object, E>(field, (Codec) mapCodec);
                     } else{
                         final Codec<Object, E> dynCodec = dynamicCodec((Codec) mapCodec, stcType);
-                        return new FieldCodec.ObjectFieldCodec<Object, E>(field, dynCodec);
+                        return new FieldCodec.ObjectFieldCodec<Object, E>(field, nullSafeCodec(dynCodec));
                     }
                 } else {
                     final Codec<Object, E> codec = dynamicCodec((Class<Object>) stcType);
-                    return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
+                    return new FieldCodec.ObjectFieldCodec<Object, E>(field, nullSafeCodec(codec));
                 }
             }
         }

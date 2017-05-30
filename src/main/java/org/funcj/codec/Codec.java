@@ -14,6 +14,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public Boolean decode(Class<Boolean> dynType, E in) {
+            return decodePrim(in);
+        }
+
+        @Override
         public Boolean decode(E in) {
             return decodePrim(in);
         }
@@ -21,11 +26,6 @@ public interface Codec<T, E> {
         abstract E encodePrim(boolean val, E out);
 
         abstract boolean decodePrim(E in);
-    }
-
-    interface BooleanArrayCodec<E> extends Codec<boolean[], E> {
-        E encode(boolean[] vals, E out);
-        boolean[] decode(E in);
     }
 
     abstract class IntegerCodec<E> implements Codec<Integer, E> {
@@ -36,6 +36,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public Integer decode(Class<Integer> dynType, E in) {
+            return decodePrim(in);
+        }
+
+        @Override
         public Integer decode(E in) {
             return decodePrim(in);
         }
@@ -43,11 +48,6 @@ public interface Codec<T, E> {
         abstract E encodePrim(int val, E out);
 
         abstract int decodePrim(E in);
-    }
-
-    interface IntegerArrayCodec<E> extends Codec<int[], E> {
-        E encode(int[] vals, E out);
-        int[] decode(E in);
     }
 
     E encode(T val, E out);

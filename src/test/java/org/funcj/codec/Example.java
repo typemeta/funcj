@@ -316,20 +316,20 @@ public abstract class Example {
         }
     }
 
-    static class Simple2 {
+    static class Simple2<T> {
         static Simple2 create() {
-            final Map<String, String> m = new TreeMap<>();
+            final HashMap<String, Object> m = new HashMap<>();
             m.put("abc", "123");
             return new Simple2(m);
         }
 
-        final Object value;
+        final Map<String, T> value;
 
         Simple2() {
             value = null;
         }
 
-        Simple2(Object value) {
+        Simple2(HashMap<String, T> value) {
             this.value = value;
         }
 
@@ -346,6 +346,22 @@ public abstract class Example {
             return "Simple2{" +
                     "value=" + value +
                     '}';
+        }
+    }
+
+    static class Derived2 extends Simple2<Integer> {
+        static Derived2 create() {
+            final HashMap<String, Integer> m = new HashMap<>();
+            m.put("abc", 123);
+            return new Derived2(m);
+        }
+
+        public Derived2() {
+
+        }
+
+        public Derived2(HashMap<String, Integer> value) {
+            super(value);
         }
     }
 }

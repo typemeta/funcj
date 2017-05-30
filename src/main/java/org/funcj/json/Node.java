@@ -274,6 +274,23 @@ public interface Node {
         }
 
         @Override
+        public boolean equals(Object rhs) {
+            if (this == rhs) {
+                return true;
+            }
+            if (rhs == null || getClass() != rhs.getClass()) {
+                return false;
+            }
+            final NumberNode that = (NumberNode) rhs;
+            return Double.compare(that.value, value) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
+        }
+
+        @Override
         public <T> T match(
                 F<NullNode, T> nln,
                 F<BoolNode, T> bn,
@@ -365,6 +382,23 @@ public interface Node {
         @Override
         public StringBuilder toString(StringBuilder sb) {
             return Utils.format(value, sb);
+        }
+
+        @Override
+        public boolean equals(Object rhs) {
+            if (this == rhs) {
+                return true;
+            }
+            if (rhs == null || getClass() != rhs.getClass()) {
+                return false;
+            }
+            final StringNode that = (StringNode) rhs;
+            return value.equals(that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return value.hashCode();
         }
 
         @Override
@@ -477,6 +511,23 @@ public interface Node {
         }
 
         @Override
+        public boolean equals(Object rhs) {
+            if (this == rhs) {
+                return true;
+            }
+            if (rhs == null || getClass() != rhs.getClass()) {
+                return false;
+            }
+            final ArrayNode that = (ArrayNode) rhs;
+            return values.equals(that.values);
+        }
+
+        @Override
+        public int hashCode() {
+            return values.hashCode();
+        }
+
+        @Override
         public <T> T match(
                 F<NullNode, T> nln,
                 F<BoolNode, T> bn,
@@ -584,6 +635,23 @@ public interface Node {
                 en.getValue().toString(sb);
             }
             return sb.append('}');
+        }
+
+        @Override
+        public boolean equals(Object rhs) {
+            if (this == rhs) {
+                return true;
+            }
+            if (rhs == null || getClass() != rhs.getClass()) {
+                return false;
+            }
+            final ObjectNode that = (ObjectNode) rhs;
+            return fields.equals(that.fields);
+        }
+
+        @Override
+        public int hashCode() {
+            return fields.hashCode();
         }
 
         @Override

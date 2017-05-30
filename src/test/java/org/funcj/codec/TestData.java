@@ -10,8 +10,9 @@ public class TestData {
         final Object obj;
         final T[] valArr;
         final Object[] objArr;
-        final Map<String, T> mapVal;
-        final Map<String, Object> mapObj;
+        final Map<String, T> mapStrVal;
+        final Map<String, Object> mapStrObj;
+        final HashMap<String, Object> hashMapStrObj;
         final Object objMap;
 
         Base() {
@@ -19,25 +20,27 @@ public class TestData {
             this.obj = null;
             this.valArr = null;
             this.objArr = null;
-            this.mapVal = null;
-            this.mapObj = null;
+            this.mapStrVal = null;
+            this.mapStrObj = null;
+            this.hashMapStrObj = null;
             this.objMap = null;
         }
 
-        Base(
-                T val,
+        Base(   T val,
                 Object obj,
                 T[] valArr,
                 Object[] objArr,
-                Map<String, T> mapVal,
-                Map<String, Object> mapObj,
+                Map<String, T> mapStrVal,
+                Map<String, Object> mapStrObj,
+                HashMap<String, Object> hashMapStrObj,
                 Map<String, Object> objMap) {
             this.val = val;
             this.obj = obj;
             this.valArr = valArr;
             this.objArr = objArr;
-            this.mapVal = mapVal;
-            this.mapObj = mapObj;
+            this.mapStrVal = mapStrVal;
+            this.mapStrObj = mapStrObj;
+            this.hashMapStrObj = hashMapStrObj;
             this.objMap = objMap;
         }
 
@@ -50,14 +53,10 @@ public class TestData {
                     Objects.equals(obj, base.obj) &&
                     Arrays.equals(valArr, base.valArr) &&
                     Arrays.equals(objArr, base.objArr) &&
-                    Objects.equals(mapVal, base.mapVal) &&
-                    Objects.equals(mapObj, base.mapObj) &&
+                    Objects.equals(mapStrVal, base.mapStrVal) &&
+                    Objects.equals(mapStrObj, base.mapStrObj) &&
+                    Objects.equals(hashMapStrObj, base.hashMapStrObj) &&
                     Objects.equals(objMap, base.objMap);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(val, obj, valArr, objArr, mapVal, mapObj, objMap);
         }
 
         @Override
@@ -67,22 +66,23 @@ public class TestData {
                     ", obj=" + obj +
                     ", valArr=" + Arrays.toString(valArr) +
                     ", objArr=" + Arrays.toString(objArr) +
-                    ", mapVal=" + mapVal +
-                    ", mapObj=" + mapObj +
+                    ", mapStrVal=" + mapStrVal +
+                    ", mapStrObj=" + mapStrObj +
+                    ", hashMapStrObj=" + hashMapStrObj +
                     ", objMap=" + objMap +
                     '}';
         }
     }
 
-    private static <K, V> Map<K, V> mapH(K k0, V v0, K k1, V v1) {
-        final Map<K, V> m = new HashMap<>();
+    private static <K, V> HashMap<K, V> mapH(K k0, V v0, K k1, V v1) {
+        final HashMap<K, V> m = new HashMap<>();
         m.put(k0, v0);
         m.put(k1, v1);
         return m;
     }
 
-    private static <K, V> Map<K, V> mapT(K k0, V v0, K k1, V v1) {
-        final Map<K, V> m = new TreeMap<>();
+    private static <K, V> TreeMap<K, V> mapT(K k0, V v0, K k1, V v1) {
+        final TreeMap<K, V> m = new TreeMap<>();
         m.put(k0, v0);
         m.put(k1, v1);
         return m;
@@ -92,10 +92,12 @@ public class TestData {
 
         final boolean val;
         final boolean[] valArr;
+        final Map<String, Boolean> mapStrBool;
 
         BoolData() {
             this.val = false;
             this.valArr = new boolean[]{};
+            this.mapStrBool = null;
         }
 
         BoolData(Init init) {
@@ -106,10 +108,12 @@ public class TestData {
                     new Boolean[]{false},
                     mapT("a", false, "b", true),
                     mapH("c", true, "d", false),
+                    mapH("c", true, "d", false),
                     mapT("e", true, "f", true)
             );
             this.val = true;
             this.valArr = new boolean[]{true, false};
+            this.mapStrBool = mapT("f", false, "g", true);
         }
 
         @Override

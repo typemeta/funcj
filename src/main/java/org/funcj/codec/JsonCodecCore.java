@@ -22,6 +22,38 @@ public class JsonCodecCore extends CodecCore<Node> {
         return "@value";
     }
 
+    @Override
+    protected <T> Codec<T, Node> nullSafeCodec(Codec<T, Node> codec) {
+        return new Codec<T, Node>() {
+            @Override
+            public Node encode(T val, Node out) {
+                if (val == null) {
+                    return JsonCodecCore.this.nullCodec().encode(null, out);
+                } else {
+                    return codec.encode(val, out);
+                }
+            }
+
+            @Override
+            public T decode(Class<T> dynType, Node in) {
+                if (in.isNull()) {
+                    return (T)JsonCodecCore.this.nullCodec().decode(in);
+                } else {
+                    return codec.decode(dynType, in);
+                }
+            }
+
+            @Override
+            public T decode(Node in) {
+                if (in.isNull()) {
+                    return (T)JsonCodecCore.this.nullCodec().decode(in);
+                } else {
+                    return codec.decode(in);
+                }
+            }
+        };
+    }
+
     private final Codec.NullCodec<Node> nullCodec = new Codec.NullCodec<Node>() {
         @Override
         public boolean isNull(Node in) {
@@ -63,7 +95,7 @@ public class JsonCodecCore extends CodecCore<Node> {
         return booleanCodec;
     }
 
-    private final Codec.BooleanArrayCodec<Node> booleanArrayCodec = new Codec.BooleanArrayCodec<Node>() {
+    private final Codec<boolean[], Node> booleanArrayCodec = new Codec<boolean[], Node>() {
 
         @Override
         public Node encode(boolean[] vals, Node out) {
@@ -87,7 +119,7 @@ public class JsonCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.BooleanArrayCodec<Node> booleanArrayCodec() {
+    protected Codec<boolean[], Node> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
@@ -126,7 +158,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             final int[] vals = new int[arrNode.values.size()];
             int i = 0;
             for (Node node : arrNode.values) {
-                vals[i++] = integerCodec.decode(node);
+                vals[i++] = integerCodec.decode(int.class, node);
             }
             return vals;
         }
@@ -140,20 +172,12 @@ public class JsonCodecCore extends CodecCore<Node> {
     private final Codec<String, Node> stringCodec = new Codec<String, Node>() {
         @Override
         public Node encode(String val, Node out) {
-            if (val == null) {
-                return JsonCodecCore.this.nullCodec().encode(null, out);
-            } else {
-                return Node.string(val);
-            }
+            return Node.string(val);
         }
 
         @Override
         public String decode(Node in) {
-            if (in.isNull()) {
-                return (String)JsonCodecCore.this.nullCodec().decode(Object.class, in);
-            } else {
-                return in.asString().value;
-            }
+            return in.asString().value;
         }
     };
 
@@ -167,20 +191,12 @@ public class JsonCodecCore extends CodecCore<Node> {
         return new Codec<EM, Node>() {
             @Override
             public Node encode(EM val, Node out) {
-                if (val == null) {
-                    return JsonCodecCore.this.nullCodec().encode(null, out);
-                } else {
-                    return Node.string(val.name());
-                }
+                return Node.string(val.name());
             }
 
             @Override
             public EM decode(Class<EM> dynType, Node in) {
-                if (in.isNull()) {
-                    return (EM) JsonCodecCore.this.nullCodec().decode(in);
-                } else {
-                    return EM.valueOf(dynType, in.asString().value);
-                }
+                return EM.valueOf(dynType, in.asString().value);
             }
         };
     }
@@ -197,69 +213,6 @@ public class JsonCodecCore extends CodecCore<Node> {
             return new JsonMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
         }
     }
-//
-//    @Override
-//    protected <T> Codec<T, Node> dynamicCodec(Class<T> stcClass, Codec<T, Node> codec) {
-//        return new Codec<T, Node>() {
-//            @Override
-//            public Node encode(T val, Node out) {
-//                if (val == null) {
-//                    return JsonCodecCore.this.nullCodec().encode(null, out);
-//                } else {
-//                    final Class<? extends T> dynClass = (Class<? extends T>)val.getClass();
-//                    final Codec<T, Node> codec2;
-//                    if (codec == null) {
-//                        codec2 = JsonCodecCore.this.getCodec(stcClass, (Class) val.getClass());
-//                    } else {
-//                        codec2 = codec;
-//                    }
-//                    if (dynClass == stcClass) {
-//                        return codec2.encode(val, out);
-//                    } else {
-//                        final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
-//                        fields.put(typeFieldName(), Node.string(classToName(dynClass)));
-//                        fields.put(valueFieldName(), codec2.encode(val, out));
-//                        return Node.object(fields);
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public T decode(Node in) {
-//                if (in.isNull()) {
-//                    return (T)JsonCodecCore.this.nullCodec().decode(Object.class, in);
-//                } else {
-//                    Class<T> dynClass = stcClass;
-//                    Codec<T, Node> codec2 = codec;
-//
-//                    if (in.isObject()) {
-//                        final Node.ObjectNode objNode = in.asObject();
-//                        if (objNode.fields.size() == 2) {
-//                            final Node typeNode = objNode.fields.get(typeFieldName());
-//                            if (typeNode != null) {
-//                                dynClass = nameToClass(typeNode.asString().value);
-//                            }
-//
-//                            if (codec2 == null) {
-//                                codec2 = JsonCodecCore.this.getCodec(stcClass, dynClass);
-//                            }
-//
-//                            final Node valueNode = objNode.fields.get(valueFieldName());
-//                            if (valueNode != null) {
-//                                return codec2.decode(dynClass, valueNode);
-//                            }
-//                        }
-//                    }
-//
-//                    if (codec2 == null) {
-//                        codec2 = JsonCodecCore.this.getCodec(stcClass, dynClass);
-//                    }
-//
-//                    return codec2.decode(dynClass, in);
-//                }
-//            }
-//        };
-//    }
 
     @Override
     protected <T> Codec<T[], Node> objectArrayCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
@@ -287,6 +240,87 @@ public class JsonCodecCore extends CodecCore<Node> {
     }
 
     @Override
+    protected <T> Codec<T, Node> dynamicCodec(Class<T> stcType) {
+        return new Codec<T, Node>() {
+            @Override
+            public Node encode(T val, Node out) {
+                final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
+                if (dynType.equals(stcType)) {
+                    return JsonCodecCore.this.getCodec(stcType).encode(val, out);
+                } else {
+                    final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
+                    fields.put(typeFieldName(), Node.string(classToName(dynType)));
+                    fields.put(valueFieldName(), encode2(JsonCodecCore.this. getCodec(dynType), val, out));
+                    return Node.object(fields);
+                }
+            }
+
+            protected <S extends T> Node encode2(Codec<S, Node> codec, T val, Node out) {
+                return codec.encode((S)val, out);
+            }
+
+            @Override
+            public T decode(Node in) {
+                if (in.isObject()) {
+                    final Node.ObjectNode objNode = in.asObject();
+                    final String typeFieldName = typeFieldName();
+                    final String valueFieldName = valueFieldName();
+                    if (objNode.fields.size() == 2 &&
+                            objNode.fields.containsKey(typeFieldName) &&
+                            objNode.fields.containsKey(valueFieldName)) {
+                        final Node typeNode = objNode.fields.get(typeFieldName());
+                        final Node valueNode = objNode.fields.get(valueFieldName());
+                        return decode2(valueNode, nameToClass(typeNode.asString().value));
+                    }
+                }
+
+                final Codec<T, Node> codec = JsonCodecCore.this.getCodec(stcType);
+                return codec.decode(stcType, in);
+            }
+
+            protected <S extends T> S decode2(Node in, Class<S> dynType) {
+                final Codec<S, Node> codec = JsonCodecCore.this.getCodec(dynType);
+                return codec.decode(dynType, in);
+            }
+        };
+    }
+
+    @Override
+    protected <T> Codec<T, Node> dynamicCodec(Codec<T, Node> codec, Class<T> stcType) {
+        return new Codec<T, Node>() {
+            @Override
+            public Node encode(T val, Node out) {
+                final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
+                if (dynType.equals(stcType)) {
+                    return codec.encode(val, out);
+                } else {
+                    final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
+                    fields.put(typeFieldName(), Node.string(classToName(dynType)));
+                    fields.put(valueFieldName(), codec.encode(val, out));
+                    return Node.object(fields);
+                }
+            }
+
+            @Override
+            public T decode(Node in) {
+                final Node.ObjectNode objNode = in.asObject();
+                final String typeFieldName = typeFieldName();
+                final String valueFieldName = valueFieldName();
+                if (objNode.fields.size() == 2 &&
+                        objNode.fields.containsKey(typeFieldName) &&
+                        objNode.fields.containsKey(valueFieldName)) {
+                    final Node typeNode = objNode.fields.get(typeFieldName());
+                    final Class<?> dynType = nameToClass(typeNode.asString().value);
+                    final Node valueNode = objNode.fields.get(valueFieldName());
+                    return codec.decode((Class<T>)dynType, valueNode);
+                } else {
+                    return codec.decode(stcType, in);
+                }
+            }
+        };
+    }
+
+    @Override
     protected <T> Codec<T, Node> createObjectCodec(
             Class<T> type,
             Map<String, FieldCodec<Node>> fieldCodecs) {
@@ -306,103 +340,6 @@ public class JsonCodecCore extends CodecCore<Node> {
                     codec.decode(val, objNode.fields.get(name));
                 });
                 return val;
-            }
-        };
-    }
-
-    @Override
-    protected <T> Codec<T, Node> dynamicCodec(Class<T> stcType) {
-        return new Codec<T, Node>() {
-            @Override
-            public Node encode(T val, Node out) {
-                if (val == null) {
-                    return JsonCodecCore.this.nullCodec().encode(null, out);
-                } else {
-                    final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
-                    if (dynType.equals(stcType)) {
-                        return JsonCodecCore.this.getCodec(stcType).encode(val, out);
-                    } else {
-                        final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
-                        fields.put(typeFieldName(), Node.string(classToName(dynType)));
-                        fields.put(valueFieldName(), encode(JsonCodecCore.this. getCodec(dynType), val, out));
-                        return Node.object(fields);
-                    }
-                }
-            }
-
-            protected <S extends T> Node encode(Codec<S, Node> codec, T val, Node out) {
-                return codec.encode((S)val, out);
-            }
-
-            @Override
-            public T decode(Node in) {
-                if (in.isNull()) {
-                    return (T) JsonCodecCore.this.nullCodec().decode(Object.class, in);
-                } else {
-                    if (in.isObject()) {
-                        final Node.ObjectNode objNode = in.asObject();
-                        final String typeFieldName = typeFieldName();
-                        final String valueFieldName = valueFieldName();
-                        if (objNode.fields.size() == 2 &&
-                                objNode.fields.containsKey(typeFieldName) &&
-                                objNode.fields.containsKey(valueFieldName)) {
-                            final Node typeNode = objNode.fields.get(typeFieldName());
-                            final Node valueNode = objNode.fields.get(valueFieldName());
-                            return decode(valueNode, nameToClass(typeNode.asString().value));
-                        }
-                    }
-
-                    final Codec<T, Node> codec = JsonCodecCore.this.getCodec(stcType);
-                    return codec.decode(stcType, in);
-                }
-            }
-
-            protected <S extends T> S decode(Node in, Class<S> dynType) {
-                final Codec<S, Node> codec = JsonCodecCore.this.getCodec(dynType);
-                return codec.decode(dynType, in);
-            }
-        };
-    }
-
-    @Override
-    protected <T> Codec<T, Node> dynamicCodec(Codec<T, Node> codec, Class<T> stcType) {
-        return new Codec<T, Node>() {
-            @Override
-            public Node encode(T val, Node out) {
-                if (val == null) {
-                    return JsonCodecCore.this.nullCodec().encode(null, out);
-                } else {
-                    final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
-                    if (dynType.equals(stcType)) {
-                        return codec.encode(val, out);
-                    } else {
-                        final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
-                        fields.put(typeFieldName(), Node.string(classToName(dynType)));
-                        fields.put(valueFieldName(), codec.encode(val, out));
-                        return Node.object(fields);
-                    }
-                }
-            }
-
-            @Override
-            public T decode(Node in) {
-                if (in.isNull()) {
-                    return (T) JsonCodecCore.this.nullCodec().decode(Object.class, in);
-                } else {
-                    final Node.ObjectNode objNode = in.asObject();
-                    final String typeFieldName = typeFieldName();
-                    final String valueFieldName = valueFieldName();
-                    if (objNode.fields.size() == 2 &&
-                            objNode.fields.containsKey(typeFieldName) &&
-                            objNode.fields.containsKey(valueFieldName)) {
-                        final Node typeNode = objNode.fields.get(typeFieldName());
-                        final Class<?> dynType = nameToClass(typeNode.asString().value);
-                        final Node valueNode = objNode.fields.get(valueFieldName());
-                        return codec.decode((Class<T>)dynType, valueNode);
-                    } else {
-                        return codec.decode(stcType, in);
-                    }
-                }
             }
         };
     }

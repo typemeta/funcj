@@ -10,6 +10,11 @@ public class JsonCodecTest {
     final static JsonCodecCore codec = new JsonCodecCore();
 
     @Test
+    public void testBooleanNulls() {
+        roundTrip(new BoolData(), BoolData.class);
+    }
+
+    @Test
     public void testBoolean() {
         roundTrip(new BoolData(Init.INIT), BoolData.class);
     }
