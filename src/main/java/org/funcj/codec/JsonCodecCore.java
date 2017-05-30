@@ -3,7 +3,7 @@ package org.funcj.codec;
 import org.funcj.control.Exceptions;
 import org.funcj.json.Node;
 
-import java.lang.reflect.Array;
+import java.lang.reflect.*;
 import java.util.*;
 
 import static org.funcj.control.Exceptions.TODO;
@@ -20,38 +20,6 @@ public class JsonCodecCore extends CodecCore<Node> {
 
     protected String valueFieldName() {
         return "@value";
-    }
-
-    @Override
-    protected <T> Codec<T, Node> nullSafeCodec(Codec<T, Node> codec) {
-        return new Codec<T, Node>() {
-            @Override
-            public Node encode(T val, Node out) {
-                if (val == null) {
-                    return JsonCodecCore.this.nullCodec().encode(null, out);
-                } else {
-                    return codec.encode(val, out);
-                }
-            }
-
-            @Override
-            public T decode(Class<T> dynType, Node in) {
-                if (in.isNull()) {
-                    return (T)JsonCodecCore.this.nullCodec().decode(in);
-                } else {
-                    return codec.decode(dynType, in);
-                }
-            }
-
-            @Override
-            public T decode(Node in) {
-                if (in.isNull()) {
-                    return (T)JsonCodecCore.this.nullCodec().decode(in);
-                } else {
-                    return codec.decode(in);
-                }
-            }
-        };
     }
 
     private final Codec.NullCodec<Node> nullCodec = new Codec.NullCodec<Node>() {
@@ -245,7 +213,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             @Override
             public Node encode(T val, Node out) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
-                if (dynType.equals(stcType)) {
+                if (dynType.equals(stcType) || Modifier.isFinal(stcType.getModifiers())) {
                     return JsonCodecCore.this.getCodec(stcType).encode(val, out);
                 } else {
                     final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();

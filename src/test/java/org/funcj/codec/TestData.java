@@ -88,19 +88,21 @@ public class TestData {
         return m;
     }
 
-    static class BoolData extends Base<Boolean> {
+    static class BooleanData extends Base<Boolean> {
 
         final boolean val;
         final boolean[] valArr;
-        final Map<String, Boolean> mapStrBool;
+        final boolean[][] valArrArr;
+        final Map<String, Boolean> mapStrVal;
 
-        BoolData() {
+        BooleanData() {
             this.val = false;
-            this.valArr = new boolean[]{};
-            this.mapStrBool = null;
+            this.valArr = null;
+            this.valArrArr = null;
+            this.mapStrVal = null;
         }
 
-        BoolData(Init init) {
+        BooleanData(Init init) {
             super(
                     true,
                     false,
@@ -113,19 +115,20 @@ public class TestData {
             );
             this.val = true;
             this.valArr = new boolean[]{true, false};
-            this.mapStrBool = mapT("f", false, "g", true);
+            this.valArrArr = new boolean[][]{{true, false}, {false, true}};
+            this.mapStrVal = mapT("f", false, "g", true);
         }
 
         @Override
-        public boolean equals(Object rhs) {
-            if (this == rhs) return true;
-            if (rhs == null || getClass() != rhs.getClass()) return false;
-            if (!super.equals(rhs)) return false;
-            BoolData boolData = (BoolData) rhs;
-            if (val != boolData.val &&
-                    !Arrays.equals(valArr, boolData.valArr))
-                return false;
-            return super.equals(boolData);
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            BooleanData rhs = (BooleanData) obj;
+            if (val != rhs.val) return false;
+            if (!Arrays.equals(valArr, rhs.valArr)) return false;
+            if (!Arrays.deepEquals(valArrArr, rhs.valArrArr)) return false;
+            if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
+            return super.equals(rhs);
         }
 
         @Override
@@ -138,6 +141,68 @@ public class TestData {
             return "BoolData{" +
                     "val=" + val +
                     ", valArr=" + Arrays.toString(valArr) +
+                    ", valArrArr=" + Arrays.deepToString(valArrArr) +
+                    ", mapStrVal=" + mapStrVal +
+                    "} " + super.toString();
+        }
+    }
+
+
+    static class IntegerData extends Base<Integer> {
+
+        final int val;
+        final int[] valArr;
+        final int[][] valArrArr;
+        final Map<String, Integer> mapStrVal;
+
+        IntegerData() {
+            this.val = 0;
+            this.valArr = null;
+            this.valArrArr = null;
+            this.mapStrVal = null;
+        }
+
+        IntegerData(Init init) {
+            super(
+                    10,
+                    -1000,
+                    new Integer[]{10, 20},
+                    new Integer[]{123456},
+                    mapT("a", 1, "b", 2),
+                    mapH("c", 3, "d", 4),
+                    mapH("c", -1, "d", -2),
+                    mapT("e", -200, "f", -300)
+            );
+            this.val = -999;
+            this.valArr = new int[]{1234, 5678};
+            this.valArrArr = new int[][]{{12, 34}, {56, 78}};
+            this.mapStrVal = mapT("f", 321, "g", 654);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            IntegerData rhs = (IntegerData) obj;
+            if (val != rhs.val) return false;
+            if (!Arrays.equals(valArr, rhs.valArr)) return false;
+            if (!Arrays.deepEquals(valArrArr, rhs.valArrArr)) return false;
+            if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
+            return super.equals(rhs);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), val, valArr);
+        }
+
+        @Override
+        public String toString() {
+            return "IntegerData{" +
+                    "val=" + val +
+                    ", valArr=" + Arrays.toString(valArr) +
+                    ", valArrArr=" + Arrays.deepToString(valArrArr) +
+                    ", mapStrVal=" + mapStrVal +
                     "} " + super.toString();
         }
     }

@@ -11,12 +11,22 @@ public class JsonCodecTest {
 
     @Test
     public void testBooleanNulls() {
-        roundTrip(new BoolData(), BoolData.class);
+        roundTrip(new BooleanData(), BooleanData.class);
     }
 
     @Test
     public void testBoolean() {
-        roundTrip(new BoolData(Init.INIT), BoolData.class);
+        roundTrip(new BooleanData(Init.INIT), BooleanData.class);
+    }
+
+    @Test
+    public void testIntegerNulls() {
+        roundTrip(new IntegerData(), IntegerData.class);
+    }
+
+    @Test
+    public void testInteger() {
+        roundTrip(new IntegerData(Init.INIT), IntegerData.class);
     }
 
     private <T> void roundTrip(T val, Class<T> clazz) {

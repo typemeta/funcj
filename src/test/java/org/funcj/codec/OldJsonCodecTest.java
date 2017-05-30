@@ -12,17 +12,13 @@ import static java.util.stream.Collectors.toList;
 public class OldJsonCodecTest {
     final static JsonCodecCore codec = new JsonCodecCore();
 
-    static {
-        codec.initialise();
-    }
-
     @Test
     public void roundTrip() {
         final Example.Derived val = Example.Derived.create();
         final Node node = codec.encode(Example.Derived.class, val, null);
         out.println(node.toJson(40));
 
-        final Example.Derived val2 = (Example.Derived)codec.decode(Example.Derived.class, node);
+        final Example.Derived val2 = codec.decode(Example.Derived.class, node);
 
         Assert.assertEquals(val, val2);
     }
@@ -48,83 +44,81 @@ public class OldJsonCodecTest {
 
         Assert.assertEquals(val, val2);
     }
-
-    static abstract class MapImpl implements Map<String, Double> {
-
-    }
-
-    static abstract class GenMapImpl<K, V> implements Map<K, V> {
-        Map<String, Double> d;
-    }
-
-    @Test
-    public void stuff() throws NoSuchFieldException {
-
-        //dump(MapImpl.class);
-        getTypeParams(HashMap.class, Map.class).forEach(out::println);
-        getTypeParams(MapImpl.class, Map.class).forEach(out::println);
-        getTypeParams(GenMapImpl.class.getDeclaredField("d"), Map.class).forEach(out::println);
-        //getTypes(, Map.class);//.forEach(out::println);
-        //dump(HashMap.class);
-    }
-
-    static List<Class<?>> getTypeParams(Field field, Class iface) {
-        out.println("Field: " + field);
-        Type type = field.getGenericType();
-        if (type instanceof ParameterizedType) {
-            final ParameterizedType pt =(ParameterizedType)type;
-            final Type rawType = pt.getRawType();
-            if (rawType.equals(iface)) {
-                return getGenTypeParams(pt);
-            }
-        }
-        return Collections.emptyList();
-    }
-
-    static List<Class<?>> getTypeParams(Class implClass, Class iface) {
-        out.println("Class: " + implClass);
-        final List<ParameterizedType> genIfaces =
-                Arrays.stream(implClass.getGenericInterfaces())
-                        .filter(t -> t instanceof ParameterizedType)
-                        .map(t -> (ParameterizedType) t)
-                        .collect(toList());
-        return genIfaces.stream()
-                .filter(pt -> pt.getRawType().equals(iface))
-                .findFirst()
-                .map(pt -> getGenTypeParams(pt))
-                .orElseThrow(() -> new RuntimeException(""));
-    }
-
-    static List<Class<?>> getGenTypeParams(ParameterizedType type) {
-        return Arrays.stream(type.getActualTypeArguments())
-                .filter(t -> t instanceof Class)
-                .map(t -> (Class<?>)t)
-                .collect(toList());
-    }
-
-    static void dump(Class<?> clazz) {
-        out.println("******");
-        out.println(clazz.getName());
-
-        final Type[] types = clazz.getGenericInterfaces();
-        Arrays.stream(types).forEach(t -> out.println("class=" + t.getClass()));
-        Arrays.stream(types).forEach(out::println);
-        out.println();
-
-        final ParameterizedType pType = (ParameterizedType)types[0];
-        out.println("class=" + pType.getClass());
-        out.println(pType);
-        out.println();
-
-        final Type rawType = pType.getRawType();
-        out.println("class=" + rawType);
-        out.println(rawType.getTypeName());
-        out.println();
-
-        final Type[] typeVars = pType.getActualTypeArguments();
-        Arrays.stream(typeVars).forEach(t -> out.println(t.getClass()));
-        Arrays.stream(typeVars).forEach(out::println);
-        out.println();
-    }
-
+//
+//    static abstract class MapImpl implements Map<String, Double> {
+//
+//    }
+//
+//    static abstract class GenMapImpl<K, V> implements Map<K, V> {
+//        Map<String, Double> d;
+//    }
+//
+//    public void stuff() throws NoSuchFieldException {
+//
+//        //dump(MapImpl.class);
+//        getTypeParams(HashMap.class, Map.class).forEach(out::println);
+//        getTypeParams(MapImpl.class, Map.class).forEach(out::println);
+//        getTypeParams(GenMapImpl.class.getDeclaredField("d"), Map.class).forEach(out::println);
+//        //getTypes(, Map.class);//.forEach(out::println);
+//        //dump(HashMap.class);
+//    }
+//
+//    static List<Class<?>> getTypeParams(Field field, Class iface) {
+//        out.println("Field: " + field);
+//        Type type = field.getGenericType();
+//        if (type instanceof ParameterizedType) {
+//            final ParameterizedType pt =(ParameterizedType)type;
+//            final Type rawType = pt.getRawType();
+//            if (rawType.equals(iface)) {
+//                return getGenTypeParams(pt);
+//            }
+//        }
+//        return Collections.emptyList();
+//    }
+//
+//    static List<Class<?>> getTypeParams(Class implClass, Class iface) {
+//        out.println("Class: " + implClass);
+//        final List<ParameterizedType> genIfaces =
+//                Arrays.stream(implClass.getGenericInterfaces())
+//                        .filter(t -> t instanceof ParameterizedType)
+//                        .map(t -> (ParameterizedType) t)
+//                        .collect(toList());
+//        return genIfaces.stream()
+//                .filter(pt -> pt.getRawType().equals(iface))
+//                .findFirst()
+//                .map(pt -> getGenTypeParams(pt))
+//                .orElseThrow(() -> new RuntimeException(""));
+//    }
+//
+//    static List<Class<?>> getGenTypeParams(ParameterizedType type) {
+//        return Arrays.stream(type.getActualTypeArguments())
+//                .filter(t -> t instanceof Class)
+//                .map(t -> (Class<?>)t)
+//                .collect(toList());
+//    }
+//
+//    static void dump(Class<?> clazz) {
+//        out.println("******");
+//        out.println(clazz.getName());
+//
+//        final Type[] types = clazz.getGenericInterfaces();
+//        Arrays.stream(types).forEach(t -> out.println("class=" + t.getClass()));
+//        Arrays.stream(types).forEach(out::println);
+//        out.println();
+//
+//        final ParameterizedType pType = (ParameterizedType)types[0];
+//        out.println("class=" + pType.getClass());
+//        out.println(pType);
+//        out.println();
+//
+//        final Type rawType = pType.getRawType();
+//        out.println("class=" + rawType);
+//        out.println(rawType.getTypeName());
+//        out.println();
+//
+//        final Type[] typeVars = pType.getActualTypeArguments();
+//        Arrays.stream(typeVars).forEach(t -> out.println(t.getClass()));
+//        Arrays.stream(typeVars).forEach(out::println);
+//        out.println();
+//    }
 }
