@@ -23,9 +23,9 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        abstract E encodePrim(boolean val, E out);
+        public abstract E encodePrim(boolean val, E out);
 
-        abstract boolean decodePrim(E in);
+        public abstract boolean decodePrim(E in);
     }
 
     abstract class IntegerCodec<E> implements Codec<Integer, E> {
@@ -45,9 +45,9 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        abstract E encodePrim(int val, E out);
+        public abstract E encodePrim(int val, E out);
 
-        abstract int decodePrim(E in);
+        public abstract int decodePrim(E in);
     }
 
     E encode(T val, E out);
@@ -57,6 +57,7 @@ public interface Codec<T, E> {
     }
 
     default T decode(E in) {
-        throw new IllegalStateException();
+        throw new CodecException("Operation not implemented");
     }
+
 }

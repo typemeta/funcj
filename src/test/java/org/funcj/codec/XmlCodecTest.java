@@ -1,14 +1,15 @@
 package org.funcj.codec;
 
 import org.funcj.codec.TestData.*;
-import org.funcj.codec.json.JsonCodecCore;
-import org.funcj.json.Node;
+import org.funcj.codec.xml.XmlCodecCore;
 import org.junit.*;
+import org.w3c.dom.Node;
 
 import static java.lang.System.out;
+import static org.funcj.codec.xml.XmlUtils.nodeToString;
 
-public class JsonCodecTest {
-    final static JsonCodecCore codec = new JsonCodecCore();
+public class XmlCodecTest {
+    final static XmlCodecCore codec = new XmlCodecCore();
 
     @Test
     public void testBooleanNulls() {
@@ -31,8 +32,9 @@ public class JsonCodecTest {
     }
 
     private <T> void roundTrip(T val, Class<T> clazz) {
+        codec.setNewDocument();
         final Node node = codec.encode(clazz, val);
-        out.println(node.toJson(40));
+        out.println(nodeToString(codec.doc, true));
 
         final T val2 = codec.decode(clazz, node);
 

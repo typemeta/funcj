@@ -88,21 +88,21 @@ public class TestData {
         return m;
     }
 
-    static class BooleanData extends Base<Boolean> {
+    public static class BooleanData extends Base<Boolean> {
 
         final boolean val;
         final boolean[] valArr;
         final boolean[][] valArrArr;
         final Map<String, Boolean> mapStrVal;
 
-        BooleanData() {
+        public BooleanData() {
             this.val = false;
             this.valArr = null;
             this.valArrArr = null;
             this.mapStrVal = null;
         }
 
-        BooleanData(Init init) {
+        public BooleanData(Init init) {
             super(
                     true,
                     false,
@@ -148,21 +148,21 @@ public class TestData {
     }
 
 
-    static class IntegerData extends Base<Integer> {
+    public static class IntegerData extends Base<Integer> {
 
         final int val;
         final int[] valArr;
         final int[][] valArrArr;
         final Map<String, Integer> mapStrVal;
 
-        IntegerData() {
+        public IntegerData() {
             this.val = 0;
             this.valArr = null;
             this.valArrArr = null;
             this.mapStrVal = null;
         }
 
-        IntegerData(Init init) {
+        public IntegerData(Init init) {
             super(
                     10,
                     -1000,

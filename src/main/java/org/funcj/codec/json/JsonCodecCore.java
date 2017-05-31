@@ -1,12 +1,11 @@
-package org.funcj.codec;
+package org.funcj.codec.json;
 
+import org.funcj.codec.*;
 import org.funcj.control.Exceptions;
 import org.funcj.json.Node;
 
 import java.lang.reflect.*;
 import java.util.*;
-
-import static org.funcj.control.Exceptions.TODO;
 
 public class JsonCodecCore extends CodecCore<Node> {
 
@@ -41,6 +40,11 @@ public class JsonCodecCore extends CodecCore<Node> {
     };
 
     @Override
+    public <T> Node encode(Class<T> type, T val) {
+        return super.encode(type, val, null);
+    }
+
+    @Override
     protected Codec.NullCodec<Node> nullCodec() {
         return nullCodec;
     }
@@ -48,7 +52,7 @@ public class JsonCodecCore extends CodecCore<Node> {
     private final Codec.BooleanCodec<Node> booleanCodec = new Codec.BooleanCodec<Node>() {
 
         @Override
-        Node encodePrim(boolean val, Node out) {
+        public Node encodePrim(boolean val, Node out) {
             return Node.bool(val);
         }
 
@@ -69,7 +73,7 @@ public class JsonCodecCore extends CodecCore<Node> {
         public Node encode(boolean[] vals, Node out) {
             final List<Node> nodes = new ArrayList<>(vals.length);
             for (boolean val : vals) {
-                nodes.add(booleanCodec.encode(val, out));
+                nodes.add(booleanCodec().encode(val, out));
             }
             return Node.array(nodes);
         }
@@ -80,7 +84,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             final boolean[] vals = new boolean[arrNode.values.size()];
             int i = 0;
             for (Node node : arrNode.values) {
-                vals[i++] = booleanCodec.decode(boolean.class, node);
+                vals[i++] = booleanCodec().decode(boolean.class, node);
             }
             return vals;
         }
@@ -94,7 +98,7 @@ public class JsonCodecCore extends CodecCore<Node> {
     private final Codec.IntegerCodec<Node> integerCodec = new Codec.IntegerCodec<Node>() {
 
         @Override
-        Node encodePrim(int val, Node out) {
+        public Node encodePrim(int val, Node out) {
             return Node.number(val);
         }
 
@@ -115,7 +119,7 @@ public class JsonCodecCore extends CodecCore<Node> {
         public Node encode(int[] vals, Node out) {
             final List<Node> nodes = new ArrayList<>(vals.length);
             for (int val : vals) {
-                nodes.add(integerCodec.encode(val, out));
+                nodes.add(integerCodec().encode(val, out));
             }
             return Node.array(nodes);
         }
@@ -126,7 +130,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             final int[] vals = new int[arrNode.values.size()];
             int i = 0;
             for (Node node : arrNode.values) {
-                vals[i++] = integerCodec.decode(int.class, node);
+                vals[i++] = integerCodec().decode(int.class, node);
             }
             return vals;
         }
@@ -196,11 +200,12 @@ public class JsonCodecCore extends CodecCore<Node> {
 
             @Override
             public T[] decode(Class<T[]> dynType, Node in) {
+                final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
                 final Node.ArrayNode arrNode = in.asArray();
                 final T[] vals = (T[]) Array.newInstance(elemType, arrNode.values.size());
                 int i = 0;
                 for (Node node : arrNode.values) {
-                    vals[i++] = elemCodec.decode((Class<T>)dynType.getComponentType(), node);
+                    vals[i++] = elemCodec.decode(dynElemType, node);
                 }
                 return vals;
             }
@@ -214,11 +219,11 @@ public class JsonCodecCore extends CodecCore<Node> {
             public Node encode(T val, Node out) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
                 if (dynType.equals(stcType) || Modifier.isFinal(stcType.getModifiers())) {
-                    return JsonCodecCore.this.getCodec(stcType).encode(val, out);
+                    return JsonCodecCore.this.getNullUnsafeCodec(stcType).encode(val, out);
                 } else {
                     final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
                     fields.put(typeFieldName(), Node.string(classToName(dynType)));
-                    fields.put(valueFieldName(), encode2(JsonCodecCore.this. getCodec(dynType), val, out));
+                    fields.put(valueFieldName(), encode2(JsonCodecCore.this.getNullUnsafeCodec(dynType), val, out));
                     return Node.object(fields);
                 }
             }
@@ -242,12 +247,12 @@ public class JsonCodecCore extends CodecCore<Node> {
                     }
                 }
 
-                final Codec<T, Node> codec = JsonCodecCore.this.getCodec(stcType);
+                final Codec<T, Node> codec = JsonCodecCore.this.agetNullUnsafeCodec(stcType);
                 return codec.decode(stcType, in);
             }
 
             protected <S extends T> S decode2(Node in, Class<S> dynType) {
-                final Codec<S, Node> codec = JsonCodecCore.this.getCodec(dynType);
+                final Codec<S, Node> codec = JsonCodecCore.this.getNullUnsafeCodec(dynType);
                 return codec.decode(dynType, in);
             }
         };
@@ -303,7 +308,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             @Override
             public T decode(Class<T> dynType, Node in) {
                 final Node.ObjectNode objNode = in.asObject();
-                final T val = (T) Exceptions.wrap(() -> dynType.newInstance());
+                final T val = Exceptions.wrap(() -> dynType.newInstance(), JsonCodecException::new);
                 fieldCodecs.forEach((name, codec) -> {
                     codec.decode(val, objNode.fields.get(name));
                 });

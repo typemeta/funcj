@@ -1,4 +1,4 @@
-package org.funcj.codec;
+package org.funcj.codec.utils;
 
 import java.lang.reflect.*;
 import java.util.*;

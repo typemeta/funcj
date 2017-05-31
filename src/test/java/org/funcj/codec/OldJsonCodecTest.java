@@ -1,13 +1,10 @@
 package org.funcj.codec;
 
+import org.funcj.codec.json.JsonCodecCore;
 import org.funcj.json.Node;
 import org.junit.*;
 
-import java.lang.reflect.*;
-import java.util.*;
-
 import static java.lang.System.out;
-import static java.util.stream.Collectors.toList;
 
 public class OldJsonCodecTest {
     final static JsonCodecCore codec = new JsonCodecCore();

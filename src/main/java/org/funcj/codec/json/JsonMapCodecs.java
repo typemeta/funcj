@@ -1,5 +1,6 @@
-package org.funcj.codec;
+package org.funcj.codec.json;
 
+import org.funcj.codec.Codec;
 import org.funcj.control.Exceptions;
 import org.funcj.json.Node;
 import org.funcj.util.Functions;
@@ -26,7 +27,7 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Node encode(Map<K, V> val, Node out) {
+        public Node encode(Map<K, V> map, Node out) {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
@@ -41,7 +42,7 @@ public abstract class JsonMapCodecs {
                         return Node.object(elemFields);
                     };
 
-            final List<Node> nodes = val.entrySet().stream()
+            final List<Node> nodes = map.entrySet().stream()
                     .map(encode::apply)
                     .collect(toList());
             return Node.array(nodes);
@@ -79,10 +80,10 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Node encode(Map<String, V> val, Node out) {
+        public Node encode(Map<String, V> map, Node out) {
             final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();
 
-            val.forEach((k, v) -> {
+            map.forEach((k, v) -> {
                 final Node value = valueCodec.encode(v, out);
                 fields.put(k, value);
             });
