@@ -247,7 +247,7 @@ public class JsonCodecCore extends CodecCore<Node> {
                     }
                 }
 
-                final Codec<T, Node> codec = JsonCodecCore.this.agetNullUnsafeCodec(stcType);
+                final Codec<T, Node> codec = JsonCodecCore.this.getNullUnsafeCodec(stcType);
                 return codec.decode(stcType, in);
             }
 
