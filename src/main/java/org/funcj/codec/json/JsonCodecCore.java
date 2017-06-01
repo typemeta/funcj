@@ -95,7 +95,145 @@ public class JsonCodecCore extends CodecCore<Node> {
         return booleanArrayCodec;
     }
 
-    private final Codec.IntegerCodec<Node> integerCodec = new Codec.IntegerCodec<Node>() {
+    private final Codec.ByteCodec<Node> byteCodec = new Codec.ByteCodec<Node>() {
+
+        @Override
+        public Node encodePrim(byte val, Node out) {
+            return Node.number(val);
+        }
+
+        @Override
+        public byte decodePrim(Node in) {
+            return (byte)in.asNumber().getValue();
+        }
+    };
+
+    @Override
+    protected Codec.ByteCodec<Node> byteCodec() {
+        return byteCodec;
+    }
+
+    private final Codec<byte[], Node> byteArrayCodec = new Codec<byte[], Node>() {
+
+        @Override
+        public Node encode(byte[] vals, Node out) {
+            final List<Node> nodes = new ArrayList<>(vals.length);
+            for (byte val : vals) {
+                nodes.add(byteCodec().encode(val, out));
+            }
+            return Node.array(nodes);
+        }
+
+        @Override
+        public byte[] decode(Node in) {
+            final Node.ArrayNode arrNode = in.asArray();
+            final byte[] vals = new byte[arrNode.size()];
+            int i = 0;
+            for (Node node : arrNode) {
+                vals[i++] = byteCodec().decode(byte.class, node);
+            }
+            return vals;
+        }
+    };
+
+    @Override
+    protected Codec<byte[], Node> byteArrayCodec() {
+        return byteArrayCodec;
+    }
+
+    private final Codec.CharCodec<Node> charCodec = new Codec.CharCodec<Node>() {
+
+        @Override
+        public Node encodePrim(char val, Node out) {
+            return Node.string(String.valueOf(val));
+        }
+
+        @Override
+        public char decodePrim(Node in) {
+            return in.asString().getValue().charAt(0);
+        }
+    };
+
+    @Override
+    protected Codec.CharCodec<Node> charCodec() {
+        return charCodec;
+    }
+
+    private final Codec<char[], Node> charArrayCodec = new Codec<char[], Node>() {
+
+        @Override
+        public Node encode(char[] vals, Node out) {
+            final List<Node> nodes = new ArrayList<>(vals.length);
+            for (char val : vals) {
+                nodes.add(charCodec().encode(val, out));
+            }
+            return Node.array(nodes);
+        }
+
+        @Override
+        public char[] decode(Node in) {
+            final Node.ArrayNode arrNode = in.asArray();
+            final char[] vals = new char[arrNode.size()];
+            int i = 0;
+            for (Node node : arrNode) {
+                vals[i++] = charCodec().decode(char.class, node);
+            }
+            return vals;
+        }
+    };
+
+    @Override
+    protected Codec<char[], Node> charArrayCodec() {
+        return charArrayCodec;
+    }
+
+    private final Codec.ShortCodec<Node> shortCodec = new Codec.ShortCodec<Node>() {
+
+        @Override
+        public Node encodePrim(short val, Node out) {
+            return Node.number(val);
+        }
+
+        @Override
+        public short decodePrim(Node in) {
+            return (short)in.asNumber().getValue();
+        }
+    };
+
+    @Override
+    protected Codec.ShortCodec<Node> shortCodec() {
+        return shortCodec;
+    }
+
+    private final Codec<short[], Node> shortArrayCodec = new Codec<short[], Node>() {
+
+        @Override
+        public Node encode(short[] vals, Node out) {
+            final List<Node> nodes = new ArrayList<>(vals.length);
+            for (short val : vals) {
+                nodes.add(shortCodec().encode(val, out));
+            }
+            return Node.array(nodes);
+        }
+
+        @Override
+        public short[] decode(Node in) {
+            final Node.ArrayNode arrNode = in.asArray();
+            final short[] vals = new short[arrNode.size()];
+            int i = 0;
+            for (Node node : arrNode) {
+                vals[i++] = shortCodec().decode(short.class, node);
+            }
+            return vals;
+        }
+    };
+
+    @Override
+    protected Codec<short[], Node> shortArrayCodec() {
+        return shortArrayCodec;
+    }
+
+    private final Codec.IntCodec<Node> intCodec = new Codec.IntCodec<Node>() {
 
         @Override
         public Node encodePrim(int val, Node out) {
@@ -109,8 +247,8 @@ public class JsonCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.IntegerCodec<Node> integerCodec() {
-        return integerCodec;
+    protected Codec.IntCodec<Node> intCodec() {
+        return intCodec;
     }
 
     private final Codec<int[], Node> integerArrayCodec = new Codec<int[], Node>() {
@@ -119,7 +257,7 @@ public class JsonCodecCore extends CodecCore<Node> {
         public Node encode(int[] vals, Node out) {
             final List<Node> nodes = new ArrayList<>(vals.length);
             for (int val : vals) {
-                nodes.add(integerCodec().encode(val, out));
+                nodes.add(intCodec().encode(val, out));
             }
             return Node.array(nodes);
         }
@@ -130,15 +268,153 @@ public class JsonCodecCore extends CodecCore<Node> {
             final int[] vals = new int[arrNode.size()];
             int i = 0;
             for (Node node : arrNode) {
-                vals[i++] = integerCodec().decode(int.class, node);
+                vals[i++] = intCodec().decode(int.class, node);
             }
             return vals;
         }
     };
 
     @Override
-    protected Codec<int[], Node> integerArrayCodec() {
+    protected Codec<int[], Node> intArrayCodec() {
         return integerArrayCodec;
+    }
+
+    private final Codec.LongCodec<Node> longCodec = new Codec.LongCodec<Node>() {
+
+        @Override
+        public Node encodePrim(long val, Node out) {
+            return Node.number(val);
+        }
+
+        @Override
+        public long decodePrim(Node in) {
+            return (long)in.asNumber().getValue();
+        }
+    };
+
+    @Override
+    protected Codec.LongCodec<Node> longCodec() {
+        return longCodec;
+    }
+
+    private final Codec<long[], Node> longArrayCodec = new Codec<long[], Node>() {
+
+        @Override
+        public Node encode(long[] vals, Node out) {
+            final List<Node> nodes = new ArrayList<>(vals.length);
+            for (long val : vals) {
+                nodes.add(longCodec().encode(val, out));
+            }
+            return Node.array(nodes);
+        }
+
+        @Override
+        public long[] decode(Node in) {
+            final Node.ArrayNode arrNode = in.asArray();
+            final long[] vals = new long[arrNode.size()];
+            int i = 0;
+            for (Node node : arrNode) {
+                vals[i++] = longCodec().decode(long.class, node);
+            }
+            return vals;
+        }
+    };
+
+    @Override
+    protected Codec<long[], Node> longArrayCodec() {
+        return longArrayCodec;
+    }
+
+    private final Codec.FloatCodec<Node> floatCodec = new Codec.FloatCodec<Node>() {
+
+        @Override
+        public Node encodePrim(float val, Node out) {
+            return Node.number(val);
+        }
+
+        @Override
+        public float decodePrim(Node in) {
+            return (float)in.asNumber().getValue();
+        }
+    };
+
+    @Override
+    protected Codec.FloatCodec<Node> floatCodec() {
+        return floatCodec;
+    }
+
+    private final Codec<float[], Node> floatArrayCodec = new Codec<float[], Node>() {
+
+        @Override
+        public Node encode(float[] vals, Node out) {
+            final List<Node> nodes = new ArrayList<>(vals.length);
+            for (float val : vals) {
+                nodes.add(floatCodec().encode(val, out));
+            }
+            return Node.array(nodes);
+        }
+
+        @Override
+        public float[] decode(Node in) {
+            final Node.ArrayNode arrNode = in.asArray();
+            final float[] vals = new float[arrNode.size()];
+            int i = 0;
+            for (Node node : arrNode) {
+                vals[i++] = floatCodec().decode(float.class, node);
+            }
+            return vals;
+        }
+    };
+
+    @Override
+    protected Codec<float[], Node> floatArrayCodec() {
+        return floatArrayCodec;
+    }
+
+    private final Codec.DoubleCodec<Node> doubleCodec = new Codec.DoubleCodec<Node>() {
+
+        @Override
+        public Node encodePrim(double val, Node out) {
+            return Node.number(val);
+        }
+
+        @Override
+        public double decodePrim(Node in) {
+            return in.asNumber().getValue();
+        }
+    };
+
+    @Override
+    protected Codec.DoubleCodec<Node> doubleCodec() {
+        return doubleCodec;
+    }
+
+    private final Codec<double[], Node> doubleArrayCodec = new Codec<double[], Node>() {
+
+        @Override
+        public Node encode(double[] vals, Node out) {
+            final List<Node> nodes = new ArrayList<>(vals.length);
+            for (double val : vals) {
+                nodes.add(doubleCodec().encode(val, out));
+            }
+            return Node.array(nodes);
+        }
+
+        @Override
+        public double[] decode(Node in) {
+            final Node.ArrayNode arrNode = in.asArray();
+            final double[] vals = new double[arrNode.size()];
+            int i = 0;
+            for (Node node : arrNode) {
+                vals[i++] = doubleCodec().decode(double.class, node);
+            }
+            return vals;
+        }
+    };
+
+    @Override
+    protected Codec<double[], Node> doubleArrayCodec() {
+        return doubleArrayCodec;
     }
 
     private final Codec<String, Node> stringCodec = new Codec<String, Node>() {

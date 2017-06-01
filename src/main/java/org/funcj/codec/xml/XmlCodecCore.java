@@ -150,7 +150,37 @@ public class XmlCodecCore extends CodecCore<Node> {
         return booleanArrayCodec;
     }
 
-    private final Codec.IntegerCodec<Node> integerCodec = new Codec.IntegerCodec<Node>() {
+    @Override
+    protected Codec.ByteCodec<Node> byteCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec<byte[], Node> byteArrayCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec.CharCodec<Node> charCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec<char[], Node> charArrayCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec.ShortCodec<Node> shortCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec<short[], Node> shortArrayCodec() {
+        return null;
+    }
+
+    private final Codec.IntCodec<Node> intCodec = new Codec.IntCodec<Node>() {
 
         @Override
         public Node encodePrim(int val, Node out) {
@@ -165,8 +195,8 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.IntegerCodec<Node> integerCodec() {
-        return integerCodec;
+    protected Codec.IntCodec<Node> intCodec() {
+        return intCodec;
     }
 
     private final Codec<int[], Node> integerArrayCodec = new Codec<int[], Node>() {
@@ -175,7 +205,7 @@ public class XmlCodecCore extends CodecCore<Node> {
         public Node encode(int[] vals, Node out) {
             for (int i = 0; i < vals.length; ++i) {
                 final Node node = out.appendChild(doc.createElement(entryElemName()));
-                integerCodec().encode(vals[i], node);
+                intCodec().encode(vals[i], node);
             }
 
             return out;
@@ -190,7 +220,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
                 if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = integerCodec().decode(int.class, elem);
+                    vals[i] = intCodec().decode(int.class, elem);
                 }
             }
 
@@ -199,8 +229,38 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<int[], Node> integerArrayCodec() {
+    protected Codec<int[], Node> intArrayCodec() {
         return integerArrayCodec;
+    }
+
+    @Override
+    protected Codec.LongCodec<Node> longCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec<long[], Node> longArrayCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec.FloatCodec<Node> floatCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec<float[], Node> floatArrayCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec.DoubleCodec<Node> doubleCodec() {
+        return null;
+    }
+
+    @Override
+    protected Codec<double[], Node> doubleArrayCodec() {
+        return null;
     }
 
     private final Codec<String, Node> stringCodec = new Codec<String, Node>() {
