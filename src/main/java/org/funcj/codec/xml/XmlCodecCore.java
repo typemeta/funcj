@@ -31,6 +31,14 @@ public class XmlCodecCore extends CodecCore<Node> {
         return doc;
     }
 
+    protected String entryElemName() {
+        return "elem";
+    }
+
+    protected String indexAttrName() {
+        return "i";
+    }
+
     protected String typeAttrName() {
         return "type";
     }
@@ -45,10 +53,6 @@ public class XmlCodecCore extends CodecCore<Node> {
 
     protected String valueElemName() {
         return "value";
-    }
-
-    protected String indexElem(int i) {
-        return "_" + Integer.toString(i);
     }
 
     private final Codec.NullCodec<Node> nullCodec = new Codec.NullCodec<Node>() {
@@ -117,8 +121,8 @@ public class XmlCodecCore extends CodecCore<Node> {
         @Override
         public Node encode(boolean[] vals, Node out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(indexElem(i)));
-                booleanCodec.encode(vals[i], node);
+                final Node node = out.appendChild(doc.createElement(entryElemName()));
+                booleanCodec().encode(vals[i], node);
             }
 
             return out;
@@ -131,7 +135,10 @@ public class XmlCodecCore extends CodecCore<Node> {
             final boolean[] vals = new boolean[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = booleanCodec.decode(boolean.class, nodes.item(i));
+                final Element elem = (Element)nodes.item(i);
+                if (elem.getNodeName().equals(entryElemName())) {
+                    vals[i] = booleanCodec().decode(boolean.class, elem);
+                }
             }
 
             return vals;
@@ -167,8 +174,8 @@ public class XmlCodecCore extends CodecCore<Node> {
         @Override
         public Node encode(int[] vals, Node out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(indexElem(i)));
-                integerCodec.encode(vals[i], node);
+                final Node node = out.appendChild(doc.createElement(entryElemName()));
+                integerCodec().encode(vals[i], node);
             }
 
             return out;
@@ -181,7 +188,10 @@ public class XmlCodecCore extends CodecCore<Node> {
             final int[] vals = new int[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = integerCodec.decode(int.class, nodes.item(i));
+                final Element elem = (Element)nodes.item(i);
+                if (elem.getNodeName().equals(entryElemName())) {
+                    vals[i] = integerCodec().decode(int.class, elem);
+                }
             }
 
             return vals;
@@ -228,16 +238,50 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <K, V> Codec<Map<K, V>, Node> mapCodec(
-            Class<K> keyType,
-            Class<V> valType) {
-        final Codec<V, Node> valueCodec = dynamicCodec(valType);
-        if (String.class.equals(keyType)) {
-            return (Codec)new XmlMapCodecs.StringMapCodec<V>(this, valueCodec);
-        } else {
-            final Codec<K, Node> keyCodec = dynamicCodec(keyType);
-            return new XmlMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
-        }
+    protected <V> Codec<Map<String, V>, Node> mapCodec(Codec<V, Node> valueCodec) {
+        return new XmlMapCodecs.StringMapCodec<V>(this, valueCodec);
+    }
+
+    @Override
+    protected <K, V> Codec<Map<K, V>, Node> mapCodec(Codec<K, Node> keyCodec, Codec<V, Node> valueCodec) {
+        return new XmlMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
+    }
+
+    @Override
+    protected <T> Codec<List<T>, Node> listCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
+        return new Codec<List<T>, Node>() {
+            @Override
+            public Node encode(List<T> vals, Node out) {
+                for (int i = 0; i < vals.size(); ++i) {
+                    final Node node = out.appendChild(doc.createElement(entryElemName()));
+                    elemCodec.encode(vals.get(i), node);
+                }
+
+                return out;
+            }
+
+            @Override
+            public List<T> decode(Class<List<T>> dynType, Node in) {
+                final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
+
+                final NodeList nodes = in.getChildNodes();
+                final int l = nodes.getLength();
+
+                final List<T> vals = Exceptions.wrap(() -> dynType.newInstance());
+                if (vals instanceof ArrayList) {
+                    ((ArrayList<T>) vals).ensureCapacity(l);
+                }
+
+                for (int i = 0; i < l; ++i) {
+                    final Element elem = (Element)nodes.item(i);
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals.add(elemCodec.decode(dynElemType, elem));
+                    }
+                }
+
+                return vals;
+            }
+        };
     }
 
     @Override
@@ -246,7 +290,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             @Override
             public Node encode(T[] vals, Node out) {
                 for (int i = 0; i < vals.length; ++i) {
-                    final Node node = out.appendChild(doc.createElement(indexElem(i)));
+                    final Node node = out.appendChild(doc.createElement(entryElemName()));
                     elemCodec.encode(vals[i], node);
                 }
 
@@ -259,10 +303,14 @@ public class XmlCodecCore extends CodecCore<Node> {
 
                 final NodeList nodes = in.getChildNodes();
                 final int l = nodes.getLength();
+
                 final T[] vals = (T[]) Array.newInstance(elemType, l);
 
                 for (int i = 0; i < l; ++i) {
-                    vals[i] = elemCodec.decode(dynElemType, nodes.item(i));
+                    final Element elem = (Element)nodes.item(i);
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals[i] = elemCodec.decode(dynElemType, elem);
+                    }
                 }
 
                 return vals;
@@ -276,7 +324,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             @Override
             public Node encode(T val, Node out) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
-                if (!dynType.equals(stcType) && !Modifier.isFinal(stcType.getModifiers())) {
+                if (!dynType.equals(stcType)) {
                     setAttrValue((Element)out, typeAttrName(), classToName(dynType));
                 }
                 return encode2(XmlCodecCore.this.getNullUnsafeCodec(dynType), val, out);
@@ -309,7 +357,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             @Override
             public Node encode(T val, Node out) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
-                if (!dynType.equals(stcType) && !Modifier.isFinal(stcType.getModifiers())) {
+                if (!dynType.equals(stcType)) {
                     setAttrValue((Element)out, typeAttrName(), classToName(dynType));
                 }
                 return codec.encode(val, out);

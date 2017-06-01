@@ -27,7 +27,7 @@ public abstract class XmlMapCodecs {
         public Node encode(Map<K, V> map, Node out) {
             int i = 0;
             for (Map.Entry<K, V> entry : map.entrySet()) {
-                final Element node = (Element)out.appendChild(core.doc.createElement(core.indexElem(i++)));
+                final Element node = (Element)out.appendChild(core.doc.createElement(core.entryElemName()));
 
                 final Node keyNode = node.appendChild(core.doc.createElement(core.keyElemName()));
                 keyCodec.encode(entry.getKey(), keyNode);
@@ -70,7 +70,7 @@ public abstract class XmlMapCodecs {
         public Node encode(Map<String, V> map, Node out) {
             int i = 0;
             for (Map.Entry<String, V> entry : map.entrySet()) {
-                final Element node = (Element)out.appendChild(core.doc.createElement(core.indexElem(i++)));
+                final Element node = (Element)out.appendChild(core.doc.createElement(core.entryElemName()));
                 setAttrValue(node, core.keyAttrName(), entry.getKey());
                 valueCodec.encode(entry.getValue(), node);
             }

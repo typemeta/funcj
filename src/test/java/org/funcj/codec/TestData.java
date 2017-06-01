@@ -10,6 +10,7 @@ public class TestData {
         final Object obj;
         final T[] valArr;
         final Object[] objArr;
+        final List<T> listVal;
         final Map<String, T> mapStrVal;
         final Map<String, Object> mapStrObj;
         final HashMap<String, Object> hashMapStrObj;
@@ -20,6 +21,7 @@ public class TestData {
             this.obj = null;
             this.valArr = null;
             this.objArr = null;
+            this.listVal = null;
             this.mapStrVal = null;
             this.mapStrObj = null;
             this.hashMapStrObj = null;
@@ -30,6 +32,7 @@ public class TestData {
                 Object obj,
                 T[] valArr,
                 Object[] objArr,
+                List<T> listVal,
                 Map<String, T> mapStrVal,
                 Map<String, Object> mapStrObj,
                 HashMap<String, Object> hashMapStrObj,
@@ -38,6 +41,7 @@ public class TestData {
             this.obj = obj;
             this.valArr = valArr;
             this.objArr = objArr;
+            this.listVal = listVal;
             this.mapStrVal = mapStrVal;
             this.mapStrObj = mapStrObj;
             this.hashMapStrObj = hashMapStrObj;
@@ -53,6 +57,7 @@ public class TestData {
                     Objects.equals(obj, base.obj) &&
                     Arrays.equals(valArr, base.valArr) &&
                     Arrays.equals(objArr, base.objArr) &&
+                    Objects.equals(listVal, base.listVal) &&
                     Objects.equals(mapStrVal, base.mapStrVal) &&
                     Objects.equals(mapStrObj, base.mapStrObj) &&
                     Objects.equals(hashMapStrObj, base.hashMapStrObj) &&
@@ -74,14 +79,22 @@ public class TestData {
         }
     }
 
-    private static <K, V> HashMap<K, V> mapH(K k0, V v0, K k1, V v1) {
+    private static <T> ArrayList<T> arrayList(T... vals) {
+        final ArrayList<T> l = new ArrayList<T>(vals.length);
+        for (T val : vals) {
+            l.add(val);
+        }
+        return l;
+    }
+
+    private static <K, V> HashMap<K, V> hashMap(K k0, V v0, K k1, V v1) {
         final HashMap<K, V> m = new HashMap<>();
         m.put(k0, v0);
         m.put(k1, v1);
         return m;
     }
 
-    private static <K, V> TreeMap<K, V> mapT(K k0, V v0, K k1, V v1) {
+    private static <K, V> TreeMap<K, V> treeMap(K k0, V v0, K k1, V v1) {
         final TreeMap<K, V> m = new TreeMap<>();
         m.put(k0, v0);
         m.put(k1, v1);
@@ -93,12 +106,14 @@ public class TestData {
         final boolean val;
         final boolean[] valArr;
         final boolean[][] valArrArr;
+        final List<Boolean> listVal;
         final Map<String, Boolean> mapStrVal;
 
         public BooleanData() {
             this.val = false;
             this.valArr = null;
             this.valArrArr = null;
+            this.listVal = null;
             this.mapStrVal = null;
         }
 
@@ -108,15 +123,17 @@ public class TestData {
                     false,
                     new Boolean[]{false, true},
                     new Boolean[]{false},
-                    mapT("a", false, "b", true),
-                    mapH("c", true, "d", false),
-                    mapH("c", true, "d", false),
-                    mapT("e", true, "f", true)
+                    arrayList(true, false, true),
+                    treeMap("a", false, "b", true),
+                    hashMap("c", true, "d", false),
+                    hashMap("c", true, "d", false),
+                    treeMap("e", true, "f", true)
             );
             this.val = true;
             this.valArr = new boolean[]{true, false};
             this.valArrArr = new boolean[][]{{true, false}, {false, true}, null};
-            this.mapStrVal = mapT("f", false, "g", true);
+            this.listVal = arrayList(false, true, false);
+            this.mapStrVal = treeMap("f", false, "g", true);
         }
 
         @Override
@@ -127,6 +144,7 @@ public class TestData {
             if (val != rhs.val) return false;
             if (!Arrays.equals(valArr, rhs.valArr)) return false;
             if (!Arrays.deepEquals(valArrArr, rhs.valArrArr)) return false;
+            if (!Objects.equals(listVal, rhs.listVal)) return false;
             if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
             return super.equals(rhs);
         }
@@ -147,18 +165,19 @@ public class TestData {
         }
     }
 
-
     public static class IntegerData extends Base<Integer> {
 
         final int val;
         final int[] valArr;
         final int[][] valArrArr;
+        final List<Integer> listVal;
         final Map<String, Integer> mapStrVal;
 
         public IntegerData() {
             this.val = 0;
             this.valArr = null;
             this.valArrArr = null;
+            this.listVal = null;
             this.mapStrVal = null;
         }
 
@@ -168,15 +187,17 @@ public class TestData {
                     -1000,
                     new Integer[]{10, 20},
                     new Integer[]{123456},
-                    mapT("a", 1, "b", 2),
-                    mapH("c", 3, "d", 4),
-                    mapH("c", -1, "d", -2),
-                    mapT("e", -200, "f", -300)
+                    arrayList(0, -1, -2, -3, null),
+                    treeMap("a", 1, "b", 2),
+                    hashMap("c", 3, "d", 4),
+                    hashMap("c", -1, "d", -2),
+                    treeMap("e", -200, "f", -300)
             );
             this.val = -999;
             this.valArr = new int[]{1234, 5678};
-            this.valArrArr = new int[][]{{12, 34}, {56, 78}};
-            this.mapStrVal = mapT("f", 321, "g", 654);
+            this.valArrArr = new int[][]{{12, 34}, {56, 78}, null};
+            this.listVal = arrayList(0, 1, 2, 3);
+            this.mapStrVal = treeMap("f", 321, "g", 654);
         }
 
         @Override
@@ -187,6 +208,7 @@ public class TestData {
             if (val != rhs.val) return false;
             if (!Arrays.equals(valArr, rhs.valArr)) return false;
             if (!Arrays.deepEquals(valArrArr, rhs.valArrArr)) return false;
+            if (!Objects.equals(listVal, rhs.listVal)) return false;
             if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
             return super.equals(rhs);
         }

@@ -174,16 +174,39 @@ public class JsonCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <K, V> Codec<Map<K, V>, Node> mapCodec(
-            Class<K> keyType,
-            Class<V> valType) {
-        final Codec<V, Node> valueCodec = dynamicCodec(valType);
-        if (String.class.equals(keyType)) {
-            return (Codec)new JsonMapCodecs.StringMapCodec<V>(this, valueCodec);
-        } else {
-            final Codec<K, Node> keyCodec = dynamicCodec(keyType);
-            return new JsonMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
-        }
+    protected <V> Codec<Map<String, V>, Node> mapCodec(Codec<V, Node> valueCodec) {
+        return new JsonMapCodecs.StringMapCodec<V>(this, valueCodec);
+    }
+
+    @Override
+    protected <K, V> Codec<Map<K, V>, Node> mapCodec(Codec<K, Node> keyCodec, Codec<V, Node> valueCodec) {
+        return new JsonMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
+    }
+
+    @Override
+    protected <T> Codec<List<T>, Node> listCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
+        return new Codec<List<T>, Node>() {
+            @Override
+            public Node encode(List<T> vals, Node out) {
+                final List<Node> nodes = new ArrayList<>(vals.size());
+                for (T val : vals) {
+                    nodes.add(elemCodec.encode(val, out));
+                }
+                return Node.array(nodes);
+            }
+
+            @Override
+            public List<T> decode(Class<List<T>> dynType, Node in) {
+                final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
+                final Node.ArrayNode arrNode = in.asArray();
+                final List<T> vals = Exceptions.wrap(() -> dynType.newInstance());
+                int i = 0;
+                for (Node node : arrNode.values) {
+                    vals.add(elemCodec.decode(dynElemType, node));
+                }
+                return vals;
+            }
+        };
     }
 
     @Override
@@ -218,7 +241,7 @@ public class JsonCodecCore extends CodecCore<Node> {
             @Override
             public Node encode(T val, Node out) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
-                if (dynType.equals(stcType) || Modifier.isFinal(stcType.getModifiers())) {
+                if (dynType.equals(stcType)) {
                     return JsonCodecCore.this.getNullUnsafeCodec(stcType).encode(val, out);
                 } else {
                     final LinkedHashMap<String, Node> fields = new LinkedHashMap<>();

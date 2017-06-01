@@ -357,7 +357,6 @@ public abstract class Example {
         }
 
         public Derived2() {
-
         }
 
         public Derived2(HashMap<String, Integer> value) {
