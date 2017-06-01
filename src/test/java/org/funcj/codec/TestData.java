@@ -115,7 +115,7 @@ public class TestData {
             );
             this.val = true;
             this.valArr = new boolean[]{true, false};
-            this.valArrArr = new boolean[][]{{true, false}, {false, true}};
+            this.valArrArr = new boolean[][]{{true, false}, {false, true}, null};
             this.mapStrVal = mapT("f", false, "g", true);
         }
 

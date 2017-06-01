@@ -349,7 +349,7 @@ public abstract class Example {
         }
     }
 
-    static class Derived2 extends Simple2<Integer> {
+    public static class Derived2 extends Simple2<Integer> {
         static Derived2 create() {
             final HashMap<String, Integer> m = new HashMap<>();
             m.put("abc", 123);

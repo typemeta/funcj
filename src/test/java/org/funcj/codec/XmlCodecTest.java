@@ -33,7 +33,7 @@ public class XmlCodecTest {
 
     private <T> void roundTrip(T val, Class<T> clazz) {
         codec.setNewDocument();
-        final Node node = codec.encode(clazz, val);
+        final Node node = codec.encode(clazz, val, "test");
         out.println(nodeToString(codec.doc, true));
 
         final T val2 = codec.decode(clazz, node);

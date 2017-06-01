@@ -119,7 +119,7 @@ public abstract class CodecCore<E> {
                     } else if (elemType.equals(Integer.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Integer.class, integerCodec());
                     } else {
-                        final Codec<Object, E> elemCodec = dynamicCodec((Class<Object>) elemType);
+                        final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec((Class<Object>) elemType));
                         codec = (Codec<T, E>) objectArrayCodec((Class<Object>) elemType, elemCodec);
                     }
                 }
@@ -188,34 +188,34 @@ public abstract class CodecCore<E> {
             if (stcType.isArray()) {
                 final Class<?> elemType = stcType.getComponentType();
                 if (elemType.equals(boolean.class)) {
-                    final Codec<boolean[], E> codec = getNullUnsafeCodec((Class<boolean[]>)stcType);
+                    final Codec<boolean[], E> codec = getNullSafeCodec((Class<boolean[]>)stcType);
                     return new FieldCodec.BooleanArrayFieldCodec<E>(field, codec);
                 } else if (elemType.equals(int.class)) {
-                    final Codec<int[], E> codec = getNullUnsafeCodec((Class<int[]>)stcType);
+                    final Codec<int[], E> codec = getNullSafeCodec((Class<int[]>)stcType);
                     return new FieldCodec.IntegerArrayFieldCodec<E>(field, codec);
                 } else {
-                    final Codec<T[], E> codec = getNullUnsafeCodec((Class<T[]>)stcType);
+                    final Codec<T[], E> codec = getNullSafeCodec((Class<T[]>)stcType);
                     return new FieldCodec.ObjectArrayFieldCodec<>(field, codec);
                 }
             } else if (stcType.isEnum() ||
                         stcType.equals(Boolean.class) ||
                         stcType.equals(Integer.class) ||
                         stcType.equals(String.class)) {
-                final Codec<T, E> codec = getNullUnsafeCodec(stcType);
+                final Codec<T, E> codec = getNullSafeCodec(stcType);
                 return new FieldCodec.ObjectFieldCodec<>(field, codec);
             } else if (Map.class.isAssignableFrom(stcType)) {
                 final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
                 final Class keyType = typeArgs.get(0);
                 final Class valType = typeArgs.get(1);
-                final Codec<Map, E> mapCodec = mapCodec(keyType, valType);
+                final Codec<Map, E> mapCodec = nullSafeCodec(mapCodec(keyType, valType));
                 if (Modifier.isFinal(stcType.getModifiers())) {
                     return new FieldCodec.ObjectFieldCodec<Object, E>(field, (Codec) mapCodec);
                 } else {
-                    final Codec<Object, E> codec = dynamicCodec((Codec) mapCodec, stcType);
+                    final Codec<Object, E> codec = nullSafeCodec(dynamicCodec((Codec) mapCodec, stcType));
                     return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
                 }
             } else {
-                final Codec<Object, E> codec = dynamicCodec((Class<Object>) stcType);
+                final Codec<Object, E> codec = nullSafeCodec(dynamicCodec((Class<Object>) stcType));
                 return new FieldCodec.ObjectFieldCodec<Object, E>(field, codec);
             }
         }
