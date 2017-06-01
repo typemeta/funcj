@@ -112,7 +112,7 @@ public class Grammar {
                     jvalue,
                     tok(chr(','))
                 )
-            ).map(Node::array);
+            ).map(IList::toList).map(Node::array);
 
         final Parser<Chr, Tuple2<String, Node>> jfield =
             jstring

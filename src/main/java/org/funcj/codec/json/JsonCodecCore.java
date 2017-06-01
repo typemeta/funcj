@@ -81,9 +81,9 @@ public class JsonCodecCore extends CodecCore<Node> {
         @Override
         public boolean[] decode(Node in) {
             final Node.ArrayNode arrNode = in.asArray();
-            final boolean[] vals = new boolean[arrNode.values.size()];
+            final boolean[] vals = new boolean[arrNode.size()];
             int i = 0;
-            for (Node node : arrNode.values) {
+            for (Node node : arrNode) {
                 vals[i++] = booleanCodec().decode(boolean.class, node);
             }
             return vals;
@@ -104,7 +104,7 @@ public class JsonCodecCore extends CodecCore<Node> {
 
         @Override
         public int decodePrim(Node in) {
-            return (int)in.asNumber().value;
+            return (int)in.asNumber().getValue();
         }
     };
 
@@ -127,9 +127,9 @@ public class JsonCodecCore extends CodecCore<Node> {
         @Override
         public int[] decode(Node in) {
             final Node.ArrayNode arrNode = in.asArray();
-            final int[] vals = new int[arrNode.values.size()];
+            final int[] vals = new int[arrNode.size()];
             int i = 0;
-            for (Node node : arrNode.values) {
+            for (Node node : arrNode) {
                 vals[i++] = integerCodec().decode(int.class, node);
             }
             return vals;
@@ -149,7 +149,7 @@ public class JsonCodecCore extends CodecCore<Node> {
 
         @Override
         public String decode(Node in) {
-            return in.asString().value;
+            return in.asString().getValue();
         }
     };
 
@@ -168,7 +168,7 @@ public class JsonCodecCore extends CodecCore<Node> {
 
             @Override
             public EM decode(Class<EM> dynType, Node in) {
-                return EM.valueOf(dynType, in.asString().value);
+                return EM.valueOf(dynType, in.asString().getValue());
             }
         };
     }
@@ -201,7 +201,7 @@ public class JsonCodecCore extends CodecCore<Node> {
                 final Node.ArrayNode arrNode = in.asArray();
                 final List<T> vals = Exceptions.wrap(() -> dynType.newInstance());
                 int i = 0;
-                for (Node node : arrNode.values) {
+                for (Node node : arrNode) {
                     vals.add(elemCodec.decode(dynElemType, node));
                 }
                 return vals;
@@ -225,9 +225,9 @@ public class JsonCodecCore extends CodecCore<Node> {
             public T[] decode(Class<T[]> dynType, Node in) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
                 final Node.ArrayNode arrNode = in.asArray();
-                final T[] vals = (T[]) Array.newInstance(elemType, arrNode.values.size());
+                final T[] vals = (T[]) Array.newInstance(elemType, arrNode.size());
                 int i = 0;
-                for (Node node : arrNode.values) {
+                for (Node node : arrNode) {
                     vals[i++] = elemCodec.decode(dynElemType, node);
                 }
                 return vals;
@@ -266,7 +266,7 @@ public class JsonCodecCore extends CodecCore<Node> {
                             objNode.fields.containsKey(valueFieldName)) {
                         final Node typeNode = objNode.fields.get(typeFieldName());
                         final Node valueNode = objNode.fields.get(valueFieldName());
-                        return decode2(valueNode, nameToClass(typeNode.asString().value));
+                        return decode2(valueNode, nameToClass(typeNode.asString().getValue()));
                     }
                 }
 
@@ -306,7 +306,7 @@ public class JsonCodecCore extends CodecCore<Node> {
                         objNode.fields.containsKey(typeFieldName) &&
                         objNode.fields.containsKey(valueFieldName)) {
                     final Node typeNode = objNode.fields.get(typeFieldName());
-                    final Class<?> dynType = nameToClass(typeNode.asString().value);
+                    final Class<?> dynType = nameToClass(typeNode.asString().getValue());
                     final Node valueNode = objNode.fields.get(valueFieldName());
                     return codec.decode((Class<T>)dynType, valueNode);
                 } else {

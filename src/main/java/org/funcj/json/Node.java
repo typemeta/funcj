@@ -7,6 +7,8 @@ import org.funcj.util.Functions.F;
 import org.funcj.util.Functors;
 
 import java.util.*;
+import java.util.function.*;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -27,16 +29,12 @@ public interface Node {
         return new StringNode(value);
     }
 
-    static ArrayNode array(IList<Node> values) {
-        return new ArrayNode(values);
-    }
-
     static ArrayNode array(Node... values) {
-        return new ArrayNode(IList.ofArray(values));
+        return new ArrayNode(Arrays.asList(values));
     }
 
-    static ArrayNode array(Iterable<Node> values) {
-        return new ArrayNode(IList.ofIterable(values));
+    static ArrayNode array(List<Node> values) {
+        return new ArrayNode(values);
     }
 
     static Tuple2<String, Node> entry(String name, Node node) {
@@ -252,10 +250,14 @@ public interface Node {
     }
 
     final class NumberNode implements Node {
-        public final double value;
+        protected final double value;
 
         public NumberNode(double value) {
             this.value = value;
+        }
+
+        public double getValue() {
+            return value;
         }
 
         @Override
@@ -363,10 +365,14 @@ public interface Node {
     }
 
     final class StringNode implements Node {
-        public final String value;
+        protected final String value;
 
         public StringNode(String value) {
             this.value = value;
+        }
+
+        public String getValue() {
+            return value;
         }
 
         @Override
@@ -473,11 +479,32 @@ public interface Node {
         }
     }
 
-    final class ArrayNode implements Node {
-        public final IList<Node> values;
+    final class ArrayNode implements Node, Iterable<Node> {
+        protected final List<Node> values;
 
-        public ArrayNode(IList<Node> values) {
+        public ArrayNode(List<Node> values) {
             this.values = values;
+        }
+
+        public int size() {
+            return values.size();
+        }
+
+        public Node get(int index) {
+            return values.get(index);
+        }
+
+        @Override
+        public Iterator<Node> iterator() {
+            return values.iterator();
+        }
+
+        public Stream<Node> stream() {
+            return values.stream();
+        }
+
+        public void forEach(Consumer<? super Node> action) {
+            values.forEach(action);
         }
 
         @Override
@@ -491,7 +518,7 @@ public interface Node {
                     API.text('['),
                     API.text(", "),
                     API.text(']'),
-                    values.map(Node::toDocument)
+                    Functors.map(Node::toDocument, values)
             );
         }
 
@@ -599,11 +626,32 @@ public interface Node {
         }
     }
 
-    final class ObjectNode implements Node {
+    final class ObjectNode implements Node, Iterable<Map.Entry<String, Node>> {
         public final LinkedHashMap<String, Node> fields;
 
         public ObjectNode(LinkedHashMap<String, Node> fields) {
             this.fields = fields;
+        }
+
+        public int size() {
+            return fields.size();
+        }
+
+        public Node get(String name) {
+            return fields.get(name);
+        }
+
+        @Override
+        public Iterator<Map.Entry<String, Node>> iterator() {
+            return fields.entrySet().iterator();
+        }
+
+        public Stream<Map.Entry<String, Node>> stream() {
+            return fields.entrySet().stream();
+        }
+
+        public void forEach(BiConsumer<? super String, ? super Node> action) {
+            fields.forEach(action);
         }
 
         @Override

@@ -45,6 +45,7 @@ public abstract class JsonMapCodecs {
             final List<Node> nodes = map.entrySet().stream()
                     .map(encode::apply)
                     .collect(toList());
+
             return Node.array(nodes);
         }
 
@@ -64,7 +65,7 @@ public abstract class JsonMapCodecs {
 
             final Node.ArrayNode objNode = in.asArray();
             final Consumer<Node> decode = decodeF.apply(map);
-            objNode.values.forEach(decode);
+            objNode.forEach(decode);
 
             return map;
         }

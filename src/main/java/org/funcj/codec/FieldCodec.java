@@ -168,7 +168,7 @@ public abstract class FieldCodec<E> {
     protected FieldCodec(Field field) {
         this.field = field;
         this.isAccessible = Modifier.isFinal(field.getModifiers()) ||
-                Modifier.isPrivate(field.getModifiers());
+                !Modifier.isPublic(field.getModifiers());
     }
 
     protected void setAccessible(boolean flag) {
