@@ -2,7 +2,7 @@ package org.funcj.data;
 
 import java.util.Objects;
 
-import static org.funcj.util.Functions.*;
+import static org.funcj.util.Functions.F0;
 
 /**
  * Interface for values which are acquired lazily.

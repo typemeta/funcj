@@ -1,7 +1,7 @@
 package org.funcj.control;
 
-import org.funcj.util.*;
 import org.funcj.util.Functions.F;
+import org.funcj.util.FunctionsGenEx;
 
 /**
  * Utility functions relating to exceptions.

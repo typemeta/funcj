@@ -5,8 +5,8 @@ import org.funcj.util.Functions.*;
 
 import java.util.Optional;
 
-import static org.funcj.parser.ParserUtils.*;
 import static org.funcj.parser.Parser.pure;
+import static org.funcj.parser.ParserUtils.*;
 import static org.funcj.util.Functions.F2.curry;
 
 /**

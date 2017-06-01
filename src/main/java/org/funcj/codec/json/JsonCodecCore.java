@@ -4,7 +4,7 @@ import org.funcj.codec.*;
 import org.funcj.control.Exceptions;
 import org.funcj.json.Node;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class JsonCodecCore extends CodecCore<Node> {

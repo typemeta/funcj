@@ -4,7 +4,8 @@ import org.funcj.codec.Codec;
 import org.funcj.control.Exceptions;
 import org.w3c.dom.*;
 
-import java.util.*;
+import java.util.Map;
+
 import static org.funcj.codec.xml.XmlUtils.*;
 
 public abstract class XmlMapCodecs {

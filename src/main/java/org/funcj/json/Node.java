@@ -3,8 +3,8 @@ package org.funcj.json;
 
 import org.funcj.data.*;
 import org.funcj.document.*;
-import org.funcj.util.*;
 import org.funcj.util.Functions.F;
+import org.funcj.util.Functors;
 
 import java.util.*;
 

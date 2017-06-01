@@ -3,7 +3,7 @@ package org.funcj.parser;
 import org.funcj.control.Exceptions;
 import org.funcj.data.Chr;
 
-import java.io.*;
+import java.io.Reader;
 
 public interface Input<I> {
     static Input<Chr> of(char[] data) {
