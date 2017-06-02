@@ -150,7 +150,7 @@ public interface Trampoline<T> {
 
             @Override
             public <U> Validated<E, U> apply(Validated<E, Functions.F<T, U>> vf) {
-                return vf.match(
+                return vf.<Validated<E, U>>match(
                     succ -> cast(),
                     fail -> Validated.failure(IList.concat(errors, fail.errors))
                 );

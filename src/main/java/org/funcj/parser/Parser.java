@@ -153,7 +153,7 @@ public interface Parser<I, A> {
     /**
      * Alternative.
      * Construct a parser which returns the result of either this parser or,
-     * if it fails, then the result of the <code><rhs/code> parser.
+     * if it fails, then the result of the <code><rhs</code> parser.
      * @param rhs alternative parser
      * @return a parser which returns the result of either parser.
      */
