@@ -18,6 +18,10 @@ public class ReflectionUtils {
             this.typeArgs = Collections.emptyList();
         }
 
+        public int size() {
+            return typeArgs.size();
+        }
+
         public Class<?> get(int index) {
             if (index < typeArgs.size()) {
                 return typeArgs.get(index);

@@ -117,7 +117,7 @@ public abstract class CodecCore<E> {
             Codec<K, E> keyCodec,
             Codec<V, E> valueCodec);
 
-    protected abstract <T> Codec<List<T>, E> listCodec(
+    protected abstract <T> Codec<Collection<T>, E> collCodec(
             Class<T> elemType,
             Codec<T, E> elemCodec);
 
@@ -221,16 +221,20 @@ public abstract class CodecCore<E> {
                 codec = (Codec<T, E>) doubleCodec();
             } else if (dynType.equals(String.class)) {
                 codec = (Codec<T, E>) stringCodec();
-            } else if (List.class.isAssignableFrom(dynType)) {
-                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(dynType, List.class);
-                final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
-                final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec(elemType));
-                codec = (Codec<T, E>) listCodec(elemType, elemCodec);
             } else if (Map.class.isAssignableFrom(dynType)) {
                 final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(dynType, Map.class);
                 final Class<?> keyType = typeArgs.get(0);
                 final Class<?> valueType = typeArgs.get(1);
                 codec = (Codec<T, E>) mapCodec(keyType, valueType);
+            } else if (Collection.class.isAssignableFrom(dynType)) {
+                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(dynType, Collection.class);
+                if (typeArgs.size() == 1) {
+                    final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
+                    final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec(elemType));
+                    codec = (Codec<T, E>) collCodec(elemType, elemCodec);
+                } else {
+                    codec = createObjectCodec(dynType);
+                }
             } else {
                 codec = createObjectCodec(dynType);
             }
@@ -336,12 +340,16 @@ public abstract class CodecCore<E> {
                         stcType.equals(Double.class) ||
                         stcType.equals(String.class)) {
                     codec = getNullSafeCodec(stcType);
-                } else if (List.class.isAssignableFrom(stcType)) {
-                    final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, List.class);
-                    final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
-                    final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec(elemType));
-                    final Codec<List<Object>, E> listCodec = listCodec(elemType, elemCodec);
-                    codec = nullSafeCodec(dynamicCheck((Codec) listCodec, stcType));
+                } else if (Collection.class.isAssignableFrom(stcType)) {
+                    final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Collection.class);
+                    if (typeArgs.size() == 1) {
+                        final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
+                        final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec(elemType));
+                        final Codec<Collection<Object>, E> collCodec = collCodec(elemType, elemCodec);
+                        codec = nullSafeCodec(dynamicCheck((Codec) collCodec, stcType));
+                    } else {
+                        codec = nullSafeCodec(dynamicCodec((Class) stcType));
+                    }
                 } else if (Map.class.isAssignableFrom(stcType)) {
                     final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
                     final Class keyType = typeArgs.get(0);

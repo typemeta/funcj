@@ -308,26 +308,28 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <T> Codec<List<T>, Node> listCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
-        return new Codec<List<T>, Node>() {
+    protected <T> Codec<Collection<T>, Node> collCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
+        return new Codec<Collection<T>, Node>() {
             @Override
-            public Node encode(List<T> vals, Node out) {
-                for (int i = 0; i < vals.size(); ++i) {
+            public Node encode(Collection<T> vals, Node out) {
+                int i = 0;
+                for (T val : vals) {
                     final Node node = out.appendChild(doc.createElement(entryElemName()));
-                    elemCodec.encode(vals.get(i), node);
+                    elemCodec.encode(val, node);
+                    i++;
                 }
 
                 return out;
             }
 
             @Override
-            public List<T> decode(Class<List<T>> dynType, Node in) {
+            public Collection<T> decode(Class<Collection<T>> dynType, Node in) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
 
                 final NodeList nodes = in.getChildNodes();
                 final int l = nodes.getLength();
 
-                final List<T> vals = Exceptions.wrap(() -> dynType.newInstance());
+                final Collection<T> vals = Exceptions.wrap(() -> dynType.newInstance());
                 if (vals instanceof ArrayList) {
                     ((ArrayList<T>) vals).ensureCapacity(l);
                 }

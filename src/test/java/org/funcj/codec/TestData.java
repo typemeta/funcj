@@ -13,6 +13,7 @@ public class TestData {
         final T[] valArr;
         final Object[] objArr;
         final List<T> listVal;
+        final Set<T> setVal;
         final Map<String, T> mapStrVal;
         final Map<String, Object> mapStrObj;
         final HashMap<String, Object> hashMapStrObj;
@@ -24,6 +25,7 @@ public class TestData {
             this.valArr = null;
             this.objArr = null;
             this.listVal = null;
+            this.setVal = null;
             this.mapStrVal = null;
             this.mapStrObj = null;
             this.hashMapStrObj = null;
@@ -35,6 +37,7 @@ public class TestData {
                 T[] valArr,
                 Object[] objArr,
                 List<T> listVal,
+                Set<T> setVal,
                 Map<String, T> mapStrVal,
                 Map<String, Object> mapStrObj,
                 HashMap<String, Object> hashMapStrObj,
@@ -44,6 +47,7 @@ public class TestData {
             this.valArr = valArr;
             this.objArr = objArr;
             this.listVal = listVal;
+            this.setVal = setVal;
             this.mapStrVal = mapStrVal;
             this.mapStrObj = mapStrObj;
             this.hashMapStrObj = hashMapStrObj;
@@ -60,6 +64,7 @@ public class TestData {
                     Arrays.equals(valArr, base.valArr) &&
                     Arrays.equals(objArr, base.objArr) &&
                     Objects.equals(listVal, base.listVal) &&
+                    Objects.equals(setVal, base.setVal) &&
                     Objects.equals(mapStrVal, base.mapStrVal) &&
                     Objects.equals(mapStrObj, base.mapStrObj) &&
                     Objects.equals(hashMapStrObj, base.hashMapStrObj) &&
@@ -73,6 +78,8 @@ public class TestData {
                     ", obj=" + obj +
                     ", valArr=" + Arrays.toString(valArr) +
                     ", objArr=" + Arrays.toString(objArr) +
+                    ", listVal=" + listVal +
+                    ", setVal=" + setVal +
                     ", mapStrVal=" + mapStrVal +
                     ", mapStrObj=" + mapStrObj +
                     ", hashMapStrObj=" + hashMapStrObj +
@@ -104,6 +111,7 @@ public class TestData {
                     new Boolean[]{false, true},
                     new Boolean[]{false},
                     arrayList(true, false, true),
+                    treeSet(false, true),
                     treeMap("a", false, "b", true),
                     hashMap("c", true, "d", false),
                     hashMap("c", true, "d", false),
@@ -169,6 +177,7 @@ public class TestData {
                     new Byte[]{10, 20},
                     new Byte[]{123},
                     arrayList((byte)0, (byte)1, (byte)2, (byte)3, null),
+                    treeSet((byte)11, (byte)22),
                     treeMap("a", (byte)1, "b", (byte)2),
                     hashMap("c", (byte)3, "d", (byte)4),
                     hashMap("c", (byte)1, "d", (byte)2),
@@ -234,6 +243,7 @@ public class TestData {
                     new Character[]{'a', 'b'},
                     new Character[]{'c'},
                     arrayList('0', '1', '2', '3', null),
+                    treeSet('z', 'g', 'a'),
                     treeMap("a", 'x', "b", 'y'),
                     hashMap("c", '!', "d", '@'),
                     hashMap("c", '£', "d", '$'),
@@ -299,6 +309,7 @@ public class TestData {
                     new Short[]{10, 20},
                     new Short[]{12345},
                     arrayList((short)0, (short)-1, (short)-2, (short)-3, null),
+                    treeSet((short)100, (short)10, (short)1),
                     treeMap("a", (short)1, "b", (short)2),
                     hashMap("c", (short)3, "d", (short)4),
                     hashMap("c", (short)-1, "d", (short)-2),
@@ -364,6 +375,7 @@ public class TestData {
                     new Integer[]{10, 20},
                     new Integer[]{123456},
                     arrayList(0, -1, -2, -3, null),
+                    treeSet(100, 0, -100),
                     treeMap("a", 1, "b", 2),
                     hashMap("c", 3, "d", 4),
                     hashMap("c", -1, "d", -2),
@@ -424,21 +436,22 @@ public class TestData {
 
         public LongData(Init init) {
             super(
-                    (long)10,
-                    -1000,
-                    new Long[]{10l, 20l},
-                    new Long[]{12345l},
-                    arrayList((long)0, (long)-1, (long)-2, (long)-3, null),
-                    treeMap("a", (long)1, "b", (long)2),
-                    hashMap("c", (long)3, "d", (long)4),
-                    hashMap("c", (long)-1, "d", (long)-2),
-                    treeMap("e", (long)-200, "f", (long)-300)
+                    10L,
+                    -1000L,
+                    new Long[]{10L, 20L},
+                    new Long[]{12345L},
+                    arrayList(0L, -1L, -2L, -3L, null),
+                    treeSet(999L, 9L, -999L),
+                    treeMap("a", 1L, "b", 2L),
+                    hashMap("c", 3L, "d", 4L),
+                    hashMap("c", -1L, "d", -2L),
+                    treeMap("e", -200L, "f", -300L)
             );
-            this.val = -999;
-            this.valArr = new long[]{1234, 5678};
+            this.val = -999L;
+            this.valArr = new long[]{1234L, 5678L};
             this.valArrArr = new long[][]{{12, 34}, {56, 78}, null};
-            this.listVal = arrayList((long)0, (long)1, (long)2, (long)3);
-            this.mapStrVal = treeMap("f", (long)321, "g", (long)654);
+            this.listVal = arrayList(0L, 1L, 2L, 3L);
+            this.mapStrVal = treeMap("f", 321L, "g", 654L);
         }
 
         @Override
@@ -494,6 +507,7 @@ public class TestData {
                     new Float[]{10.1f, 20.2f},
                     new Float[]{123456.5678f},
                     arrayList(0.1f, -1.2f, -2.3f, -3.4f, null),
+                    treeSet(-1000.1f, 101f, 1000.1f),
                     treeMap("a", 1.5f, "b", 2.5f),
                     hashMap("c", 3f, "d", 4f),
                     hashMap("c", -1f, "d", -2f),
@@ -558,17 +572,18 @@ public class TestData {
                     -1000,
                     new Double[]{10.1, 20.2},
                     new Double[]{123456.5678},
-                    arrayList(0.1, -1.2, -2.3, -3.4, null),
-                    treeMap("a", 1.5, "b", 2.5),
-                    hashMap("c", 3, "d", 4),
-                    hashMap("c", -1, "d", -2),
-                    treeMap("e", -200, "f", -300)
+                    arrayList(0.1d, -1.2d, -2.3d, -3.4d, null),
+                    treeSet(-1000.1d, 101d, 1000.1d),
+                    treeMap("a", 1.5d, "b", 2.5d),
+                    hashMap("c", 3d, "d", 4d),
+                    hashMap("c", -1d, "d", -2d),
+                    treeMap("e", -200d, "f", -300d)
             );
-            this.val = -999;
-            this.valArr = new double[]{1234, 5678};
-            this.valArrArr = new double[][]{{12, 34}, {56, 78}, null};
-            this.listVal = arrayList(0.1, 1.2, 2.3, 3.4);
-            this.mapStrVal = treeMap("f", 321.9, "g", 654.3);
+            this.val = -999d;
+            this.valArr = new double[]{1234d, 5678d};
+            this.valArrArr = new double[][]{{12d, 34d}, {56d, 78d}, null};
+            this.listVal = arrayList(0.1d, 1.2d, 2.3d, 3.4d);
+            this.mapStrVal = treeMap("f", 321.9d, "g", 654.3d);
         }
 
         @Override
@@ -606,9 +621,7 @@ abstract class TestDataUtils {
 
     static <T> ArrayList<T> arrayList(T... vals) {
         final ArrayList<T> l = new ArrayList<T>(vals.length);
-        for (T val : vals) {
-            l.add(val);
-        }
+        l.addAll(Arrays.asList(vals));
         return l;
     }
 
@@ -626,4 +639,9 @@ abstract class TestDataUtils {
         return m;
     }
 
+    static <T> TreeSet<T> treeSet(T... vals) {
+        final TreeSet<T> l = new TreeSet<T>();
+        l.addAll(Arrays.asList(vals));
+        return l;
+    }
 }

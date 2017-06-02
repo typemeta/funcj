@@ -460,10 +460,10 @@ public class JsonCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <T> Codec<List<T>, Node> listCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
-        return new Codec<List<T>, Node>() {
+    protected <T> Codec<Collection<T>, Node> collCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
+        return new Codec<Collection<T>, Node>() {
             @Override
-            public Node encode(List<T> vals, Node out) {
+            public Node encode(Collection<T> vals, Node out) {
                 final List<Node> nodes = new ArrayList<>(vals.size());
                 for (T val : vals) {
                     nodes.add(elemCodec.encode(val, out));
@@ -472,10 +472,10 @@ public class JsonCodecCore extends CodecCore<Node> {
             }
 
             @Override
-            public List<T> decode(Class<List<T>> dynType, Node in) {
+            public Collection<T> decode(Class<Collection<T>> dynType, Node in) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
                 final Node.ArrayNode arrNode = in.asArray();
-                final List<T> vals = Exceptions.wrap(() -> dynType.newInstance());
+                final Collection<T> vals = Exceptions.wrap(() -> dynType.newInstance());
                 int i = 0;
                 for (Node node : arrNode) {
                     vals.add(elemCodec.decode(dynElemType, node));
