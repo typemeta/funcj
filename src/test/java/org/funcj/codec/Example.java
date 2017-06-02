@@ -323,14 +323,15 @@ public abstract class Example {
             return new Simple2(m);
         }
 
-        final boolean[] value;
+        final List<Double> value;
 
         Simple2() {
             value = null;
         }
 
         Simple2(HashMap<String, T> value) {
-            this.value = null;
+            this.value = new ArrayList<Double>();
+            this.value.add(1.2);
         }
 
         @Override

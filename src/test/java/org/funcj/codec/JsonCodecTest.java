@@ -10,6 +10,15 @@ import static java.lang.System.out;
 public class JsonCodecTest {
     final static JsonCodecCore codec = new JsonCodecCore();
 
+    private <T> void roundTrip(T val, Class<T> clazz) {
+        final Node node = codec.encode(clazz, val);
+        out.println(node.toJson(40));
+
+        final T val2 = codec.decode(clazz, node);
+
+        Assert.assertEquals(val, val2);
+    }
+
     @Test
     public void testBooleanNulls() {
         roundTrip(new BooleanData(), BooleanData.class);
@@ -18,6 +27,36 @@ public class JsonCodecTest {
     @Test
     public void testBoolean() {
         roundTrip(new BooleanData(Init.INIT), BooleanData.class);
+    }
+
+    @Test
+    public void testByteNulls() {
+        roundTrip(new ByteData(), ByteData.class);
+    }
+
+    @Test
+    public void testByte() {
+        roundTrip(new ByteData(Init.INIT), ByteData.class);
+    }
+
+    @Test
+    public void testCharNulls() {
+        roundTrip(new CharData(), CharData.class);
+    }
+
+    @Test
+    public void testChar() {
+        roundTrip(new CharData(Init.INIT), CharData.class);
+    }
+
+    @Test
+    public void testShortNulls() {
+        roundTrip(new ShortData(), ShortData.class);
+    }
+
+    @Test
+    public void testShort() {
+        roundTrip(new ShortData(Init.INIT), ShortData.class);
     }
 
     @Test
@@ -30,12 +69,33 @@ public class JsonCodecTest {
         roundTrip(new IntegerData(Init.INIT), IntegerData.class);
     }
 
-    private <T> void roundTrip(T val, Class<T> clazz) {
-        final Node node = codec.encode(clazz, val);
-        out.println(node.toJson(40));
+    @Test
+    public void testLongNulls() {
+        roundTrip(new LongData(), LongData.class);
+    }
 
-        final T val2 = codec.decode(clazz, node);
+    @Test
+    public void testLong() {
+        roundTrip(new LongData(Init.INIT), LongData.class);
+    }
 
-        Assert.assertEquals(val, val2);
+    @Test
+    public void testFloatNulls() {
+        roundTrip(new FloatData(), FloatData.class);
+    }
+
+    @Test
+    public void testFloat() {
+        roundTrip(new FloatData(Init.INIT), FloatData.class);
+    }
+
+    @Test
+    public void testDoubleNulls() {
+        roundTrip(new DoubleData(), DoubleData.class);
+    }
+
+    @Test
+    public void testDouble() {
+        roundTrip(new DoubleData(Init.INIT), DoubleData.class);
     }
 }

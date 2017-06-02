@@ -182,19 +182,19 @@ public abstract class CodecCore<E> {
                 } else {
                     if (elemType.equals(Boolean.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Boolean.class, booleanCodec());
-                    } else if (elemType.equals(Integer.class)) {
+                    } else if (elemType.equals(Byte.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Byte.class, byteCodec());
-                    } else if (elemType.equals(Integer.class)) {
+                    } else if (elemType.equals(Character.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Character.class, charCodec());
-                    } else if (elemType.equals(Integer.class)) {
+                    } else if (elemType.equals(Short.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Short.class, shortCodec());
                     } else if (elemType.equals(Integer.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Integer.class, intCodec());
-                    } else if (elemType.equals(Integer.class)) {
+                    } else if (elemType.equals(Long.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Long.class, longCodec());
-                    } else if (elemType.equals(Integer.class)) {
+                    } else if (elemType.equals(Float.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Float.class, floatCodec());
-                    } else if (elemType.equals(Integer.class)) {
+                    } else if (elemType.equals(Double.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Double.class, doubleCodec());
                     } else {
                         final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec((Class<Object>) elemType));
@@ -205,8 +205,20 @@ public abstract class CodecCore<E> {
                 codec = enumCodec((Class) dynType);
             } else if (dynType.equals(Boolean.class)) {
                 codec = (Codec<T, E>) booleanCodec();
+            } else if (dynType.equals(Byte.class)) {
+                codec = (Codec<T, E>) byteCodec();
+            } else if (dynType.equals(Character.class)) {
+                codec = (Codec<T, E>) charCodec();
+            } else if (dynType.equals(Short.class)) {
+                codec = (Codec<T, E>) shortCodec();
             } else if (dynType.equals(Integer.class)) {
                 codec = (Codec<T, E>) intCodec();
+            } else if (dynType.equals(Long.class)) {
+                codec = (Codec<T, E>) longCodec();
+            } else if (dynType.equals(Float.class)) {
+                codec = (Codec<T, E>) floatCodec();
+            } else if (dynType.equals(Double.class)) {
+                codec = (Codec<T, E>) doubleCodec();
             } else if (dynType.equals(String.class)) {
                 codec = (Codec<T, E>) stringCodec();
             } else if (List.class.isAssignableFrom(dynType)) {
@@ -315,7 +327,13 @@ public abstract class CodecCore<E> {
 
                 if (stcType.isEnum() ||
                         stcType.equals(Boolean.class) ||
+                        stcType.equals(Byte.class) ||
+                        stcType.equals(Character.class) ||
+                        stcType.equals(Short.class) ||
                         stcType.equals(Integer.class) ||
+                        stcType.equals(Long.class) ||
+                        stcType.equals(Float.class) ||
+                        stcType.equals(Double.class) ||
                         stcType.equals(String.class)) {
                     codec = getNullSafeCodec(stcType);
                 } else if (List.class.isAssignableFrom(stcType)) {
