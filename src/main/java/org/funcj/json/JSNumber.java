@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public final class JSNumber extends AbstractJSValue {
 
-    protected final double value;
+    private final double value;
 
     public JSNumber(double value) {
         this.value = value;

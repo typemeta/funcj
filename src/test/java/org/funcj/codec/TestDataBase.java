@@ -1,10 +1,12 @@
 package org.funcj.codec;
 
+import org.funcj.json.JSValue;
+
 import java.util.*;
 
 import static org.funcj.codec.TestDataUtils.*;
 
-public class DataBase {
+public class TestDataBase {
     enum Init {INIT}
 
     static class Base<T> {
@@ -613,6 +615,78 @@ public class DataBase {
                     ", listVal=" + listVal + 
                     ", mapStrVal=" + mapStrVal +
                     "} " + super.toString();
+        }
+    }
+
+    public static final class NoPublicEmptyCtor {
+        public static NoPublicEmptyCtor create(boolean flag) {
+            return new NoPublicEmptyCtor(flag);
+        }
+
+        public boolean flag;
+
+        private NoPublicEmptyCtor() {
+        }
+
+        private NoPublicEmptyCtor(boolean flag) {
+            this.flag = flag;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            NoPublicEmptyCtor that = (NoPublicEmptyCtor) o;
+            return flag == that.flag;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(flag);
+        }
+
+        @Override
+        public String toString() {
+            return "NoPublicEmptyCtor{" +
+                    "flag=" + flag +
+                    '}';
+        }
+    }
+
+    public static class Recursive {
+        private final Recursive next;
+        private final int id;
+
+        public Recursive() {
+            this.next = null;
+            this.id = -1;
+        }
+
+        public Recursive(Recursive next, int id) {
+            this.next = next;
+            this.id = id;
+        }
+
+        @Override
+        public String toString() {
+            return "Recursive{" +
+                    "next=" + next +
+                    ", id=" + id +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Recursive recursive = (Recursive) o;
+            return id == recursive.id &&
+                    Objects.equals(next, recursive.next);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(next, id);
         }
     }
 }

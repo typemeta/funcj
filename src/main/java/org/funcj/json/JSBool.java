@@ -7,10 +7,14 @@ public enum JSBool implements JSValue {
     TRUE(true),
     FALSE(false);
 
-    public final boolean value;
+    private final boolean value;
 
     JSBool(boolean value) {
         this.value = value;
+    }
+
+    public boolean getValue() {
+        return value;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.funcj.codec;
 
+import org.funcj.codec.TestDataBase.*;
 import org.junit.Test;
 
 public abstract class TestBase {
@@ -8,81 +9,98 @@ public abstract class TestBase {
 
     @Test
     public void testBooleanNulls() {
-        roundTrip(new DataBase.BooleanData(), DataBase.BooleanData.class);
+        roundTrip(new BooleanData(), BooleanData.class);
     }
 
     @Test
     public void testBoolean() {
-        roundTrip(new DataBase.BooleanData(DataBase.Init.INIT), DataBase.BooleanData.class);
+        roundTrip(new BooleanData(Init.INIT), BooleanData.class);
     }
 
     @Test
     public void testByteNulls() {
-        roundTrip(new DataBase.ByteData(), DataBase.ByteData.class);
+        roundTrip(new ByteData(), ByteData.class);
     }
 
     @Test
     public void testByte() {
-        roundTrip(new DataBase.ByteData(DataBase.Init.INIT), DataBase.ByteData.class);
+        roundTrip(new ByteData(Init.INIT), ByteData.class);
     }
 
     @Test
     public void testCharNulls() {
-        roundTrip(new DataBase.CharData(), DataBase.CharData.class);
+        roundTrip(new CharData(), CharData.class);
     }
 
     @Test
     public void testChar() {
-        roundTrip(new DataBase.CharData(DataBase.Init.INIT), DataBase.CharData.class);
+        roundTrip(new CharData(Init.INIT), CharData.class);
     }
 
     @Test
     public void testShortNulls() {
-        roundTrip(new DataBase.ShortData(), DataBase.ShortData.class);
+        roundTrip(new ShortData(), ShortData.class);
     }
 
     @Test
     public void testShort() {
-        roundTrip(new DataBase.ShortData(DataBase.Init.INIT), DataBase.ShortData.class);
+        roundTrip(new ShortData(Init.INIT), ShortData.class);
     }
 
     @Test
     public void testIntegerNulls() {
-        roundTrip(new DataBase.IntegerData(), DataBase.IntegerData.class);
+        roundTrip(new IntegerData(), IntegerData.class);
     }
 
     @Test
     public void testInteger() {
-        roundTrip(new DataBase.IntegerData(DataBase.Init.INIT), DataBase.IntegerData.class);
+        roundTrip(new IntegerData(Init.INIT), IntegerData.class);
     }
 
     @Test
     public void testLongNulls() {
-        roundTrip(new DataBase.LongData(), DataBase.LongData.class);
+        roundTrip(new LongData(), LongData.class);
     }
 
     @Test
     public void testLong() {
-        roundTrip(new DataBase.LongData(DataBase.Init.INIT), DataBase.LongData.class);
+        roundTrip(new LongData(Init.INIT), LongData.class);
     }
 
     @Test
     public void testFloatNulls() {
-        roundTrip(new DataBase.FloatData(), DataBase.FloatData.class);
+        roundTrip(new FloatData(), FloatData.class);
     }
 
     @Test
     public void testFloat() {
-        roundTrip(new DataBase.FloatData(DataBase.Init.INIT), DataBase.FloatData.class);
+        roundTrip(new FloatData(Init.INIT), FloatData.class);
     }
 
     @Test
     public void testDoubleNulls() {
-        roundTrip(new DataBase.DoubleData(), DataBase.DoubleData.class);
+        roundTrip(new DoubleData(), DoubleData.class);
     }
 
     @Test
     public void testDouble() {
-        roundTrip(new DataBase.DoubleData(DataBase.Init.INIT), DataBase.DoubleData.class);
+        roundTrip(new DoubleData(Init.INIT), DoubleData.class);
+    }
+
+    @Test
+    public void testNoPublicEmptyCtor() {
+        roundTrip(NoPublicEmptyCtor.create(true), NoPublicEmptyCtor.class);
+    }
+
+    @Test
+    public void testRecursive() {
+        final Recursive rec = new Recursive(null, 0);
+        roundTrip(rec, Recursive.class);
+
+        final Recursive rec2 = new Recursive(rec, 1);
+        roundTrip(rec2, Recursive.class);
+
+        final Recursive rec3 = new Recursive(rec2, 2);
+        roundTrip(rec3, Recursive.class);
     }
 }

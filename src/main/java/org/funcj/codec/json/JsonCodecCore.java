@@ -9,15 +9,15 @@ import java.util.*;
 
 public class JsonCodecCore extends CodecCore<JSValue> {
 
-    protected String typeFieldName() {
+    public String typeFieldName() {
         return "@type";
     }
 
-    protected String keyFieldName() {
+    public String keyFieldName() {
         return "@key";
     }
 
-    protected String valueFieldName() {
+    public String valueFieldName() {
         return "@value";
     }
 
@@ -45,7 +45,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     }
 
     @Override
-    protected Codec.NullCodec<JSValue> nullCodec() {
+    public Codec.NullCodec<JSValue> nullCodec() {
         return nullCodec;
     }
 
@@ -58,12 +58,12 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public boolean decodePrim(JSValue in) {
-            return in.asBool().value;
+            return in.asBool().getValue();
         }
     };
 
     @Override
-    protected Codec.BooleanCodec<JSValue> booleanCodec() {
+    public Codec.BooleanCodec<JSValue> booleanCodec() {
         return booleanCodec;
     }
 
@@ -91,7 +91,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec<boolean[], JSValue> booleanArrayCodec() {
+    public Codec<boolean[], JSValue> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
@@ -109,7 +109,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec.ByteCodec<JSValue> byteCodec() {
+    public Codec.ByteCodec<JSValue> byteCodec() {
         return byteCodec;
     }
 
@@ -137,7 +137,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec<byte[], JSValue> byteArrayCodec() {
+    public Codec<byte[], JSValue> byteArrayCodec() {
         return byteArrayCodec;
     }
 
@@ -155,7 +155,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec.CharCodec<JSValue> charCodec() {
+    public Codec.CharCodec<JSValue> charCodec() {
         return charCodec;
     }
 
@@ -183,7 +183,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec<char[], JSValue> charArrayCodec() {
+    public Codec<char[], JSValue> charArrayCodec() {
         return charArrayCodec;
     }
 
@@ -201,7 +201,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec.ShortCodec<JSValue> shortCodec() {
+    public Codec.ShortCodec<JSValue> shortCodec() {
         return shortCodec;
     }
 
@@ -229,7 +229,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec<short[], JSValue> shortArrayCodec() {
+    public Codec<short[], JSValue> shortArrayCodec() {
         return shortArrayCodec;
     }
 
@@ -247,7 +247,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec.IntCodec<JSValue> intCodec() {
+    public Codec.IntCodec<JSValue> intCodec() {
         return intCodec;
     }
 
@@ -275,7 +275,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec<int[], JSValue> intArrayCodec() {
+    public Codec<int[], JSValue> intArrayCodec() {
         return intArrayCodec;
     }
 
@@ -293,7 +293,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec.LongCodec<JSValue> longCodec() {
+    public Codec.LongCodec<JSValue> longCodec() {
         return longCodec;
     }
 
@@ -321,7 +321,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec<long[], JSValue> longArrayCodec() {
+    public Codec<long[], JSValue> longArrayCodec() {
         return longArrayCodec;
     }
 
@@ -339,7 +339,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec.FloatCodec<JSValue> floatCodec() {
+    public Codec.FloatCodec<JSValue> floatCodec() {
         return floatCodec;
     }
 
@@ -367,7 +367,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec<float[], JSValue> floatArrayCodec() {
+    public Codec<float[], JSValue> floatArrayCodec() {
         return floatArrayCodec;
     }
 
@@ -385,7 +385,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec.DoubleCodec<JSValue> doubleCodec() {
+    public Codec.DoubleCodec<JSValue> doubleCodec() {
         return doubleCodec;
     }
 
@@ -413,7 +413,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec<double[], JSValue> doubleArrayCodec() {
+    public Codec<double[], JSValue> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
@@ -430,12 +430,12 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     };
 
     @Override
-    protected Codec<String, JSValue> stringCodec() {
+    public Codec<String, JSValue> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    protected <EM extends Enum<EM>> Codec<EM, JSValue> enumCodec(Class<? super EM> enumType) {
+    public <EM extends Enum<EM>> Codec<EM, JSValue> enumCodec(Class<? super EM> enumType) {
         return new Codec<EM, JSValue>() {
             @Override
             public JSValue encode(EM val, JSValue out) {
@@ -450,17 +450,17 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     }
 
     @Override
-    protected <V> Codec<Map<String, V>, JSValue> mapCodec(Codec<V, JSValue> valueCodec) {
+    public <V> Codec<Map<String, V>, JSValue> mapCodec(Codec<V, JSValue> valueCodec) {
         return new JsonMapCodecs.StringMapCodec<V>(this, valueCodec);
     }
 
     @Override
-    protected <K, V> Codec<Map<K, V>, JSValue> mapCodec(Codec<K, JSValue> keyCodec, Codec<V, JSValue> valueCodec) {
+    public <K, V> Codec<Map<K, V>, JSValue> mapCodec(Codec<K, JSValue> keyCodec, Codec<V, JSValue> valueCodec) {
         return new JsonMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
     }
 
     @Override
-    protected <T> Codec<Collection<T>, JSValue> collCodec(Class<T> elemType, Codec<T, JSValue> elemCodec) {
+    public <T> Codec<Collection<T>, JSValue> collCodec(Class<T> elemType, Codec<T, JSValue> elemCodec) {
         return new Codec<Collection<T>, JSValue>() {
             @Override
             public JSValue encode(Collection<T> vals, JSValue out) {
@@ -486,7 +486,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     }
 
     @Override
-    protected <T> Codec<T[], JSValue> objectArrayCodec(Class<T> elemType, Codec<T, JSValue> elemCodec) {
+    public <T> Codec<T[], JSValue> objectArrayCodec(Class<T> elemType, Codec<T, JSValue> elemCodec) {
         return new Codec<T[], JSValue>() {
             @Override
             public JSValue encode(T[] vals, JSValue out) {
@@ -512,7 +512,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     }
 
     @Override
-    protected <T> Codec<T, JSValue> dynamicCodec(Class<T> stcType) {
+    public <T> Codec<T, JSValue> dynamicCodec(Class<T> stcType) {
         return new Codec<T, JSValue>() {
             @Override
             public JSValue encode(T val, JSValue out) {
@@ -558,7 +558,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     }
 
     @Override
-    protected <T> Codec<T, JSValue> dynamicCodec(Codec<T, JSValue> codec, Class<T> stcType) {
+    public <T> Codec<T, JSValue> dynamicCodec(Codec<T, JSValue> codec, Class<T> stcType) {
         return new Codec<T, JSValue>() {
             @Override
             public JSValue encode(T val, JSValue out) {
@@ -593,7 +593,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     }
 
     @Override
-    protected <T> Codec<T, JSValue> createObjectCodec(
+    public <T> Codec<T, JSValue> createObjectCodec(
             Class<T> type,
             Map<String, FieldCodec<JSValue>> fieldCodecs) {
         return new Codec<T, JSValue>() {

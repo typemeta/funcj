@@ -10,6 +10,10 @@ public abstract class CodecCore<E> {
 
     protected final Map<String, Codec<?, E>> codecs = new HashMap<>();
 
+    public <T> void registerCodec(Class<T> clazz, Codec<T, E> codec) {
+        codecs.put(classToName(clazz), codec);
+    }
+
     abstract public <T> E encode(Class<T> type, T val);
 
     public <T> E encode(Class<T> type, T val, E out) {
@@ -19,7 +23,6 @@ public abstract class CodecCore<E> {
     public <T> T decode(Class<T> type, E in) {
         return dynamicCodec(type).decode(in);
     }
-
 
     protected String classToName(Class<?> clazz) {
         return clazz.getName();
@@ -61,45 +64,45 @@ public abstract class CodecCore<E> {
         };
     }
 
-    protected abstract Codec.NullCodec<E> nullCodec();
+    public abstract Codec.NullCodec<E> nullCodec();
 
-    protected abstract Codec.BooleanCodec<E> booleanCodec();
+    public abstract Codec.BooleanCodec<E> booleanCodec();
 
-    protected abstract Codec<boolean[], E> booleanArrayCodec();
+    public abstract Codec<boolean[], E> booleanArrayCodec();
 
-    protected abstract Codec.ByteCodec<E> byteCodec();
+    public abstract Codec.ByteCodec<E> byteCodec();
 
-    protected abstract Codec<byte[], E> byteArrayCodec();
+    public abstract Codec<byte[], E> byteArrayCodec();
 
-    protected abstract Codec.CharCodec<E> charCodec();
+    public abstract Codec.CharCodec<E> charCodec();
 
-    protected abstract Codec<char[], E> charArrayCodec();
+    public abstract Codec<char[], E> charArrayCodec();
 
-    protected abstract Codec.ShortCodec<E> shortCodec();
+    public abstract Codec.ShortCodec<E> shortCodec();
 
-    protected abstract Codec<short[], E> shortArrayCodec();
+    public abstract Codec<short[], E> shortArrayCodec();
 
-    protected abstract Codec.IntCodec<E> intCodec();
+    public abstract Codec.IntCodec<E> intCodec();
 
-    protected abstract Codec<int[], E> intArrayCodec();
+    public abstract Codec<int[], E> intArrayCodec();
 
-    protected abstract Codec.LongCodec<E> longCodec();
+    public abstract Codec.LongCodec<E> longCodec();
 
-    protected abstract Codec<long[], E> longArrayCodec();
+    public abstract Codec<long[], E> longArrayCodec();
 
-    protected abstract Codec.FloatCodec<E> floatCodec();
+    public abstract Codec.FloatCodec<E> floatCodec();
 
-    protected abstract Codec<float[], E> floatArrayCodec();
+    public abstract Codec<float[], E> floatArrayCodec();
 
-    protected abstract Codec.DoubleCodec<E> doubleCodec();
+    public abstract Codec.DoubleCodec<E> doubleCodec();
 
-    protected abstract Codec<double[], E> doubleArrayCodec();
+    public abstract Codec<double[], E> doubleArrayCodec();
 
-    protected abstract Codec<String, E> stringCodec();
+    public abstract Codec<String, E> stringCodec();
 
-    protected abstract <EM extends Enum<EM>> Codec<EM, E> enumCodec(Class<? super EM> enumType);
+    public abstract <EM extends Enum<EM>> Codec<EM, E> enumCodec(Class<? super EM> enumType);
 
-    protected <K, V> Codec<Map<K, V>, E> mapCodec(
+    public <K, V> Codec<Map<K, V>, E> mapCodec(
             Class<K> keyType,
             Class<V> valType)  {
         final Codec<V, E> valueCodec = dynamicCodec(valType);
@@ -111,34 +114,34 @@ public abstract class CodecCore<E> {
         }
     }
 
-    protected abstract <V> Codec<Map<String, V>, E> mapCodec(Codec<V, E> valueCodec);
+    public abstract <V> Codec<Map<String, V>, E> mapCodec(Codec<V, E> valueCodec);
 
-    protected abstract <K, V> Codec<Map<K, V>, E> mapCodec(
+    public abstract <K, V> Codec<Map<K, V>, E> mapCodec(
             Codec<K, E> keyCodec,
             Codec<V, E> valueCodec);
 
-    protected abstract <T> Codec<Collection<T>, E> collCodec(
+    public abstract <T> Codec<Collection<T>, E> collCodec(
             Class<T> elemType,
             Codec<T, E> elemCodec);
 
-    protected abstract <T> Codec<T[], E> objectArrayCodec(
+    public abstract <T> Codec<T[], E> objectArrayCodec(
             Class<T> elemType,
             Codec<T, E> elemCodec);
 
-    protected abstract <T> Codec<T, E> dynamicCodec(Class<T> stcType);
+    public abstract <T> Codec<T, E> dynamicCodec(Class<T> stcType);
 
-    protected abstract <T> Codec<T, E> dynamicCodec(Codec<T, E> codec, Class<T> stcType);
+    public abstract <T> Codec<T, E> dynamicCodec(Codec<T, E> codec, Class<T> stcType);
 
-    protected <T> Codec<T, E> getNullSafeCodec(Class<T> dynType) {
+    public <T> Codec<T, E> getNullSafeCodec(Class<T> dynType) {
         return nullSafeCodec(getNullUnsafeCodec(dynType));
     }
 
-    protected <T> Codec<T, E> getNullUnsafeCodec(Class<T> dynType) {
+    public <T> Codec<T, E> getNullUnsafeCodec(Class<T> dynType) {
         final String name = classToName(dynType);
         return (Codec<T, E>)codecs.computeIfAbsent(name, n -> getCodecImpl(dynType));
     }
 
-    protected <T> Codec<T, E> getCodecImpl(Class<T> dynType) {
+    public <T> Codec<T, E> getCodecImpl(Class<T> dynType) {
         if (dynType.isPrimitive()) {
             if (dynType.equals(boolean.class)) {
                 return (Codec<T, E>)booleanCodec();
@@ -243,7 +246,7 @@ public abstract class CodecCore<E> {
         }
     }
 
-    protected <T> Codec<T, E> createObjectCodec(Class<T> type) {
+    public <T> Codec<T, E> createObjectCodec(Class<T> type) {
         final Map<String, FieldCodec<E>> fieldCodecs = new LinkedHashMap<>();
         Class<?> clazz = type;
         for (int depth = 0; !clazz.equals(Object.class); depth++) {
@@ -261,11 +264,11 @@ public abstract class CodecCore<E> {
         return createObjectCodec(type, fieldCodecs);
     }
 
-    protected abstract <T> Codec<T, E> createObjectCodec(
+    public abstract <T> Codec<T, E> createObjectCodec(
             Class<T> type,
             Map<String, FieldCodec<E>> fieldCodecs);
 
-    protected String getFieldName(Field field, int depth, Set<String> existingNames) {
+    public String getFieldName(Field field, int depth, Set<String> existingNames) {
         String name = field.getName();
         while (existingNames.contains(name)) {
             name = "*" + name;
@@ -273,7 +276,7 @@ public abstract class CodecCore<E> {
         return name;
     }
 
-    protected <T> FieldCodec<E> getFieldCodec(Field field) {
+    public <T> FieldCodec<E> getFieldCodec(Field field) {
         final Class<T> stcType = (Class<T>)field.getType();
         if (stcType.isPrimitive()) {
             if (stcType.equals(boolean.class)) {
@@ -365,7 +368,7 @@ public abstract class CodecCore<E> {
         }
     }
 
-    protected <T> Codec<T, E> dynamicCheck(Codec<T, E> codec, Class<T> stcType) {
+    public <T> Codec<T, E> dynamicCheck(Codec<T, E> codec, Class<T> stcType) {
         if (Modifier.isFinal(stcType.getModifiers())) {
             return codec;
         } else {

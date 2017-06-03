@@ -41,6 +41,7 @@
         <jdk.version>1.8</jdk.version>
         <jmh.version>1.18</jmh.version>
         <junit.version>4.12</junit.version>
+        <immutables.version>2.5.1</immutables.version>
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <uberjar.name>benchmarks</uberjar.name>
@@ -66,11 +67,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>com.github.biboudis</groupId>-->
-            <!--<artifactId>jmh-profilers</artifactId>-->
-            <!--<version>0.1.2</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
+            <version>${immutables.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

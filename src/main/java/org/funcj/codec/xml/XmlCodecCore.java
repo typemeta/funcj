@@ -31,27 +31,27 @@ public class XmlCodecCore extends CodecCore<Node> {
         return doc;
     }
 
-    protected String entryElemName() {
+    public String entryElemName() {
         return "elem";
     }
 
-    protected String indexAttrName() {
+    public String indexAttrName() {
         return "i";
     }
 
-    protected String typeAttrName() {
+    public String typeAttrName() {
         return "type";
     }
 
-    protected String keyAttrName() {
+    public String keyAttrName() {
         return "key";
     }
 
-    protected String keyElemName() {
+    public String keyElemName() {
         return "key";
     }
 
-    protected String valueElemName() {
+    public String valueElemName() {
         return "value";
     }
 
@@ -93,7 +93,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected Codec.NullCodec<Node> nullCodec() {
+    public Codec.NullCodec<Node> nullCodec() {
         return nullCodec;
     }
 
@@ -112,7 +112,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.BooleanCodec<Node> booleanCodec() {
+    public Codec.BooleanCodec<Node> booleanCodec() {
         return booleanCodec;
     }
 
@@ -146,7 +146,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<boolean[], Node> booleanArrayCodec() {
+    public Codec<boolean[], Node> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
@@ -165,7 +165,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.ByteCodec<Node> byteCodec() {
+    public Codec.ByteCodec<Node> byteCodec() {
         return byteCodec;
     }
 
@@ -199,7 +199,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<byte[], Node> byteArrayCodec() {
+    public Codec<byte[], Node> byteArrayCodec() {
         return byteArrayCodec;
     }
 
@@ -218,7 +218,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.CharCodec<Node> charCodec() {
+    public Codec.CharCodec<Node> charCodec() {
         return charCodec;
     }
 
@@ -252,7 +252,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<char[], Node> charArrayCodec() {
+    public Codec<char[], Node> charArrayCodec() {
         return charArrayCodec;
     }
 
@@ -271,7 +271,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.ShortCodec<Node> shortCodec() {
+    public Codec.ShortCodec<Node> shortCodec() {
         return shortCodec;
     }
 
@@ -305,7 +305,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<short[], Node> shortArrayCodec() {
+    public Codec<short[], Node> shortArrayCodec() {
         return shortArrayCodec;
     }
 
@@ -324,7 +324,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.IntCodec<Node> intCodec() {
+    public Codec.IntCodec<Node> intCodec() {
         return intCodec;
     }
 
@@ -358,7 +358,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<int[], Node> intArrayCodec() {
+    public Codec<int[], Node> intArrayCodec() {
         return intArrayCodec;
     }
 
@@ -377,7 +377,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.LongCodec<Node> longCodec() {
+    public Codec.LongCodec<Node> longCodec() {
         return longCodec;
     }
 
@@ -411,7 +411,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<long[], Node> longArrayCodec() {
+    public Codec<long[], Node> longArrayCodec() {
         return longArrayCodec;
     }
 
@@ -430,7 +430,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.FloatCodec<Node> floatCodec() {
+    public Codec.FloatCodec<Node> floatCodec() {
         return floatCodec;
     }
 
@@ -464,7 +464,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<float[], Node> floatArrayCodec() {
+    public Codec<float[], Node> floatArrayCodec() {
         return floatArrayCodec;
     }
 
@@ -483,7 +483,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec.DoubleCodec<Node> doubleCodec() {
+    public Codec.DoubleCodec<Node> doubleCodec() {
         return doubleCodec;
     }
 
@@ -517,7 +517,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<double[], Node> doubleArrayCodec() {
+    public Codec<double[], Node> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
@@ -535,12 +535,12 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    protected Codec<String, Node> stringCodec() {
+    public Codec<String, Node> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    protected <EM extends Enum<EM>> Codec<EM, Node> enumCodec(Class<? super EM> enumType) {
+    public <EM extends Enum<EM>> Codec<EM, Node> enumCodec(Class<? super EM> enumType) {
         return new Codec<EM, Node>() {
             @Override
             public Node encode(EM val, Node out) {
@@ -556,17 +556,17 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <V> Codec<Map<String, V>, Node> mapCodec(Codec<V, Node> valueCodec) {
+    public <V> Codec<Map<String, V>, Node> mapCodec(Codec<V, Node> valueCodec) {
         return new XmlMapCodecs.StringMapCodec<V>(this, valueCodec);
     }
 
     @Override
-    protected <K, V> Codec<Map<K, V>, Node> mapCodec(Codec<K, Node> keyCodec, Codec<V, Node> valueCodec) {
+    public <K, V> Codec<Map<K, V>, Node> mapCodec(Codec<K, Node> keyCodec, Codec<V, Node> valueCodec) {
         return new XmlMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
     }
 
     @Override
-    protected <T> Codec<Collection<T>, Node> collCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
+    public <T> Codec<Collection<T>, Node> collCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
         return new Codec<Collection<T>, Node>() {
             @Override
             public Node encode(Collection<T> vals, Node out) {
@@ -605,7 +605,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <T> Codec<T[], Node> objectArrayCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
+    public <T> Codec<T[], Node> objectArrayCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
         return new Codec<T[], Node>() {
             @Override
             public Node encode(T[] vals, Node out) {
@@ -639,7 +639,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <T> Codec<T, Node> dynamicCodec(Class<T> stcType) {
+    public <T> Codec<T, Node> dynamicCodec(Class<T> stcType) {
         return new Codec<T, Node>() {
             @Override
             public Node encode(T val, Node out) {
@@ -672,7 +672,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <T> Codec<T, Node> dynamicCodec(Codec<T, Node> codec, Class<T> stcType) {
+    public <T> Codec<T, Node> dynamicCodec(Codec<T, Node> codec, Class<T> stcType) {
         return new Codec<T, Node>() {
             @Override
             public Node encode(T val, Node out) {
@@ -700,7 +700,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected <T> Codec<T, Node> createObjectCodec(
+    public <T> Codec<T, Node> createObjectCodec(
             Class<T> type,
             Map<String, FieldCodec<Node>> fieldCodecs) {
         return new Codec<T, Node>() {
@@ -726,7 +726,7 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    protected String getFieldName(Field field, int depth, Set<String> existingNames) {
+    public String getFieldName(Field field, int depth, Set<String> existingNames) {
         String name = field.getName();
         while (existingNames.contains(name)) {
             name = "_" + name;
