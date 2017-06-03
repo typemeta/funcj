@@ -251,7 +251,7 @@ public class JsonCodecCore extends CodecCore<Node> {
         return intCodec;
     }
 
-    private final Codec<int[], Node> integerArrayCodec = new Codec<int[], Node>() {
+    private final Codec<int[], Node> intArrayCodec = new Codec<int[], Node>() {
 
         @Override
         public Node encode(int[] vals, Node out) {
@@ -276,7 +276,7 @@ public class JsonCodecCore extends CodecCore<Node> {
 
     @Override
     protected Codec<int[], Node> intArrayCodec() {
-        return integerArrayCodec;
+        return intArrayCodec;
     }
 
     private final Codec.LongCodec<Node> longCodec = new Codec.LongCodec<Node>() {
