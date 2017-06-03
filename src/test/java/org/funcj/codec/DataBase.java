@@ -4,20 +4,20 @@ import java.util.*;
 
 import static org.funcj.codec.TestDataUtils.*;
 
-public class TestData {
+public class DataBase {
     enum Init {INIT}
 
     static class Base<T> {
-        final T val;
-        final Object obj;
-        final T[] valArr;
-        final Object[] objArr;
-        final List<T> listVal;
-        final Set<T> setVal;
-        final Map<String, T> mapStrVal;
-        final Map<String, Object> mapStrObj;
-        final HashMap<String, Object> hashMapStrObj;
-        final Object objMap;
+        private final T val;
+        private final Object obj;
+        private final T[] valArr;
+        private final Object[] objArr;
+        private final List<T> listVal;
+        private final Set<T> setVal;
+        private final Map<String, T> mapStrVal;
+        private final Map<String, Object> mapStrObj;
+        private final HashMap<String, Object> hashMapStrObj;
+        private final Object objMap;
 
         Base() {
             this.val = null;

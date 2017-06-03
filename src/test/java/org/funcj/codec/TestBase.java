@@ -8,81 +8,81 @@ public abstract class TestBase {
 
     @Test
     public void testBooleanNulls() {
-        roundTrip(new TestData.BooleanData(), TestData.BooleanData.class);
+        roundTrip(new DataBase.BooleanData(), DataBase.BooleanData.class);
     }
 
     @Test
     public void testBoolean() {
-        roundTrip(new TestData.BooleanData(TestData.Init.INIT), TestData.BooleanData.class);
+        roundTrip(new DataBase.BooleanData(DataBase.Init.INIT), DataBase.BooleanData.class);
     }
 
     @Test
     public void testByteNulls() {
-        roundTrip(new TestData.ByteData(), TestData.ByteData.class);
+        roundTrip(new DataBase.ByteData(), DataBase.ByteData.class);
     }
 
     @Test
     public void testByte() {
-        roundTrip(new TestData.ByteData(TestData.Init.INIT), TestData.ByteData.class);
+        roundTrip(new DataBase.ByteData(DataBase.Init.INIT), DataBase.ByteData.class);
     }
 
     @Test
     public void testCharNulls() {
-        roundTrip(new TestData.CharData(), TestData.CharData.class);
+        roundTrip(new DataBase.CharData(), DataBase.CharData.class);
     }
 
     @Test
     public void testChar() {
-        roundTrip(new TestData.CharData(TestData.Init.INIT), TestData.CharData.class);
+        roundTrip(new DataBase.CharData(DataBase.Init.INIT), DataBase.CharData.class);
     }
 
     @Test
     public void testShortNulls() {
-        roundTrip(new TestData.ShortData(), TestData.ShortData.class);
+        roundTrip(new DataBase.ShortData(), DataBase.ShortData.class);
     }
 
     @Test
     public void testShort() {
-        roundTrip(new TestData.ShortData(TestData.Init.INIT), TestData.ShortData.class);
+        roundTrip(new DataBase.ShortData(DataBase.Init.INIT), DataBase.ShortData.class);
     }
 
     @Test
     public void testIntegerNulls() {
-        roundTrip(new TestData.IntegerData(), TestData.IntegerData.class);
+        roundTrip(new DataBase.IntegerData(), DataBase.IntegerData.class);
     }
 
     @Test
     public void testInteger() {
-        roundTrip(new TestData.IntegerData(TestData.Init.INIT), TestData.IntegerData.class);
+        roundTrip(new DataBase.IntegerData(DataBase.Init.INIT), DataBase.IntegerData.class);
     }
 
     @Test
     public void testLongNulls() {
-        roundTrip(new TestData.LongData(), TestData.LongData.class);
+        roundTrip(new DataBase.LongData(), DataBase.LongData.class);
     }
 
     @Test
     public void testLong() {
-        roundTrip(new TestData.LongData(TestData.Init.INIT), TestData.LongData.class);
+        roundTrip(new DataBase.LongData(DataBase.Init.INIT), DataBase.LongData.class);
     }
 
     @Test
     public void testFloatNulls() {
-        roundTrip(new TestData.FloatData(), TestData.FloatData.class);
+        roundTrip(new DataBase.FloatData(), DataBase.FloatData.class);
     }
 
     @Test
     public void testFloat() {
-        roundTrip(new TestData.FloatData(TestData.Init.INIT), TestData.FloatData.class);
+        roundTrip(new DataBase.FloatData(DataBase.Init.INIT), DataBase.FloatData.class);
     }
 
     @Test
     public void testDoubleNulls() {
-        roundTrip(new TestData.DoubleData(), TestData.DoubleData.class);
+        roundTrip(new DataBase.DoubleData(), DataBase.DoubleData.class);
     }
 
     @Test
     public void testDouble() {
-        roundTrip(new TestData.DoubleData(TestData.Init.INIT), TestData.DoubleData.class);
+        roundTrip(new DataBase.DoubleData(DataBase.Init.INIT), DataBase.DoubleData.class);
     }
 }

@@ -18,21 +18,21 @@ public class Grammar {
         return p.andL(skipMany(ws));
     }
 
-    private static LinkedHashMap<String, Node> toMap(IList<Tuple2<String, Node>> fields) {
-        final LinkedHashMap<String, Node> map = new LinkedHashMap<String, Node>();
+    private static LinkedHashMap<String, JSValue> toMap(IList<Tuple2<String, JSValue>> fields) {
+        final LinkedHashMap<String, JSValue> map = new LinkedHashMap<String, JSValue>();
         fields.forEach(field -> map.put(field._1, field._2));
         return map;
     }
 
     static {
-        final Parser<Chr, Node> jnull = tok(string("null")).andR(pure(Node.nul()));
+        final Parser<Chr, JSValue> jnull = tok(string("null")).andR(pure(Json.nul()));
 
         final Parser<Chr, Boolean> jtrue = tok(string("true")).andR(pure(Boolean.TRUE));
         final Parser<Chr, Boolean> jfalse = tok(string("false")).andR(pure(Boolean.FALSE));
 
-        final Parser<Chr, Node> jbool = tok(jtrue.or(jfalse)).map(Node::bool);
+        final Parser<Chr, JSValue> jbool = tok(jtrue.or(jfalse)).map(Json::bool);
 
-        final Parser<Chr, Node> jnumber = tok(dble).map(Node::number);
+        final Parser<Chr, JSValue> jnumber = tok(dble).map(Json::number);
 
         final Parser<Chr, Byte> hexDigit =
             choice(
@@ -86,9 +86,7 @@ public class Grammar {
             );
 
         final Parser<Chr, Chr> stringChar =
-            (
-                bsChr.andR(esc)
-            ).or(
+            (bsChr.andR(esc)).or(
                 satisfy("schar", c -> !c.equals('"') && !c.equals('\\'))
             );
 
@@ -99,12 +97,12 @@ public class Grammar {
                 many(stringChar).map(Chr::listToString)
             ));
 
-        final Parser<Chr, Node> jtext =
-            jstring.map(Node::string);
+        final Parser<Chr, JSValue> jtext =
+            jstring.map(Json::string);
 
-        final Ref<Chr, Node> jvalue = Ref.of();
+        final Ref<Chr, JSValue> jvalue = Ref.of();
 
-        final Parser<Chr, Node> jarray =
+        final Parser<Chr, JSValue> jarray =
             between(
                 tok(chr('[')),
                 tok(chr(']')),
@@ -112,22 +110,22 @@ public class Grammar {
                     jvalue,
                     tok(chr(','))
                 )
-            ).map(IList::toList).map(Node::array);
+            ).map(IList::toList).map(Json::array);
 
-        final Parser<Chr, Tuple2<String, Node>> jfield =
+        final Parser<Chr, Tuple2<String, JSValue>> jfield =
             jstring
                 .andL(tok(chr(':')))
                 .and(jvalue)
                 .map(Tuple2::new);
 
-        final Parser<Chr, Node> jobject =
+        final Parser<Chr, JSValue> jobject =
             between(
                 tok(chr('{')),
                 tok(chr('}')),
                 sepBy(
                     jfield,
                     tok(chr(','))
-                ).map(Grammar::toMap).map(Node::object)
+                ).map(Grammar::toMap).map(Json::object)
             );
 
         jvalue.set(
@@ -144,9 +142,9 @@ public class Grammar {
         parser = skipMany(ws).andR(tok(jvalue));
     }
 
-    public static final Parser<Chr, Node> parser;
+    public static final Parser<Chr, JSValue> parser;
 
-    public static Result<Chr, Node> parse(String str) {
+    public static Result<Chr, JSValue> parse(String str) {
         return parser.run(Input.of(str));
     }
 }

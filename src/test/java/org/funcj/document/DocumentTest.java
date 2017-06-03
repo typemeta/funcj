@@ -1,27 +1,27 @@
 package org.funcj.document;
 
-import org.funcj.json.Node;
+import org.funcj.json.*;
+import org.funcj.json.Json;
 import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.funcj.json.Node.*;
 import static org.junit.Assert.*;
 
 public class DocumentTest {
 
-    private static final Node testNode =
-            object(
-                    entry("numbers", array(number(1.2), number(3.4), number(4.5))),
-                    entry("strings", array(string("abcd"), string("efgh"), string("ijkl"))),
-                    entry("objects", array(
-                            object(
-                                    entry("a", number(1)),
-                                    entry("b", number(2))
+    private static final JSValue testNode =
+            Json.object(
+                    Json.entry("numbers", Json.array(Json.number(1.2), Json.number(3.4), Json.number(4.5))),
+                    Json.entry("strings", Json.array(Json.string("abcd"), Json.string("efgh"), Json.string("ijkl"))),
+                    Json.entry("objects", Json.array(
+                            Json.object(
+                                    Json.entry("a", Json.number(1)),
+                                    Json.entry("b", Json.number(2))
                             ),
-                            object(
-                                    entry("c", number(3)),
-                                    entry("d", number(4))
+                            Json.object(
+                                    Json.entry("c", Json.number(3)),
+                                    Json.entry("d", Json.number(4))
                             )
                     ))
             );
@@ -41,9 +41,9 @@ public class DocumentTest {
         checkJsonNode(testNode, 5, 60);
     }
 
-    private static void checkJsonNode(Node node, int lines, int width) {
+    private static void checkJsonNode(JSValue node, int lines, int width) {
         final String text = node.toJson(width);
-        System.out.println(text);
+        //System.out.println(text);
         checkSize(text, lines, width);
     }
 
