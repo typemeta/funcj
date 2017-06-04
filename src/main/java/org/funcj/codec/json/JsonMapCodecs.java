@@ -1,6 +1,7 @@
 package org.funcj.codec.json;
 
 import org.funcj.codec.Codec;
+import org.funcj.codec.utils.ReflectionUtils;
 import org.funcj.control.Exceptions;
 import org.funcj.json.*;
 import org.funcj.util.Functions;
@@ -56,12 +57,14 @@ public abstract class JsonMapCodecs {
 
             final Functions.F<Map<K, V>, Consumer<JSValue>> decodeF = m -> elemNode -> {
                 final JSObject elemObjNode = elemNode.asObject();
-                final K key = keyCodec.decode(elemObjNode.fields.get(keyFieldName));
-                final V val = valueCodec.decode(elemObjNode.fields.get(valueFieldName));
+                final K key = keyCodec.decode(elemObjNode.get(keyFieldName));
+                final V val = valueCodec.decode(elemObjNode.get(valueFieldName));
                 m.put(key, val);
             };
 
-            final Map<K, V> map = Exceptions.wrap(() -> dynType.newInstance());
+            final Map<K, V> map = Exceptions.wrap(
+                    () -> ReflectionUtils.newInstance(dynType),
+                    JsonCodecException::new);
 
             final JSArray objNode = in.asArray();
             final Consumer<JSValue> decode = decodeF.apply(map);
@@ -96,9 +99,11 @@ public abstract class JsonMapCodecs {
         public Map<String, V> decode(Class<Map<String, V>> dynType, JSValue in) {
             final JSObject objNode = in.asObject();
 
-            final Map<String, V> map = Exceptions.wrap(() -> dynType.newInstance());
+            final Map<String, V> map = Exceptions.wrap(
+                    () -> ReflectionUtils.newInstance(dynType),
+                    JsonCodecException::new);
 
-            objNode.fields.forEach((k, v) -> {
+            objNode.forEach((k, v) -> {
                 final V value = valueCodec.decode(v);
                 map.put(k, value);
             });

@@ -31,11 +31,11 @@ public abstract class Exceptions {
      * into one that that throws an unchecked exception.
      */
     public static <E extends Exception, E2 extends RuntimeException>
-    void wrap(ThrowsVoid<E> f, F<E, E2> exSupp) {
+    void wrap(ThrowsVoid<E> f, F<Exception, E2> exSupp) {
         try {
             f.apply();
         } catch(Exception ex) {
-            throw exSupp.apply((E)ex);
+            throw exSupp.apply(ex);
         }
     }
 
@@ -57,11 +57,11 @@ public abstract class Exceptions {
      * into one that that throws an unchecked exception.
      */
     public static <R, E extends Exception, E2 extends RuntimeException>
-    R wrap(FunctionsGenEx.F0<R, E> f, F<E, E2> exSupp) {
+    R wrap(FunctionsGenEx.F0<R, E> f, F<Exception, E2> exSupp) {
         try {
             return f.apply();
         } catch(Exception ex) {
-            throw exSupp.apply((E)ex);
+            throw exSupp.apply(ex);
         }
     }
 
@@ -85,12 +85,12 @@ public abstract class Exceptions {
      * into one that that throws an unchecked exception.
      */
     public static <R, T, E extends Exception, E2 extends RuntimeException>
-    F<T, R> wrap(FunctionsGenEx.F<T, R, E> f, F<E, E2> exSupp) {
+    F<T, R> wrap(FunctionsGenEx.F<T, R, E> f, F<Exception, E2> exSupp) {
         return t -> {
             try {
                 return f.apply(t);
             } catch(Exception ex) {
-                throw exSupp.apply((E)ex);
+                throw exSupp.apply(ex);
             }
         };
     }

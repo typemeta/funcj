@@ -10,10 +10,14 @@ import java.util.stream.Stream;
 public final class JSArray extends AbstractJSValue
         implements Iterable<JSValue> {
 
-    protected final List<JSValue> values;
+    private final List<JSValue> values;
 
     public JSArray(List<JSValue> values) {
         this.values = values;
+    }
+
+    public boolean isEmpty() {
+        return values.isEmpty();
     }
 
     public int size() {
@@ -26,7 +30,20 @@ public final class JSArray extends AbstractJSValue
 
     @Override
     public Iterator<JSValue> iterator() {
-        return values.iterator();
+        final Iterator<JSValue> iter = values.iterator();
+
+        return new Iterator<JSValue>() {
+
+            @Override
+            public boolean hasNext() {
+                return iter.hasNext();
+            }
+
+            @Override
+            public JSValue next() {
+                return iter.next();
+            }
+        };
     }
 
     public Stream<JSValue> stream() {

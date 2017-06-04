@@ -10,14 +10,22 @@ import java.util.stream.Stream;
 public final class JSObject extends AbstractJSValue
         implements Iterable<Map.Entry<String, JSValue>> {
 
-    public final LinkedHashMap<String, JSValue> fields;
+    private final LinkedHashMap<String, JSValue> fields;
 
     public JSObject(LinkedHashMap<String, JSValue> fields) {
         this.fields = fields;
     }
 
+    public boolean isEmpty() {
+        return fields.isEmpty();
+    }
+
     public int size() {
         return fields.size();
+    }
+
+    public boolean containsName(String name) {
+        return fields.containsKey(name);
     }
 
     public JSValue get(String name) {
@@ -26,7 +34,19 @@ public final class JSObject extends AbstractJSValue
 
     @Override
     public Iterator<Map.Entry<String, JSValue>> iterator() {
-        return fields.entrySet().iterator();
+        final Iterator<Map.Entry<String, JSValue>> iter = fields.entrySet().iterator();
+        return new Iterator<Map.Entry<String, JSValue>>() {
+
+            @Override
+            public boolean hasNext() {
+                return iter.hasNext();
+            }
+
+            @Override
+            public Map.Entry<String, JSValue> next() {
+                return iter.next();
+            }
+        };
     }
 
     public Stream<Map.Entry<String, JSValue>> stream() {
@@ -97,58 +117,8 @@ public final class JSObject extends AbstractJSValue
     }
 
     @Override
-    public boolean isNull() {
-        return false;
-    }
-
-    @Override
-    public boolean isBool() {
-        return false;
-    }
-
-    @Override
-    public boolean isNumber() {
-        return false;
-    }
-
-    @Override
-    public boolean isString() {
-        return false;
-    }
-
-    @Override
-    public boolean isArray() {
-        return false;
-    }
-
-    @Override
     public boolean isObject() {
         return true ;
-    }
-
-    @Override
-    public JSNull asNull() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
-    }
-
-    @Override
-    public JSBool asBool() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
-    }
-
-    @Override
-    public JSNumber asNumber() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
-    }
-
-    @Override
-    public JSString asString() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
-    }
-
-    @Override
-    public JSArray asArray() {
-        throw new RuntimeException(getClass().getSimpleName() + " is not the expected node type");
     }
 
     @Override

@@ -9,16 +9,16 @@ import static org.funcj.parser.Parser.*;
 import static org.funcj.parser.Text.*;
 
 /**
- * A grammar for JSON.
+ * A parser for JSON.
  * Adapted from the Haskell Parsec-based JSON parser:
  * https://hackage.haskell.org/package/json
  */
-public class Grammar {
+public class JsonParser {
     private static <T> Parser<Chr, T> tok(Parser<Chr, T> p) {
         return p.andL(skipMany(ws));
     }
 
-    private static LinkedHashMap<String, JSValue> toMap(IList<Tuple2<String, JSValue>> fields) {
+    private static LinkedHashMap<String, JSValue> toMap(Iterable<Tuple2<String, JSValue>> fields) {
         final LinkedHashMap<String, JSValue> map = new LinkedHashMap<String, JSValue>();
         fields.forEach(field -> map.put(field._1, field._2));
         return map;
@@ -125,7 +125,7 @@ public class Grammar {
                 sepBy(
                     jfield,
                     tok(chr(','))
-                ).map(Grammar::toMap).map(Json::object)
+                ).map(JsonParser::toMap).map(Json::object)
             );
 
         jvalue.set(
@@ -142,10 +142,28 @@ public class Grammar {
         parser = skipMany(ws).andR(tok(jvalue));
     }
 
+    /**
+     * Parser (primarily for compising with other Parsers).
+     */
     public static final Parser<Chr, JSValue> parser;
 
+    /**
+     * Parse a JSON string into a parse result.
+     * @param str JSON string
+     * @return parse result
+     */
     public static Result<Chr, JSValue> parse(String str) {
         return parser.run(Input.of(str));
+    }
+
+    /**
+     * Parse a JSON string into a <code>JSValue</code>.
+     * @param str JSON string
+     * @return a <code>JSValue</code if parse is successful
+     * @throws RuntimeException if parse is unsuccessful
+     */
+    public static JSValue parseOrThrow(String str) throws RuntimeException {
+        return parse(str).getOrThrow();
     }
 }
 

@@ -1,11 +1,30 @@
 package org.funcj.codec;
 
+/**
+ * A Codec encapsulates the logic for encoding a value of type <code>T</code>
+ * into a value of type <code>E</code> and vice versa.
+ * @param <T> type to be encoded/decoded
+ * @param <E> encoded type
+ */
 public interface Codec<T, E> {
 
+    /**
+     * Codec for null values.
+     * @param <E> encoded type
+     */
     interface NullCodec<E> extends Codec<Object, E> {
+        /**
+         * Check whether and encoded value represents a null value.
+         * @param in encoded value
+         * @return true if encoded value represents a null value
+         */
         boolean isNull(E in);
     }
 
+    /**
+     * Codec for Boolean and boolean values.
+     * @param <E> encoded type
+     */
     abstract class BooleanCodec<E> implements Codec<Boolean, E> {
 
         @Override

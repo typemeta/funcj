@@ -102,5 +102,4 @@ class JsonUtils {
     static RuntimeException asObject(Class<?> clazz) {
         return new RuntimeException("Expecting JSObject but encountered a " + clazz.getSimpleName());
     }
-
 }

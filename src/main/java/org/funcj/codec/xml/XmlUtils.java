@@ -12,7 +12,6 @@ import java.util.Optional;
 
 public class XmlUtils {
     public static String nodeToString(Document doc, boolean pretty) {
-
         try {
             final Transformer tf = TransformerFactory.newInstance().newTransformer();
             tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -33,7 +32,7 @@ public class XmlUtils {
         return Exceptions.wrap(() -> DocumentBuilderFactory.newInstance().newDocumentBuilder());
     }
 
-    protected static Element firstChildElement(Node node, String name) {
+    public static Element firstChildElement(Node node, String name) {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() == Node.ELEMENT_NODE && name.equals(child.getNodeName())) {
                 return (Element) child;
@@ -42,7 +41,7 @@ public class XmlUtils {
         throw new XmlCodecException("No ELEMENT_NODE child found for node " + node.getNodeName());
     }
 
-    protected static Optional<Text> firstChildTextOpt(Node node) {
+    public static Optional<Text> firstChildTextOpt(Node node) {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() == Node.TEXT_NODE) {
                 return Optional.of((Text) child);
@@ -51,7 +50,7 @@ public class XmlUtils {
         return Optional.empty();
     }
 
-    protected static Text firstChildText(Node node) {
+    public static Text firstChildText(Node node) {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() == Node.TEXT_NODE) {
                 return (Text) child;
@@ -60,11 +59,11 @@ public class XmlUtils {
         throw new XmlCodecException("No TEXT_NODE child found for node " + node.getNodeName());
     }
 
-    protected static String getAttrValue(Element elem, String name) {
+    public static String getAttrValue(Element elem, String name) {
         return elem.getAttribute(name);
     }
 
-    protected static Element setAttrValue(Element elem, String name, String value) {
+    public static Element setAttrValue(Element elem, String name, String value) {
         elem.setAttribute(name, value);
         return elem;
     }

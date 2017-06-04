@@ -1,7 +1,10 @@
 package org.funcj.codec;
 
 import org.funcj.codec.TestDataBase.*;
+import org.funcj.json.Json;
 import org.junit.Test;
+
+import java.util.Optional;
 
 public abstract class TestBase {
 
@@ -88,6 +91,21 @@ public abstract class TestBase {
     }
 
     @Test
+    public void testOptionalNulls() {
+        roundTrip(new HasOptional<Integer>(), HasOptional.class);
+    }
+
+    @Test
+    public void testOptionalEmpty() {
+        roundTrip(new HasOptional<Integer>(Optional.empty(), Optional.empty()), HasOptional.class);
+    }
+
+    @Test
+    public void testOptional() {
+        roundTrip(new HasOptional<Integer>(1234, "abcd"), HasOptional.class);
+    }
+
+    @Test
     public void testNoPublicEmptyCtor() {
         roundTrip(NoPublicEmptyCtor.create(true), NoPublicEmptyCtor.class);
     }
@@ -102,5 +120,24 @@ public abstract class TestBase {
 
         final Recursive rec3 = new Recursive(rec2, 2);
         roundTrip(rec3, Recursive.class);
+    }
+
+    static class NoPublicEmptyCtorCodec<E> implements Codec<NoPublicEmptyCtor, E> {
+
+        private final CodecCore<E> core;
+
+        NoPublicEmptyCtorCodec(CodecCore<E> core) {
+            this.core = core;
+        }
+
+        @Override
+        public E encode(NoPublicEmptyCtor val, E out) {
+            return core.booleanCodec().encode(val.flag, out);
+        }
+
+        @Override
+        public NoPublicEmptyCtor decode(E in) {
+            return NoPublicEmptyCtor.create(core.booleanCodec().decode(in));
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.funcj.codec.xml;
 
 import org.funcj.codec.Codec;
+import org.funcj.codec.utils.ReflectionUtils;
 import org.funcj.control.Exceptions;
 import org.w3c.dom.*;
 
@@ -45,7 +46,7 @@ public abstract class XmlMapCodecs {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
 
-            final Map<K, V> map = Exceptions.wrap(() -> dynType.newInstance());
+            final Map<K, V> map = Exceptions.wrap(() -> ReflectionUtils.newInstance(dynType));
 
             for (int i = 0; i < l; ++i) {
                 final Element childElem = (Element)nodes.item(i);
@@ -85,7 +86,9 @@ public abstract class XmlMapCodecs {
             final NodeList nodes = elem.getChildNodes();
             final int l = nodes.getLength();
 
-            final Map<String, V> map = Exceptions.wrap(() -> dynType.newInstance(), XmlCodecException::new);
+            final Map<String, V> map = Exceptions.wrap(
+                    () -> ReflectionUtils.newInstance(dynType),
+                    XmlCodecException::new);
 
             for (int i = 0; i < l; ++i) {
                 final Element childElem = (Element)nodes.item(i);

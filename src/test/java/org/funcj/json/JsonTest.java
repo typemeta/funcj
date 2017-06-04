@@ -38,8 +38,7 @@ public class JsonTest {
 
     private static void roundTrip(String json) {
         //System.out.println(" Parsing: " + json);
-        final Result<Chr, JSValue> result = Grammar.parse(json);
-        final JSValue node = result.getOrThrow();
+        final JSValue node = JsonParser.parseOrThrow(json);
 
         final String json2 = node.toString();
         //System.out.println(json2);
@@ -55,7 +54,7 @@ public class JsonTest {
     @Test
     public void testSuccessParse() throws IOException {
         final Result<Chr, JSValue> result =
-            Grammar.parser.run(
+            JsonParser.parser.run(
                 Input.of(FileUtils.openFile("/example.json").get()));
         final JSValue node = result.getOrThrow();
         final String json2 = node.toJson(100);
@@ -66,7 +65,7 @@ public class JsonTest {
 
     @Benchmark
     public void benchSuccessParse() throws IOException {
-        final Result<Chr, JSValue> result = Grammar.parse(json);
+        final Result<Chr, JSValue> result = JsonParser.parse(json);
         final JSValue node = result.getOrThrow();
     }
 }

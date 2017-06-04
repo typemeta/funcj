@@ -1,6 +1,7 @@
 package org.funcj.codec.xml;
 
 import org.funcj.codec.*;
+import org.funcj.codec.utils.ReflectionUtils;
 import org.funcj.control.Exceptions;
 import org.w3c.dom.*;
 
@@ -55,21 +56,23 @@ public class XmlCodecCore extends CodecCore<Node> {
         return "value";
     }
 
+    @Override
+    public <T> Node encode(Class<T> type, T val) {
+        return encode(type, val, "_");
+    }
+
+    public <T> Node encode(Class<T> type, T val, String rootName) {
+        return encode(type, val, doc.appendChild(doc.createElement(rootName)));
+    }
+
     private final Codec.NullCodec<Node> nullCodec = new Codec.NullCodec<Node>() {
         @Override
         public boolean isNull(Node in) {
-            if (!in.hasChildNodes()) {
-                return true;
-            } else {
-                return in.getChildNodes().getLength() == 1 &&
-                        firstChildTextOpt(in).map(t -> t.getWholeText().isEmpty())
-                                .orElse(false);
-            }
+            return !in.hasChildNodes() && !in.hasAttributes();
         }
 
         @Override
         public Node encode(Object val, Node out) {
-            out.appendChild(doc.createTextNode(""));
             return out;
         }
 
@@ -82,15 +85,6 @@ public class XmlCodecCore extends CodecCore<Node> {
             }
         }
     };
-
-    @Override
-    public <T> Node encode(Class<T> type, T val) {
-        return encode(type, val, "_");
-    }
-
-    public <T> Node encode(Class<T> type, T val, String rootName) {
-        return encode(type, val, doc.appendChild(doc.createElement(rootName)));
-    }
 
     @Override
     public Codec.NullCodec<Node> nullCodec() {
@@ -137,7 +131,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
                 if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = booleanCodec().decode(boolean.class, elem);
+                    vals[i] = booleanCodec().decode(elem);
                 }
             }
 
@@ -190,7 +184,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
                 if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = byteCodec().decode(byte.class, elem);
+                    vals[i] = byteCodec().decode(elem);
                 }
             }
 
@@ -243,7 +237,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
                 if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = charCodec().decode(char.class, elem);
+                    vals[i] = charCodec().decode(elem);
                 }
             }
 
@@ -296,7 +290,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
                 if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = shortCodec().decode(short.class, elem);
+                    vals[i] = shortCodec().decode(elem);
                 }
             }
 
@@ -349,7 +343,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
                 if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = intCodec().decode(int.class, elem);
+                    vals[i] = intCodec().decode(elem);
                 }
             }
 
@@ -402,7 +396,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
                 if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = longCodec().decode(long.class, elem);
+                    vals[i] = longCodec().decode(elem);
                 }
             }
 
@@ -455,7 +449,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
                 if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = floatCodec().decode(float.class, elem);
+                    vals[i] = floatCodec().decode(elem);
                 }
             }
 
@@ -508,7 +502,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
                 if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = doubleCodec().decode(double.class, elem);
+                    vals[i] = doubleCodec().decode(elem);
                 }
             }
 
@@ -587,7 +581,7 @@ public class XmlCodecCore extends CodecCore<Node> {
                 final NodeList nodes = in.getChildNodes();
                 final int l = nodes.getLength();
 
-                final Collection<T> vals = Exceptions.wrap(() -> dynType.newInstance());
+                final Collection<T> vals = Exceptions.wrap(() -> ReflectionUtils.newInstance(dynType));
                 if (vals instanceof ArrayList) {
                     ((ArrayList<T>) vals).ensureCapacity(l);
                 }
@@ -708,7 +702,7 @@ public class XmlCodecCore extends CodecCore<Node> {
             public Node encode(T val, Node out) {
                 fieldCodecs.forEach((name, codec) -> {
                     final Element node = (Element)out.appendChild(doc.createElement(name));
-                    codec.encode(val, node);
+                    codec.encodeField(val, node);
                 });
                 return out;
             }
@@ -716,9 +710,11 @@ public class XmlCodecCore extends CodecCore<Node> {
             @Override
             public T decode(Class<T> dynType, Node in) {
                 final Element elem = (Element)in;
-                final T val = Exceptions.wrap(() -> dynType.newInstance(), XmlCodecException::new);
+                final T val = Exceptions.wrap(
+                        () -> ReflectionUtils.newInstance(dynType),
+                        XmlCodecException::new);
                 fieldCodecs.forEach((name, codec) -> {
-                    codec.decode(val, firstChildElement(elem, name));
+                    codec.decodeField(val, firstChildElement(elem, name));
                 });
                 return val;
             }

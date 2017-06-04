@@ -10,7 +10,7 @@ public abstract class CodecCore<E> {
 
     protected final Map<String, Codec<?, E>> codecs = new HashMap<>();
 
-    public <T> void registerCodec(Class<T> clazz, Codec<T, E> codec) {
+    public <T> void registerCodec(Class<? extends T> clazz, Codec<T, E> codec) {
         codecs.put(classToName(clazz), codec);
     }
 
@@ -128,20 +128,46 @@ public abstract class CodecCore<E> {
             Class<T> elemType,
             Codec<T, E> elemCodec);
 
+    public Codec<Object, E> dynamicCodec() {
+        return dynamicCodec(Object.class);
+    }
+
     public abstract <T> Codec<T, E> dynamicCodec(Class<T> stcType);
 
     public abstract <T> Codec<T, E> dynamicCodec(Codec<T, E> codec, Class<T> stcType);
 
-    public <T> Codec<T, E> getNullSafeCodec(Class<T> dynType) {
-        return nullSafeCodec(getNullUnsafeCodec(dynType));
+    public <T> Codec<T, E> getNullSafeCodec(Class<T> type) {
+        return nullSafeCodec(getNullUnsafeCodec(type));
     }
 
-    public <T> Codec<T, E> getNullUnsafeCodec(Class<T> dynType) {
-        final String name = classToName(dynType);
-        return (Codec<T, E>)codecs.computeIfAbsent(name, n -> getCodecImpl(dynType));
+    public <T> Codec<T, E> getNullUnsafeCodec(Class<T> type) {
+        final String name = classToName(type);
+        return (Codec<T, E>)codecs.computeIfAbsent(name, n -> getNullUnsafeCodecImplDyn(type));
     }
 
-    public <T> Codec<T, E> getCodecImpl(Class<T> dynType) {
+    public <T> Codec<T, E> getNullUnsafeCodecImplDyn(Class<T> dynType) {
+        final Codec<T, E> codec = getNullUnsafeCodecImpl(dynType);
+        if (codec == null) {
+            return createObjectCodec(dynType);
+        } else {
+            return codec;
+        }
+    }
+
+    public <T> Codec<T, E> getNullUnsafeCodecImplStc(Class<T> stcType) {
+        final Codec<T, E> codec = getNullUnsafeCodecImpl(stcType);
+        if (codec == null) {
+            if (Modifier.isFinal(stcType.getModifiers())) {
+                return createObjectCodec(stcType);
+            } else {
+                return dynamicCodec(stcType);
+            }
+        } else {
+            return codec;
+        }
+    }
+
+    public <T> Codec<T, E> getNullUnsafeCodecImpl(Class<T> dynType) {
         if (dynType.isPrimitive()) {
             if (dynType.equals(boolean.class)) {
                 return (Codec<T, E>)booleanCodec();
@@ -236,10 +262,10 @@ public abstract class CodecCore<E> {
                     final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec(elemType));
                     codec = (Codec<T, E>) collCodec(elemType, elemCodec);
                 } else {
-                    codec = createObjectCodec(dynType);
+                    codec = null;
                 }
             } else {
-                codec = createObjectCodec(dynType);
+                codec = null;
             }
 
             return codec;
@@ -330,7 +356,7 @@ public abstract class CodecCore<E> {
                     return new FieldCodec.ObjectArrayFieldCodec<>(field, codec);
                 }
             } else {
-                final Codec<T, E> codec;
+                Codec<T, E> codec = null;
 
                 if (stcType.isEnum() ||
                         stcType.equals(Boolean.class) ||
@@ -350,8 +376,6 @@ public abstract class CodecCore<E> {
                         final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec(elemType));
                         final Codec<Collection<Object>, E> collCodec = collCodec(elemType, elemCodec);
                         codec = nullSafeCodec(dynamicCheck((Codec) collCodec, stcType));
-                    } else {
-                        codec = nullSafeCodec(dynamicCodec((Class) stcType));
                     }
                 } else if (Map.class.isAssignableFrom(stcType)) {
                     final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
@@ -359,8 +383,12 @@ public abstract class CodecCore<E> {
                     final Class valType = typeArgs.get(1);
                     final Codec<Map<?, ?>, E> mapCodec = mapCodec(keyType, valType);
                     codec = nullSafeCodec(dynamicCheck((Codec) mapCodec, stcType));
-                } else {
-                    codec = nullSafeCodec(dynamicCodec((Class) stcType));
+                }
+
+                if (codec == null) {
+                    final String name = classToName(stcType);
+                    codec = (Codec<T, E>)codecs.computeIfAbsent(name, n -> getNullUnsafeCodecImplStc(stcType));
+                    codec = nullSafeCodec(codec);
                 }
 
                 return new FieldCodec.ObjectFieldCodec<>(field, codec);

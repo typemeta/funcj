@@ -20,6 +20,8 @@ public class TestDataBase {
         private final Map<String, Object> mapStrObj;
         private final HashMap<String, Object> hashMapStrObj;
         private final Object objMap;
+        private final Optional<T> optValE;
+        private final Optional<T> optValF;
 
         Base() {
             this.val = null;
@@ -32,6 +34,8 @@ public class TestDataBase {
             this.mapStrObj = null;
             this.hashMapStrObj = null;
             this.objMap = null;
+            this.optValE = null;
+            this.optValF = null;
         }
 
         Base(   T val,
@@ -43,7 +47,9 @@ public class TestDataBase {
                 Map<String, T> mapStrVal,
                 Map<String, Object> mapStrObj,
                 HashMap<String, Object> hashMapStrObj,
-                Map<String, Object> objMap) {
+                Map<String, Object> objMap,
+                Optional<T> optValE,
+                Optional<T> optValF) {
             this.val = val;
             this.obj = obj;
             this.valArr = valArr;
@@ -54,6 +60,8 @@ public class TestDataBase {
             this.mapStrObj = mapStrObj;
             this.hashMapStrObj = hashMapStrObj;
             this.objMap = objMap;
+            this.optValE = optValE;
+            this.optValF = optValF;
         }
 
         @Override
@@ -70,7 +78,9 @@ public class TestDataBase {
                     Objects.equals(mapStrVal, base.mapStrVal) &&
                     Objects.equals(mapStrObj, base.mapStrObj) &&
                     Objects.equals(hashMapStrObj, base.hashMapStrObj) &&
-                    Objects.equals(objMap, base.objMap);
+                    Objects.equals(objMap, base.objMap) &&
+                    Objects.equals(optValE, base.optValE) &&
+                    Objects.equals(optValF, base.optValF);
         }
 
         @Override
@@ -86,6 +96,8 @@ public class TestDataBase {
                     ", mapStrObj=" + mapStrObj +
                     ", hashMapStrObj=" + hashMapStrObj +
                     ", objMap=" + objMap +
+                    ", optValE=" + optValE +
+                    ", optValF=" + optValF +
                     '}';
         }
     }
@@ -117,7 +129,9 @@ public class TestDataBase {
                     treeMap("a", false, "b", true),
                     hashMap("c", true, "d", false),
                     hashMap("c", true, "d", false),
-                    treeMap("e", true, "f", true)
+                    treeMap("e", true, "f", true),
+                    Optional.empty(),
+                    Optional.of(true)
             );
             this.val = true;
             this.valArr = new boolean[]{true, false};
@@ -183,7 +197,9 @@ public class TestDataBase {
                     treeMap("a", (byte)1, "b", (byte)2),
                     hashMap("c", (byte)3, "d", (byte)4),
                     hashMap("c", (byte)1, "d", (byte)2),
-                    treeMap("e", (byte)200, "f", (byte)300)
+                    treeMap("e", (byte)200, "f", (byte)300),
+                    Optional.empty(),
+                    Optional.of((byte)99)
             );
             this.val = 99;
             this.valArr = new byte[]{123, 56};
@@ -249,7 +265,9 @@ public class TestDataBase {
                     treeMap("a", 'x', "b", 'y'),
                     hashMap("c", '!', "d", '@'),
                     hashMap("c", '£', "d", '$'),
-                    treeMap("e", '%', "f", '\\')
+                    treeMap("e", '%', "f", '\\'),
+                    Optional.empty(),
+                    Optional.of((char)99)
             );
             this.val = 99;
             this.valArr = new char[]{'q', 'w'};
@@ -315,7 +333,9 @@ public class TestDataBase {
                     treeMap("a", (short)1, "b", (short)2),
                     hashMap("c", (short)3, "d", (short)4),
                     hashMap("c", (short)-1, "d", (short)-2),
-                    treeMap("e", (short)-200, "f", (short)-300)
+                    treeMap("e", (short)-200, "f", (short)-300),
+                    Optional.empty(),
+                    Optional.of((short)99)
             );
             this.val = -999;
             this.valArr = new short[]{1234, 5678};
@@ -381,7 +401,9 @@ public class TestDataBase {
                     treeMap("a", 1, "b", 2),
                     hashMap("c", 3, "d", 4),
                     hashMap("c", -1, "d", -2),
-                    treeMap("e", -200, "f", -300)
+                    treeMap("e", -200, "f", -300),
+                    Optional.empty(),
+                    Optional.of((int)99)
             );
             this.val = -999;
             this.valArr = new int[]{1234, 5678};
@@ -447,7 +469,9 @@ public class TestDataBase {
                     treeMap("a", 1L, "b", 2L),
                     hashMap("c", 3L, "d", 4L),
                     hashMap("c", -1L, "d", -2L),
-                    treeMap("e", -200L, "f", -300L)
+                    treeMap("e", -200L, "f", -300L),
+                    Optional.empty(),
+                    Optional.of((long)99)
             );
             this.val = -999L;
             this.valArr = new long[]{1234L, 5678L};
@@ -513,7 +537,9 @@ public class TestDataBase {
                     treeMap("a", 1.5f, "b", 2.5f),
                     hashMap("c", 3f, "d", 4f),
                     hashMap("c", -1f, "d", -2f),
-                    treeMap("e", -200f, "f", -300f)
+                    treeMap("e", -200f, "f", -300f),
+                    Optional.empty(),
+                    Optional.of(99.99f)
             );
             this.val = -999;
             this.valArr = new float[]{1234, 5678};
@@ -579,7 +605,9 @@ public class TestDataBase {
                     treeMap("a", 1.5d, "b", 2.5d),
                     hashMap("c", 3d, "d", 4d),
                     hashMap("c", -1d, "d", -2d),
-                    treeMap("e", -200d, "f", -300d)
+                    treeMap("e", -200d, "f", -300d),
+                    Optional.empty(),
+                    Optional.of(99.99d)
             );
             this.val = -999d;
             this.valArr = new double[]{1234d, 5678d};
@@ -618,6 +646,43 @@ public class TestDataBase {
         }
     }
 
+    public static class HasOptional<T> {
+        public final Optional<T> optVal;
+        public final Optional<String> optStr;
+
+        public HasOptional() {
+            this.optVal = null;
+            this.optStr = null;
+        }
+
+        public HasOptional(T val, String str) {
+            this.optVal = Optional.of(val);
+            this.optStr = Optional.of(str);
+        }
+
+        public HasOptional(Optional<T> optVal, Optional<String> optStr) {
+            this.optVal = optVal;
+            this.optStr = optStr;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            HasOptional<?> that = (HasOptional<?>) o;
+            return Objects.equals(optVal, that.optVal) &&
+                    Objects.equals(optStr, that.optStr);
+        }
+
+        @Override
+        public String toString() {
+            return "HasOptional{" +
+                    "optVal=" + optVal +
+                    ", optStr=" + optStr +
+                    '}';
+        }
+    }
+
     public static final class NoPublicEmptyCtor {
         public static NoPublicEmptyCtor create(boolean flag) {
             return new NoPublicEmptyCtor(flag);
@@ -638,11 +703,6 @@ public class TestDataBase {
             if (o == null || getClass() != o.getClass()) return false;
             NoPublicEmptyCtor that = (NoPublicEmptyCtor) o;
             return flag == that.flag;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(flag);
         }
 
         @Override
@@ -682,11 +742,6 @@ public class TestDataBase {
             Recursive recursive = (Recursive) o;
             return id == recursive.id &&
                     Objects.equals(next, recursive.next);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(next, id);
         }
     }
 }
