@@ -6,6 +6,10 @@ import org.funcj.control.Exceptions;
 import java.lang.reflect.*;
 import java.util.*;
 
+/**
+ * Base class for codec implementations.
+ * @param <E> encoded type
+ */
 public abstract class CodecCore<E> {
 
     protected final Map<String, Codec<?, E>> codecs = new HashMap<>();

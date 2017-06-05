@@ -32,6 +32,12 @@ public class XmlUtils {
         return Exceptions.wrap(() -> DocumentBuilderFactory.newInstance().newDocumentBuilder());
     }
 
+    public static Element addElement(Document doc, Node parent, String name) {
+        final Element elem = doc.createElement(name);
+        parent.appendChild(elem);
+        return elem;
+    }
+
     public static Element firstChildElement(Node node, String name) {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() == Node.ELEMENT_NODE && name.equals(child.getNodeName())) {

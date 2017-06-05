@@ -11,30 +11,30 @@ import static org.funcj.codec.xml.XmlUtils.*;
 
 public abstract class XmlMapCodecs {
 
-    public static class MapCodec<K, V> implements Codec<Map<K, V>, Node> {
+    public static class MapCodec<K, V> implements Codec<Map<K, V>, Element> {
         private final XmlCodecCore core;
-        private final Codec<K, Node> keyCodec;
-        private final Codec<V, Node> valueCodec;
+        private final Codec<K, Element> keyCodec;
+        private final Codec<V, Element> valueCodec;
 
         public MapCodec(
                 XmlCodecCore core,
-                Codec<K, Node> keyCodec,
-                Codec<V, Node> valueCodec) {
+                Codec<K, Element> keyCodec,
+                Codec<V, Element> valueCodec) {
             this.core = core;
             this.keyCodec = keyCodec;
             this.valueCodec = valueCodec;
         }
 
         @Override
-        public Node encode(Map<K, V> map, Node out) {
+        public Element encode(Map<K, V> map, Element out) {
             int i = 0;
             for (Map.Entry<K, V> entry : map.entrySet()) {
-                final Element node = (Element)out.appendChild(core.doc.createElement(core.entryElemName()));
+                final Element elem = core.addEntryElement(out);
 
-                final Node keyNode = node.appendChild(core.doc.createElement(core.keyElemName()));
+                final Element keyNode = (Element)elem.appendChild(core.doc.createElement(core.keyElemName()));
                 keyCodec.encode(entry.getKey(), keyNode);
 
-                final Node valueNode = node.appendChild(core.doc.createElement(core.valueElemName()));
+                final Element valueNode = (Element)elem.appendChild(core.doc.createElement(core.valueElemName()));
                 valueCodec.encode(entry.getValue(), valueNode);
             }
 
@@ -42,16 +42,16 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Map<K, V> decode(Class<Map<K, V>> dynType, Node in) {
+        public Map<K, V> decode(Class<Map<K, V>> dynType, Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
 
             final Map<K, V> map = Exceptions.wrap(() -> ReflectionUtils.newInstance(dynType));
 
             for (int i = 0; i < l; ++i) {
-                final Element childElem = (Element)nodes.item(i);
-                final K key = keyCodec.decode(firstChildElement(childElem, core.keyElemName()));
-                final V value = valueCodec.decode(firstChildElement(childElem, core.valueElemName()));
+                final Element elem = (Element)nodes.item(i);
+                final K key = keyCodec.decode(firstChildElement(elem, core.keyElemName()));
+                final V value = valueCodec.decode(firstChildElement(elem, core.valueElemName()));
                 map.put(key, value);
             }
 
@@ -59,31 +59,30 @@ public abstract class XmlMapCodecs {
         }
     }
 
-    public static class StringMapCodec<V> implements Codec<Map<String, V>, Node> {
+    public static class StringMapCodec<V> implements Codec<Map<String, V>, Element> {
         private final XmlCodecCore core;
-        private final Codec<V, Node> valueCodec;
+        private final Codec<V, Element> valueCodec;
 
-        public StringMapCodec(XmlCodecCore core, Codec<V, Node> valueCodec) {
+        public StringMapCodec(XmlCodecCore core, Codec<V, Element> valueCodec) {
             this.core = core;
             this.valueCodec = valueCodec;
         }
 
         @Override
-        public Node encode(Map<String, V> map, Node out) {
+        public Element encode(Map<String, V> map, Element out) {
             int i = 0;
             for (Map.Entry<String, V> entry : map.entrySet()) {
-                final Element node = (Element)out.appendChild(core.doc.createElement(core.entryElemName()));
-                setAttrValue(node, core.keyAttrName(), entry.getKey());
-                valueCodec.encode(entry.getValue(), node);
+                final Element elem = core.addEntryElement(out);
+                setAttrValue(elem, core.keyAttrName(), entry.getKey());
+                valueCodec.encode(entry.getValue(), elem);
             }
 
             return out;
         }
 
         @Override
-        public Map<String, V> decode(Class<Map<String, V>> dynType, Node in) {
-            final Element elem = (Element)in;
-            final NodeList nodes = elem.getChildNodes();
+        public Map<String, V> decode(Class<Map<String, V>> dynType, Element in) {
+            final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
 
             final Map<String, V> map = Exceptions.wrap(

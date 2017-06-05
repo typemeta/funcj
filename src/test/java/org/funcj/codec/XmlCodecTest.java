@@ -20,10 +20,10 @@ public class XmlCodecTest extends TestBase {
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
         codec.setNewDocument();
-        final Node node = codec.encode(clazz, val, "test");
 
+        final Element elem = codec.encode(clazz, val, "test");
 
-        final T val2 = codec.decode(clazz, node);
+        final T val2 = codec.decode(clazz, elem);
 
         if (!val.equals(val2)) {
             java.lang.System.out.println(nodeToString(codec.doc, true));
@@ -32,7 +32,7 @@ public class XmlCodecTest extends TestBase {
         Assert.assertEquals(val, val2);
     }
 
-    static class OptionalCodec<T> implements Codec<Optional<T>, Node> {
+    static class OptionalCodec<T> implements Codec<Optional<T>, Element> {
 
         private final XmlCodecCore core;
 
@@ -41,15 +41,14 @@ public class XmlCodecTest extends TestBase {
         }
 
         @Override
-        public Node encode(Optional<T> val, Node out) {
+        public Element encode(Optional<T> val, Element out) {
             return val.map(t -> core.dynamicCodec().encode(t, out))
                     .orElseGet(() -> XmlUtils.setAttrValue((Element)out, "empty", "1"));
         }
 
         @Override
-        public Optional<T> decode(Class<Optional<T>> dynType, Node in) {
-            final Element elem = (Element)in;
-            if (!elem.getAttribute("empty").isEmpty()) {
+        public Optional<T> decode(Class<Optional<T>> dynType, Element in) {
+            if (!in.getAttribute("empty").isEmpty()) {
                 return Optional.empty();
             } else {
                 return Optional.of((T) core.dynamicCodec().decode(in));

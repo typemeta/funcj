@@ -11,7 +11,7 @@ import java.util.*;
 
 import static org.funcj.codec.xml.XmlUtils.*;
 
-public class XmlCodecCore extends CodecCore<Node> {
+public class XmlCodecCore extends CodecCore<Element> {
 
     public final DocumentBuilder docBuilder;
 
@@ -56,28 +56,32 @@ public class XmlCodecCore extends CodecCore<Node> {
         return "value";
     }
 
+    public Element addEntryElement(Element parent) {
+        return addElement(doc, parent, entryElemName());
+    }
+
     @Override
-    public <T> Node encode(Class<T> type, T val) {
+    public <T> Element encode(Class<T> type, T val) {
         return encode(type, val, "_");
     }
 
-    public <T> Node encode(Class<T> type, T val, String rootName) {
-        return encode(type, val, doc.appendChild(doc.createElement(rootName)));
+    public <T> Element encode(Class<T> type, T val, String rootName) {
+        return encode(type, val, (Element)doc.appendChild(doc.createElement(rootName)));
     }
 
-    private final Codec.NullCodec<Node> nullCodec = new Codec.NullCodec<Node>() {
+    private final Codec.NullCodec<Element> nullCodec = new Codec.NullCodec<Element>() {
         @Override
-        public boolean isNull(Node in) {
+        public boolean isNull(Element in) {
             return !in.hasChildNodes() && !in.hasAttributes();
         }
 
         @Override
-        public Node encode(Object val, Node out) {
+        public Element encode(Object val, Element out) {
             return out;
         }
 
         @Override
-        public Object decode(Node in) {
+        public Object decode(Element in) {
             if (isNull(in)) {
                 return null;
             } else {
@@ -87,51 +91,53 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    public Codec.NullCodec<Node> nullCodec() {
+    public Codec.NullCodec<Element> nullCodec() {
         return nullCodec;
     }
 
-    private final Codec.BooleanCodec<Node> booleanCodec = new Codec.BooleanCodec<Node>() {
+    private final Codec.BooleanCodec<Element> booleanCodec = new Codec.BooleanCodec<Element>() {
 
         @Override
-        public Node encodePrim(boolean val, Node out) {
+        public Element encodePrim(boolean val, Element out) {
             out.appendChild(doc.createTextNode(String.valueOf(val)));
             return out;
         }
 
         @Override
-        public boolean decodePrim(Node in) {
+        public boolean decodePrim(Element in) {
             return Boolean.parseBoolean(firstChildText(in).getWholeText());
         }
     };
 
     @Override
-    public Codec.BooleanCodec<Node> booleanCodec() {
+    public Codec.BooleanCodec<Element> booleanCodec() {
         return booleanCodec;
     }
 
-    private final Codec<boolean[], Node> booleanArrayCodec = new Codec<boolean[], Node>() {
+    private final Codec<boolean[], Element> booleanArrayCodec = new Codec<boolean[], Element>() {
 
         @Override
-        public Node encode(boolean[] vals, Node out) {
+        public Element encode(boolean[] vals, Element out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(entryElemName()));
-                booleanCodec().encode(vals[i], node);
+                booleanCodec().encode(vals[i], addEntryElement(out));
             }
 
             return out;
         }
 
         @Override
-        public boolean[] decode(Node in) {
+        public boolean[] decode(Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
             final boolean[] vals = new boolean[l];
 
             for (int i = 0; i < l; ++i) {
-                final Element elem = (Element)nodes.item(i);
-                if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = booleanCodec().decode(elem);
+                final Node node = nodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    final Element elem = (Element) node;
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals[i] = booleanCodec().decode(elem);
+                    }
                 }
             }
 
@@ -140,51 +146,53 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    public Codec<boolean[], Node> booleanArrayCodec() {
+    public Codec<boolean[], Element> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
-    private final Codec.ByteCodec<Node> byteCodec = new Codec.ByteCodec<Node>() {
+    private final Codec.ByteCodec<Element> byteCodec = new Codec.ByteCodec<Element>() {
 
         @Override
-        public Node encodePrim(byte val, Node out) {
+        public Element encodePrim(byte val, Element out) {
             out.appendChild(doc.createTextNode(String.valueOf(val)));
             return out;
         }
 
         @Override
-        public byte decodePrim(Node in) {
+        public byte decodePrim(Element in) {
             return Byte.parseByte(firstChildText(in).getWholeText());
         }
     };
 
     @Override
-    public Codec.ByteCodec<Node> byteCodec() {
+    public Codec.ByteCodec<Element> byteCodec() {
         return byteCodec;
     }
 
-    private final Codec<byte[], Node> byteArrayCodec = new Codec<byte[], Node>() {
+    private final Codec<byte[], Element> byteArrayCodec = new Codec<byte[], Element>() {
 
         @Override
-        public Node encode(byte[] vals, Node out) {
+        public Element encode(byte[] vals, Element out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(entryElemName()));
-                byteCodec().encode(vals[i], node);
+                byteCodec().encode(vals[i], addEntryElement(out));
             }
 
             return out;
         }
 
         @Override
-        public byte[] decode(Node in) {
+        public byte[] decode(Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
             final byte[] vals = new byte[l];
 
             for (int i = 0; i < l; ++i) {
-                final Element elem = (Element)nodes.item(i);
-                if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = byteCodec().decode(elem);
+                final Node node = nodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    final Element elem = (Element) node;
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals[i] = byteCodec().decode(elem);
+                    }
                 }
             }
 
@@ -193,51 +201,53 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    public Codec<byte[], Node> byteArrayCodec() {
+    public Codec<byte[], Element> byteArrayCodec() {
         return byteArrayCodec;
     }
 
-    private final Codec.CharCodec<Node> charCodec = new Codec.CharCodec<Node>() {
+    private final Codec.CharCodec<Element> charCodec = new Codec.CharCodec<Element>() {
 
         @Override
-        public Node encodePrim(char val, Node out) {
+        public Element encodePrim(char val, Element out) {
             out.appendChild(doc.createTextNode(String.valueOf(val)));
             return out;
         }
 
         @Override
-        public char decodePrim(Node in) {
+        public char decodePrim(Element in) {
             return firstChildText(in).getWholeText().charAt(0);
         }
     };
 
     @Override
-    public Codec.CharCodec<Node> charCodec() {
+    public Codec.CharCodec<Element> charCodec() {
         return charCodec;
     }
 
-    private final Codec<char[], Node> charArrayCodec = new Codec<char[], Node>() {
+    private final Codec<char[], Element> charArrayCodec = new Codec<char[], Element>() {
 
         @Override
-        public Node encode(char[] vals, Node out) {
+        public Element encode(char[] vals, Element out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(entryElemName()));
-                charCodec().encode(vals[i], node);
+                charCodec().encode(vals[i], addEntryElement(out));
             }
 
             return out;
         }
 
         @Override
-        public char[] decode(Node in) {
+        public char[] decode(Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
             final char[] vals = new char[l];
 
             for (int i = 0; i < l; ++i) {
-                final Element elem = (Element)nodes.item(i);
-                if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = charCodec().decode(elem);
+                final Node node = nodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    final Element elem = (Element) node;
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals[i] = charCodec().decode(elem);
+                    }
                 }
             }
 
@@ -246,51 +256,53 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    public Codec<char[], Node> charArrayCodec() {
+    public Codec<char[], Element> charArrayCodec() {
         return charArrayCodec;
     }
 
-    private final Codec.ShortCodec<Node> shortCodec = new Codec.ShortCodec<Node>() {
+    private final Codec.ShortCodec<Element> shortCodec = new Codec.ShortCodec<Element>() {
 
         @Override
-        public Node encodePrim(short val, Node out) {
+        public Element encodePrim(short val, Element out) {
             out.appendChild(doc.createTextNode(String.valueOf(val)));
             return out;
         }
 
         @Override
-        public short decodePrim(Node in) {
+        public short decodePrim(Element in) {
             return Short.parseShort(firstChildText(in).getWholeText());
         }
     };
 
     @Override
-    public Codec.ShortCodec<Node> shortCodec() {
+    public Codec.ShortCodec<Element> shortCodec() {
         return shortCodec;
     }
 
-    private final Codec<short[], Node> shortArrayCodec = new Codec<short[], Node>() {
+    private final Codec<short[], Element> shortArrayCodec = new Codec<short[], Element>() {
 
         @Override
-        public Node encode(short[] vals, Node out) {
+        public Element encode(short[] vals, Element out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(entryElemName()));
-                shortCodec().encode(vals[i], node);
+                shortCodec().encode(vals[i], addEntryElement(out));
             }
 
             return out;
         }
 
         @Override
-        public short[] decode(Node in) {
+        public short[] decode(Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
             final short[] vals = new short[l];
 
             for (int i = 0; i < l; ++i) {
-                final Element elem = (Element)nodes.item(i);
-                if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = shortCodec().decode(elem);
+                final Node node = nodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    final Element elem = (Element) node;
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals[i] = shortCodec().decode(elem);
+                    }
                 }
             }
 
@@ -299,51 +311,53 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    public Codec<short[], Node> shortArrayCodec() {
+    public Codec<short[], Element> shortArrayCodec() {
         return shortArrayCodec;
     }
 
-    private final Codec.IntCodec<Node> intCodec = new Codec.IntCodec<Node>() {
+    private final Codec.IntCodec<Element> intCodec = new Codec.IntCodec<Element>() {
 
         @Override
-        public Node encodePrim(int val, Node out) {
+        public Element encodePrim(int val, Element out) {
             out.appendChild(doc.createTextNode(String.valueOf(val)));
             return out;
         }
 
         @Override
-        public int decodePrim(Node in) {
+        public int decodePrim(Element in) {
             return Integer.parseInt(firstChildText(in).getWholeText());
         }
     };
 
     @Override
-    public Codec.IntCodec<Node> intCodec() {
+    public Codec.IntCodec<Element> intCodec() {
         return intCodec;
     }
 
-    private final Codec<int[], Node> intArrayCodec = new Codec<int[], Node>() {
+    private final Codec<int[], Element> intArrayCodec = new Codec<int[], Element>() {
 
         @Override
-        public Node encode(int[] vals, Node out) {
+        public Element encode(int[] vals, Element out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(entryElemName()));
-                intCodec().encode(vals[i], node);
+                intCodec().encode(vals[i], addEntryElement(out));
             }
 
             return out;
         }
 
         @Override
-        public int[] decode(Node in) {
+        public int[] decode(Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
             final int[] vals = new int[l];
 
             for (int i = 0; i < l; ++i) {
-                final Element elem = (Element)nodes.item(i);
-                if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = intCodec().decode(elem);
+                final Node node = nodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    final Element elem = (Element) node;
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals[i] = intCodec().decode(elem);
+                    }
                 }
             }
 
@@ -352,51 +366,53 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    public Codec<int[], Node> intArrayCodec() {
+    public Codec<int[], Element> intArrayCodec() {
         return intArrayCodec;
     }
 
-    private final Codec.LongCodec<Node> longCodec = new Codec.LongCodec<Node>() {
+    private final Codec.LongCodec<Element> longCodec = new Codec.LongCodec<Element>() {
 
         @Override
-        public Node encodePrim(long val, Node out) {
+        public Element encodePrim(long val, Element out) {
             out.appendChild(doc.createTextNode(String.valueOf(val)));
             return out;
         }
 
         @Override
-        public long decodePrim(Node in) {
+        public long decodePrim(Element in) {
             return Long.parseLong(firstChildText(in).getWholeText());
         }
     };
 
     @Override
-    public Codec.LongCodec<Node> longCodec() {
+    public Codec.LongCodec<Element> longCodec() {
         return longCodec;
     }
 
-    private final Codec<long[], Node> longArrayCodec = new Codec<long[], Node>() {
+    private final Codec<long[], Element> longArrayCodec = new Codec<long[], Element>() {
 
         @Override
-        public Node encode(long[] vals, Node out) {
+        public Element encode(long[] vals, Element out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(entryElemName()));
-                longCodec().encode(vals[i], node);
+                longCodec().encode(vals[i], addEntryElement(out));
             }
 
             return out;
         }
 
         @Override
-        public long[] decode(Node in) {
+        public long[] decode(Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
             final long[] vals = new long[l];
 
             for (int i = 0; i < l; ++i) {
-                final Element elem = (Element)nodes.item(i);
-                if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = longCodec().decode(elem);
+                final Node node = nodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    final Element elem = (Element) node;
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals[i] = longCodec().decode(elem);
+                    }
                 }
             }
 
@@ -405,51 +421,53 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    public Codec<long[], Node> longArrayCodec() {
+    public Codec<long[], Element> longArrayCodec() {
         return longArrayCodec;
     }
 
-    private final Codec.FloatCodec<Node> floatCodec = new Codec.FloatCodec<Node>() {
+    private final Codec.FloatCodec<Element> floatCodec = new Codec.FloatCodec<Element>() {
 
         @Override
-        public Node encodePrim(float val, Node out) {
+        public Element encodePrim(float val, Element out) {
             out.appendChild(doc.createTextNode(String.valueOf(val)));
             return out;
         }
 
         @Override
-        public float decodePrim(Node in) {
+        public float decodePrim(Element in) {
             return Float.parseFloat(firstChildText(in).getWholeText());
         }
     };
 
     @Override
-    public Codec.FloatCodec<Node> floatCodec() {
+    public Codec.FloatCodec<Element> floatCodec() {
         return floatCodec;
     }
 
-    private final Codec<float[], Node> floatArrayCodec = new Codec<float[], Node>() {
+    private final Codec<float[], Element> floatArrayCodec = new Codec<float[], Element>() {
 
         @Override
-        public Node encode(float[] vals, Node out) {
+        public Element encode(float[] vals, Element out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(entryElemName()));
-                floatCodec().encode(vals[i], node);
+                floatCodec().encode(vals[i], addEntryElement(out));
             }
 
             return out;
         }
 
         @Override
-        public float[] decode(Node in) {
+        public float[] decode(Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
             final float[] vals = new float[l];
 
             for (int i = 0; i < l; ++i) {
-                final Element elem = (Element)nodes.item(i);
-                if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = floatCodec().decode(elem);
+                final Node node = nodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    final Element elem = (Element) node;
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals[i] = floatCodec().decode(elem);
+                    }
                 }
             }
 
@@ -458,51 +476,53 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    public Codec<float[], Node> floatArrayCodec() {
+    public Codec<float[], Element> floatArrayCodec() {
         return floatArrayCodec;
     }
 
-    private final Codec.DoubleCodec<Node> doubleCodec = new Codec.DoubleCodec<Node>() {
+    private final Codec.DoubleCodec<Element> doubleCodec = new Codec.DoubleCodec<Element>() {
 
         @Override
-        public Node encodePrim(double val, Node out) {
+        public Element encodePrim(double val, Element out) {
             out.appendChild(doc.createTextNode(String.valueOf(val)));
             return out;
         }
 
         @Override
-        public double decodePrim(Node in) {
+        public double decodePrim(Element in) {
             return Double.parseDouble(firstChildText(in).getWholeText());
         }
     };
 
     @Override
-    public Codec.DoubleCodec<Node> doubleCodec() {
+    public Codec.DoubleCodec<Element> doubleCodec() {
         return doubleCodec;
     }
 
-    private final Codec<double[], Node> doubleArrayCodec = new Codec<double[], Node>() {
+    private final Codec<double[], Element> doubleArrayCodec = new Codec<double[], Element>() {
 
         @Override
-        public Node encode(double[] vals, Node out) {
+        public Element encode(double[] vals, Element out) {
             for (int i = 0; i < vals.length; ++i) {
-                final Node node = out.appendChild(doc.createElement(entryElemName()));
-                doubleCodec().encode(vals[i], node);
+                doubleCodec().encode(vals[i], addEntryElement(out));
             }
 
             return out;
         }
 
         @Override
-        public double[] decode(Node in) {
+        public double[] decode(Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
             final double[] vals = new double[l];
 
             for (int i = 0; i < l; ++i) {
-                final Element elem = (Element)nodes.item(i);
-                if (elem.getNodeName().equals(entryElemName())) {
-                    vals[i] = doubleCodec().decode(elem);
+                final Node node = nodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    final Element elem = (Element) node;
+                    if (elem.getNodeName().equals(entryElemName())) {
+                        vals[i] = doubleCodec().decode(elem);
+                    }
                 }
             }
 
@@ -511,71 +531,68 @@ public class XmlCodecCore extends CodecCore<Node> {
     };
 
     @Override
-    public Codec<double[], Node> doubleArrayCodec() {
+    public Codec<double[], Element> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
-    private final Codec<String, Node> stringCodec = new Codec<String, Node>() {
+    private final Codec<String, Element> stringCodec = new Codec<String, Element>() {
         @Override
-        public Node encode(String val, Node out) {
+        public Element encode(String val, Element out) {
             out.appendChild(doc.createTextNode(val));
             return out;
         }
 
         @Override
-        public String decode(Node in) {
+        public String decode(Element in) {
             return firstChildText(in).getWholeText();
         }
     };
 
     @Override
-    public Codec<String, Node> stringCodec() {
+    public Codec<String, Element> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    public <EM extends Enum<EM>> Codec<EM, Node> enumCodec(Class<? super EM> enumType) {
-        return new Codec<EM, Node>() {
+    public <EM extends Enum<EM>> Codec<EM, Element> enumCodec(Class<? super EM> enumType) {
+        return new Codec<EM, Element>() {
             @Override
-            public Node encode(EM val, Node out) {
+            public Element encode(EM val, Element out) {
                 out.appendChild(doc.createTextNode(val.name()));
                 return out;
             }
 
             @Override
-            public EM decode(Class<EM> dynType, Node in) {
+            public EM decode(Class<EM> dynType, Element in) {
                 return EM.valueOf(dynType, firstChildText(in).getWholeText());
             }
         };
     }
 
     @Override
-    public <V> Codec<Map<String, V>, Node> mapCodec(Codec<V, Node> valueCodec) {
+    public <V> Codec<Map<String, V>, Element> mapCodec(Codec<V, Element> valueCodec) {
         return new XmlMapCodecs.StringMapCodec<V>(this, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, Node> mapCodec(Codec<K, Node> keyCodec, Codec<V, Node> valueCodec) {
+    public <K, V> Codec<Map<K, V>, Element> mapCodec(Codec<K, Element> keyCodec, Codec<V, Element> valueCodec) {
         return new XmlMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
     }
 
     @Override
-    public <T> Codec<Collection<T>, Node> collCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
-        return new Codec<Collection<T>, Node>() {
+    public <T> Codec<Collection<T>, Element> collCodec(Class<T> elemType, Codec<T, Element> elemCodec) {
+        return new Codec<Collection<T>, Element>() {
             @Override
-            public Node encode(Collection<T> vals, Node out) {
-                int i = 0;
+            public Element encode(Collection<T> vals, Element out) {
                 for (T val : vals) {
-                    final Node node = out.appendChild(doc.createElement(entryElemName()));
-                    elemCodec.encode(val, node);
-                    i++;
+                    elemCodec.encode(val, addEntryElement(out));
                 }
 
                 return out;
             }
 
             @Override
-            public Collection<T> decode(Class<Collection<T>> dynType, Node in) {
+            public Collection<T> decode(Class<Collection<T>> dynType, Element in) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
 
                 final NodeList nodes = in.getChildNodes();
@@ -587,9 +604,12 @@ public class XmlCodecCore extends CodecCore<Node> {
                 }
 
                 for (int i = 0; i < l; ++i) {
-                    final Element elem = (Element)nodes.item(i);
-                    if (elem.getNodeName().equals(entryElemName())) {
-                        vals.add(elemCodec.decode(dynElemType, elem));
+                    final Node node = nodes.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        final Element elem = (Element) node;
+                        if (elem.getNodeName().equals(entryElemName())) {
+                            vals.add(elemCodec.decode(dynElemType, elem));
+                        }
                     }
                 }
 
@@ -599,20 +619,19 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    public <T> Codec<T[], Node> objectArrayCodec(Class<T> elemType, Codec<T, Node> elemCodec) {
-        return new Codec<T[], Node>() {
+    public <T> Codec<T[], Element> objectArrayCodec(Class<T> elemType, Codec<T, Element> elemCodec) {
+        return new Codec<T[], Element>() {
             @Override
-            public Node encode(T[] vals, Node out) {
+            public Element encode(T[] vals, Element out) {
                 for (int i = 0; i < vals.length; ++i) {
-                    final Node node = out.appendChild(doc.createElement(entryElemName()));
-                    elemCodec.encode(vals[i], node);
+                    elemCodec.encode(vals[i], addEntryElement(out));
                 }
 
                 return out;
             }
 
             @Override
-            public T[] decode(Class<T[]> dynType, Node in) {
+            public T[] decode(Class<T[]> dynType, Element in) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
 
                 final NodeList nodes = in.getChildNodes();
@@ -621,9 +640,12 @@ public class XmlCodecCore extends CodecCore<Node> {
                 final T[] vals = (T[]) Array.newInstance(elemType, l);
 
                 for (int i = 0; i < l; ++i) {
-                    final Element elem = (Element)nodes.item(i);
-                    if (elem.getNodeName().equals(entryElemName())) {
-                        vals[i] = elemCodec.decode(dynElemType, elem);
+                    final Node node = nodes.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        final Element elem = (Element) node;
+                        if (elem.getNodeName().equals(entryElemName())) {
+                            vals[i] = elemCodec.decode(dynElemType, elem);
+                        }
                     }
                 }
 
@@ -633,25 +655,24 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    public <T> Codec<T, Node> dynamicCodec(Class<T> stcType) {
-        return new Codec<T, Node>() {
+    public <T> Codec<T, Element> dynamicCodec(Class<T> stcType) {
+        return new Codec<T, Element>() {
             @Override
-            public Node encode(T val, Node out) {
+            public Element encode(T val, Element out) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
                 if (!dynType.equals(stcType)) {
-                    setAttrValue((Element)out, typeAttrName(), classToName(dynType));
+                    setAttrValue(out, typeAttrName(), classToName(dynType));
                 }
                 return encode2(XmlCodecCore.this.getNullUnsafeCodec(dynType), val, out);
             }
 
-            protected <S extends T> Node encode2(Codec<S, Node> codec, T val, Node out) {
+            protected <S extends T> Element encode2(Codec<S, Element> codec, T val, Element out) {
                 return codec.encode((S)val, out);
             }
 
             @Override
-            public T decode(Node in) {
-                final Element elem = (Element)in;
-                final String typeName = getAttrValue(elem, typeAttrName());
+            public T decode(Element in) {
+                final String typeName = getAttrValue(in, typeAttrName());
                 final Class<T> dynType;
                 if (typeName.isEmpty()) {
                     dynType = stcType;
@@ -659,28 +680,27 @@ public class XmlCodecCore extends CodecCore<Node> {
                     dynType = nameToClass(typeName);
                 }
 
-                final Codec<T, Node> codec = XmlCodecCore.this.getNullUnsafeCodec(dynType);
+                final Codec<T, Element> codec = XmlCodecCore.this.getNullUnsafeCodec(dynType);
                 return codec.decode(dynType, in);
             }
         };
     }
 
     @Override
-    public <T> Codec<T, Node> dynamicCodec(Codec<T, Node> codec, Class<T> stcType) {
-        return new Codec<T, Node>() {
+    public <T> Codec<T, Element> dynamicCodec(Codec<T, Element> codec, Class<T> stcType) {
+        return new Codec<T, Element>() {
             @Override
-            public Node encode(T val, Node out) {
+            public Element encode(T val, Element out) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
                 if (!dynType.equals(stcType)) {
-                    setAttrValue((Element)out, typeAttrName(), classToName(dynType));
+                    setAttrValue(out, typeAttrName(), classToName(dynType));
                 }
                 return codec.encode(val, out);
             }
 
             @Override
-            public T decode(Node in) {
-                final Element elem = (Element)in;
-                final String typeName = getAttrValue(elem, typeAttrName());
+            public T decode(Element in) {
+                final String typeName = getAttrValue(in, typeAttrName());
                 final Class<T> dynType;
                 if (typeName.isEmpty()) {
                     dynType = stcType;
@@ -694,27 +714,25 @@ public class XmlCodecCore extends CodecCore<Node> {
     }
 
     @Override
-    public <T> Codec<T, Node> createObjectCodec(
+    public <T> Codec<T, Element> createObjectCodec(
             Class<T> type,
-            Map<String, FieldCodec<Node>> fieldCodecs) {
-        return new Codec<T, Node>() {
+            Map<String, FieldCodec<Element>> fieldCodecs) {
+        return new Codec<T, Element>() {
             @Override
-            public Node encode(T val, Node out) {
+            public Element encode(T val, Element out) {
                 fieldCodecs.forEach((name, codec) -> {
-                    final Element node = (Element)out.appendChild(doc.createElement(name));
-                    codec.encodeField(val, node);
+                    codec.encodeField(val, addElement(doc, out, name));
                 });
                 return out;
             }
 
             @Override
-            public T decode(Class<T> dynType, Node in) {
-                final Element elem = (Element)in;
+            public T decode(Class<T> dynType, Element in) {
                 final T val = Exceptions.wrap(
                         () -> ReflectionUtils.newInstance(dynType),
                         XmlCodecException::new);
                 fieldCodecs.forEach((name, codec) -> {
-                    codec.decodeField(val, firstChildElement(elem, name));
+                    codec.decodeField(val, firstChildElement(in, name));
                 });
                 return val;
             }
