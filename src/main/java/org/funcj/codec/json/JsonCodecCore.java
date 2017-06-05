@@ -30,7 +30,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public JSValue encode(Object val, JSValue out) {
-            return Json.nul();
+            return JSNull.of();
         }
 
         @Override
@@ -54,7 +54,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public JSValue encodePrim(boolean val, JSValue out) {
-            return Json.bool(val);
+            return JSBool.of(val);
         }
 
         @Override
@@ -76,7 +76,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             for (boolean val : vals) {
                 nodes.add(booleanCodec().encode(val, out));
             }
-            return Json.array(nodes);
+            return JSArray.of(nodes);
         }
 
         @Override
@@ -100,7 +100,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public JSValue encodePrim(byte val, JSValue out) {
-            return Json.number(val);
+            return JSNumber.of(val);
         }
 
         @Override
@@ -122,7 +122,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             for (byte val : vals) {
                 nodes.add(byteCodec().encode(val, out));
             }
-            return Json.array(nodes);
+            return JSArray.of(nodes);
         }
 
         @Override
@@ -146,7 +146,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public JSValue encodePrim(char val, JSValue out) {
-            return Json.string(String.valueOf(val));
+            return JSString.of(String.valueOf(val));
         }
 
         @Override
@@ -168,7 +168,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             for (char val : vals) {
                 nodes.add(charCodec().encode(val, out));
             }
-            return Json.array(nodes);
+            return JSArray.of(nodes);
         }
 
         @Override
@@ -192,7 +192,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public JSValue encodePrim(short val, JSValue out) {
-            return Json.number(val);
+            return JSNumber.of(val);
         }
 
         @Override
@@ -214,7 +214,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             for (short val : vals) {
                 nodes.add(shortCodec().encode(val, out));
             }
-            return Json.array(nodes);
+            return JSArray.of(nodes);
         }
 
         @Override
@@ -238,7 +238,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public JSValue encodePrim(int val, JSValue out) {
-            return Json.number(val);
+            return JSNumber.of(val);
         }
 
         @Override
@@ -260,7 +260,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             for (int val : vals) {
                 nodes.add(intCodec().encode(val, out));
             }
-            return Json.array(nodes);
+            return JSArray.of(nodes);
         }
 
         @Override
@@ -284,7 +284,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public JSValue encodePrim(long val, JSValue out) {
-            return Json.number(val);
+            return JSNumber.of(val);
         }
 
         @Override
@@ -306,7 +306,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             for (long val : vals) {
                 nodes.add(longCodec().encode(val, out));
             }
-            return Json.array(nodes);
+            return JSArray.of(nodes);
         }
 
         @Override
@@ -330,7 +330,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public JSValue encodePrim(float val, JSValue out) {
-            return Json.number(val);
+            return JSNumber.of(val);
         }
 
         @Override
@@ -352,7 +352,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             for (float val : vals) {
                 nodes.add(floatCodec().encode(val, out));
             }
-            return Json.array(nodes);
+            return JSArray.of(nodes);
         }
 
         @Override
@@ -376,7 +376,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public JSValue encodePrim(double val, JSValue out) {
-            return Json.number(val);
+            return JSNumber.of(val);
         }
 
         @Override
@@ -398,7 +398,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             for (double val : vals) {
                 nodes.add(doubleCodec().encode(val, out));
             }
-            return Json.array(nodes);
+            return JSArray.of(nodes);
         }
 
         @Override
@@ -421,7 +421,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     private final Codec<String, JSValue> stringCodec = new Codec<String, JSValue>() {
         @Override
         public JSValue encode(String val, JSValue out) {
-            return Json.string(val);
+            return JSString.of(val);
         }
 
         @Override
@@ -440,7 +440,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         return new Codec<EM, JSValue>() {
             @Override
             public JSValue encode(EM val, JSValue out) {
-                return Json.string(val.name());
+                return JSString.of(val.name());
             }
 
             @Override
@@ -469,7 +469,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
                 for (T val : vals) {
                     nodes.add(elemCodec.encode(val, out));
                 }
-                return Json.array(nodes);
+                return JSArray.of(nodes);
             }
 
             @Override
@@ -495,7 +495,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
                 for (T val : vals) {
                     nodes.add(elemCodec.encode(val, out));
                 }
-                return Json.array(nodes);
+                return JSArray.of(nodes);
             }
 
             @Override
@@ -521,10 +521,14 @@ public class JsonCodecCore extends CodecCore<JSValue> {
                 if (dynType.equals(stcType)) {
                     return JsonCodecCore.this.getNullUnsafeCodec(stcType).encode(val, out);
                 } else {
-                    final LinkedHashMap<String, JSValue> fields = new LinkedHashMap<>();
-                    fields.put(typeFieldName(), Json.string(classToName(dynType)));
-                    fields.put(valueFieldName(), encode2(JsonCodecCore.this.getNullUnsafeCodec(dynType), val, out));
-                    return Json.object(fields);
+                    return JSObject.of(
+                            JSObject.field(
+                                    typeFieldName(),
+                                    JSString.of(classToName(dynType))),
+                            JSObject.field(
+                                    valueFieldName(),
+                                    encode2(JsonCodecCore.this.getNullUnsafeCodec(dynType), val, out))
+                    );
                 }
             }
 
@@ -567,10 +571,10 @@ public class JsonCodecCore extends CodecCore<JSValue> {
                 if (dynType.equals(stcType)) {
                     return codec.encode(val, out);
                 } else {
-                    final LinkedHashMap<String, JSValue> fields = new LinkedHashMap<>();
-                    fields.put(typeFieldName(), Json.string(classToName(dynType)));
-                    fields.put(valueFieldName(), codec.encode(val, out));
-                    return Json.object(fields);
+                    return JSObject.of(
+                            JSObject.field(typeFieldName(), JSString.of(classToName(dynType))),
+                            JSObject.field(valueFieldName(), codec.encode(val, out))
+                    );
                 }
             }
 
@@ -600,9 +604,9 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         return new Codec<T, JSValue>() {
             @Override
             public JSValue encode(T val, JSValue out) {
-                final LinkedHashMap<String, JSValue> fields = new LinkedHashMap<>();
-                fieldCodecs.forEach((name, codec) -> fields.put(name, codec.encodeField(val, out)));
-                return Json.object(fields);
+                final List<JSObject.Field> fields = new ArrayList<>(fieldCodecs.size());
+                fieldCodecs.forEach((name, codec) -> fields.add(JSObject.field(name, codec.encodeField(val, out))));
+                return JSObject.of(fields);
             }
 
             @Override

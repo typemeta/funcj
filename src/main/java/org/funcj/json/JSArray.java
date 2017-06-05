@@ -10,9 +10,17 @@ import java.util.stream.Stream;
 public final class JSArray extends AbstractJSValue
         implements Iterable<JSValue> {
 
+    public static JSArray of(JSValue... values) {
+        return new JSArray(Arrays.asList(values));
+    }
+
+    public static JSArray of(List<JSValue> values) {
+        return new JSArray(values);
+    }
+
     private final List<JSValue> values;
 
-    public JSArray(List<JSValue> values) {
+    protected JSArray(List<JSValue> values) {
         this.values = values;
     }
 

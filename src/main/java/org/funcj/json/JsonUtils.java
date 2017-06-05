@@ -5,8 +5,8 @@ import org.funcj.document.*;
 import java.util.Map;
 
 class JsonUtils {
-    static JSValue duplicateKeyError(JSValue u, JSValue v) {
-        throw new IllegalStateException("Duplicate keys");
+    static <T> T duplicateKeyError(T u, T v) {
+        throw new IllegalStateException("Duplicate keys - " + u + " & " + v);
     }
 
     static String format(double d) {
@@ -71,11 +71,11 @@ class JsonUtils {
         return sb;
     }
 
-    static Document toDoc(Map.Entry<String, JSValue> field) {
+    static Document toDoc(JSObject.Field field) {
         return API.concat(
-                API.text("\"" + field.getKey() + "\""),
+                API.text("\"" + field.name + "\""),
                 API.text(" : "),
-                field.getValue().toDocument()
+                field.value.toDocument()
         );
     }
 

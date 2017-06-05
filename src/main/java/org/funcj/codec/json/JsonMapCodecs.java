@@ -32,22 +32,13 @@ public abstract class JsonMapCodecs {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
-
-            final Functions.F<Map.Entry<K, V>, JSValue> encode =
-                    en -> {
-                        final K key = en.getKey();
-                        final V value = en.getValue();
-                        final LinkedHashMap<String, JSValue> elemFields = new LinkedHashMap<>();
-                        elemFields.put(keyFieldName, keyCodec.encode(key, out));
-                        elemFields.put(valueFieldName, valueCodec.encode(value, out));
-                        return Json.object(elemFields);
-                    };
-
             final List<JSValue> nodes = map.entrySet().stream()
-                    .map(encode::apply)
-                    .collect(toList());
+                    .map(en -> JSObject.of(
+                            JSObject.field(keyFieldName, keyCodec.encode(en.getKey(), out)),
+                            JSObject.field(valueFieldName, valueCodec.encode(en.getValue(), out))
+                    )).collect(toList());
 
-            return Json.array(nodes);
+            return JSArray.of(nodes);
         }
 
         @Override
@@ -85,14 +76,14 @@ public abstract class JsonMapCodecs {
 
         @Override
         public JSValue encode(Map<String, V> map, JSValue out) {
-            final LinkedHashMap<String, JSValue> fields = new LinkedHashMap<>();
+            final List<JSObject.Field> fields = new ArrayList<>(map.size());
 
             map.forEach((k, v) -> {
                 final JSValue value = valueCodec.encode(v, out);
-                fields.put(k, value);
+                fields.add(JSObject.field(k, value));
             });
 
-            return Json.object(fields);
+            return JSObject.of(fields);
         }
 
         @Override
@@ -103,9 +94,9 @@ public abstract class JsonMapCodecs {
                     () -> ReflectionUtils.newInstance(dynType),
                     JsonCodecException::new);
 
-            objNode.forEach((k, v) -> {
-                final V value = valueCodec.decode(v);
-                map.put(k, value);
+            objNode.forEach(field -> {
+                final V value = valueCodec.decode(field.getValue());
+                map.put(field.getName(), value);
             });
 
             return map;

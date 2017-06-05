@@ -6,6 +6,10 @@ import org.funcj.util.Functions;
 public enum JSNull implements JSValue {
     INSTANCE;
 
+    public static JSNull of() {
+        return INSTANCE;
+    }
+
     @Override
     public String toString() {
         return "null";

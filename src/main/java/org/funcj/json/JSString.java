@@ -5,9 +5,13 @@ import org.funcj.util.Functions;
 
 public final class JSString extends AbstractJSValue {
 
+    public static JSString of(String value) {
+        return new JSString(value);
+    }
+
     protected final String value;
 
-    public JSString(String value) {
+    protected JSString(String value) {
         this.value = value;
     }
 

@@ -3,7 +3,7 @@ package org.funcj.json;
 import org.funcj.data.*;
 import org.funcj.parser.*;
 
-import java.util.LinkedHashMap;
+import java.util.*;
 
 import static org.funcj.parser.Parser.*;
 import static org.funcj.parser.Text.*;
@@ -18,21 +18,21 @@ public class JsonParser {
         return p.andL(skipMany(ws));
     }
 
-    private static LinkedHashMap<String, JSValue> toMap(Iterable<Tuple2<String, JSValue>> fields) {
-        final LinkedHashMap<String, JSValue> map = new LinkedHashMap<String, JSValue>();
-        fields.forEach(field -> map.put(field._1, field._2));
-        return map;
+    private static List<JSObject.Field> toMap(Iterable<Tuple2<String, JSValue>> iter) {
+        final List<JSObject.Field> fields = new ArrayList<>();
+        iter.forEach(t2 -> fields.add(JSObject.field(t2._1, t2._2)));
+        return fields;
     }
 
     static {
-        final Parser<Chr, JSValue> jnull = tok(string("null")).andR(pure(Json.nul()));
+        final Parser<Chr, JSValue> jnull = tok(string("null")).andR(pure(JSNull.of()));
 
         final Parser<Chr, Boolean> jtrue = tok(string("true")).andR(pure(Boolean.TRUE));
         final Parser<Chr, Boolean> jfalse = tok(string("false")).andR(pure(Boolean.FALSE));
 
-        final Parser<Chr, JSValue> jbool = tok(jtrue.or(jfalse)).map(Json::bool);
+        final Parser<Chr, JSValue> jbool = tok(jtrue.or(jfalse)).map(JSBool::of);
 
-        final Parser<Chr, JSValue> jnumber = tok(dble).map(Json::number);
+        final Parser<Chr, JSValue> jnumber = tok(dble).map(JSNumber::of);
 
         final Parser<Chr, Byte> hexDigit =
             choice(
@@ -98,7 +98,7 @@ public class JsonParser {
             ));
 
         final Parser<Chr, JSValue> jtext =
-            jstring.map(Json::string);
+            jstring.map(JSString::of);
 
         final Ref<Chr, JSValue> jvalue = Ref.of();
 
@@ -110,7 +110,7 @@ public class JsonParser {
                     jvalue,
                     tok(chr(','))
                 )
-            ).map(IList::toList).map(Json::array);
+            ).map(IList::toList).map(JSArray::of);
 
         final Parser<Chr, Tuple2<String, JSValue>> jfield =
             jstring
@@ -125,7 +125,7 @@ public class JsonParser {
                 sepBy(
                     jfield,
                     tok(chr(','))
-                ).map(JsonParser::toMap).map(Json::object)
+                ).map(JsonParser::toMap).map(JSObject::of)
             );
 
         jvalue.set(

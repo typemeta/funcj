@@ -7,6 +7,10 @@ public enum JSBool implements JSValue {
     TRUE(true),
     FALSE(false);
 
+    public static JSBool of(boolean value) {
+        return value ? TRUE : FALSE;
+    }
+
     private final boolean value;
 
     JSBool(boolean value) {

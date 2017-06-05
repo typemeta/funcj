@@ -1,18 +1,93 @@
 package org.funcj.json;
 
+import org.funcj.data.Tuple2;
 import org.funcj.document.*;
 import org.funcj.util.*;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.stream.Stream;
+import java.util.function.*;
+import java.util.stream.*;
+
+import static java.util.stream.Collectors.toMap;
 
 public final class JSObject extends AbstractJSValue
-        implements Iterable<Map.Entry<String, JSValue>> {
+        implements Iterable<JSObject.Field> {
 
-    private final LinkedHashMap<String, JSValue> fields;
+    public static class Field {
+        public final String name;
+        public final JSValue value;
 
-    public JSObject(LinkedHashMap<String, JSValue> fields) {
+        public Field(String name, JSValue value) {
+            this.name = Objects.requireNonNull(name);
+            this.value = Objects.requireNonNull(value);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public JSValue getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return "Field{" +
+                    "name='" + name + '\'' +
+                    ", value=" + value +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Field field = (Field) o;
+            return Objects.equals(name, field.name) &&
+                    Objects.equals(value, field.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, value);
+        }
+    }
+
+    public static Field field(String name, JSValue node) {
+        return new Field(name, node);
+    }
+
+    public static JSObject of(Field... fields) {
+        final LinkedHashMap<String, Field> fieldMap =
+                Arrays.stream(fields)
+                        .collect(toMap(
+                                Field::getName,
+                                Function.identity(),
+                                JsonUtils::duplicateKeyError,
+                                LinkedHashMap::new
+                        ));
+        return of(fieldMap);
+    }
+
+    public static JSObject of(Iterable<Field> iter) {
+        final LinkedHashMap<String, Field> fieldMap =
+                StreamSupport.stream(iter.spliterator(), false)
+                        .collect(toMap(
+                                Field::getName,
+                                Function.identity(),
+                                JsonUtils::duplicateKeyError,
+                                LinkedHashMap::new
+                        ));
+        return of(fieldMap);
+    }
+
+    public static JSObject of(LinkedHashMap<String, Field> values) {
+        return new JSObject(values);
+    }
+
+    private final LinkedHashMap<String, Field> fields;
+
+    protected JSObject(LinkedHashMap<String, Field> fields) {
         this.fields = fields;
     }
 
@@ -29,13 +104,13 @@ public final class JSObject extends AbstractJSValue
     }
 
     public JSValue get(String name) {
-        return fields.get(name);
+        return fields.get(name).value;
     }
 
     @Override
-    public Iterator<Map.Entry<String, JSValue>> iterator() {
-        final Iterator<Map.Entry<String, JSValue>> iter = fields.entrySet().iterator();
-        return new Iterator<Map.Entry<String, JSValue>>() {
+    public Iterator<Field> iterator() {
+        final Iterator<Map.Entry<String, Field>> iter = fields.entrySet().iterator();
+        return new Iterator<Field>() {
 
             @Override
             public boolean hasNext() {
@@ -43,18 +118,18 @@ public final class JSObject extends AbstractJSValue
             }
 
             @Override
-            public Map.Entry<String, JSValue> next() {
-                return iter.next();
+            public Field next() {
+                return iter.next().getValue();
             }
         };
     }
 
-    public Stream<Map.Entry<String, JSValue>> stream() {
-        return fields.entrySet().stream();
+    public Stream<Field> stream() {
+        return fields.values().stream();
     }
 
-    public void forEach(BiConsumer<? super String, ? super JSValue> action) {
-        fields.forEach(action);
+    public void forEach(Consumer<? super Field> action) {
+        fields.values().forEach(action);
     }
 
     @Override
@@ -68,7 +143,7 @@ public final class JSObject extends AbstractJSValue
                 API.text('{'),
                 API.text(", "),
                 API.text('}'),
-                Functors.map(JsonUtils::toDoc, fields.entrySet())
+                Functors.map(JsonUtils::toDoc, fields.values())
         );
     }
 
@@ -76,14 +151,14 @@ public final class JSObject extends AbstractJSValue
     public StringBuilder toString(StringBuilder sb) {
         sb.append('{');
         boolean first = true;
-        for (Map.Entry<String, JSValue> en : fields.entrySet()) {
+        for (Field field : fields.values()) {
             if (first) {
                 first = false;
             } else {
                 sb.append(',');
             }
-            JsonUtils.format(en.getKey(), sb).append(':');
-            en.getValue().toString(sb);
+            JsonUtils.format(field.name, sb).append(':');
+            field.value.toString(sb);
         }
         return sb.append('}');
     }

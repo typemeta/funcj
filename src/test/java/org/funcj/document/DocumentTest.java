@@ -1,7 +1,6 @@
 package org.funcj.document;
 
 import org.funcj.json.*;
-import org.funcj.json.Json;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -11,17 +10,17 @@ import static org.junit.Assert.*;
 public class DocumentTest {
 
     private static final JSValue testNode =
-            Json.object(
-                    Json.entry("numbers", Json.array(Json.number(1.2), Json.number(3.4), Json.number(4.5))),
-                    Json.entry("strings", Json.array(Json.string("abcd"), Json.string("efgh"), Json.string("ijkl"))),
-                    Json.entry("objects", Json.array(
-                            Json.object(
-                                    Json.entry("a", Json.number(1)),
-                                    Json.entry("b", Json.number(2))
+            JSObject.of(
+                    JSObject.field("numbers", JSArray.of(JSNumber.of(1.2), JSNumber.of(3.4), JSNumber.of(4.5))),
+                    JSObject.field("strings", JSArray.of(JSString.of("abcd"), JSString.of("efgh"), JSString.of("ijkl"))),
+                    JSObject.field("objects", JSArray.of(
+                            JSObject.of(
+                                    JSObject.field("a", JSNumber.of(1)),
+                                    JSObject.field("b", JSNumber.of(2))
                             ),
-                            Json.object(
-                                    Json.entry("c", Json.number(3)),
-                                    Json.entry("d", Json.number(4))
+                            JSObject.of(
+                                    JSObject.field("c", JSNumber.of(3)),
+                                    JSObject.field("d", JSNumber.of(4))
                             )
                     ))
             );
