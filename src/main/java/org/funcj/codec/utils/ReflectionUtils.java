@@ -1,7 +1,5 @@
 package org.funcj.codec.utils;
 
-import org.funcj.codec.json.JsonCodecException;
-
 import java.lang.reflect.*;
 import java.util.*;
 

@@ -105,8 +105,8 @@ public abstract class TestBase {
     }
 
     @Test
-    public void testNoPublicEmptyCtor() {
-        roundTrip(NoPublicEmptyCtor.create(true), NoPublicEmptyCtor.class);
+    public void testNoEmptyCtor() {
+        roundTrip(NoEmptyCtor.create(true), NoEmptyCtor.class);
     }
 
     @Test
@@ -121,22 +121,22 @@ public abstract class TestBase {
         roundTrip(rec3, Recursive.class);
     }
 
-    static class NoPublicEmptyCtorCodec<E> implements Codec<NoPublicEmptyCtor, E> {
+    static class NoEmptyCtorCodec<E> implements Codec<NoEmptyCtor, E> {
 
         private final CodecCore<E> core;
 
-        NoPublicEmptyCtorCodec(CodecCore<E> core) {
+        NoEmptyCtorCodec(CodecCore<E> core) {
             this.core = core;
         }
 
         @Override
-        public E encode(NoPublicEmptyCtor val, E out) {
+        public E encode(NoEmptyCtor val, E out) {
             return core.booleanCodec().encode(val.flag, out);
         }
 
         @Override
-        public NoPublicEmptyCtor decode(E in) {
-            return NoPublicEmptyCtor.create(core.booleanCodec().decode(in));
+        public NoEmptyCtor decode(E in) {
+            return NoEmptyCtor.create(core.booleanCodec().decode(in));
         }
     }
 }

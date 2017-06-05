@@ -5,7 +5,10 @@ import org.funcj.data.IList;
 
 import java.io.*;
 
-public class DocWriter {
+/**
+ * Format a <code>Document</code> into a <code>String</code>.
+ */
+public class DocFormat {
     public static String format(int width, Document doc) {
         final StringWriter wtr = new StringWriter();
         format(wtr, width, doc);
@@ -23,7 +26,7 @@ public class DocWriter {
     }
 
     public static void format(BufferedWriter wtr, int width, Document doc) {
-        new DocWriter(wtr, width).format(doc);
+        new DocFormat(wtr, width).format(doc);
         Exceptions.wrap(wtr::flush);
     }
 
@@ -71,7 +74,7 @@ public class DocWriter {
     private final BufferedWriter wtr;
     private final int width;
 
-    public DocWriter(BufferedWriter wtr, int width) {
+    public DocFormat(BufferedWriter wtr, int width) {
         this.wtr = wtr;
         this.width = width;
     }
@@ -80,17 +83,17 @@ public class DocWriter {
         format(0, IList.of(FmtState.of(0, false, API.group(doc))));
     }
 
-    private DocWriter newLine() {
+    private DocFormat newLine() {
         Exceptions.wrap(wtr::newLine);
         return this;
     }
 
-    private DocWriter indent(int depth) {
+    private DocFormat indent(int depth) {
         Exceptions.wrap(() -> wtr.write(indentStr(depth)));
         return this;
     }
 
-    private DocWriter write(String s) {
+    private DocFormat write(String s) {
         Exceptions.wrap(() -> wtr.write(s));
         return this;
     }
@@ -161,5 +164,4 @@ public class DocWriter {
             }
         }
     }
-
 }

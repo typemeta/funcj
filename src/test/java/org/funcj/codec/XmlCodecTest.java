@@ -1,6 +1,6 @@
 package org.funcj.codec;
 
-import org.funcj.codec.TestDataBase.NoPublicEmptyCtor;
+import org.funcj.codec.TestDataBase.NoEmptyCtor;
 import org.funcj.codec.xml.*;
 import org.junit.Assert;
 import org.w3c.dom.*;
@@ -13,7 +13,7 @@ public class XmlCodecTest extends TestBase {
     final static XmlCodecCore codec = new XmlCodecCore();
 
     static {
-        codec.registerCodec(NoPublicEmptyCtor.class, new NoPublicEmptyCtorCodec<>(codec));
+        codec.registerCodec(NoEmptyCtor.class, new NoEmptyCtorCodec<>(codec));
         codec.registerCodec((Class)Optional.class, new OptionalCodec<>(codec));
     }
 

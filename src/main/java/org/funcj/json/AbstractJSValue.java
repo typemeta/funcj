@@ -1,6 +1,5 @@
 package org.funcj.json;
 
-import org.funcj.document.*;
 import org.funcj.util.Functions;
 
 public abstract class AbstractJSValue implements JSValue {

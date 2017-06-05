@@ -5,6 +5,9 @@ import org.funcj.util.Functions.F;
 
 import java.io.Writer;
 
+/**
+ * A model structure for formattable documents.
+ */
 public interface Document {
     enum Nil implements Document {
         INSTANCE {
@@ -127,6 +130,6 @@ public interface Document {
         F<Concat, T> concat);
 
     default void format(Writer wtr, int width) {
-        DocWriter.format(wtr, width, this);
+        DocFormat.format(wtr, width, this);
     }
 }

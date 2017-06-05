@@ -38,11 +38,11 @@ final public class Tuple2<A, B> {
         return Tuple2.of(_1, c);
     }
 
-    public <T> Tuple2<T, B> map1(F<A, T> f) {
+    public <T> Tuple2<T, B> map1(F<? super A, ? extends T> f) {
         return of(f.apply(_1), _2);
     }
 
-    public <T> Tuple2<A, T> map2(F<B, T> f) {
+    public <T> Tuple2<A, T> map2(F<? super B, ? extends T> f) {
         return of(_1, f.apply(_2));
     }
 

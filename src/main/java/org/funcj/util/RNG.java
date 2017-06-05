@@ -3,6 +3,9 @@ package org.funcj.util;
 import org.funcj.control.State;
 import org.funcj.data.Tuple2;
 
+/**
+ * Pseudo-random number generator, using the <code>State</code> monad.
+ */
 public interface RNG {
 
     static RNG xorShiftRNG(long seed) {

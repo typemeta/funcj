@@ -9,7 +9,6 @@ import java.util.stream.*;
 
 /**
  * Simple recursive, immutable linked list.
- * It allows tails to be shared between lists.
  * Null elements are not allowed.
  * @param <T> element type
  */

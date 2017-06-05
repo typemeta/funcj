@@ -1,6 +1,5 @@
 package org.funcj.json;
 
-import org.funcj.data.Tuple2;
 import org.funcj.document.*;
 import org.funcj.util.*;
 

@@ -1,7 +1,5 @@
 package org.funcj.codec;
 
-import org.funcj.json.JSValue;
-
 import java.util.*;
 
 import static org.funcj.codec.TestDataUtils.*;
@@ -683,17 +681,14 @@ public class TestDataBase {
         }
     }
 
-    public static final class NoPublicEmptyCtor {
-        public static NoPublicEmptyCtor create(boolean flag) {
-            return new NoPublicEmptyCtor(flag);
+    public static final class NoEmptyCtor {
+        public static NoEmptyCtor create(boolean flag) {
+            return new NoEmptyCtor(flag);
         }
 
         public boolean flag;
 
-        private NoPublicEmptyCtor() {
-        }
-
-        private NoPublicEmptyCtor(boolean flag) {
+        private NoEmptyCtor(boolean flag) {
             this.flag = flag;
         }
 
@@ -701,7 +696,7 @@ public class TestDataBase {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            NoPublicEmptyCtor that = (NoPublicEmptyCtor) o;
+            NoEmptyCtor that = (NoEmptyCtor) o;
             return flag == that.flag;
         }
 

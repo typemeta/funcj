@@ -1,6 +1,6 @@
 package org.funcj.codec;
 
-import org.funcj.codec.TestDataBase.NoPublicEmptyCtor;
+import org.funcj.codec.TestDataBase.NoEmptyCtor;
 import org.funcj.codec.json.JsonCodecCore;
 import org.funcj.json.*;
 import org.junit.Assert;
@@ -12,7 +12,7 @@ public class JsonCodecTest extends TestBase {
     final static JsonCodecCore codec = new JsonCodecCore();
 
     static {
-        codec.registerCodec(NoPublicEmptyCtor.class, new NoPublicEmptyCtorCodec<>(codec));
+        codec.registerCodec(NoEmptyCtor.class, new NoEmptyCtorCodec<>(codec));
         codec.registerCodec((Class)Optional.class, new OptionalCodec<Object>(codec));
     }
 

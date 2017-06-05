@@ -37,21 +37,21 @@ final public class Tuple3<A, B, C> {
         return _3;
     }
 
-    public <T> Tuple3<T, B, C> map1(F<A, T> f) {
+    public <T> Tuple3<T, B, C> map1(F<? super A, ? extends T> f) {
         return of(f.apply(_1), _2, _3);
     }
 
-    public <T> Tuple3<A, T, C> map2(F<B, T> f) {
+    public <T> Tuple3<A, T, C> map2(F<? super B, ? extends T> f) {
         return of(_1, f.apply(_2), _3);
     }
 
-    public <T> Tuple3<A, B, T> map3(F<C, T> f) {
+    public <T> Tuple3<A, B, T> map3(F<? super C, ? extends T> f) {
         return of(_1, _2, f.apply(_3));
     }
 
     @Override
     public String toString() {
-        return "(" + _1 + ',' + _2 + ')';
+        return "(" + _1 + ',' + _2 + ',' + _3 + ')';
     }
 
     @Override

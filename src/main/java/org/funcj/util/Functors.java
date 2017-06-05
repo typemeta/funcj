@@ -2,6 +2,7 @@ package org.funcj.util;
 
 import org.funcj.util.Functions.F;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -11,16 +12,35 @@ import static java.util.stream.Collectors.toList;
  */
 public abstract class Functors {
     /**
-     * Map a function over a collection.
+     * Map a function over a <code>Collection</code>.
      */
     public static <T, U> List<U> map(F<T, U> f, Collection<T> ts) {
         return ts.stream().map(f::apply).collect(toList());
     }
 
     /**
-     * Map a function over an optional.
+     * Map a function over an <code>Optional</code>.
      */
     public static <T, U> Optional<U> map(F<T, U> f, Optional<T> ot) {
         return ot.map(f::apply);
+    }
+
+    /**
+     * Map a function over an array.
+     */
+    public static <A, B> B[] map(A[] from, B[] to, F<A, B> f) {
+        final int l = from.length;
+        if (to.length != l) {
+            final Class<?> type = to.getClass();
+            to = (type == Object[].class)
+                    ? (B[]) new Object[l]
+                    : (B[]) Array.newInstance(type.getComponentType(), l);
+        }
+
+        for (int i = 0; i < from.length; ++i) {
+            to[i] = f.apply(from[i]);
+        }
+
+        return to;
     }
 }

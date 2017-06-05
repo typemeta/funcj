@@ -6,7 +6,7 @@ import org.funcj.util.Functions.F;
 public interface JSValue {
 
     default String toJson(int width)  {
-        return DocWriter.format(width, toDocument());
+        return DocFormat.format(width, toDocument());
     }
 
     StringBuilder toString(StringBuilder sb);

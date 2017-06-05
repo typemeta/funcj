@@ -4,6 +4,10 @@ import org.funcj.util.Functions.F;
 
 import java.util.Optional;
 
+/**
+ * Utilities for casting and type-matching.
+ * @param <T>
+ */
 public class ClassType<T> {
 
     public static <T> ClassType<T> of(Class<T> clazz) {
