@@ -69,7 +69,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return encode(type, val, (Element)doc.appendChild(doc.createElement(rootName)));
     }
 
-    private final Codec.NullCodec<Element> nullCodec = new Codec.NullCodec<Element>() {
+    protected final Codec.NullCodec<Element> nullCodec = new Codec.NullCodec<Element>() {
         @Override
         public boolean isNull(Element in) {
             return !in.hasChildNodes() && !in.hasAttributes();
@@ -95,7 +95,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return nullCodec;
     }
 
-    private final Codec.BooleanCodec<Element> booleanCodec = new Codec.BooleanCodec<Element>() {
+    protected final Codec.BooleanCodec<Element> booleanCodec = new Codec.BooleanCodec<Element>() {
 
         @Override
         public Element encodePrim(boolean val, Element out) {
@@ -114,12 +114,12 @@ public class XmlCodecCore extends CodecCore<Element> {
         return booleanCodec;
     }
 
-    private final Codec<boolean[], Element> booleanArrayCodec = new Codec<boolean[], Element>() {
+    protected final Codec<boolean[], Element> booleanArrayCodec = new Codec<boolean[], Element>() {
 
         @Override
         public Element encode(boolean[] vals, Element out) {
-            for (int i = 0; i < vals.length; ++i) {
-                booleanCodec().encode(vals[i], addEntryElement(out));
+            for (boolean val : vals) {
+                booleanCodec().encode(val, addEntryElement(out));
             }
 
             return out;
@@ -150,7 +150,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return booleanArrayCodec;
     }
 
-    private final Codec.ByteCodec<Element> byteCodec = new Codec.ByteCodec<Element>() {
+    protected final Codec.ByteCodec<Element> byteCodec = new Codec.ByteCodec<Element>() {
 
         @Override
         public Element encodePrim(byte val, Element out) {
@@ -169,12 +169,12 @@ public class XmlCodecCore extends CodecCore<Element> {
         return byteCodec;
     }
 
-    private final Codec<byte[], Element> byteArrayCodec = new Codec<byte[], Element>() {
+    protected final Codec<byte[], Element> byteArrayCodec = new Codec<byte[], Element>() {
 
         @Override
         public Element encode(byte[] vals, Element out) {
-            for (int i = 0; i < vals.length; ++i) {
-                byteCodec().encode(vals[i], addEntryElement(out));
+            for (byte val : vals) {
+                byteCodec().encode(val, addEntryElement(out));
             }
 
             return out;
@@ -205,7 +205,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return byteArrayCodec;
     }
 
-    private final Codec.CharCodec<Element> charCodec = new Codec.CharCodec<Element>() {
+    protected final Codec.CharCodec<Element> charCodec = new Codec.CharCodec<Element>() {
 
         @Override
         public Element encodePrim(char val, Element out) {
@@ -224,12 +224,12 @@ public class XmlCodecCore extends CodecCore<Element> {
         return charCodec;
     }
 
-    private final Codec<char[], Element> charArrayCodec = new Codec<char[], Element>() {
+    protected final Codec<char[], Element> charArrayCodec = new Codec<char[], Element>() {
 
         @Override
         public Element encode(char[] vals, Element out) {
-            for (int i = 0; i < vals.length; ++i) {
-                charCodec().encode(vals[i], addEntryElement(out));
+            for (char val : vals) {
+                charCodec().encode(val, addEntryElement(out));
             }
 
             return out;
@@ -260,7 +260,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return charArrayCodec;
     }
 
-    private final Codec.ShortCodec<Element> shortCodec = new Codec.ShortCodec<Element>() {
+    protected final Codec.ShortCodec<Element> shortCodec = new Codec.ShortCodec<Element>() {
 
         @Override
         public Element encodePrim(short val, Element out) {
@@ -279,12 +279,12 @@ public class XmlCodecCore extends CodecCore<Element> {
         return shortCodec;
     }
 
-    private final Codec<short[], Element> shortArrayCodec = new Codec<short[], Element>() {
+    protected final Codec<short[], Element> shortArrayCodec = new Codec<short[], Element>() {
 
         @Override
         public Element encode(short[] vals, Element out) {
-            for (int i = 0; i < vals.length; ++i) {
-                shortCodec().encode(vals[i], addEntryElement(out));
+            for (short val : vals) {
+                shortCodec().encode(val, addEntryElement(out));
             }
 
             return out;
@@ -315,7 +315,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return shortArrayCodec;
     }
 
-    private final Codec.IntCodec<Element> intCodec = new Codec.IntCodec<Element>() {
+    protected final Codec.IntCodec<Element> intCodec = new Codec.IntCodec<Element>() {
 
         @Override
         public Element encodePrim(int val, Element out) {
@@ -334,12 +334,12 @@ public class XmlCodecCore extends CodecCore<Element> {
         return intCodec;
     }
 
-    private final Codec<int[], Element> intArrayCodec = new Codec<int[], Element>() {
+    protected final Codec<int[], Element> intArrayCodec = new Codec<int[], Element>() {
 
         @Override
         public Element encode(int[] vals, Element out) {
-            for (int i = 0; i < vals.length; ++i) {
-                intCodec().encode(vals[i], addEntryElement(out));
+            for (int val : vals) {
+                intCodec().encode(val, addEntryElement(out));
             }
 
             return out;
@@ -370,7 +370,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return intArrayCodec;
     }
 
-    private final Codec.LongCodec<Element> longCodec = new Codec.LongCodec<Element>() {
+    protected final Codec.LongCodec<Element> longCodec = new Codec.LongCodec<Element>() {
 
         @Override
         public Element encodePrim(long val, Element out) {
@@ -389,12 +389,12 @@ public class XmlCodecCore extends CodecCore<Element> {
         return longCodec;
     }
 
-    private final Codec<long[], Element> longArrayCodec = new Codec<long[], Element>() {
+    protected final Codec<long[], Element> longArrayCodec = new Codec<long[], Element>() {
 
         @Override
         public Element encode(long[] vals, Element out) {
-            for (int i = 0; i < vals.length; ++i) {
-                longCodec().encode(vals[i], addEntryElement(out));
+            for (long val : vals) {
+                longCodec().encode(val, addEntryElement(out));
             }
 
             return out;
@@ -425,7 +425,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return longArrayCodec;
     }
 
-    private final Codec.FloatCodec<Element> floatCodec = new Codec.FloatCodec<Element>() {
+    protected final Codec.FloatCodec<Element> floatCodec = new Codec.FloatCodec<Element>() {
 
         @Override
         public Element encodePrim(float val, Element out) {
@@ -444,12 +444,12 @@ public class XmlCodecCore extends CodecCore<Element> {
         return floatCodec;
     }
 
-    private final Codec<float[], Element> floatArrayCodec = new Codec<float[], Element>() {
+    protected final Codec<float[], Element> floatArrayCodec = new Codec<float[], Element>() {
 
         @Override
         public Element encode(float[] vals, Element out) {
-            for (int i = 0; i < vals.length; ++i) {
-                floatCodec().encode(vals[i], addEntryElement(out));
+            for (float val : vals) {
+                floatCodec().encode(val, addEntryElement(out));
             }
 
             return out;
@@ -480,7 +480,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return floatArrayCodec;
     }
 
-    private final Codec.DoubleCodec<Element> doubleCodec = new Codec.DoubleCodec<Element>() {
+    protected final Codec.DoubleCodec<Element> doubleCodec = new Codec.DoubleCodec<Element>() {
 
         @Override
         public Element encodePrim(double val, Element out) {
@@ -499,12 +499,12 @@ public class XmlCodecCore extends CodecCore<Element> {
         return doubleCodec;
     }
 
-    private final Codec<double[], Element> doubleArrayCodec = new Codec<double[], Element>() {
+    protected final Codec<double[], Element> doubleArrayCodec = new Codec<double[], Element>() {
 
         @Override
         public Element encode(double[] vals, Element out) {
-            for (int i = 0; i < vals.length; ++i) {
-                doubleCodec().encode(vals[i], addEntryElement(out));
+            for (double val : vals) {
+                doubleCodec().encode(val, addEntryElement(out));
             }
 
             return out;
@@ -535,7 +535,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return doubleArrayCodec;
     }
 
-    private final Codec<String, Element> stringCodec = new Codec<String, Element>() {
+    protected final Codec<String, Element> stringCodec = new Codec<String, Element>() {
         @Override
         public Element encode(String val, Element out) {
             out.appendChild(doc.createTextNode(val));
