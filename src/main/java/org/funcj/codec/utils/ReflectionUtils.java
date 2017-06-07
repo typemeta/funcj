@@ -84,39 +84,6 @@ public class ReflectionUtils {
         return new TypeArgs(typeArgs);
     }
 
-    public static <T> T newInstance(Class<T> clazz) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        final List<Constructor<T>> ctors =
-                Arrays.stream(clazz.getDeclaredConstructors())
-                        .filter(ctor -> ctor.getParameterCount() == 0)
-                        .map(ctor -> (Constructor<T>)ctor)
-                        .collect(toList());
-        Constructor<T> defCtor = null;
-        switch (ctors.size()) {
-            case 0:
-                throw new InstantiationException(clazz.getName() + " has no default contructor");
-            case 1:
-                defCtor = ctors.get(0);
-                break;
-            default:
-                for (Constructor<T> ctor : ctors) {
-                    if (defCtor == null || defCtor.isAccessible()) {
-                        defCtor = ctor;
-                    }
-                }
-                break;
-        }
-
-        final boolean access = defCtor.isAccessible();
-        if (!access) {
-            defCtor.setAccessible(true);
-        }
-        final T result = defCtor.newInstance((Object[])null);
-        if (!access) {
-            defCtor.setAccessible(false);
-        }
-        return result;
-    }
-
     public static <T> CodecCore.TypeConstructor<T> createTypeConstructor(Class<T> clazz) throws InstantiationException {
         final List<Constructor<T>> ctors =
                 Arrays.stream(clazz.getDeclaredConstructors())

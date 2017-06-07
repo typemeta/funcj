@@ -33,6 +33,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public E encode(Boolean val) {
+            return encodePrim(val) ;
+        }
+
+        @Override
         public Boolean decode(Class<Boolean> dynType, E in) {
             return decodePrim(in);
         }
@@ -42,7 +47,13 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        public abstract E encodePrim(boolean val, E out);
+        public E encodePrim(boolean val, E out) {
+            return encodePrim(val);
+        }
+
+        public E encodePrim(boolean val) {
+            throw new CodecException("Operation not implemented");
+        }
 
         public abstract boolean decodePrim(E in);
     }
@@ -59,6 +70,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public E encode(Byte val) {
+            return encodePrim(val) ;
+        }
+
+        @Override
         public Byte decode(Class<Byte> dynType, E in) {
             return decodePrim(in);
         }
@@ -68,7 +84,13 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        public abstract E encodePrim(byte val, E out);
+        public E encodePrim(byte val, E out) {
+            return encodePrim(val);
+        }
+
+        public E encodePrim(byte val) {
+            throw new CodecException("Operation not implemented");
+        }
 
         public abstract byte decodePrim(E in);
     }
@@ -85,6 +107,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public E encode(Character val) {
+            return encodePrim(val) ;
+        }
+
+        @Override
         public Character decode(Class<Character> dynType, E in) {
             return decodePrim(in);
         }
@@ -94,7 +121,13 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        public abstract E encodePrim(char val, E out);
+        public E encodePrim(char val, E out) {
+            return encodePrim(val);
+        }
+
+        public E encodePrim(char val) {
+            throw new CodecException("Operation not implemented");
+        }
 
         public abstract char decodePrim(E in);
     }
@@ -111,6 +144,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public E encode(Short val) {
+            return encodePrim(val) ;
+        }
+
+        @Override
         public Short decode(Class<Short> dynType, E in) {
             return decodePrim(in);
         }
@@ -120,7 +158,13 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        public abstract E encodePrim(short val, E out);
+        public E encodePrim(short val, E out) {
+            return encodePrim(val);
+        }
+
+        public E encodePrim(short val) {
+            throw new CodecException("Operation not implemented");
+        }
 
         public abstract short decodePrim(E in);
     }
@@ -137,6 +181,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public E encode(Integer val) {
+            return encodePrim(val) ;
+        }
+
+        @Override
         public Integer decode(Class<Integer> dynType, E in) {
             return decodePrim(in);
         }
@@ -146,7 +195,13 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        public abstract E encodePrim(int val, E out);
+        public E encodePrim(int val, E out) {
+            return encodePrim(val);
+        }
+
+        public E encodePrim(int val) {
+            throw new CodecException("Operation not implemented");
+        }
 
         public abstract int decodePrim(E in);
     }
@@ -163,6 +218,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public E encode(Long val) {
+            return encodePrim(val) ;
+        }
+
+        @Override
         public Long decode(Class<Long> dynType, E in) {
             return decodePrim(in);
         }
@@ -172,7 +232,13 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        public abstract E encodePrim(long val, E out);
+        public E encodePrim(long val, E out) {
+            return encodePrim(val);
+        }
+
+        public E encodePrim(long val) {
+            throw new CodecException("Operation not implemented");
+        }
 
         public abstract long decodePrim(E in);
     }
@@ -189,6 +255,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public E encode(Float val) {
+            return encodePrim(val) ;
+        }
+
+        @Override
         public Float decode(Class<Float> dynType, E in) {
             return decodePrim(in);
         }
@@ -198,7 +269,13 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        public abstract E encodePrim(float val, E out);
+        public E encodePrim(float val, E out) {
+            return encodePrim(val);
+        }
+
+        public E encodePrim(float val) {
+            throw new CodecException("Operation not implemented");
+        }
 
         public abstract float decodePrim(E in);
     }
@@ -215,6 +292,11 @@ public interface Codec<T, E> {
         }
 
         @Override
+        public E encode(Double val) {
+            return encodePrim(val) ;
+        }
+
+        @Override
         public Double decode(Class<Double> dynType, E in) {
             return decodePrim(in);
         }
@@ -224,15 +306,20 @@ public interface Codec<T, E> {
             return decodePrim(in);
         }
 
-        public abstract E encodePrim(double val, E out);
+        public E encodePrim(double val, E out) {
+            return encodePrim(val);
+        }
+
+        public E encodePrim(double val) {
+            throw new CodecException("Operation not implemented");
+        }
 
         public abstract double decodePrim(E in);
     }
 
     /**
      * Encode a value of type <code>T</code> into and encoded value of type <code>E</code>.
-     * One of the two <code>encode</code> methods must be implemented by implementing
-     * classes.
+     * One of the two <code>encode</code> methods must be implemented by sub-classes.
      * @param val unencoded value
      * @param out encoded parent value
      * @return encoded value
@@ -243,33 +330,31 @@ public interface Codec<T, E> {
 
     /**
      * Encode a value of type <code>T</code> into and encoded value of type <code>E</code>.
-     * One of the two <code>encode</code> methods must be implemented by implementing
-     * classes.
+     * One of the two <code>encode</code> methods must be implemented by sub-classes.
      * @param val unencoded value
      * @return encoded value
      */
     default E encode(T val) {
+        encode(val, null);
         throw new CodecException("Operation not implemented");
     }
 
     /**
-     * Decode a value of type <code>E</code> back into a value of type <code>T</code> .
-     * One of the two <code>decode</code> methods must be implemented by implementing
-     * classes.
+     * Decode a value of type <code>E</code> back into a value of type <code>T</code>.
+     * One of the two <code>decode</code> methods must be implemented by sub-classes.
      * @param dynType the dynamic type to decode into.
      * @param in the encoded value
-     * @return unencoded value
+     * @return decoded value
      */
     default T decode(Class<T> dynType, E in) {
         return decode(in);
     }
 
     /**
-     * Decode a value of type <code>E</code> back into a value of type <code>T</code> .
-     * One of the two <code>decode</code> methods must be implemented by implementing
-     * classes.
+     * Decode an encoded value of type <code>E</code> back into a value of type <code>T</code>.
+     * One of the two <code>decode</code> methods must be implemented by sub-classes.
      * @param in the encoded value
-     * @return unencoded value
+     * @return decoded value
      */
     default T decode(E in) {
         throw new CodecException("Operation not implemented");

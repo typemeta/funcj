@@ -38,8 +38,8 @@ public class JsonCodecTest extends TestBase {
         }
 
         @Override
-        public JSValue encode(Optional<T> val, JSValue out) {
-            return val.map(t -> core.dynamicCodec().encode(t, out))
+        public JSValue encode(Optional<T> val) {
+            return val.map(t -> core.dynamicCodec().encode(t))
                     .orElse(JSObject.of());
         }
 

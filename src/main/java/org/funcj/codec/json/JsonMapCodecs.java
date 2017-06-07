@@ -28,14 +28,14 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public JSValue encode(Map<K, V> map, JSValue out) {
+        public JSValue encode(Map<K, V> map) {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
             final List<JSValue> nodes = map.entrySet().stream()
                     .map(en -> JSObject.of(
-                            JSObject.field(keyFieldName, keyCodec.encode(en.getKey(), out)),
-                            JSObject.field(valueFieldName, valueCodec.encode(en.getValue(), out))
+                            JSObject.field(keyFieldName, keyCodec.encode(en.getKey())),
+                            JSObject.field(valueFieldName, valueCodec.encode(en.getValue()))
                     )).collect(toList());
 
             return JSArray.of(nodes);
@@ -54,7 +54,7 @@ public abstract class JsonMapCodecs {
             };
 
             final Map<K, V> map = Exceptions.wrap(
-                    () -> ReflectionUtils.newInstance(dynType),
+                    () -> core.getTypeConstructor(dynType).construct(),
                     JsonCodecException::new);
 
             final JSArray objNode = in.asArray();
@@ -75,11 +75,11 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public JSValue encode(Map<String, V> map, JSValue out) {
+        public JSValue encode(Map<String, V> map) {
             final List<JSObject.Field> fields = new ArrayList<>(map.size());
 
             map.forEach((k, v) -> {
-                final JSValue value = valueCodec.encode(v, out);
+                final JSValue value = valueCodec.encode(v);
                 fields.add(JSObject.field(k, value));
             });
 
@@ -91,7 +91,7 @@ public abstract class JsonMapCodecs {
             final JSObject objNode = in.asObject();
 
             final Map<String, V> map = Exceptions.wrap(
-                    () -> ReflectionUtils.newInstance(dynType),
+                    () -> core.getTypeConstructor(dynType).construct(),
                     JsonCodecException::new);
 
             objNode.forEach(field -> {

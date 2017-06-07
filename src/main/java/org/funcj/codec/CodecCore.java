@@ -50,14 +50,14 @@ public abstract class CodecCore<E> {
 
     public abstract RuntimeException wrapException(Exception ex);
 ;
-    protected <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
+    public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
         final String name = classToName(clazz);
         return (TypeConstructor<T>)typeCtors.computeIfAbsent(
                 name,
                 n -> Exceptions.wrap(() -> createTypeConstructor(clazz), this::wrapException));
     }
 
-    protected <T> Codec<T, E> makeNullSafeCodec(Codec<T, E> codec) {
+    public <T> Codec<T, E> makeNullSafeCodec(Codec<T, E> codec) {
         final Codec.NullCodec<E> nullCodec = nullCodec();
         return new Codec<T, E>() {
             @Override
@@ -66,6 +66,15 @@ public abstract class CodecCore<E> {
                     return nullCodec.encode(null, out);
                 } else {
                     return codec.encode(val, out);
+                }
+            }
+
+            @Override
+            public E encode(T val) {
+                if (val == null) {
+                    return nullCodec.encode(null);
+                } else {
+                    return codec.encode(val);
                 }
             }
 

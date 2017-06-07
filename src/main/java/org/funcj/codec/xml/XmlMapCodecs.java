@@ -46,7 +46,9 @@ public abstract class XmlMapCodecs {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
 
-            final Map<K, V> map = Exceptions.wrap(() -> ReflectionUtils.newInstance(dynType));
+            final Map<K, V> map = Exceptions.wrap(
+                    () -> core.getTypeConstructor(dynType).construct(),
+                    XmlCodecException::new);
 
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
@@ -86,7 +88,7 @@ public abstract class XmlMapCodecs {
             final int l = nodes.getLength();
 
             final Map<String, V> map = Exceptions.wrap(
-                    () -> ReflectionUtils.newInstance(dynType),
+                    () -> core.getTypeConstructor(dynType).construct(),
                     XmlCodecException::new);
 
             for (int i = 0; i < l; ++i) {
