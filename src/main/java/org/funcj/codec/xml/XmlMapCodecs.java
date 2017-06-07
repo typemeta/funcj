@@ -26,10 +26,10 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Element encode(Map<K, V> map, Element out) {
+        public Element encode(Map<K, V> map, Element enc) {
             int i = 0;
             for (Map.Entry<K, V> entry : map.entrySet()) {
-                final Element elem = core.addEntryElement(out);
+                final Element elem = core.addEntryElement(enc);
 
                 final Element keyNode = (Element)elem.appendChild(core.doc.createElement(core.keyElemName()));
                 keyCodec.encode(entry.getKey(), keyNode);
@@ -38,12 +38,12 @@ public abstract class XmlMapCodecs {
                 valueCodec.encode(entry.getValue(), valueNode);
             }
 
-            return out;
+            return enc;
         }
 
         @Override
-        public Map<K, V> decode(Class<Map<K, V>> dynType, Element in) {
-            final NodeList nodes = in.getChildNodes();
+        public Map<K, V> decode(Class<Map<K, V>> dynType, Element enc) {
+            final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
 
             final Map<K, V> map = Exceptions.wrap(
@@ -71,20 +71,20 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Element encode(Map<String, V> map, Element out) {
+        public Element encode(Map<String, V> map, Element enc) {
             int i = 0;
             for (Map.Entry<String, V> entry : map.entrySet()) {
-                final Element elem = core.addEntryElement(out);
+                final Element elem = core.addEntryElement(enc);
                 setAttrValue(elem, core.keyAttrName(), entry.getKey());
                 valueCodec.encode(entry.getValue(), elem);
             }
 
-            return out;
+            return enc;
         }
 
         @Override
-        public Map<String, V> decode(Class<Map<String, V>> dynType, Element in) {
-            final NodeList nodes = in.getChildNodes();
+        public Map<String, V> decode(Class<Map<String, V>> dynType, Element enc) {
+            final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
 
             final Map<String, V> map = Exceptions.wrap(

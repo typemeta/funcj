@@ -41,17 +41,17 @@ public class XmlCodecTest extends TestBase {
         }
 
         @Override
-        public Element encode(Optional<T> val, Element out) {
-            return val.map(t -> core.dynamicCodec().encode(t, out))
-                    .orElseGet(() -> XmlUtils.setAttrValue((Element)out, "empty", "1"));
+        public Element encode(Optional<T> val, Element enc) {
+            return val.map(t -> core.dynamicCodec().encode(t, enc))
+                    .orElseGet(() -> XmlUtils.setAttrValue((Element) enc, "empty", "1"));
         }
 
         @Override
-        public Optional<T> decode(Class<Optional<T>> dynType, Element in) {
-            if (!in.getAttribute("empty").isEmpty()) {
+        public Optional<T> decode(Class<Optional<T>> dynType, Element enc) {
+            if (!enc.getAttribute("empty").isEmpty()) {
                 return Optional.empty();
             } else {
-                return Optional.of((T) core.dynamicCodec().decode(in));
+                return Optional.of((T) core.dynamicCodec().decode(enc));
             }
         }
     }

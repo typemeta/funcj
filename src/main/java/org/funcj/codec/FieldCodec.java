@@ -1,5 +1,6 @@
 package org.funcj.codec;
 
+import org.funcj.codec.utils.Utils;
 import org.funcj.control.Exceptions;
 
 import java.lang.reflect.*;
@@ -21,11 +22,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final boolean fieldVal = Exceptions.wrap(() -> field.getBoolean(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -36,8 +37,8 @@ public abstract class FieldCodec<E> {
             return codec.encode(fieldVal);
         }
         @Override
-        public void decodeField(Object obj, E in) {
-            final boolean fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final boolean fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.setBoolean(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -54,11 +55,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final boolean[] fieldVal = (boolean[])Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -70,8 +71,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final boolean[] fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final boolean[] fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -88,11 +89,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final byte fieldVal = Exceptions.wrap(() -> field.getByte(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -104,8 +105,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final byte fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final byte fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.setByte(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -122,11 +123,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final byte[] fieldVal = (byte[])Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -138,8 +139,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final byte[] fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final byte[] fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -156,11 +157,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final char fieldVal = Exceptions.wrap(() -> field.getChar(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -172,8 +173,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final char fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final char fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.setChar(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -190,11 +191,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final char[] fieldVal = (char[])Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -206,8 +207,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final char[] fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final char[] fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -224,11 +225,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final short fieldVal = Exceptions.wrap(() -> field.getShort(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -240,8 +241,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final short fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final short fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.setShort(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -258,11 +259,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final short[] fieldVal = (short[])Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -274,8 +275,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final short[] fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final short[] fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -292,11 +293,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final int fieldVal = Exceptions.wrap(() -> field.getInt(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -307,8 +308,8 @@ public abstract class FieldCodec<E> {
             return codec.encode(fieldVal);
         }
 
-        public void decodeField(Object obj, E in) {
-            final int fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final int fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.setInt(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -325,11 +326,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final int[] fieldVal = (int[])Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -341,8 +342,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final int[] fieldVal = codec.decode(int[].class, in);
+        public void decodeField(Object obj, E enc) {
+            final int[] fieldVal = codec.decode(int[].class, enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -359,11 +360,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final long fieldVal = Exceptions.wrap(() -> field.getLong(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -375,8 +376,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final long fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final long fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.setLong(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -393,11 +394,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final long[] fieldVal = (long[])Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -409,8 +410,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final long[] fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final long[] fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -427,11 +428,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final float fieldVal = Exceptions.wrap(() -> field.getFloat(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -443,8 +444,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final float fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final float fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.setFloat(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -461,11 +462,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final float[] fieldVal = (float[])Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -477,8 +478,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final float[] fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final float[] fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -495,11 +496,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final double fieldVal = Exceptions.wrap(() -> field.getDouble(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -511,8 +512,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final double fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final double fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.setDouble(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -529,11 +530,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final double[] fieldVal = (double[])Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -545,8 +546,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final double[] fieldVal = codec.decode(in);
+        public void decodeField(Object obj, E enc) {
+            final double[] fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -563,11 +564,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final T fieldVal = (T)Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -579,8 +580,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final T fieldVal = codec.decode((Class<T>)field.getType(), in);
+        public void decodeField(Object obj, E enc) {
+            final T fieldVal = codec.decode((Class<T>)field.getType(), enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -597,11 +598,11 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public E encodeField(Object obj, E out) {
+        public E encodeField(Object obj, E enc) {
             setAccessible(true);
             final T[] fieldVal = (T[])Exceptions.wrap(() -> field.get(obj), CodecException::new);
             setAccessible(false);
-            return codec.encode(fieldVal, out);
+            return codec.encode(fieldVal, enc);
         }
 
         @Override
@@ -613,8 +614,8 @@ public abstract class FieldCodec<E> {
         }
 
         @Override
-        public void decodeField(Object obj, E in) {
-            final T[] fieldVal = codec.decode((Class<T[]>)field.getType(), in);
+        public void decodeField(Object obj, E enc) {
+            final T[] fieldVal = codec.decode((Class<T[]>)field.getType(), enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);
@@ -641,10 +642,10 @@ public abstract class FieldCodec<E> {
      * Encode a field with an object into an encoded type <code>E</code>.
      * One of the two <code>encode</code> methods must be implemented by sub-classes.
      * @param obj object to which the field belongs
-     * @param out encoded parent value
+     * @param enc encoded parent value
      * @return encoded value
      */
-    public E encodeField(Object obj, E out) {
+    public E encodeField(Object obj, E enc) {
         return encodeField(obj);
     }
 
@@ -655,15 +656,15 @@ public abstract class FieldCodec<E> {
      * @return encoded value
      */
     public E encodeField(Object obj) {
-        throw new CodecException("Operation not implemented");
+        throw Utils.opnNotImplError();
     }
 
     /**
      * Decode an encoded value of type <code>E</code> back into a field of type <code>T</code>.
      * One of the two <code>decode</code> methods must be implemented by sub-classes.
      * @param obj object to which the field belongs
-     * @param in the encoded value
+     * @param enc the encoded value
      * @return decoded value
      */
-    public abstract void decodeField(Object obj, E in);
+    public abstract void decodeField(Object obj, E enc);
 }

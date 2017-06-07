@@ -23,8 +23,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
     private final Codec.NullCodec<JSValue> nullCodec = new Codec.NullCodec<JSValue>() {
         @Override
-        public boolean isNull(JSValue in) {
-            return in.isNull();
+        public boolean isNull(JSValue enc) {
+            return enc.isNull();
         }
 
         @Override
@@ -33,8 +33,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public Object decode(JSValue in) {
-            in.asNull();
+        public Object decode(JSValue enc) {
+            enc.asNull();
             return null;
         }
     };
@@ -62,8 +62,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public boolean decodePrim(JSValue in) {
-            return in.asBool().getValue();
+        public boolean decodePrim(JSValue enc) {
+            return enc.asBool().getValue();
         }
     };
 
@@ -84,8 +84,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public boolean[] decode(JSValue in) {
-            final JSArray arrNode = in.asArray();
+        public boolean[] decode(JSValue enc) {
+            final JSArray arrNode = enc.asArray();
             final boolean[] vals = new boolean[arrNode.size()];
             int i = 0;
             for (JSValue node : arrNode) {
@@ -108,8 +108,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public byte decodePrim(JSValue in) {
-            return (byte)in.asNumber().getValue();
+        public byte decodePrim(JSValue enc) {
+            return (byte) enc.asNumber().getValue();
         }
     };
 
@@ -130,8 +130,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public byte[] decode(JSValue in) {
-            final JSArray arrNode = in.asArray();
+        public byte[] decode(JSValue enc) {
+            final JSArray arrNode = enc.asArray();
             final byte[] vals = new byte[arrNode.size()];
             int i = 0;
             for (JSValue node : arrNode) {
@@ -154,8 +154,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public char decodePrim(JSValue in) {
-            final String s = in.asString().getValue();
+        public char decodePrim(JSValue enc) {
+            final String s = enc.asString().getValue();
             if (s.length() == 1) {
                 return s.charAt(0);
             } else {
@@ -182,8 +182,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public char[] decode(JSValue in) {
-            final JSArray arrNode = in.asArray();
+        public char[] decode(JSValue enc) {
+            final JSArray arrNode = enc.asArray();
             final char[] vals = new char[arrNode.size()];
             int i = 0;
             for (JSValue node : arrNode) {
@@ -206,8 +206,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public short decodePrim(JSValue in) {
-            return (short)in.asNumber().getValue();
+        public short decodePrim(JSValue enc) {
+            return (short) enc.asNumber().getValue();
         }
     };
 
@@ -228,8 +228,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public short[] decode(JSValue in) {
-            final JSArray arrNode = in.asArray();
+        public short[] decode(JSValue enc) {
+            final JSArray arrNode = enc.asArray();
             final short[] vals = new short[arrNode.size()];
             int i = 0;
             for (JSValue node : arrNode) {
@@ -252,8 +252,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public int decodePrim(JSValue in) {
-            return (int)in.asNumber().getValue();
+        public int decodePrim(JSValue enc) {
+            return (int) enc.asNumber().getValue();
         }
     };
 
@@ -274,8 +274,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public int[] decode(JSValue in) {
-            final JSArray arrNode = in.asArray();
+        public int[] decode(JSValue enc) {
+            final JSArray arrNode = enc.asArray();
             final int[] vals = new int[arrNode.size()];
             int i = 0;
             for (JSValue node : arrNode) {
@@ -298,8 +298,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public long decodePrim(JSValue in) {
-            return (long)in.asNumber().getValue();
+        public long decodePrim(JSValue enc) {
+            return (long) enc.asNumber().getValue();
         }
     };
 
@@ -320,8 +320,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public long[] decode(JSValue in) {
-            final JSArray arrNode = in.asArray();
+        public long[] decode(JSValue enc) {
+            final JSArray arrNode = enc.asArray();
             final long[] vals = new long[arrNode.size()];
             int i = 0;
             for (JSValue node : arrNode) {
@@ -344,8 +344,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public float decodePrim(JSValue in) {
-            return (float)in.asNumber().getValue();
+        public float decodePrim(JSValue enc) {
+            return (float) enc.asNumber().getValue();
         }
     };
 
@@ -366,8 +366,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public float[] decode(JSValue in) {
-            final JSArray arrNode = in.asArray();
+        public float[] decode(JSValue enc) {
+            final JSArray arrNode = enc.asArray();
             final float[] vals = new float[arrNode.size()];
             int i = 0;
             for (JSValue node : arrNode) {
@@ -390,8 +390,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public double decodePrim(JSValue in) {
-            return in.asNumber().getValue();
+        public double decodePrim(JSValue enc) {
+            return enc.asNumber().getValue();
         }
     };
 
@@ -412,8 +412,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public double[] decode(JSValue in) {
-            final JSArray arrNode = in.asArray();
+        public double[] decode(JSValue enc) {
+            final JSArray arrNode = enc.asArray();
             final double[] vals = new double[arrNode.size()];
             int i = 0;
             for (JSValue node : arrNode) {
@@ -435,8 +435,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public String decode(JSValue in) {
-            return in.asString().getValue();
+        public String decode(JSValue enc) {
+            return enc.asString().getValue();
         }
     };
 
@@ -454,8 +454,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             }
 
             @Override
-            public EM decode(Class<EM> dynType, JSValue in) {
-                return EM.valueOf(dynType, in.asString().getValue());
+            public EM decode(Class<EM> dynType, JSValue enc) {
+                return EM.valueOf(dynType, enc.asString().getValue());
             }
         };
     }
@@ -483,9 +483,9 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             }
 
             @Override
-            public Collection<T> decode(Class<Collection<T>> dynType, JSValue in) {
+            public Collection<T> decode(Class<Collection<T>> dynType, JSValue enc) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
-                final JSArray arrNode = in.asArray();
+                final JSArray arrNode = enc.asArray();
                 final Collection<T> vals = Exceptions.wrap(
                         () -> getTypeConstructor(dynType).construct(),
                         ex -> wrapException(ex));
@@ -511,9 +511,9 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             }
 
             @Override
-            public T[] decode(Class<T[]> dynType, JSValue in) {
+            public T[] decode(Class<T[]> dynType, JSValue enc) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
-                final JSArray arrNode = in.asArray();
+                final JSArray arrNode = enc.asArray();
                 final T[] vals = (T[]) Array.newInstance(elemType, arrNode.size());
                 int i = 0;
                 for (JSValue node : arrNode) {
@@ -549,9 +549,9 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             }
 
             @Override
-            public T decode(JSValue in) {
-                if (in.isObject()) {
-                    final JSObject objNode = in.asObject();
+            public T decode(JSValue enc) {
+                if (enc.isObject()) {
+                    final JSObject objNode = enc.asObject();
                     final String typeFieldName = typeFieldName();
                     final String valueFieldName = valueFieldName();
                     if (objNode.size() == 2 &&
@@ -564,7 +564,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
                 }
 
                 final Codec<T, JSValue> codec = JsonCodecCore.this.getNullUnsafeCodec(stcType);
-                return codec.decode(stcType, in);
+                return codec.decode(stcType, enc);
             }
 
             protected <S extends T> S decode2(JSValue in, Class<S> dynType) {
@@ -591,8 +591,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             }
 
             @Override
-            public T decode(JSValue in) {
-                final JSObject objNode = in.asObject();
+            public T decode(JSValue enc) {
+                final JSObject objNode = enc.asObject();
                 final String typeFieldName = typeFieldName();
                 final String valueFieldName = valueFieldName();
                 if (objNode.size() == 2 &&
@@ -603,7 +603,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
                     final JSValue valueNode = objNode.get(valueFieldName());
                     return codec.decode((Class<T>)dynType, valueNode);
                 } else {
-                    return codec.decode(stcType, in);
+                    return codec.decode(stcType, enc);
                 }
             }
         };
@@ -623,8 +623,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             }
 
             @Override
-            public T decode(Class<T> dynType, JSValue in) {
-                final JSObject objNode = in.asObject();
+            public T decode(Class<T> dynType, JSValue enc) {
+                final JSObject objNode = enc.asObject();
                 final T val = Exceptions.wrap(
                         () -> getTypeConstructor(dynType).construct(),
                         ex -> wrapException(ex));

@@ -44,15 +44,15 @@ public class JsonCodecTest extends TestBase {
         }
 
         @Override
-        public Optional<T> decode(Class<Optional<T>> dynType, JSValue in) {
-            if (in.isObject()) {
-                final JSObject jso = in.asObject();
+        public Optional<T> decode(Class<Optional<T>> dynType, JSValue enc) {
+            if (enc.isObject()) {
+                final JSObject jso = enc.asObject();
                 if (jso.isEmpty()) {
                     return Optional.empty();
                 }
             }
 
-            return Optional.of((T) core.dynamicCodec().decode(in));
+            return Optional.of((T) core.dynamicCodec().decode(enc));
         }
     }
 }

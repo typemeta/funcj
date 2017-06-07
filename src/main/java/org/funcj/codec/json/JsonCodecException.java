@@ -18,7 +18,11 @@ public class JsonCodecException extends CodecException {
         super(cause);
     }
 
-    public JsonCodecException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public JsonCodecException(
+            String message,
+            Throwable cause,
+            boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -32,12 +32,12 @@ public abstract class CodecCore<E> {
 
     public abstract <T> E encode(Class<T> type, T val);
 
-    public <T> E encode(Class<T> type, T val, E out) {
-        return dynamicCodec(type).encode(val, out);
+    public <T> E encode(Class<T> type, T val, E enc) {
+        return dynamicCodec(type).encode(val, enc);
     }
 
-    public <T> T decode(Class<T> type, E in) {
-        return dynamicCodec(type).decode(in);
+    public <T> T decode(Class<T> type, E enc) {
+        return dynamicCodec(type).decode(enc);
     }
 
     public String classToName(Class<?> clazz) {
@@ -61,11 +61,11 @@ public abstract class CodecCore<E> {
         final Codec.NullCodec<E> nullCodec = nullCodec();
         return new Codec<T, E>() {
             @Override
-            public E encode(T val, E out) {
+            public E encode(T val, E enc) {
                 if (val == null) {
-                    return nullCodec.encode(null, out);
+                    return nullCodec.encode(null, enc);
                 } else {
-                    return codec.encode(val, out);
+                    return codec.encode(val, enc);
                 }
             }
 
@@ -79,20 +79,20 @@ public abstract class CodecCore<E> {
             }
 
             @Override
-            public T decode(Class<T> dynType, E in) {
-                if (nullCodec.isNull(in)) {
-                    return (T)nullCodec.decode(in);
+            public T decode(Class<T> dynType, E enc) {
+                if (nullCodec.isNull(enc)) {
+                    return (T)nullCodec.decode(enc);
                 } else {
-                    return codec.decode(dynType, in);
+                    return codec.decode(dynType, enc);
                 }
             }
 
             @Override
-            public T decode(E in) {
-                if (nullCodec.isNull(in)) {
-                    return (T)nullCodec.decode(in);
+            public T decode(E enc) {
+                if (nullCodec.isNull(enc)) {
+                    return (T)nullCodec.decode(enc);
                 } else {
-                    return codec.decode(in);
+                    return codec.decode(enc);
                 }
             }
         };

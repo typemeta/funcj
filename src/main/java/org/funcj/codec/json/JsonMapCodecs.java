@@ -42,7 +42,7 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Map<K, V> decode(Class<Map<K, V>> dynType, JSValue in) {
+        public Map<K, V> decode(Class<Map<K, V>> dynType, JSValue enc) {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
@@ -57,7 +57,7 @@ public abstract class JsonMapCodecs {
                     () -> core.getTypeConstructor(dynType).construct(),
                     JsonCodecException::new);
 
-            final JSArray objNode = in.asArray();
+            final JSArray objNode = enc.asArray();
             final Consumer<JSValue> decode = decodeF.apply(map);
             objNode.forEach(decode);
 
@@ -87,8 +87,8 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Map<String, V> decode(Class<Map<String, V>> dynType, JSValue in) {
-            final JSObject objNode = in.asObject();
+        public Map<String, V> decode(Class<Map<String, V>> dynType, JSValue enc) {
+            final JSObject objNode = enc.asObject();
 
             final Map<String, V> map = Exceptions.wrap(
                     () -> core.getTypeConstructor(dynType).construct(),
