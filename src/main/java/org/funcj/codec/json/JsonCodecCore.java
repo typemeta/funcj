@@ -151,7 +151,13 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
         @Override
         public char decodePrim(JSValue in) {
-            return in.asString().getValue().charAt(0);
+            final String s = in.asString().getValue();
+            if (s.length() == 1) {
+                return s.charAt(0);
+            } else {
+                throw new JsonCodecException(
+                        "Unexpected String of length " + s.length() + " when decoding a char");
+            }
         }
     };
 
