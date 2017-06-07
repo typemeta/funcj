@@ -78,12 +78,12 @@ class StringInput implements Input<Chr> {
 
 class ReaderInput implements Input<Chr> {
 
-    private int position;
-    private final Reader reader;
-    private Chr current;
-    private boolean isEof = false;
+    protected int position;
+    protected final Reader reader;
+    protected Chr current;
+    protected boolean isEof = false;
 
-    private final ReaderInput other;
+    protected final ReaderInput other;
 
     ReaderInput(Reader reader) {
         this.position = 0;
@@ -99,7 +99,7 @@ class ReaderInput implements Input<Chr> {
         this.other = other;
     }
 
-    private ReaderInput setPosition(int position) {
+    protected ReaderInput setPosition(int position) {
         this.position = position;
         return this;
     }
