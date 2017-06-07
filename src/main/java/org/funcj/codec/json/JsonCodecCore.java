@@ -2,6 +2,7 @@ package org.funcj.codec.json;
 
 import org.funcj.codec.*;
 import org.funcj.codec.utils.ReflectionUtils;
+import org.funcj.codec.xml.XmlCodecException;
 import org.funcj.control.Exceptions;
 import org.funcj.json.*;
 
@@ -43,6 +44,11 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     @Override
     public <T> JSValue encode(Class<T> type, T val) {
         return super.encode(type, val, null);
+    }
+
+    @Override
+    public JsonCodecException wrapException(Exception ex) {
+        return new JsonCodecException(ex);
     }
 
     @Override
@@ -482,7 +488,9 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             public Collection<T> decode(Class<Collection<T>> dynType, JSValue in) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
                 final JSArray arrNode = in.asArray();
-                final Collection<T> vals = Exceptions.wrap(() -> ReflectionUtils.newInstance(dynType));
+                final Collection<T> vals = Exceptions.wrap(
+                        () -> getTypeConstructor(dynType).construct(),
+                        ex -> wrapException(ex));
                 int i = 0;
                 for (JSValue node : arrNode) {
                     vals.add(elemCodec.decode(dynElemType, node));
@@ -619,8 +627,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
             public T decode(Class<T> dynType, JSValue in) {
                 final JSObject objNode = in.asObject();
                 final T val = Exceptions.wrap(
-                        () -> ReflectionUtils.newInstance(dynType),
-                        JsonCodecException::new);
+                        () -> getTypeConstructor(dynType).construct(),
+                        ex -> wrapException(ex));
                 fieldCodecs.forEach((name, codec) -> {
                     codec.decodeField(val, objNode.get(name));
                 });

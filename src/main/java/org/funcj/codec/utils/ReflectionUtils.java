@@ -1,5 +1,8 @@
 package org.funcj.codec.utils;
 
+import org.funcj.codec.CodecCore;
+import org.funcj.control.Exceptions;
+
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -103,7 +106,7 @@ public class ReflectionUtils {
                 break;
         }
 
-        final boolean access = !defCtor.isAccessible();
+        final boolean access = defCtor.isAccessible();
         if (!access) {
             defCtor.setAccessible(true);
         }
@@ -112,5 +115,42 @@ public class ReflectionUtils {
             defCtor.setAccessible(false);
         }
         return result;
+    }
+
+    public static <T> CodecCore.TypeConstructor<T> createTypeConstructor(Class<T> clazz) throws InstantiationException {
+        final List<Constructor<T>> ctors =
+                Arrays.stream(clazz.getDeclaredConstructors())
+                        .filter(ctor -> ctor.getParameterCount() == 0)
+                        .map(ctor -> (Constructor<T>)ctor)
+                        .collect(toList());
+        final Constructor<T> defCtor;
+        switch (ctors.size()) {
+            case 0:
+                throw new InstantiationException(clazz.getName() + " has no default contructor");
+            case 1:
+                defCtor = ctors.get(0);
+                break;
+            default:
+                Constructor<T> bestCtor = null;
+                for (Constructor<T> ctor : ctors) {
+                    if (bestCtor == null || bestCtor.isAccessible()) {
+                        bestCtor = ctor;
+                    }
+                }
+                defCtor = bestCtor;
+                break;
+        }
+
+        final boolean access = defCtor.isAccessible();
+        if (defCtor.isAccessible()) {
+            return () -> defCtor.newInstance((Object[])null);
+        } else {
+            return () -> {
+                defCtor.setAccessible(true);
+                final T result = defCtor.newInstance((Object[])null);
+                defCtor.setAccessible(false);
+                return result;
+            };
+        }
     }
 }

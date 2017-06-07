@@ -120,23 +120,4 @@ public abstract class TestBase {
         final Recursive rec3 = new Recursive(rec2, 2);
         roundTrip(rec3, Recursive.class);
     }
-
-    static class NoEmptyCtorCodec<E> implements Codec<NoEmptyCtor, E> {
-
-        private final CodecCore<E> core;
-
-        NoEmptyCtorCodec(CodecCore<E> core) {
-            this.core = core;
-        }
-
-        @Override
-        public E encode(NoEmptyCtor val, E out) {
-            return core.booleanCodec().encode(val.flag, out);
-        }
-
-        @Override
-        public NoEmptyCtor decode(E in) {
-            return NoEmptyCtor.create(core.booleanCodec().decode(in));
-        }
-    }
 }

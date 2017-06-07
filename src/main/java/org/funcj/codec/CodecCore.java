@@ -6,19 +6,31 @@ import org.funcj.control.Exceptions;
 import java.lang.reflect.*;
 import java.util.*;
 
+import static org.funcj.codec.utils.ReflectionUtils.createTypeConstructor;
+
 /**
  * Base class for codec implementations.
  * @param <E> encoded type
  */
 public abstract class CodecCore<E> {
 
+    public interface TypeConstructor<T> {
+        T construct() throws ReflectiveOperationException;
+    }
+
     protected final Map<String, Codec<?, E>> codecs = new HashMap<>();
+
+    protected final Map<String, TypeConstructor<?>> typeCtors = new HashMap<>();
 
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, E> codec) {
         codecs.put(classToName(clazz), codec);
     }
 
-    abstract public <T> E encode(Class<T> type, T val);
+    public <T> void registerTypeConstructor(Class<? extends T> clazz, TypeConstructor<T> typeCtor) {
+        typeCtors.put(classToName(clazz), typeCtor);
+    }
+
+    public abstract <T> E encode(Class<T> type, T val);
 
     public <T> E encode(Class<T> type, T val, E out) {
         return dynamicCodec(type).encode(val, out);
@@ -28,15 +40,24 @@ public abstract class CodecCore<E> {
         return dynamicCodec(type).decode(in);
     }
 
-    protected String classToName(Class<?> clazz) {
+    public String classToName(Class<?> clazz) {
         return clazz.getName();
     }
 
-    protected <T> Class<T> nameToClass(String name) {
-        return (Class<T>) Exceptions.wrap(() -> Class.forName(name), CodecException::new);
+    public <T> Class<T> nameToClass(String name) {
+        return (Class<T>) Exceptions.wrap(() -> Class.forName(name), this::wrapException);
     }
 
-    protected <T> Codec<T, E> nullSafeCodec(Codec<T, E> codec) {
+    public abstract RuntimeException wrapException(Exception ex);
+;
+    protected <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
+        final String name = classToName(clazz);
+        return (TypeConstructor<T>)typeCtors.computeIfAbsent(
+                name,
+                n -> Exceptions.wrap(() -> createTypeConstructor(clazz), this::wrapException));
+    }
+
+    protected <T> Codec<T, E> makeNullSafeCodec(Codec<T, E> codec) {
         final Codec.NullCodec<E> nullCodec = nullCodec();
         return new Codec<T, E>() {
             @Override
@@ -141,7 +162,7 @@ public abstract class CodecCore<E> {
     public abstract <T> Codec<T, E> dynamicCodec(Codec<T, E> codec, Class<T> stcType);
 
     public <T> Codec<T, E> getNullSafeCodec(Class<T> type) {
-        return nullSafeCodec(getNullUnsafeCodec(type));
+        return makeNullSafeCodec(getNullUnsafeCodec(type));
     }
 
     public <T> Codec<T, E> getNullUnsafeCodec(Class<T> type) {
@@ -230,7 +251,7 @@ public abstract class CodecCore<E> {
                     } else if (elemType.equals(Double.class)) {
                         codec = (Codec<T, E>) objectArrayCodec(Double.class, doubleCodec());
                     } else {
-                        final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec((Class<Object>) elemType));
+                        final Codec<Object, E> elemCodec = makeNullSafeCodec(dynamicCodec((Class<Object>) elemType));
                         codec = (Codec<T, E>) objectArrayCodec((Class<Object>) elemType, elemCodec);
                     }
                 }
@@ -263,7 +284,7 @@ public abstract class CodecCore<E> {
                 final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(dynType, Collection.class);
                 if (typeArgs.size() == 1) {
                     final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
-                    final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec(elemType));
+                    final Codec<Object, E> elemCodec = makeNullSafeCodec(dynamicCodec(elemType));
                     codec = (Codec<T, E>) collCodec(elemType, elemCodec);
                 } else {
                     codec = null;
@@ -377,22 +398,22 @@ public abstract class CodecCore<E> {
                     final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Collection.class);
                     if (typeArgs.size() == 1) {
                         final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
-                        final Codec<Object, E> elemCodec = nullSafeCodec(dynamicCodec(elemType));
+                        final Codec<Object, E> elemCodec = makeNullSafeCodec(dynamicCodec(elemType));
                         final Codec<Collection<Object>, E> collCodec = collCodec(elemType, elemCodec);
-                        codec = nullSafeCodec(dynamicCheck((Codec) collCodec, stcType));
+                        codec = makeNullSafeCodec(dynamicCheck((Codec) collCodec, stcType));
                     }
                 } else if (Map.class.isAssignableFrom(stcType)) {
                     final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
                     final Class keyType = typeArgs.get(0);
                     final Class valType = typeArgs.get(1);
                     final Codec<Map<?, ?>, E> mapCodec = mapCodec(keyType, valType);
-                    codec = nullSafeCodec(dynamicCheck((Codec) mapCodec, stcType));
+                    codec = makeNullSafeCodec(dynamicCheck((Codec) mapCodec, stcType));
                 }
 
                 if (codec == null) {
                     final String name = classToName(stcType);
                     codec = (Codec<T, E>)codecs.computeIfAbsent(name, n -> getNullUnsafeCodecImplStc(stcType));
-                    codec = nullSafeCodec(codec);
+                    codec = makeNullSafeCodec(codec);
                 }
 
                 return new FieldCodec.ObjectFieldCodec<>(field, codec);

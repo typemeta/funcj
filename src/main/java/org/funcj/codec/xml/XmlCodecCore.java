@@ -65,6 +65,11 @@ public class XmlCodecCore extends CodecCore<Element> {
         return encode(type, val, "_");
     }
 
+    @Override
+    public XmlCodecException wrapException(Exception ex) {
+        return new XmlCodecException(ex);
+    }
+
     public <T> Element encode(Class<T> type, T val, String rootName) {
         return encode(type, val, (Element)doc.appendChild(doc.createElement(rootName)));
     }
@@ -598,7 +603,9 @@ public class XmlCodecCore extends CodecCore<Element> {
                 final NodeList nodes = in.getChildNodes();
                 final int l = nodes.getLength();
 
-                final Collection<T> vals = Exceptions.wrap(() -> ReflectionUtils.newInstance(dynType));
+                final Collection<T> vals = Exceptions.wrap(
+                        () -> getTypeConstructor(dynType).construct(),
+                        ex -> wrapException(ex));
                 if (vals instanceof ArrayList) {
                     ((ArrayList<T>) vals).ensureCapacity(l);
                 }
@@ -729,8 +736,8 @@ public class XmlCodecCore extends CodecCore<Element> {
             @Override
             public T decode(Class<T> dynType, Element in) {
                 final T val = Exceptions.wrap(
-                        () -> ReflectionUtils.newInstance(dynType),
-                        XmlCodecException::new);
+                        () -> getTypeConstructor(dynType).construct(),
+                        ex -> wrapException(ex));
                 fieldCodecs.forEach((name, codec) -> {
                     codec.decodeField(val, firstChildElement(in, name));
                 });

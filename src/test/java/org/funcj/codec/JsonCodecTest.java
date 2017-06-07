@@ -12,7 +12,7 @@ public class JsonCodecTest extends TestBase {
     final static JsonCodecCore codec = new JsonCodecCore();
 
     static {
-        codec.registerCodec(NoEmptyCtor.class, new NoEmptyCtorCodec<>(codec));
+        codec.registerTypeConstructor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));
         codec.registerCodec((Class)Optional.class, new OptionalCodec<Object>(codec));
     }
 

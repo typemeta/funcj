@@ -13,7 +13,7 @@ public class XmlCodecTest extends TestBase {
     final static XmlCodecCore codec = new XmlCodecCore();
 
     static {
-        codec.registerCodec(NoEmptyCtor.class, new NoEmptyCtorCodec<>(codec));
+        codec.registerTypeConstructor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));
         codec.registerCodec((Class)Optional.class, new OptionalCodec<>(codec));
     }
 
