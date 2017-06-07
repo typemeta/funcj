@@ -1,7 +1,7 @@
 package org.funcj.codec;
 
 /**
- * A Codec encapsulates the logic for encoding a value of type <code>T</code>
+ * A <code>Codec</code> encapsulates the logic for encoding a value of type <code>T</code>
  * into a value of type <code>E</code> and vice versa.
  * @param <T> type to be encoded/decoded
  * @param <E> encoded type
@@ -22,7 +22,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Codec for Boolean and boolean values.
+     * Codec for {@link java.lang.Boolean} and <code>boolean</code> values.
      * @param <E> encoded type
      */
     abstract class BooleanCodec<E> implements Codec<Boolean, E> {
@@ -47,7 +47,10 @@ public interface Codec<T, E> {
         public abstract boolean decodePrim(E in);
     }
 
-
+    /**
+     * Codec for {@link java.lang.Byte} and <code>byte</code> values.
+     * @param <E> encoded type
+     */
     abstract class ByteCodec<E> implements Codec<Byte, E> {
 
         @Override
@@ -70,6 +73,10 @@ public interface Codec<T, E> {
         public abstract byte decodePrim(E in);
     }
 
+    /**
+     * Codec for {@link java.lang.Character} and <code>char</code> values.
+     * @param <E> encoded type
+     */
     abstract class CharCodec<E> implements Codec<Character, E> {
 
         @Override
@@ -92,6 +99,10 @@ public interface Codec<T, E> {
         public abstract char decodePrim(E in);
     }
 
+    /**
+     * Codec for {@link java.lang.Short} and <code>short</code> values.
+     * @param <E> encoded type
+     */
     abstract class ShortCodec<E> implements Codec<Short, E> {
 
         @Override
@@ -114,6 +125,10 @@ public interface Codec<T, E> {
         public abstract short decodePrim(E in);
     }
 
+    /**
+     * Codec for {@link java.lang.Integer} and <code>int</code> values.
+     * @param <E> encoded type
+     */
     abstract class IntCodec<E> implements Codec<Integer, E> {
 
         @Override
@@ -136,6 +151,10 @@ public interface Codec<T, E> {
         public abstract int decodePrim(E in);
     }
 
+    /**
+     * Codec for {@link java.lang.Long} and <code>long</code> values.
+     * @param <E> encoded type
+     */
     abstract class LongCodec<E> implements Codec<Long, E> {
 
         @Override
@@ -158,6 +177,10 @@ public interface Codec<T, E> {
         public abstract long decodePrim(E in);
     }
 
+    /**
+     * Codec for {@link java.lang.Float} and <code>float</code> values.
+     * @param <E> encoded type
+     */
     abstract class FloatCodec<E> implements Codec<Float, E> {
 
         @Override
@@ -180,6 +203,10 @@ public interface Codec<T, E> {
         public abstract float decodePrim(E in);
     }
 
+    /**
+     * Codec for {@link java.lang.Double} and <code>double</code> values.
+     * @param <E> encoded type
+     */
     abstract class DoubleCodec<E> implements Codec<Double, E> {
 
         @Override
@@ -202,12 +229,48 @@ public interface Codec<T, E> {
         public abstract double decodePrim(E in);
     }
 
-    E encode(T val, E out);
+    /**
+     * Encode a value of type <code>T</code> into and encoded value of type <code>E</code>.
+     * One of the two <code>encode</code> methods must be implemented by implementing
+     * classes.
+     * @param val unencoded value
+     * @param out encoded parent value
+     * @return encoded value
+     */
+    default E encode(T val, E out) {
+        return encode(val);
+    }
 
+    /**
+     * Encode a value of type <code>T</code> into and encoded value of type <code>E</code>.
+     * One of the two <code>encode</code> methods must be implemented by implementing
+     * classes.
+     * @param val unencoded value
+     * @return encoded value
+     */
+    default E encode(T val) {
+        throw new CodecException("Operation not implemented");
+    }
+
+    /**
+     * Decode a value of type <code>E</code> back into a value of type <code>T</code> .
+     * One of the two <code>decode</code> methods must be implemented by implementing
+     * classes.
+     * @param dynType the dynamic type to decode into.
+     * @param in the encoded value
+     * @return unencoded value
+     */
     default T decode(Class<T> dynType, E in) {
         return decode(in);
     }
 
+    /**
+     * Decode a value of type <code>E</code> back into a value of type <code>T</code> .
+     * One of the two <code>decode</code> methods must be implemented by implementing
+     * classes.
+     * @param in the encoded value
+     * @return unencoded value
+     */
     default T decode(E in) {
         throw new CodecException("Operation not implemented");
     }

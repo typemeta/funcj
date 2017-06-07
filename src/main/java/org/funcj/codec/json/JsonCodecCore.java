@@ -29,7 +29,7 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
 
         @Override
-        public JSValue encode(Object val, JSValue out) {
+        public JSValue encode(Object val) {
             return JSNull.of();
         }
 
