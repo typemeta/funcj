@@ -5,25 +5,64 @@ import org.funcj.data.Chr;
 
 import java.io.Reader;
 
+/**
+ * An abstraction for a position in a stream of input symbols,
+ * that {link Parser}s operate on.
+ * @param <I> input stream symbol type
+ */
 public interface Input<I> {
+    /**
+     * Construct an <code>Input</code> from a <code>char</code> array.
+     * @param data input data
+     * @return parseable input stream
+     */
     static Input<Chr> of(char[] data) {
         return new StringInput(data);
     }
 
+    /**
+     * Construct an <code>Input</code> from a {link java.lang.String}.
+     * @param s input data
+     * @return parseable input stream
+     */
     static Input<Chr> of(String s) {
         return new StringInput(s.toCharArray());
     }
 
+    /**
+     * Construct an <code>Input</code> from a {link java.io.Reader}.
+     * @param rdr input data
+     * @return parseable input stream
+     */
     static Input<Chr> of(Reader rdr) {
         return new ReaderInput(rdr);
     }
 
+    /**
+     * Have we reached the end of the input stream?
+     * @return true if at the end of the input
+     */
     boolean isEof();
 
+    /**
+     * Get the current symbol from the stream.
+     * Will throw if <code>isEof</code> is true.
+     * @return next symbol
+     */
     I get();
 
+    /**
+     * Get the next position in the input stream.
+     * Will throw if <code>isEof</code> is true.
+     * @return the next position in the input stream
+     */
     Input<I> next();
 
+    /**
+     * Return a implementation-specific representation of the
+     * current position (e.g. an Integer).
+     * @return current position
+     */
     Object position();
 }
 

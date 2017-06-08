@@ -660,11 +660,9 @@ public abstract class FieldCodec<E> {
     }
 
     /**
-     * Decode an encoded value of type <code>E</code> back into a field of type <code>T</code>.
      * One of the two <code>decode</code> methods must be implemented by sub-classes.
      * @param obj object to which the field belongs
      * @param enc the encoded value
-     * @return decoded value
      */
     public abstract void decodeField(Object obj, E enc);
 }
