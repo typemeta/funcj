@@ -592,19 +592,21 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
             @Override
             public T decode(JSValue enc) {
-                final JSObject objNode = enc.asObject();
-                final String typeFieldName = typeFieldName();
-                final String valueFieldName = valueFieldName();
-                if (objNode.size() == 2 &&
-                        objNode.containsName(typeFieldName) &&
-                        objNode.containsName(valueFieldName)) {
-                    final JSValue typeNode = objNode.get(typeFieldName());
-                    final Class<?> dynType = nameToClass(typeNode.asString().getValue());
-                    final JSValue valueNode = objNode.get(valueFieldName());
-                    return codec.decode((Class<T>)dynType, valueNode);
-                } else {
-                    return codec.decode(stcType, enc);
+                if (enc.isObject()) {
+                    final JSObject objNode = enc.asObject();
+                    final String typeFieldName = typeFieldName();
+                    final String valueFieldName = valueFieldName();
+                    if (objNode.size() == 2 &&
+                            objNode.containsName(typeFieldName) &&
+                            objNode.containsName(valueFieldName)) {
+                        final JSValue typeNode = objNode.get(typeFieldName());
+                        final Class<?> dynType = nameToClass(typeNode.asString().getValue());
+                        final JSValue valueNode = objNode.get(valueFieldName());
+                        return codec.decode((Class<T>) dynType, valueNode);
+                    }
                 }
+
+                return codec.decode(stcType, enc);
             }
         };
     }

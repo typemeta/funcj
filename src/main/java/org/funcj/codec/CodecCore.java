@@ -49,7 +49,7 @@ public abstract class CodecCore<E> {
     }
 
     public abstract RuntimeException wrapException(Exception ex);
-;
+
     public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
         final String name = classToName(clazz);
         return (TypeConstructor<T>)typeCtors.computeIfAbsent(
@@ -192,7 +192,8 @@ public abstract class CodecCore<E> {
         final Codec<T, E> codec = getNullUnsafeCodecImpl(stcType);
         if (codec == null) {
             if (Modifier.isFinal(stcType.getModifiers())) {
-                return createObjectCodec(stcType);
+                final String name = classToName(stcType);
+                return (Codec<T, E>)codecs.computeIfAbsent(name, n -> createObjectCodec(stcType));
             } else {
                 return dynamicCodec(stcType);
             }
@@ -201,31 +202,31 @@ public abstract class CodecCore<E> {
         }
     }
 
-    public <T> Codec<T, E> getNullUnsafeCodecImpl(Class<T> dynType) {
-        if (dynType.isPrimitive()) {
-            if (dynType.equals(boolean.class)) {
+    public <T> Codec<T, E> getNullUnsafeCodecImpl(Class<T> type) {
+        if (type.isPrimitive()) {
+            if (type.equals(boolean.class)) {
                 return (Codec<T, E>)booleanCodec();
-            } else if (dynType.equals(byte.class)) {
+            } else if (type.equals(byte.class)) {
                 return (Codec<T, E>) byteCodec();
-            } else if (dynType.equals(char.class)) {
+            } else if (type.equals(char.class)) {
                 return (Codec<T, E>) charCodec();
-            } else if (dynType.equals(short.class)) {
+            } else if (type.equals(short.class)) {
                 return (Codec<T, E>) shortCodec();
-            } else if (dynType.equals(int.class)) {
+            } else if (type.equals(int.class)) {
                 return (Codec<T, E>) intCodec();
-            } else if (dynType.equals(long.class)) {
+            } else if (type.equals(long.class)) {
                 return (Codec<T, E>) longCodec();
-            } else if (dynType.equals(float.class)) {
+            } else if (type.equals(float.class)) {
                 return (Codec<T, E>) floatCodec();
-            } else if (dynType.equals(double.class)) {
+            } else if (type.equals(double.class)) {
                 return (Codec<T, E>) doubleCodec();
             } else {
-                throw new IllegalStateException("Unexpected primitive type - " + dynType);
+                throw new IllegalStateException("Unexpected primitive type - " + type);
             }
         } else {
             final Codec<T, E> codec;
-            if (dynType.isArray()) {
-                final Class<?> elemType = dynType.getComponentType();
+            if (type.isArray()) {
+                final Class<?> elemType = type.getComponentType();
                 if (elemType.equals(boolean.class)) {
                     codec = (Codec<T, E>) booleanArrayCodec();
                 } else if (elemType.equals(byte.class)) {
@@ -264,37 +265,37 @@ public abstract class CodecCore<E> {
                         codec = (Codec<T, E>) objectArrayCodec((Class<Object>) elemType, elemCodec);
                     }
                 }
-            } else if (dynType.isEnum()) {
-                codec = enumCodec((Class) dynType);
-            } else if (dynType.equals(Boolean.class)) {
+            } else if (type.isEnum()) {
+                codec = enumCodec((Class) type);
+            } else if (type.equals(Boolean.class)) {
                 codec = (Codec<T, E>) booleanCodec();
-            } else if (dynType.equals(Byte.class)) {
+            } else if (type.equals(Byte.class)) {
                 codec = (Codec<T, E>) byteCodec();
-            } else if (dynType.equals(Character.class)) {
+            } else if (type.equals(Character.class)) {
                 codec = (Codec<T, E>) charCodec();
-            } else if (dynType.equals(Short.class)) {
+            } else if (type.equals(Short.class)) {
                 codec = (Codec<T, E>) shortCodec();
-            } else if (dynType.equals(Integer.class)) {
+            } else if (type.equals(Integer.class)) {
                 codec = (Codec<T, E>) intCodec();
-            } else if (dynType.equals(Long.class)) {
+            } else if (type.equals(Long.class)) {
                 codec = (Codec<T, E>) longCodec();
-            } else if (dynType.equals(Float.class)) {
+            } else if (type.equals(Float.class)) {
                 codec = (Codec<T, E>) floatCodec();
-            } else if (dynType.equals(Double.class)) {
+            } else if (type.equals(Double.class)) {
                 codec = (Codec<T, E>) doubleCodec();
-            } else if (dynType.equals(String.class)) {
+            } else if (type.equals(String.class)) {
                 codec = (Codec<T, E>) stringCodec();
-            } else if (Map.class.isAssignableFrom(dynType)) {
-                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(dynType, Map.class);
+            } else if (Map.class.isAssignableFrom(type)) {
+                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(type, Map.class);
                 final Class<?> keyType = typeArgs.get(0);
                 final Class<?> valueType = typeArgs.get(1);
-                codec = (Codec<T, E>) mapCodec(keyType, valueType);
-            } else if (Collection.class.isAssignableFrom(dynType)) {
-                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(dynType, Collection.class);
+                codec = dynamicCheck((Codec<T, E>) mapCodec(keyType, valueType), type);
+            } else if (Collection.class.isAssignableFrom(type)) {
+                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(type, Collection.class);
                 if (typeArgs.size() == 1) {
                     final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
                     final Codec<Object, E> elemCodec = makeNullSafeCodec(dynamicCodec(elemType));
-                    codec = (Codec<T, E>) collCodec(elemType, elemCodec);
+                    codec = dynamicCheck((Codec<T, E>) collCodec(elemType, elemCodec), type);
                 } else {
                     codec = null;
                 }
@@ -407,7 +408,7 @@ public abstract class CodecCore<E> {
                     final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Collection.class);
                     if (typeArgs.size() == 1) {
                         final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
-                        final Codec<Object, E> elemCodec = makeNullSafeCodec(dynamicCodec(elemType));
+                        final Codec<Object, E> elemCodec = makeNullSafeCodec(getNullUnsafeCodecImplStc(elemType));
                         final Codec<Collection<Object>, E> collCodec = collCodec(elemType, elemCodec);
                         codec = makeNullSafeCodec(dynamicCheck((Codec) collCodec, stcType));
                     }
@@ -420,9 +421,7 @@ public abstract class CodecCore<E> {
                 }
 
                 if (codec == null) {
-                    final String name = classToName(stcType);
-                    codec = (Codec<T, E>)codecs.computeIfAbsent(name, n -> getNullUnsafeCodecImplStc(stcType));
-                    codec = makeNullSafeCodec(codec);
+                    codec = makeNullSafeCodec(getNullUnsafeCodecImplStc(stcType));
                 }
 
                 return new FieldCodec.ObjectFieldCodec<>(field, codec);

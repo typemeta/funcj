@@ -69,7 +69,8 @@ public class ReflectionUtils {
                         .map(t -> (ParameterizedType) t)
                         .collect(toList());
         return genIfaces.stream()
-                .filter(pt -> pt.getRawType().equals(iface))
+                .filter(pt -> pt.getRawType() instanceof Class)
+                .filter(pt -> iface.isAssignableFrom((Class)pt.getRawType()))
                 .findFirst()
                 .map(ReflectionUtils::getGenTypeArgs)
                 .orElseGet(TypeArgs::new);
@@ -93,7 +94,7 @@ public class ReflectionUtils {
         final Constructor<T> defCtor;
         switch (ctors.size()) {
             case 0:
-                throw new InstantiationException(clazz.getName() + " has no default contructor");
+                throw new InstantiationException(clazz.getName() + " has no default constructor");
             case 1:
                 defCtor = ctors.get(0);
                 break;
@@ -108,7 +109,6 @@ public class ReflectionUtils {
                 break;
         }
 
-        final boolean access = defCtor.isAccessible();
         if (defCtor.isAccessible()) {
             return () -> defCtor.newInstance((Object[])null);
         } else {
