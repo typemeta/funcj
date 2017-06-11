@@ -166,7 +166,11 @@ class ReaderInput implements Input<Chr> {
 
     @Override
     public Chr get() {
-        return current;
+        if (isEof()) {
+            throw new RuntimeException("End of input");
+        } else {
+            return current;
+        }
     }
 
     @Override
