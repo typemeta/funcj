@@ -70,15 +70,6 @@ public abstract class CodecCore<E> {
             }
 
             @Override
-            public E encode(T val) {
-                if (val == null) {
-                    return nullCodec.encode(null);
-                } else {
-                    return codec.encode(val);
-                }
-            }
-
-            @Override
             public T decode(Class<T> dynType, E enc) {
                 if (nullCodec.isNull(enc)) {
                     return (T)nullCodec.decode(enc);

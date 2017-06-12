@@ -35,11 +35,6 @@ public interface Codec<T, E> {
         }
 
         @Override
-        public E encode(Boolean val) {
-            return encodePrim(val) ;
-        }
-
-        @Override
         public Boolean decode(Class<Boolean> dynType, E enc) {
             return decodePrim(enc);
         }
@@ -69,11 +64,6 @@ public interface Codec<T, E> {
         @Override
         public E encode(Byte val, E enc) {
             return encodePrim(val, enc) ;
-        }
-
-        @Override
-        public E encode(Byte val) {
-            return encodePrim(val) ;
         }
 
         @Override
@@ -109,11 +99,6 @@ public interface Codec<T, E> {
         }
 
         @Override
-        public E encode(Character val) {
-            return encodePrim(val) ;
-        }
-
-        @Override
         public Character decode(Class<Character> dynType, E enc) {
             return decodePrim(enc);
         }
@@ -143,11 +128,6 @@ public interface Codec<T, E> {
         @Override
         public E encode(Short val, E enc) {
             return encodePrim(val, enc) ;
-        }
-
-        @Override
-        public E encode(Short val) {
-            return encodePrim(val) ;
         }
 
         @Override
@@ -183,11 +163,6 @@ public interface Codec<T, E> {
         }
 
         @Override
-        public E encode(Integer val) {
-            return encodePrim(val) ;
-        }
-
-        @Override
         public Integer decode(Class<Integer> dynType, E enc) {
             return decodePrim(enc);
         }
@@ -217,11 +192,6 @@ public interface Codec<T, E> {
         @Override
         public E encode(Long val, E enc) {
             return encodePrim(val, enc) ;
-        }
-
-        @Override
-        public E encode(Long val) {
-            return encodePrim(val) ;
         }
 
         @Override
@@ -257,11 +227,6 @@ public interface Codec<T, E> {
         }
 
         @Override
-        public E encode(Float val) {
-            return encodePrim(val) ;
-        }
-
-        @Override
         public Float decode(Class<Float> dynType, E enc) {
             return decodePrim(enc);
         }
@@ -294,11 +259,6 @@ public interface Codec<T, E> {
         }
 
         @Override
-        public E encode(Double val) {
-            return encodePrim(val) ;
-        }
-
-        @Override
         public Double decode(Class<Double> dynType, E enc) {
             return decodePrim(enc);
         }
@@ -321,24 +281,11 @@ public interface Codec<T, E> {
 
     /**
      * Encode a value of type <code>T</code> into and encoded value of type <code>E</code>.
-     * One of the two <code>encode</code> methods must be implemented by sub-classes.
      * @param val unencoded value
      * @param enc encoded parent value
      * @return encoded value
      */
-    default E encode(T val, E enc) {
-        return encode(val);
-    }
-
-    /**
-     * Encode a value of type <code>T</code> into and encoded value of type <code>E</code>.
-     * One of the two <code>encode</code> methods must be implemented by sub-classes.
-     * @param val unencoded value
-     * @return encoded value
-     */
-    default E encode(T val) {
-        throw Utils.opnNotImplError();
-    }
+    E encode(T val, E enc) ;
 
     /**
      * Decode a value of type <code>E</code> back into a value of type <code>T</code>.

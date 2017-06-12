@@ -28,14 +28,14 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public JSValue encode(Map<K, V> map) {
+        public JSValue encode(Map<K, V> map, JSValue enc) {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
             final List<JSValue> nodes = map.entrySet().stream()
                     .map(en -> JSObject.of(
-                            JSObject.field(keyFieldName, keyCodec.encode(en.getKey())),
-                            JSObject.field(valueFieldName, valueCodec.encode(en.getValue()))
+                            JSObject.field(keyFieldName, keyCodec.encode(en.getKey(), enc)),
+                            JSObject.field(valueFieldName, valueCodec.encode(en.getValue(), enc))
                     )).collect(toList());
 
             return JSArray.of(nodes);
@@ -75,11 +75,11 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public JSValue encode(Map<String, V> map) {
+        public JSValue encode(Map<String, V> map, JSValue enc) {
             final List<JSObject.Field> fields = new ArrayList<>(map.size());
 
             map.forEach((k, v) -> {
-                final JSValue value = valueCodec.encode(v);
+                final JSValue value = valueCodec.encode(v, enc);
                 fields.add(JSObject.field(k, value));
             });
 
