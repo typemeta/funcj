@@ -16,21 +16,11 @@ public class DocFormat {
     }
 
     public static void format(Writer wtr, int width, Document doc) {
-        final BufferedWriter bw = new BufferedWriter(wtr) {
-            @Override
-            public void newLine() throws IOException {
-                write('\n');
-            }
-        };
-        format(bw, width, doc);
-    }
-
-    public static void format(BufferedWriter wtr, int width, Document doc) {
         new DocFormat(wtr, width).format(doc);
         Exceptions.wrap(wtr::flush);
     }
 
-    private static final String indent = "                                ";
+    private static final String indent = "                                                                ";
     private static final int indentLen = indent.length();
 
     private static String indentStr(int depth) {
@@ -71,30 +61,45 @@ public class DocFormat {
         }
     }
 
-    private final BufferedWriter wtr;
+    private StringBuilder line = new StringBuilder();
+    private final Writer wtr;
     private final int width;
 
-    public DocFormat(BufferedWriter wtr, int width) {
+    public DocFormat(Writer wtr, int width) {
         this.wtr = wtr;
         this.width = width;
     }
 
     private void format(Document doc) {
         format(0, IList.of(FmtState.of(0, false, API.group(doc))));
+        flush();
     }
 
     private DocFormat newLine() {
-        Exceptions.wrap(wtr::newLine);
+        Exceptions.wrap(() -> {
+            final String line2 = Utils.trimTrailing(line.toString());
+            wtr.append(line2).append("\n");
+            line.setLength(0);
+        });
+        return this;
+    }
+
+    private DocFormat flush() {
+        Exceptions.wrap(() -> {
+            final String line2 = Utils.trimTrailing(line.toString());
+            wtr.append(line2);
+            line.setLength(0);
+        });
         return this;
     }
 
     private DocFormat indent(int depth) {
-        Exceptions.wrap(() -> wtr.write(indentStr(depth)));
+        Exceptions.wrap(() -> line.append(indentStr(depth)));
         return this;
     }
 
     private DocFormat write(String s) {
-        Exceptions.wrap(() -> wtr.write(s));
+        Exceptions.wrap(() -> line.append(s));
         return this;
     }
 

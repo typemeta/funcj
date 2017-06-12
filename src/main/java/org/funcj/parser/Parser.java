@@ -263,7 +263,6 @@ public interface Parser<I, A> {
             @Override
             public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
                 return Result.success(res, in.next());
-
             }
         };
     }
