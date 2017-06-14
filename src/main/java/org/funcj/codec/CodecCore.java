@@ -9,7 +9,7 @@ import java.util.*;
 import static org.funcj.codec.utils.ReflectionUtils.createTypeConstructor;
 
 /**
- * Base class for codec implementations.
+ * Base class for implementations which implement a specific encoing.
  * @param <E> encoded type
  */
 public abstract class CodecCore<E> {
@@ -352,7 +352,7 @@ public abstract class CodecCore<E> {
             } else if (stcType.equals(double.class)) {
                 return new FieldCodec.DoubleFieldCodec<E>(field, doubleCodec());
             } else {
-                throw new RuntimeException(stcType.getName());
+                throw new IllegalStateException("Unexpected primitive type - " + stcType);
             }
         } else {
             if (stcType.isArray()) {

@@ -36,26 +36,29 @@ public class ReflectionUtils {
     public static TypeArgs getTypeArgs(Field field, Class iface) {
         final Type type = field.getGenericType();
         if (type instanceof ParameterizedType) {
-            final ParameterizedType pt = (ParameterizedType)type;
-            final Type[] typeArgs = pt.getActualTypeArguments();
-            final List<Class<?>> results = new ArrayList<>(typeArgs.length);
-            for (Type typeArg : pt.getActualTypeArguments()) {
-                if (typeArg instanceof Class) {
-                    results.add((Class<?>)typeArg);
-                } else if (typeArg instanceof TypeVariable) {
-                    final TypeVariable tv = (TypeVariable)typeArg;
-                    final Type[] bounds = tv.getBounds();
-                    if (bounds.length == 1 && bounds[0] instanceof Class) {
-                        results.add((Class<?>) bounds[0]);
+            final ParameterizedType pt = (ParameterizedType) type;
+            final Class rt = (Class)pt.getRawType();
+            if (iface.isAssignableFrom(rt)) {
+                final Type[] typeArgs = pt.getActualTypeArguments();
+                final List<Class<?>> results = new ArrayList<>(typeArgs.length);
+                for (Type typeArg : pt.getActualTypeArguments()) {
+                    if (typeArg instanceof Class) {
+                        results.add((Class<?>) typeArg);
+                    } else if (typeArg instanceof TypeVariable) {
+                        final TypeVariable tv = (TypeVariable) typeArg;
+                        final Type[] bounds = tv.getBounds();
+                        if (bounds.length == 1 && bounds[0] instanceof Class) {
+                            results.add((Class<?>) bounds[0]);
+                        } else {
+                            results.add(Object.class);
+                        }
                     } else {
                         results.add(Object.class);
                     }
-                } else {
-                    results.add(Object.class);
                 }
-            }
 
-            return new TypeArgs(results);
+                return new TypeArgs(results);
+            }
         }
 
         return new TypeArgs();
