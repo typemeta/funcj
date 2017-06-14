@@ -3,7 +3,7 @@ package org.funcj.codec;
 import org.funcj.codec.utils.Utils;
 
 /**
- * A <code>Codec</code> encapsulates the logic for encoding a value of type <code>T</code>
+ * Interface for classes that encapsulates the logic for encoding a value of type <code>T</code>
  * into a value of type <code>E</code> and vice versa.
  * @param <T> type to be encoded/decoded
  * @param <E> encoded type

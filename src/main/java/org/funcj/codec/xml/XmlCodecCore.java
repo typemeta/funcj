@@ -1,7 +1,6 @@
 package org.funcj.codec.xml;
 
 import org.funcj.codec.*;
-import org.funcj.codec.utils.ReflectionUtils;
 import org.funcj.control.Exceptions;
 import org.w3c.dom.*;
 
@@ -19,6 +18,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
     public XmlCodecCore(DocumentBuilder docBuilder) {
         this.docBuilder = docBuilder;
+        registerCodec(Optional.class, new XmlCodecs.OptionalCodec(this));
     }
 
     public XmlCodecCore() {

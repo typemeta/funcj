@@ -22,6 +22,10 @@ public abstract class CodecCore<E> {
 
     protected final Map<String, TypeConstructor<?>> typeCtors = new HashMap<>();
 
+    protected CodecCore() {
+        registerCodec(Class.class, new Codecs.ClassCodec(this));
+    }
+
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, E> codec) {
         codecs.put(classToName(clazz), codec);
     }

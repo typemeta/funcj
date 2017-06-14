@@ -9,6 +9,10 @@ import java.util.*;
 
 public class JsonCodecCore extends CodecCore<JSValue> {
 
+    public JsonCodecCore() {
+        registerCodec(Optional.class, new JsonCodecs.OptionalCodec(this));
+    }
+
     public String typeFieldName() {
         return "@type";
     }

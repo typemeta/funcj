@@ -1,7 +1,6 @@
 package org.funcj.codec.xml;
 
 import org.funcj.codec.Codec;
-import org.funcj.codec.utils.ReflectionUtils;
 import org.funcj.control.Exceptions;
 import org.w3c.dom.*;
 

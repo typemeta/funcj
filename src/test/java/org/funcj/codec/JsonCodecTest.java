@@ -2,10 +2,8 @@ package org.funcj.codec;
 
 import org.funcj.codec.TestDataBase.NoEmptyCtor;
 import org.funcj.codec.json.JsonCodecCore;
-import org.funcj.json.*;
+import org.funcj.json.JSValue;
 import org.junit.Assert;
-
-import java.util.Optional;
 
 public class JsonCodecTest extends TestBase {
 
@@ -13,7 +11,6 @@ public class JsonCodecTest extends TestBase {
 
     static {
         codec.registerTypeConstructor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));
-        codec.registerCodec((Class)Optional.class, new OptionalCodec<Object>(codec));
     }
 
     @Override
@@ -27,32 +24,5 @@ public class JsonCodecTest extends TestBase {
         }
 
         Assert.assertEquals(val, val2);
-    }
-
-    static class OptionalCodec<T> implements Codec<Optional<T>, JSValue> {
-
-        private final JsonCodecCore core;
-
-        OptionalCodec(JsonCodecCore  core) {
-            this.core = core;
-        }
-
-        @Override
-        public JSValue encode(Optional<T> val, JSValue enc) {
-            return val.map(t -> core.dynamicCodec().encode(t, enc))
-                    .orElse(JSObject.of());
-        }
-
-        @Override
-        public Optional<T> decode(Class<Optional<T>> dynType, JSValue enc) {
-            if (enc.isObject()) {
-                final JSObject jso = enc.asObject();
-                if (jso.isEmpty()) {
-                    return Optional.empty();
-                }
-            }
-
-            return Optional.of((T) core.dynamicCodec().decode(enc));
-        }
     }
 }

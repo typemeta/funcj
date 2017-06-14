@@ -1,6 +1,5 @@
 package org.funcj.codec;
 
-import org.funcj.codec.utils.Utils;
 import org.funcj.control.Exceptions;
 
 import java.lang.reflect.*;

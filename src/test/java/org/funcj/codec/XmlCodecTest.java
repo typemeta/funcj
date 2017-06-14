@@ -1,11 +1,9 @@
 package org.funcj.codec;
 
 import org.funcj.codec.TestDataBase.NoEmptyCtor;
-import org.funcj.codec.xml.*;
+import org.funcj.codec.xml.XmlCodecCore;
 import org.junit.Assert;
-import org.w3c.dom.*;
-
-import java.util.Optional;
+import org.w3c.dom.Element;
 
 import static org.funcj.codec.xml.XmlUtils.nodeToString;
 
@@ -14,7 +12,6 @@ public class XmlCodecTest extends TestBase {
 
     static {
         codec.registerTypeConstructor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));
-        codec.registerCodec((Class)Optional.class, new OptionalCodec<>(codec));
     }
 
     @Override
@@ -30,29 +27,5 @@ public class XmlCodecTest extends TestBase {
         }
 
         Assert.assertEquals(val, val2);
-    }
-
-    static class OptionalCodec<T> implements Codec<Optional<T>, Element> {
-
-        private final XmlCodecCore core;
-
-        OptionalCodec(XmlCodecCore core) {
-            this.core = core;
-        }
-
-        @Override
-        public Element encode(Optional<T> val, Element enc) {
-            return val.map(t -> core.dynamicCodec().encode(t, enc))
-                    .orElseGet(() -> XmlUtils.setAttrValue((Element) enc, "empty", "1"));
-        }
-
-        @Override
-        public Optional<T> decode(Class<Optional<T>> dynType, Element enc) {
-            if (!enc.getAttribute("empty").isEmpty()) {
-                return Optional.empty();
-            } else {
-                return Optional.of((T) core.dynamicCodec().decode(enc));
-            }
-        }
     }
 }
