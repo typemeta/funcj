@@ -1,5 +1,8 @@
 package org.funcj.codec;
 
+/**
+ * Exception class for encoding/decoding exceptions.
+ */
 public class CodecException extends RuntimeException {
     public CodecException() {
     }

@@ -5,8 +5,8 @@ import org.funcj.control.Exceptions;
 import java.lang.reflect.*;
 
 /**
- * A <code>FieldCodec</code> encapsulates encoding a field to encoded type <code>E</code>,
- * and vice-versa.
+ * A <code>FieldCodec</code> encapsulates encoding a field
+ * to encoded type <code>E</code>, and vice-versa.
  * @param <E> encoded type
  */
 public abstract class FieldCodec<E> {
@@ -496,7 +496,6 @@ public abstract class FieldCodec<E> {
 
     /**
      * Encode a field with an object into an encoded type <code>E</code>.
-     * One of the two <code>encode</code> methods must be implemented by sub-classes.
      * @param obj object to which the field belongs
      * @param enc encoded parent value
      * @return encoded value

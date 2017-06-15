@@ -12,24 +12,8 @@ import static org.funcj.codec.xml.XmlUtils.*;
 
 public class XmlCodecCore extends CodecCore<Element> {
 
-    public final DocumentBuilder docBuilder;
-
-    public Document doc;
-
-    public XmlCodecCore(DocumentBuilder docBuilder) {
-        this.docBuilder = docBuilder;
-        registerCodec(Optional.class, new XmlCodecs.OptionalCodec(this));
-    }
-
     public XmlCodecCore() {
-        this(Exceptions.wrap(
-                () -> DocumentBuilderFactory.newInstance().newDocumentBuilder(),
-                XmlCodecException::new));
-    }
-
-    public Document setNewDocument() {
-        doc = docBuilder.newDocument();
-        return doc;
+        registerCodec(Optional.class, new XmlCodecs.OptionalCodec(this));
     }
 
     public String entryElemName() {
@@ -57,21 +41,12 @@ public class XmlCodecCore extends CodecCore<Element> {
     }
 
     public Element addEntryElement(Element parent) {
-        return addElement(doc, parent, entryElemName());
-    }
-
-    @Override
-    public <T> Element encode(Class<T> type, T val) {
-        return encode(type, val, "_");
+        return addElement(parent, entryElemName());
     }
 
     @Override
     public XmlCodecException wrapException(Exception ex) {
         return new XmlCodecException(ex);
-    }
-
-    public <T> Element encode(Class<T> type, T val, String rootName) {
-        return encode(type, val, (Element)doc.appendChild(doc.createElement(rootName)));
     }
 
     protected final Codec.NullCodec<Element> nullCodec = new Codec.NullCodec<Element>() {
@@ -104,8 +79,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
         @Override
         public Element encodePrim(boolean val, Element enc) {
-            enc.appendChild(doc.createTextNode(String.valueOf(val)));
-            return enc;
+            return addTextElement(enc, String.valueOf(val));
         }
 
         @Override
@@ -159,8 +133,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
         @Override
         public Element encodePrim(byte val, Element enc) {
-            enc.appendChild(doc.createTextNode(String.valueOf(val)));
-            return enc;
+            return addTextElement(enc, String.valueOf(val));
         }
 
         @Override
@@ -214,8 +187,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
         @Override
         public Element encodePrim(char val, Element enc) {
-            enc.appendChild(doc.createTextNode(String.valueOf(val)));
-            return enc;
+            return addTextElement(enc, String.valueOf(val));
         }
 
         @Override
@@ -269,8 +241,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
         @Override
         public Element encodePrim(short val, Element enc) {
-            enc.appendChild(doc.createTextNode(String.valueOf(val)));
-            return enc;
+            return addTextElement(enc, String.valueOf(val));
         }
 
         @Override
@@ -324,8 +295,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
         @Override
         public Element encodePrim(int val, Element enc) {
-            enc.appendChild(doc.createTextNode(String.valueOf(val)));
-            return enc;
+            return addTextElement(enc, String.valueOf(val));
         }
 
         @Override
@@ -379,8 +349,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
         @Override
         public Element encodePrim(long val, Element enc) {
-            enc.appendChild(doc.createTextNode(String.valueOf(val)));
-            return enc;
+            return addTextElement(enc, String.valueOf(val));
         }
 
         @Override
@@ -434,8 +403,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
         @Override
         public Element encodePrim(float val, Element enc) {
-            enc.appendChild(doc.createTextNode(String.valueOf(val)));
-            return enc;
+            return addTextElement(enc, String.valueOf(val));
         }
 
         @Override
@@ -489,8 +457,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
         @Override
         public Element encodePrim(double val, Element enc) {
-            enc.appendChild(doc.createTextNode(String.valueOf(val)));
-            return enc;
+            return addTextElement(enc, String.valueOf(val));
         }
 
         @Override
@@ -543,8 +510,7 @@ public class XmlCodecCore extends CodecCore<Element> {
     protected final Codec<String, Element> stringCodec = new Codec<String, Element>() {
         @Override
         public Element encode(String val, Element enc) {
-            enc.appendChild(doc.createTextNode(val));
-            return enc;
+            return addTextElement(enc, String.valueOf(val));
         }
 
         @Override
@@ -563,8 +529,7 @@ public class XmlCodecCore extends CodecCore<Element> {
         return new Codec<EM, Element>() {
             @Override
             public Element encode(EM val, Element enc) {
-                enc.appendChild(doc.createTextNode(val.name()));
-                return enc;
+                return addTextElement(enc, val.name());
             }
 
             @Override
@@ -728,7 +693,7 @@ public class XmlCodecCore extends CodecCore<Element> {
             @Override
             public Element encode(T val, Element enc) {
                 fieldCodecs.forEach((name, codec) -> {
-                    codec.encodeField(val, addElement(doc, enc, name));
+                    codec.encodeField(val, addElement(enc, name));
                 });
                 return enc;
             }

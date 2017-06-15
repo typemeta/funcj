@@ -1,14 +1,20 @@
 package org.funcj.codec.utils;
 
-import org.funcj.codec.CodecCore;
+import org.funcj.codec.*;
 
 import java.lang.reflect.*;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
-public class ReflectionUtils {
+/**
+ * Utility methods relating to Reflection.
+ */
+public abstract class ReflectionUtils {
 
+    /**
+     * Data structure representing the type arguments of a generic type.
+     */
     public static class TypeArgs {
         public final List<Class<?>> typeArgs;
 
@@ -33,12 +39,19 @@ public class ReflectionUtils {
         }
     }
 
+    /**
+     * Inspect the supplied field. If it implements the supplied generic interface
+     * then extract and return the type arguments.
+     * @param field the field to inspect
+     * @param iface generic interface
+     * @return type arguments
+     */
     public static TypeArgs getTypeArgs(Field field, Class iface) {
         final Type type = field.getGenericType();
         if (type instanceof ParameterizedType) {
             final ParameterizedType pt = (ParameterizedType) type;
-            final Class rt = (Class)pt.getRawType();
-            if (iface.isAssignableFrom(rt)) {
+            if (pt.getRawType() instanceof Class &&
+                    iface.isAssignableFrom((Class)pt.getRawType())) {
                 final Type[] typeArgs = pt.getActualTypeArguments();
                 final List<Class<?>> results = new ArrayList<>(typeArgs.length);
                 for (Type typeArg : pt.getActualTypeArguments()) {
@@ -64,6 +77,13 @@ public class ReflectionUtils {
         return new TypeArgs();
     }
 
+    /**
+     * Inspect the supplied type. If it implements the supplied generic interface
+     * then extract and return the type arguments.
+     * @param implClass type to inspect
+     * @param iface generic interface
+     * @return type arguments
+     */
     public static TypeArgs getTypeArgs(Class implClass, Class iface) {
         final List<ParameterizedType> genIfaces =
                 Arrays.stream(implClass.getGenericInterfaces())
@@ -78,48 +98,12 @@ public class ReflectionUtils {
                 .orElseGet(TypeArgs::new);
     }
 
-    public static TypeArgs getGenTypeArgs(ParameterizedType type) {
+    private static TypeArgs getGenTypeArgs(ParameterizedType type) {
         final List<Class<?>> typeArgs =
                 Arrays.stream(type.getActualTypeArguments())
                         .filter(t -> t instanceof Class)
                         .map(t -> (Class<?>)t)
                         .collect(toList());
         return new TypeArgs(typeArgs);
-    }
-
-    public static <T> CodecCore.TypeConstructor<T> createTypeConstructor(Class<T> clazz) throws InstantiationException {
-        final List<Constructor<T>> ctors =
-                Arrays.stream(clazz.getDeclaredConstructors())
-                        .filter(ctor -> ctor.getParameterCount() == 0)
-                        .map(ctor -> (Constructor<T>)ctor)
-                        .collect(toList());
-        final Constructor<T> defCtor;
-        switch (ctors.size()) {
-            case 0:
-                throw new InstantiationException(clazz.getName() + " has no default constructor");
-            case 1:
-                defCtor = ctors.get(0);
-                break;
-            default:
-                Constructor<T> bestCtor = null;
-                for (Constructor<T> ctor : ctors) {
-                    if (bestCtor == null || bestCtor.isAccessible()) {
-                        bestCtor = ctor;
-                    }
-                }
-                defCtor = bestCtor;
-                break;
-        }
-
-        if (defCtor.isAccessible()) {
-            return () -> defCtor.newInstance((Object[])null);
-        } else {
-            return () -> {
-                defCtor.setAccessible(true);
-                final T result = defCtor.newInstance((Object[])null);
-                defCtor.setAccessible(false);
-                return result;
-            };
-        }
     }
 }

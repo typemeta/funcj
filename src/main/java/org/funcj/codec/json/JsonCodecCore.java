@@ -43,7 +43,6 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
     };
 
-    @Override
     public <T> JSValue encode(Class<T> type, T val) {
         return super.encode(type, val, null);
     }

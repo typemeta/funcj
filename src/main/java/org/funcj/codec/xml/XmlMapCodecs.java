@@ -30,10 +30,10 @@ public abstract class XmlMapCodecs {
             for (Map.Entry<K, V> entry : map.entrySet()) {
                 final Element elem = core.addEntryElement(enc);
 
-                final Element keyNode = (Element)elem.appendChild(core.doc.createElement(core.keyElemName()));
+                final Element keyNode = addElement(elem, core.keyElemName());
                 keyCodec.encode(entry.getKey(), keyNode);
 
-                final Element valueNode = (Element)elem.appendChild(core.doc.createElement(core.valueElemName()));
+                final Element valueNode = addElement(elem, core.valueElemName());
                 valueCodec.encode(entry.getValue(), valueNode);
             }
 

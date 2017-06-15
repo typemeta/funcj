@@ -6,17 +6,13 @@ import org.funcj.control.Exceptions;
 import java.lang.reflect.*;
 import java.util.*;
 
-import static org.funcj.codec.utils.ReflectionUtils.createTypeConstructor;
+import static org.funcj.codec.TypeConstructor.createTypeConstructor;
 
 /**
  * Base class for implementations which implement a specific encoing.
  * @param <E> encoded type
  */
 public abstract class CodecCore<E> {
-
-    public interface TypeConstructor<T> {
-        T construct() throws ReflectiveOperationException;
-    }
 
     protected final Map<String, Codec<?, E>> codecs = new HashMap<>();
 
@@ -33,8 +29,6 @@ public abstract class CodecCore<E> {
     public <T> void registerTypeConstructor(Class<? extends T> clazz, TypeConstructor<T> typeCtor) {
         typeCtors.put(classToName(clazz), typeCtor);
     }
-
-    public abstract <T> E encode(Class<T> type, T val);
 
     public <T> E encode(Class<T> type, T val, E enc) {
         return dynamicCodec(type).encode(val, enc);
