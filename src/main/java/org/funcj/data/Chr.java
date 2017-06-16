@@ -1,7 +1,7 @@
 package org.funcj.data;
 
 /**
- * Simplified boxed equivalent of <code>char</code> primitive type.
+ * Simplified boxed equivalent of {@code char} primitive type.
  */
 public final class Chr implements Comparable<Chr> {
 

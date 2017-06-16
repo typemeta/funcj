@@ -3,8 +3,8 @@ package org.funcj.codec;
 import org.funcj.codec.utils.Utils;
 
 /**
- * Interface for classes that encapsulates the logic for encoding a value of type <code>T</code>
- * into a value of type <code>E</code> and vice versa.
+ * Interface for classes that encapsulates the logic for encoding a value of type {@code T}
+ * into a value of type {@code E} and vice versa.
  * @param <T> type to be encoded/decoded
  * @param <E> encoded type
  */
@@ -24,7 +24,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Codec for {@link java.lang.Boolean} and <code>boolean</code> values.
+     * Codec for {@link java.lang.Boolean} and {@code boolean} values.
      * @param <E> encoded type
      */
     abstract class BooleanCodec<E> implements Codec<Boolean, E> {
@@ -56,7 +56,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Codec for {@link java.lang.Byte} and <code>byte</code> values.
+     * Codec for {@link java.lang.Byte} and {@code byte} values.
      * @param <E> encoded type
      */
     abstract class ByteCodec<E> implements Codec<Byte, E> {
@@ -88,7 +88,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Codec for {@link java.lang.Character} and <code>char</code> values.
+     * Codec for {@link java.lang.Character} and {@code char} values.
      * @param <E> encoded type
      */
     abstract class CharCodec<E> implements Codec<Character, E> {
@@ -120,7 +120,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Codec for {@link java.lang.Short} and <code>short</code> values.
+     * Codec for {@link java.lang.Short} and {@code short} values.
      * @param <E> encoded type
      */
     abstract class ShortCodec<E> implements Codec<Short, E> {
@@ -152,7 +152,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Codec for {@link java.lang.Integer} and <code>int</code> values.
+     * Codec for {@link java.lang.Integer} and {@code int} values.
      * @param <E> encoded type
      */
     abstract class IntCodec<E> implements Codec<Integer, E> {
@@ -184,7 +184,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Codec for {@link java.lang.Long} and <code>long</code> values.
+     * Codec for {@link java.lang.Long} and {@code long} values.
      * @param <E> encoded type
      */
     abstract class LongCodec<E> implements Codec<Long, E> {
@@ -216,7 +216,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Codec for {@link java.lang.Float} and <code>float</code> values.
+     * Codec for {@link java.lang.Float} and {@code float} values.
      * @param <E> encoded type
      */
     abstract class FloatCodec<E> implements Codec<Float, E> {
@@ -248,7 +248,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Codec for {@link java.lang.Double} and <code>double</code> values.
+     * Codec for {@link java.lang.Double} and {@code double} values.
      * @param <E> encoded type
      */
     abstract class DoubleCodec<E> implements Codec<Double, E> {
@@ -280,7 +280,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Encode a value of type <code>T</code> into and encoded value of type <code>E</code>.
+     * Encode a value of type {@code T} into and encoded value of type {@code E}.
      * @param val unencoded value
      * @param enc encoded parent value
      * @return encoded value
@@ -288,8 +288,8 @@ public interface Codec<T, E> {
     E encode(T val, E enc) ;
 
     /**
-     * Decode a value of type <code>E</code> back into a value of type <code>T</code>.
-     * One of the two <code>decode</code> methods must be implemented by sub-classes.
+     * Decode a value of type {@code E} back into a value of type {@code T}.
+     * One of the two {@code decode} methods must be implemented by sub-classes.
      * @param dynType the dynamic type to decode into.
      * @param enc the encoded value
      * @return decoded value
@@ -299,8 +299,8 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Decode an encoded value of type <code>E</code> back into a value of type <code>T</code>.
-     * One of the two <code>decode</code> methods must be implemented by sub-classes.
+     * Decode an encoded value of type {@code E} back into a value of type {@code T}.
+     * One of the two {@code decode} methods must be implemented by sub-classes.
      * @param enc the encoded value
      * @return decoded value
      */

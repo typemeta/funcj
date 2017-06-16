@@ -157,9 +157,9 @@ public class JsonParser {
     }
 
     /**
-     * Parse a JSON string into a <code>JSValue</code>.
+     * Parse a JSON string into a {@code JSValue}.
      * @param str JSON string
-     * @return a <code>JSValue</code> if parse is successful
+     * @return a {@code JSValue} if parse is successful
      * @throws RuntimeException if parse is unsuccessful
      */
     public static JSValue parseOrThrow(String str) throws RuntimeException {

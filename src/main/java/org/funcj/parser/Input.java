@@ -12,7 +12,7 @@ import java.io.Reader;
  */
 public interface Input<I> {
     /**
-     * Construct an <code>Input</code> from a <code>char</code> array.
+     * Construct an {@code Input} from a {@code char} array.
      * @param data input data
      * @return parseable input stream
      */
@@ -21,7 +21,7 @@ public interface Input<I> {
     }
 
     /**
-     * Construct an <code>Input</code> from a {link java.lang.String}.
+     * Construct an {@code Input} from a {link java.lang.String}.
      * @param s input data
      * @return parseable input stream
      */
@@ -30,7 +30,7 @@ public interface Input<I> {
     }
 
     /**
-     * Construct an <code>Input</code> from a {link java.io.Reader}.
+     * Construct an {@code Input} from a {link java.io.Reader}.
      * @param rdr input data
      * @return parseable input stream
      */
@@ -46,14 +46,14 @@ public interface Input<I> {
 
     /**
      * Get the current symbol from the stream.
-     * Will throw if <code>isEof</code> is true.
+     * Will throw if {@code isEof} is true.
      * @return next symbol
      */
     I get();
 
     /**
      * Get the next position in the input stream.
-     * Will throw if <code>isEof</code> is true.
+     * Will throw if {@code isEof} is true.
      * @return the next position in the input stream
      */
     Input<I> next();

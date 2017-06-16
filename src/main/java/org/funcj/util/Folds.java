@@ -35,7 +35,7 @@ public abstract class Folds {
     }
 
     /**
-     * Right-fold a function over an <code>List</code>.
+     * Right-fold a function over an {@code List}.
      */
     public static <T, R> R foldRight(F2<T, R, R> f, R z, List<T> ts) {
         R acc = z;
@@ -46,7 +46,7 @@ public abstract class Folds {
     }
 
     /**
-     * Right-fold a function over an <code>List</code>.
+     * Right-fold a function over an {@code List}.
      */
     public static <T> T foldRight1(Op2<T> f, List<T> ts) {
         final int i0 = ts.size() - 1;

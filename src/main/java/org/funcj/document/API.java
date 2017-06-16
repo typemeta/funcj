@@ -98,8 +98,8 @@ public abstract class API {
     }
 
     /**
-     * Create a document from elements by separating them with <code>sep</code>,
-     * and enclosing them in <code>open</code> and <code>close</code>.
+     * Create a document from elements by separating them with {@code sep},
+     * and enclosing them in {@code open} and {@code close}.
      */
     public static Document enclose(Document open, Document sep, Document close, IList<Document> docs) {
         final Document elems = docs.isEmpty() ?
@@ -109,8 +109,8 @@ public abstract class API {
     }
 
     /**
-     * Create a document from elements by separating them with <code>sep</code>,
-     * and enclosing them in <code>open</code> and <code>close</code>.
+     * Create a document from elements by separating them with {@code sep},
+     * and enclosing them in {@code open} and {@code close}.
      */
     public static Document enclose(Document open, Document sep, Document close, List<Document> docs) {
         final Document elems = docs.isEmpty() ?

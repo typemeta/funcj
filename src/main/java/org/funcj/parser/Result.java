@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * A parse result. Either a <code>Success</code> or a <code>Failure</code>
+ * A parse result. Either a {@code Success} or a {@code Failure}
  * @param <I> input stream symbol type
  * @param <A> parse result type
  */

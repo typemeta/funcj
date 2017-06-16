@@ -6,16 +6,16 @@ import java.util.*;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Interface for constructing a value of type <code>T</code>.
+ * Interface for constructing a value of type {@code T}.
  * @param <T> type of value to be constructed
  */
 public interface TypeConstructor<T> {
     /**
-     * Create a <code>TypeConstructor</code> for the specified class.
+     * Create a {@code TypeConstructor} for the specified class.
      * @param clazz type descriptor which conveys the type argument
-     * @param <T> the type we want a <code>TypeConstructor</code> for
-     * @return a <code>TypeConstructor</code>
-     * @throws InstantiationException
+     * @param <T> the type we want a {@code TypeConstructor} for
+     * @return a {@code TypeConstructor}
+     * @throws InstantiationException if type has no constructors
      */
     static <T> TypeConstructor<T> createTypeConstructor(Class<T> clazz)
             throws InstantiationException {
@@ -56,9 +56,9 @@ public interface TypeConstructor<T> {
     }
 
     /**
-     * Construct a value of type <code>T</code>.
-     * @return new value
-     * @throws ReflectiveOperationException
+     * Construct a value of type {@code T}.
+     * @return newly constructed value
+     * @throws ReflectiveOperationException typically thrown by {@link java.lang.reflect.Constructor#newInstance(Object[])}
      */
     T construct() throws ReflectiveOperationException;
 }

@@ -10,27 +10,37 @@ import java.util.function.Consumer;
 /**
  * Simple monadic wrapper for computations which result in either a successfully computed value
  * or an error.
- * Try is effectively a discriminated union of Success (which wraps a value)
- * and Failure (which wraps an exception).
+ * Try is effectively a discriminated union of {@code Success} (which wraps a value)
+ * and {@code Failure} (which wraps an exception).
+ * @param <T> successful result type
  */
 public interface Try<T> {
 
     /**
-     * Create a Success value.
+     * Create a {@code Success} value that wraps a successful result.
+     * @param value successful result to be wrapped
+     * @param <T> successful result type
+     * @return a {@code Success} value
      */
     static <T> Try<T> success(T value) {
         return new Success<T>(value);
     }
 
     /**
-     * Create a Failure value.
+     * Create a {@code Failure} value that wraps a error result.
+     * @param error error result
+     * @param <T> successful result type
+     * @return a {@code Failure} value
      */
     static <T> Try<T> failure(Exception error) {
         return new Failure<T>(error);
     }
 
     /**
-     * Create a Try value from a function which either yields a result or throws.
+     * Create a {@code Try} value from a function which either yields a result or throws.
+     * @param f function which may throw
+     * @param <T> successful result type
+     * @return {@code Try} value which wraps the function result
      */
     static <T> Try<T> of(FunctionsEx.F0<T> f) {
         try {
@@ -42,6 +52,11 @@ public interface Try<T> {
 
     /**
      * Applicative function application.
+     * @param tf function wrapped in a {@code Try}
+     * @param ta function argument wrapped in a {@code Try}
+     * @param <A> function argument type
+     * @param <B> function return type
+     * @return the result of applying the function to the argument, wrapped in a {@code Try}
      */
     static <A, B> Try<B> ap(Try<F<A, B>> tf, Try<A> ta) {
         return ta.apply(tf);
@@ -49,6 +64,11 @@ public interface Try<T> {
 
     /**
      * Applicative function application.
+     * @param f function
+     * @param ta function argument wrapped in a {@code Try}
+     * @param <A> function argument type
+     * @param <B> function return type
+     * @return the result of applying the function to the argument, wrapped in a {@code Try}
      */
     static <A, B> Try<B> ap(F<A, B> f, Try<A> ta) {
         return ta.map(f);
@@ -56,6 +76,11 @@ public interface Try<T> {
 
     /**
      * Standard applicative traversal.
+     * @param lt list of {@code Try} values
+     * @param f function to be applied to each {@code Try} in the list
+     * @param <T> type of list elements
+     * @param <U> type wrapped by the {@code Try} returned by the function
+     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
         return lt.foldRight(
@@ -66,6 +91,9 @@ public interface Try<T> {
 
     /**
      * Standard applicative sequencing.
+     * @param lt list of {@code Try} values
+     * @param <T> type of list elements
+     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
     static <T> Try<IList<T>> sequence(IList<Try<T>> lt) {
         return lt.foldRight(
@@ -75,32 +103,44 @@ public interface Try<T> {
     }
 
     /**
-     * Do we have a success result?
+     * Indicates if this value is a {code Success} value.
+     * @return true if this value is a {code Success} value
      */
     boolean isSuccess();
 
     /**
-     * Either return the result value, otherwise return the supplied default value.
+     * Either return the wrapped value if it's a {@code Success}, otherwise return the supplied default value.
+     * @param defaultValue value to be returned if this is a failure value.
+     * @return the success result value if it's a {@code Success}, otherwise return the supplied default value.
      */
     T getOrElse(T defaultValue);
 
     /**
-     * Either return the result value, otherwise throw the result exception.
+     * Either return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
+     * @return the wrapped value if it's a {@code Success}
+     * @throws Exception if the wrapped value is a {@code Failure}
      */
     T getOrThrow() throws Exception;
 
     /**
      * Similar to getOrThrow but will throw a RuntimeException.
+     * @return the wrapped value if it's a {@code Success}
      */
     T get();
 
     /**
-     * Push the result to a Consumer.
+     * Push the result to a {@link java.util.function.Consumer}.
+     * @param success consumer to be applied to {@code Success} values
+     * @param failure consumer to be applied to {@code Failure} values
      */
-    void handle(Consumer<T> success, Consumer<Exception> failure);
+    void handle(Consumer<Success<T>> success, Consumer<Failure<T>> failure);
 
     /**
-     * Map either function over the result.
+     * Map a function over the value.
+     * @param success function to be applied to {@code Success} values
+     * @param failure function to be applied to {@code Failure} values
+     * @param <R> return type of functions
+     * @return the result of applying the function
      */
     <R> R match(F<Success<T>, ? extends R> success, F<Failure<T>, ? extends R> failure);
 
@@ -166,8 +206,8 @@ public interface Try<T> {
         }
 
         @Override
-        public void handle(Consumer<T> success, Consumer<Exception> failure) {
-            success.accept(value);
+        public void handle(Consumer<Success<T>> success, Consumer<Failure<T>> failure) {
+            success.accept(this);
         }
 
         @Override
@@ -252,8 +292,8 @@ public interface Try<T> {
         }
 
         @Override
-        public void handle(Consumer<T> success, Consumer<Exception> failure) {
-            failure.accept(error);
+        public void handle(Consumer<Success<T>> success, Consumer<Failure<T>> failure) {
+            failure.accept(this);
         }
 
         @Override

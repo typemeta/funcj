@@ -6,7 +6,7 @@ import org.funcj.data.IList;
 import java.io.*;
 
 /**
- * Format a <code>Document</code> into a <code>String</code>.
+ * Format a {@code Document} into a {@code String}.
  */
 public class DocFormat {
     public static String format(int width, Document doc) {

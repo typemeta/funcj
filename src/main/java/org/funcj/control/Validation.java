@@ -6,43 +6,131 @@ import org.funcj.util.FunctionsGenEx;
 
 import java.util.function.Consumer;
 
+/**
+ * Simple monadic wrapper for computations which result in either a successfully computed value
+ * or a list of errors.
+ * Validation is effectively a discriminated union of {@code Success} (which wraps a value)
+ * and {@code Failure} (which wraps a list of errors).
+ * @param <E> error type
+ * @param <T> successful result type
+ */
 public interface Validation<E, T> {
+    /**
+     * Create a {@code Success} value that wraps a successful result.
+     * @param result successful result to be wrapped
+     * @param <E> error type
+     * @param <T> successful result type
+     * @return a success value
+     */
     static <E, T> Validation<E, T> success(T result) {
         return new Success<E, T>(result);
     }
 
+    /**
+     * Create a {@code Failure} value that wraps a error result.
+     * @param errors list of failures result to be wrapped
+     * @param <E> error type
+     * @param <T> successful result type
+     * @return a failure value
+     */
     static <E, T> Validation<E, T> failure(IList<E> errors) {
         return new Failure<E, T>(errors);
     }
 
+    /**
+     * Create a {@code Failure} value that wraps a error result.
+     * @param error single failure result to be wrapped
+     * @param <E> error type
+     * @param <T> successful result type
+     * @return a failure value
+     */
     static <E, T> Validation<E, T> failure(E error) {
         return new Failure<E, T>(IList.of(error));
     }
 
+    /**
+     * Create a {@code Validation} value from a function which either yields a result or throws.
+     * @param f function which may throw
+     * @param <T> successful result type
+     * @return {@code Validation} value which wraps the function result
+     */
     static <E, T, X extends Exception>
-    Validation<E, T> of(FunctionsGenEx.F0<T, X> get, F<X, E> error) {
+    Validation<E, T> of(FunctionsGenEx.F0<T, X> f, F<X, E> error) {
         try {
-            return success(get.apply());
+            return success(f.apply());
         } catch (Exception ex) {
             return failure(error.apply((X)ex));
         }
     }
 
+    /**
+     * Applicative function application.
+     * @param vf function wrapped in a {@code Validation}
+     * @param va function argument wrapped in a {@code Validation}
+     * @param <A> function argument type
+     * @param <B> function return type
+     * @return the result of applying the function to the argument, wrapped in a {@code Validation}
+     */
     static <E, A, B> Validation<E, B> ap(Validation<E, F<A, B>> vf, Validation<E, A> va) {
         return va.apply(vf);
     }
 
+    /**
+     * Standard applicative traversal.
+     * @param lt list of {@code Validation} values
+     * @param f function to be applied to each {@code Validation} in the list
+     * @param <T> type of list elements
+     * @param <U> type wrapped by the {@code Try} returned by the function
+     * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
+     */
+    static <E, T, U> Validation<E, IList<U>> traverse(IList<T> lt, F<T, Validation<E, U>> f) {
+        return lt.foldRight(
+                (t, tlt) -> f.apply(t).apply(tlt.map(l -> l::add)),
+                success(IList.nil())
+        );
+    }
+
+    /**
+     * Standard applicative sequencing.
+     * @param lt list of {@code Validation} values
+     * @param <T> type of list elements
+     * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
+     */
+
+    static <E, T> Validation<E, IList<T>> sequence(IList<Validation<E, T>> lt) {
+        return lt.foldRight(
+                (tt, tlt) -> tt.apply(tlt.map(l -> l::add)),
+                success(IList.nil())
+        );
+    }
+
+    /**
+     * Indicates if this value is a {code Success} value.
+     * @return true if this value is a {code Success} value
+     */
     boolean isSuccess();
 
+    /**
+     * Push the result to a {@link java.util.function.Consumer}.
+     * @param success consumer to be applied to {@code Success} values
+     * @param failure consumer to be applied to {@code Failure} values
+     */
     void handle(Consumer<Success<E, T>> success, Consumer<Failure<E, T>> failure);
 
-    <U> U match(F<Success<E, T>, U> success, F<Failure<E, T>, U> failure);
+    /**
+     * Map a function over the value.
+     * @param success
+     * @param failure
+     * @param <R>
+     * @return
+     */
+    <R> R match(F<Success<E, T>, R> success, F<Failure<E, T>, R> failure);
 
-    <U> Validation<E, U> map(F<T, U> f);
+    <R> Validation<E, R> map(F<T, R> f);
 
-    <U> Validation<E, U> apply(Validation<E, F<T, U>> vf);
+    <R> Validation<E, R> apply(Validation<E, F<T, R>> vf);
 
-    <U> Validation<E, U> flatMap(F<T, Validation<E, U>> f);
+    <R> Validation<E, R> flatMap(F<T, Validation<E, R>> f);
 
     default <U> ApplyBuilder._2<E, T, U> and(Validation<E, U> vb) {
         return new ApplyBuilder._2<E, T, U>(this, vb);

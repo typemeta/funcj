@@ -12,14 +12,14 @@ import static java.util.stream.Collectors.toList;
  */
 public abstract class Functors {
     /**
-     * Map a function over a <code>Collection</code>.
+     * Map a function over a {@code Collection}.
      */
     public static <T, U> List<U> map(F<T, U> f, Collection<T> ts) {
         return ts.stream().map(f::apply).collect(toList());
     }
 
     /**
-     * Map a function over an <code>Optional</code>.
+     * Map a function over an {@code Optional}.
      */
     public static <T, U> Optional<U> map(F<T, U> f, Optional<T> ot) {
         return ot.map(f::apply);

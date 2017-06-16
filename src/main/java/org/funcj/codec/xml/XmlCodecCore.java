@@ -4,7 +4,6 @@ import org.funcj.codec.*;
 import org.funcj.control.Exceptions;
 import org.w3c.dom.*;
 
-import javax.xml.parsers.*;
 import java.lang.reflect.*;
 import java.util.*;
 

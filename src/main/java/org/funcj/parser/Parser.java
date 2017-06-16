@@ -83,7 +83,7 @@ public interface Parser<I, A> {
      * Functor map operation.
      * @param f funtion to be mapped over this parser
      * @param <B> function return type
-     * @return a parser that returns <code>f</code> mapped over this parser's result
+     * @return a parser that returns {@code f} mapped over this parser's result
      */
     default <B> Parser<I, B> map(F<A, B> f) {
         return new ParserImpl<I, B>(
@@ -153,7 +153,7 @@ public interface Parser<I, A> {
     /**
      * Alternative.
      * Construct a parser which returns the result of either this parser or,
-     * if it fails, then the result of the <code>rhs</code> parser.
+     * if it fails, then the result of the {@code rhs} parser.
      * @param rhs alternative parser
      * @return a parser which returns the result of either parser.
      */
@@ -353,7 +353,7 @@ public interface Parser<I, A> {
 }
 
 /**
- * Base class for <code>Parser</code> implementations.
+ * Base class for {@code Parser} implementations.
  * @param <I> input stream symbol type
  * @param <A> parse result type
  */

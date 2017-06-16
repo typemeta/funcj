@@ -1,9 +1,7 @@
 package org.funcj.codec.xml;
 
-import org.funcj.control.Exceptions;
 import org.w3c.dom.*;
 
-import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -26,10 +24,6 @@ public class XmlUtils {
         } catch (TransformerException ex) {
             throw new XmlCodecException(ex);
         }
-    }
-
-    private static DocumentBuilder createDocumentBuilder() {
-        return Exceptions.wrap(() -> DocumentBuilderFactory.newInstance().newDocumentBuilder());
     }
 
     public static Element addElement(Element parent, String name) {
