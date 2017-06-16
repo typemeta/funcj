@@ -4,6 +4,7 @@ import org.funcj.data.IList;
 import org.funcj.util.Functions.*;
 import org.funcj.util.FunctionsGenEx;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -118,24 +119,68 @@ public interface Validation<E, T> {
     void handle(Consumer<Success<E, T>> success, Consumer<Failure<E, T>> failure);
 
     /**
-     * Map a function over the value.
-     * @param success
-     * @param failure
-     * @param <R>
-     * @return
+     * Poor-man's pattern matching.
+     * Apply one of two functions to this value, according to the type of value.
+     * @param success function to be applied to {@code Success} values
+     * @param failure function to be applied to {@code Failure} values
+     * @param <R> return type of functions
+     * @return the result of applying the function
      */
     <R> R match(F<Success<E, T>, R> success, F<Failure<E, T>, R> failure);
 
+    /**
+     * Functor function application.
+     * If this value is a success then apply the function to the value,
+     * otherwise if thjis is a failure then leave it untouched.
+     * @param f function to be applied
+     * @param <R> function return type
+     * @return a {@code Validation} that wraps the function result, or the original failure
+     */
     <R> Validation<E, R> map(F<T, R> f);
 
+    /**
+     * Applicative function application (inverted).
+     * If the {@code vf} parameter is a {@code Success} and this is a {@code Success},
+     * then apply the function wrapped in the {@code tf} to this.
+     * @param vf function wrapped in a {@code Validation}
+     * @param <R> return type of function
+     * @return a {@code Validation} wrapping the result of applying the function, or a {@code Failure}.
+     */
     <R> Validation<E, R> apply(Validation<E, F<T, R>> vf);
 
+    /**
+     * Monadic bind/flatMap.
+     * If this is a {@code Success} then apply the function to the value and return the result,
+     * otherwise return the {@code Failure} result.
+     * @param f function to be applied
+     * @param <R> type parameter to the {@code Validation} returned by the function
+     * @return the result of combining this value with the function {@code f}
+     */
     <R> Validation<E, R> flatMap(F<T, Validation<E, R>> f);
 
+    /**
+     * Builder API for chaining together n {@code Validation}s,
+     * and applying an n-ary function at the end.
+     * @param vb next {@code Validation} value to chain
+     * @param <U> successful result type for next {@code Validation}
+     * @return next builder
+     */
     default <U> ApplyBuilder._2<E, T, U> and(Validation<E, U> vb) {
         return new ApplyBuilder._2<E, T, U>(this, vb);
     }
 
+    /**
+     * Downgrade this value into an {@link java.util.Optional}.
+     * @return a populated {@code Optional} value if this is a {Code Success},
+     * otherwise an empty {@code Optional}
+     */
+    Optional<T> asOptional();
+
+    /**
+     * Success type
+     * @param <E> error type
+     * @param <T> successful result type
+     */
     class Success<E, T> implements Validation<E, T> {
         public final T value;
 
@@ -172,8 +217,18 @@ public interface Validation<E, T> {
         public <U> Validation<E, U> flatMap(F<T, Validation<E, U>> f) {
             return f.apply(value);
         }
+
+        @Override
+        public Optional<T> asOptional() {
+            return Optional.of(value);
+        }
     }
 
+    /**
+     * Failure type
+     * @param <E> error type
+     * @param <T> successful result type
+     */
     class Failure<E, T> implements Validation<E, T> {
         public final IList<E> errors;
 
@@ -211,6 +266,11 @@ public interface Validation<E, T> {
             return cast();
         }
 
+        @Override
+        public Optional<T> asOptional() {
+            return Optional.empty();
+        }
+
         public <U> Failure<E, U> cast() {
             return (Failure<E, U>) this;
         }
@@ -218,54 +278,54 @@ public interface Validation<E, T> {
 
     class ApplyBuilder {
         public static class _2<E, A, B> {
-            private final Validation<E, A> pa;
-            private final Validation<E, B> pb;
+            private final Validation<E, A> va;
+            private final Validation<E, B> vb;
 
-            _2(Validation<E, A> pa, Validation<E, B> pb) {
-                this.pa = pa;
-                this.pb = pb;
+            _2(Validation<E, A> va, Validation<E, B> vb) {
+                this.va = va;
+                this.vb = vb;
             }
 
             public <R> Validation<E, R> map(F<A, F<B, R>> f) {
-                return pb.apply(pa.map(f));
+                return vb.apply(va.map(f));
             }
 
             public <R> Validation<E, R> map(F2<A, B, R> f) {
                 return map(f.curry());
             }
 
-            public <C> _3<C> and(Validation<E, C> pc) {
-                return new _3<C>(pc);
+            public <C> _3<C> and(Validation<E, C> vc) {
+                return new _3<C>(vc);
             }
 
             public class _3<C> {
-                private final Validation<E, C> pc;
+                private final Validation<E, C> vc;
 
-                private _3(Validation<E, C> pc) {
-                    this.pc = pc;
+                private _3(Validation<E, C> vc) {
+                    this.vc = vc;
                 }
 
                 public <R> Validation<E, R> map(F<A, F<B, F<C, R>>> f) {
-                    return ap(_2.this.map(f), pc);
+                    return ap(_2.this.map(f), vc);
                 }
 
                 public <R> Validation<E, R> map(F3<A, B, C, R> f) {
                     return map(f.curry());
                 }
 
-                public <D> _4<D> and(Validation<E, D> pd) {
-                    return new _4<D>(pd);
+                public <D> _4<D> and(Validation<E, D> vd) {
+                    return new _4<D>(vd);
                 }
 
                 public class _4<D> {
-                    private final Validation<E, D> pd;
+                    private final Validation<E, D> vd;
 
-                    private _4(Validation<E, D> pd) {
-                        this.pd = pd;
+                    private _4(Validation<E, D> vd) {
+                        this.vd = vd;
                     }
 
                     public <R> Validation<E, R> map(F<A, F<B, F<C, F<D, R>>>> f) {
-                        return ap(_3.this.map(f), pd);
+                        return ap(_3.this.map(f), vd);
                     }
 
                     public <R> Validation<E, R> map(F4<A, B, C, D, R> f) {
@@ -291,8 +351,8 @@ public interface Validation<E, T> {
                             return map(f.curry());
                         }
 
-                        public <H> _6<H> and(Validation<E, H> pg) {
-                            return new _6<H>(pg);
+                        public <H> _6<H> and(Validation<E, H> vg) {
+                            return new _6<H>(vg);
                         }
 
                         public class _6<H> {

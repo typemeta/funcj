@@ -63,18 +63,6 @@ public interface Try<T> {
     }
 
     /**
-     * Applicative function application.
-     * @param f function
-     * @param ta function argument wrapped in a {@code Try}
-     * @param <A> function argument type
-     * @param <B> function return type
-     * @return the result of applying the function to the argument, wrapped in a {@code Try}
-     */
-    static <A, B> Try<B> ap(F<A, B> f, Try<A> ta) {
-        return ta.map(f);
-    }
-
-    /**
      * Standard applicative traversal.
      * @param lt list of {@code Try} values
      * @param f function to be applied to each {@code Try} in the list
@@ -136,7 +124,8 @@ public interface Try<T> {
     void handle(Consumer<Success<T>> success, Consumer<Failure<T>> failure);
 
     /**
-     * Map a function over the value.
+     * Poor-man's pattern matching.
+     * Apply one of two functions to this value, according to the type of value.
      * @param success function to be applied to {@code Success} values
      * @param failure function to be applied to {@code Failure} values
      * @param <R> return type of functions
@@ -146,36 +135,65 @@ public interface Try<T> {
 
     /**
      * Functor function application.
-     * If this is a success then apply the function to the value.
+     * If this value is a success then apply the function to the value,
+     * otherwise if this is a failure then leave it untouched.
+     * @param f function to be applied
+     * @param <R> function return type
+     * @return a {@code Try} that wraps the function result, or the original failure
      */
     <R> Try<R> map(F<? super T, ? extends R> f);
 
     /**
-     * Applicative function application.
+     * Applicative function application (inverted).
+     * If the {@code tf} parameter is a {@code Success} and this is a {@code Success},
+     * then apply the function wrapped in the {@code tf} to this.
+     * @param tf function wrapped in a {@code Try}
+     * @param <R> return type of function
+     * @return a {@code Try} wrapping the result of applying the function, or a {@code Failure}.
      */
     <R> Try<R> apply(Try<F<T, R>> tf);
 
     /**
      * Monadic bind/flatMap.
-     * If this is a success then apply the function to the value and return the result,
-     * Otherwise return the failure result.
+     * If this is a {@code Success} then apply the function to the value and return the result,
+     * otherwise return the {@code Failure} result.
+     * @param f function to be applied
+     * @param <R> type parameter to the {@code Try} returned by the function
+     * @return the result of combining this value with the function {@code f}
      */
     <R> Try<R> flatMap(F<? super T, Try<R>> f);
 
     /**
-     * Variant of flatMap which ignores the supplied value.
+     * Variant of flatMap which ignores this value.
+     * @param f function to be invoked
+     * @param <R> type parameter to the {@code Try} returned by the function
+     * @return the result of combining this value with the function {@code f}
      */
     default <R> Try<R> flatMap(F0<Try<R>> f) {
         return flatMap(u -> f.apply());
     }
 
     /**
-     * Convert the value into an Optional.
+     * Downgrade this value into an {@link java.util.Optional}.
+     * @return a populated {@code Optional} value if this is a {Code Success},
+     * otherwise an empty {@code Optional}
      */
     Optional<T> asOptional();
 
     /**
-     * Successful result type, which wraps the result value.
+     * Builder API for chaining together n {@code Try}s,
+     * and applying an n-ary function at the end.
+     * @param tb next {@code Try} value to chain
+     * @param <U> successful result type for next {@code Try}
+     * @return next builder
+     */
+    default <U> ApplyBuilder._2<T, U> and(Try<U> tb) {
+        return new ApplyBuilder._2<T, U>(this, tb);
+    }
+
+    /**
+     * Successful value.
+     * @param <T> successful result type
      */
     final class Success<T> implements Try<T> {
 
@@ -261,7 +279,8 @@ public interface Try<T> {
     }
 
     /**
-     * Unsuccessful result type. Wraps the result exception.
+     * Failure type
+     * @param <T> successful result type
      */
     final class Failure<T> implements Try<T> {
 
@@ -350,6 +369,106 @@ public interface Try<T> {
 
         private <U> Try<U> cast() {
             return (Try<U>) this;
+        }
+    }
+
+    class ApplyBuilder {
+        public static class _2<A, B> {
+            private final Try<A> ta;
+            private final Try<B> tb;
+
+            _2(Try<A> ta, Try<B> tb) {
+                this.ta = ta;
+                this.tb = tb;
+            }
+
+            public <R> Try<R> map(F<A, F<B, R>> f) {
+                return tb.apply(ta.map(f));
+            }
+
+            public <R> Try<R> map(F2<A, B, R> f) {
+                return map(f.curry());
+            }
+
+            public <C> _3<C> and(Try<C> tc) {
+                return new _3<C>(tc);
+            }
+
+            public class _3<C> {
+                private final Try<C> tc;
+
+                private _3(Try<C> tc) {
+                    this.tc = tc;
+                }
+
+                public <R> Try<R> map(F<A, F<B, F<C, R>>> f) {
+                    return ap(_2.this.map(f), tc);
+                }
+
+                public <R> Try<R> map(F3<A, B, C, R> f) {
+                    return map(f.curry());
+                }
+
+                public <D> _4<D> and(Try<D> td) {
+                    return new _4<D>(td);
+                }
+
+                public class _4<D> {
+                    private final Try<D> td;
+
+                    private _4(Try<D> td) {
+                        this.td = td;
+                    }
+
+                    public <R> Try<R> map(F<A, F<B, F<C, F<D, R>>>> f) {
+                        return ap(_3.this.map(f), td);
+                    }
+
+                    public <R> Try<R> map(F4<A, B, C, D, R> f) {
+                        return map(f.curry());
+                    }
+
+                    public <E> _5<E> and(Try<E> te) {
+                        return new _5<E>(te);
+                    }
+
+                    public class _5<E> {
+                        private final Try<E> te;
+
+                        private _5(Try<E> te) {
+                            this.te = te;
+                        }
+
+                        public <R> Try<R> map(F<A, F<B, F<C, F<D, F<E, R>>>>> f) {
+                            return ap(_4.this.map(f), te);
+                        }
+
+                        public <R> Try<R> map(F5<A, B, C, D, E, R> f) {
+                            return map(f.curry());
+                        }
+
+                        public <G> _6<G> and(Try<G> tg) {
+                            return new _6<G>(tg);
+                        }
+
+                        public class _6<G> {
+                            private final Try<G> tg;
+
+                            private _6(Try<G> tg) {
+                                this.tg = tg;
+                            }
+
+                            public <R> Try<R> map(F<A, F<B, F<C, F<D, F<E, F<G, R>>>>>> f) {
+                                return ap(_5.this.map(f), tg);
+                            }
+
+                            public <R> Try<R> map(F6<A, B, C, D, E, G, R> f) {
+                                return map(f.curry());
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
