@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * Simple monadic wrapper for computations which result in either a successfully computed value
  * or an error.
- * Try is effectively a discriminated union of {@code Success} (which wraps a value)
+ * Try is effectively a discriminated union of {@code Success} (which wraps the result value)
  * and {@code Failure} (which wraps an exception).
  * @param <T> successful result type
  */
@@ -121,7 +121,7 @@ public interface Try<T> {
     }
 
     /**
-     * Indicates if this value is a {code Success} value.
+     * Indicates if this is a {code Success} value.
      * @return true if this value is a {code Success} value
      */
     boolean isSuccess();
@@ -221,7 +221,7 @@ public interface Try<T> {
     }
 
     /**
-     * Successful value.
+     * Success type.
      * @param <T> successful result type
      */
     final class Success<T> implements Try<T> {

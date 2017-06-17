@@ -263,7 +263,7 @@ public abstract class FieldCodec<E> {
 
         @Override
         public void decodeField(Object obj, E enc) {
-            final int[] fieldVal = codec.decode(int[].class, enc);
+            final int[] fieldVal = codec.decode(enc);
             setAccessible(true);
             Exceptions.wrap(() -> field.set(obj, fieldVal), CodecException::new);
             setAccessible(false);

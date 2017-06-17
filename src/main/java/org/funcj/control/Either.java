@@ -114,7 +114,7 @@ public interface Either<E, S> {
     }
 
     /**
-     * Indicates if this value is a {code Right} value.
+     * Indicates if this is a {code Right} value.
      * @return true if this value is a {code Right} value
      */
     boolean isRight();
@@ -181,6 +181,17 @@ public interface Either<E, S> {
      * @return the result of combining this value with the function {@code f}
      */
     <R> Either<E, R> flatMap(F<? super S, Either<E, R>> f);
+
+    /**
+     * Builder API for chaining together n {@code Validation}s,
+     * and applying an n-ary function at the end.
+     * @param vb next {@code Validation} value to chain
+     * @param <T> successful result type for next {@code Validation}
+     * @return next builder
+     */
+    default <T> ApplyBuilder._2<E, S, T> and(Either<E, T> vb) {
+        return new ApplyBuilder._2<E, S, T>(this, vb);
+    }
 
     /**
      * Left value.

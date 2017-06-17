@@ -5,7 +5,7 @@ import org.funcj.codec.utils.Utils;
 /**
  * Interface for classes that encapsulates the logic for encoding a value of type {@code T}
  * into a value of type {@code E} and vice versa.
- * @param <T> type to be encoded/decoded
+ * @param <T> raw type to be encoded/decoded
  * @param <E> encoded type
  */
 public interface Codec<T, E> {

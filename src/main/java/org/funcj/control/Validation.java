@@ -51,8 +51,11 @@ public interface Validation<E, T> {
 
     /**
      * Create a {@code Validation} value from a function which either yields a result or throws.
-     * @param f function which may throw
+     * @param f  function which may throw
+     * @param error exception to error translator
+     * @param <E> error type
      * @param <T> successful result type
+     * @param <X> exception type
      * @return {@code Validation} value which wraps the function result
      */
     static <E, T, X extends Exception>
@@ -68,6 +71,7 @@ public interface Validation<E, T> {
      * Applicative function application.
      * @param vf function wrapped in a {@code Validation}
      * @param va function argument wrapped in a {@code Validation}
+     * @param <E>  error type
      * @param <A> function argument type
      * @param <B> function return type
      * @return the result of applying the function to the argument, wrapped in a {@code Validation}
@@ -80,6 +84,7 @@ public interface Validation<E, T> {
      * Standard applicative traversal.
      * @param lt list of values
      * @param f function to be applied to each value in the list
+     * @param <E>  error type
      * @param <T> type of list elements
      * @param <U> type wrapped by the {@code Try} returned by the function
      * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
@@ -95,6 +100,7 @@ public interface Validation<E, T> {
      * Standard applicative traversal.
      * @param lt list of values
      * @param f function to be applied to each value in the list
+     * @param <E>  error type
      * @param <T> type of list elements
      * @param <U> type wrapped by the {@code Try} returned by the function
      * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
@@ -110,6 +116,7 @@ public interface Validation<E, T> {
     /**
      * Standard applicative sequencing.
      * @param lvt list of {@code Validation} values
+     * @param <E>  error type
      * @param <T> type of list elements
      * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
      */
@@ -123,6 +130,7 @@ public interface Validation<E, T> {
     /**
      * Standard applicative sequencing.
      * @param lvt list of {@code Validation} values
+     * @param <E>  error type
      * @param <T> type of list elements
      * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
      */
@@ -135,7 +143,7 @@ public interface Validation<E, T> {
     }
 
     /**
-     * Indicates if this value is a {code Success} value.
+     * Indicates if this is a {code Success} value.
      * @return true if this value is a {code Success} value
      */
     boolean isSuccess();
@@ -213,7 +221,7 @@ public interface Validation<E, T> {
         public final T value;
 
         public Success(T value) {
-            this.value = value;
+            this.value = Objects.requireNonNull(value);
         }
 
         @Override
@@ -261,7 +269,7 @@ public interface Validation<E, T> {
         public final IList<E> errors;
 
         public Failure(IList<E> errors) {
-            this.errors = errors;
+            this.errors = Objects.requireNonNull(errors);
         }
 
         @Override
