@@ -1,8 +1,8 @@
 package org.funcj.control;
 
 import org.funcj.data.IList;
+import org.funcj.util.*;
 import org.funcj.util.Functions.*;
-import org.funcj.util.FunctionsEx;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -64,29 +64,59 @@ public interface Try<T> {
 
     /**
      * Standard applicative traversal.
-     * @param lt list of {@code Try} values
-     * @param f function to be applied to each {@code Try} in the list
+     * @param lt list of values
+     * @param f function to be applied to each value in the list
      * @param <T> type of list elements
      * @param <U> type wrapped by the {@code Try} returned by the function
      * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
         return lt.foldRight(
-                (t, tlt) -> f.apply(t).apply(tlt.map(l -> l::add)),
+                (t, tlu) -> f.apply(t).apply(tlu.map(lu -> lu::add)),
                 success(IList.nil())
         );
     }
 
     /**
+     * Standard applicative traversal.
+     * @param lt list of values
+     * @param f function to be applied to each value in the list
+     * @param <T> type of list elements
+     * @param <U> type wrapped by the {@code Try} returned by the function
+     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     */
+    static <T, U> Try<List<U>> traverse(List<T> lt, F<T, Try<U>> f) {
+        return Folds.foldRight(
+                (t, tlt) -> f.apply(t).apply(tlt.map(lu -> u -> {lu.add(u); return lu;})),
+                success(new ArrayList<>()),
+                lt
+        );
+    }
+
+    /**
      * Standard applicative sequencing.
-     * @param lt list of {@code Try} values
+     * @param ltt list of {@code Try} values
      * @param <T> type of list elements
      * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
-    static <T> Try<IList<T>> sequence(IList<Try<T>> lt) {
-        return lt.foldRight(
-            (tt, tlt) -> tt.apply(tlt.map(l -> l::add)),
+    static <T> Try<IList<T>> sequence(IList<Try<T>> ltt) {
+        return ltt.foldRight(
+            (tt, tlt) -> tt.apply(tlt.map(lt -> lt::add)),
             success(IList.nil())
+        );
+    }
+
+    /**
+     * Standard applicative sequencing.
+     * @param ltt list of {@code Try} values
+     * @param <T> type of list elements
+     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     */
+    static <T> Try<List<T>> sequence(List<Try<T>> ltt) {
+        return Folds.foldRight(
+                (tt, tlt) -> tt.apply(tlt.map(lt -> t -> {lt.add(t); return lt;})),
+                success(new ArrayList<>()),
+                ltt
         );
     }
 
@@ -97,6 +127,13 @@ public interface Try<T> {
     boolean isSuccess();
 
     /**
+     * Downgrade this value into an {@link java.util.Optional}.
+     * @return a populated {@code Optional} value if this is a {Code Success} value,
+     * otherwise an empty {@code Optional}
+     */
+    Optional<T> asOptional();
+
+    /**
      * Either return the wrapped value if it's a {@code Success}, otherwise return the supplied default value.
      * @param defaultValue value to be returned if this is a failure value.
      * @return the success result value if it's a {@code Success}, otherwise return the supplied default value.
@@ -104,14 +141,14 @@ public interface Try<T> {
     T getOrElse(T defaultValue);
 
     /**
-     * Either return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
+     * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
      * @return the wrapped value if it's a {@code Success}
      * @throws Exception if the wrapped value is a {@code Failure}
      */
     T getOrThrow() throws Exception;
 
     /**
-     * Similar to getOrThrow but will throw a RuntimeException.
+     * Return the wrapped value if it's a {@code Success}, otherwise throw a RuntimeException.
      * @return the wrapped value if it's a {@code Success}
      */
     T get();
@@ -124,19 +161,18 @@ public interface Try<T> {
     void handle(Consumer<Success<T>> success, Consumer<Failure<T>> failure);
 
     /**
-     * Poor-man's pattern matching.
      * Apply one of two functions to this value, according to the type of value.
      * @param success function to be applied to {@code Success} values
      * @param failure function to be applied to {@code Failure} values
      * @param <R> return type of functions
-     * @return the result of applying the function
+     * @return the result of applying either function
      */
     <R> R match(F<Success<T>, ? extends R> success, F<Failure<T>, ? extends R> failure);
 
     /**
      * Functor function application.
-     * If this value is a success then apply the function to the value,
-     * otherwise if this is a failure then leave it untouched.
+     * If this value is a {@code Success} then apply the function to the value,
+     * otherwise if this is a {@code Failure} then leave it untouched.
      * @param f function to be applied
      * @param <R> function return type
      * @return a {@code Try} that wraps the function result, or the original failure
@@ -145,11 +181,11 @@ public interface Try<T> {
 
     /**
      * Applicative function application (inverted).
-     * If the {@code tf} parameter is a {@code Success} and this is a {@code Success},
+     * If the {@code tf} parameter is a {@code Success} value and this is a {@code Success} value,
      * then apply the function wrapped in the {@code tf} to this.
      * @param tf function wrapped in a {@code Try}
      * @param <R> return type of function
-     * @return a {@code Try} wrapping the result of applying the function, or a {@code Failure}.
+     * @return a {@code Try} wrapping the result of applying the function, or a {@code Failure} value
      */
     <R> Try<R> apply(Try<F<T, R>> tf);
 
@@ -172,13 +208,6 @@ public interface Try<T> {
     default <R> Try<R> flatMap(F0<Try<R>> f) {
         return flatMap(u -> f.apply());
     }
-
-    /**
-     * Downgrade this value into an {@link java.util.Optional}.
-     * @return a populated {@code Optional} value if this is a {Code Success},
-     * otherwise an empty {@code Optional}
-     */
-    Optional<T> asOptional();
 
     /**
      * Builder API for chaining together n {@code Try}s,

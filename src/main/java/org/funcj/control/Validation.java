@@ -1,10 +1,10 @@
 package org.funcj.control;
 
 import org.funcj.data.IList;
+import org.funcj.util.*;
 import org.funcj.util.Functions.*;
-import org.funcj.util.FunctionsGenEx;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -78,30 +78,59 @@ public interface Validation<E, T> {
 
     /**
      * Standard applicative traversal.
-     * @param lt list of {@code Validation} values
-     * @param f function to be applied to each {@code Validation} in the list
+     * @param lt list of values
+     * @param f function to be applied to each value in the list
      * @param <T> type of list elements
      * @param <U> type wrapped by the {@code Try} returned by the function
      * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, T, U> Validation<E, IList<U>> traverse(IList<T> lt, F<T, Validation<E, U>> f) {
         return lt.foldRight(
-                (t, tlt) -> f.apply(t).apply(tlt.map(l -> l::add)),
+                (t, vlu) -> f.apply(t).apply(vlu.map(lu -> lu::add)),
+                success(IList.nil())
+        );
+    }
+
+    /**
+     * Standard applicative traversal.
+     * @param lt list of values
+     * @param f function to be applied to each value in the list
+     * @param <T> type of list elements
+     * @param <U> type wrapped by the {@code Try} returned by the function
+     * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
+     */
+    static <E, T, U> Validation<E, List<U>> traverse(List<T> lt, F<T, Validation<E, U>> f) {
+        return Folds.foldRight(
+                (t, vlu) -> f.apply(t).apply(vlu.map(lu -> u -> {lu.add(u); return lu;})),
+                success(new ArrayList<>()),
+                lt
+        );
+    }
+
+    /**
+     * Standard applicative sequencing.
+     * @param lvt list of {@code Validation} values
+     * @param <T> type of list elements
+     * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
+     */
+    static <E, T> Validation<E, IList<T>> sequence(IList<Validation<E, T>> lvt) {
+        return lvt.foldRight(
+                (vt, vlt) -> vt.apply(vlt.map(lt -> lt::add)),
                 success(IList.nil())
         );
     }
 
     /**
      * Standard applicative sequencing.
-     * @param lt list of {@code Validation} values
+     * @param lvt list of {@code Validation} values
      * @param <T> type of list elements
      * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
      */
-
-    static <E, T> Validation<E, IList<T>> sequence(IList<Validation<E, T>> lt) {
-        return lt.foldRight(
-                (tt, tlt) -> tt.apply(tlt.map(l -> l::add)),
-                success(IList.nil())
+    static <E, T> Validation<E, List<T>> sequence(List<Validation<E, T>> lvt) {
+        return Folds.foldRight(
+                (vt, vlt) -> vt.apply(vlt.map(lu -> u -> {lu.add(u); return lu;})),
+                success(new ArrayList<>()),
+                lvt
         );
     }
 
@@ -112,6 +141,13 @@ public interface Validation<E, T> {
     boolean isSuccess();
 
     /**
+     * Downgrade this value into an {@link java.util.Optional}.
+     * @return a populated {@code Optional} value if this is a {Code Success} value,
+     * otherwise an empty {@code Optional}
+     */
+    Optional<T> asOptional();
+
+    /**
      * Push the result to a {@link java.util.function.Consumer}.
      * @param success consumer to be applied to {@code Success} values
      * @param failure consumer to be applied to {@code Failure} values
@@ -119,19 +155,18 @@ public interface Validation<E, T> {
     void handle(Consumer<Success<E, T>> success, Consumer<Failure<E, T>> failure);
 
     /**
-     * Poor-man's pattern matching.
      * Apply one of two functions to this value, according to the type of value.
      * @param success function to be applied to {@code Success} values
      * @param failure function to be applied to {@code Failure} values
      * @param <R> return type of functions
-     * @return the result of applying the function
+     * @return the result of applying either function
      */
     <R> R match(F<Success<E, T>, R> success, F<Failure<E, T>, R> failure);
 
     /**
      * Functor function application.
-     * If this value is a success then apply the function to the value,
-     * otherwise if thjis is a failure then leave it untouched.
+     * If this value is a {@code Success} then apply the function to the value,
+     * otherwise if this is a {@code Failure} then leave it untouched.
      * @param f function to be applied
      * @param <R> function return type
      * @return a {@code Validation} that wraps the function result, or the original failure
@@ -140,11 +175,11 @@ public interface Validation<E, T> {
 
     /**
      * Applicative function application (inverted).
-     * If the {@code vf} parameter is a {@code Success} and this is a {@code Success},
+     * If the {@code vf} parameter is a {@code Success} value and this is a {@code Success} value,
      * then apply the function wrapped in the {@code tf} to this.
      * @param vf function wrapped in a {@code Validation}
      * @param <R> return type of function
-     * @return a {@code Validation} wrapping the result of applying the function, or a {@code Failure}.
+     * @return a {@code Validation} wrapping the result of applying the function, or a {@code Failure} value
      */
     <R> Validation<E, R> apply(Validation<E, F<T, R>> vf);
 
@@ -168,13 +203,6 @@ public interface Validation<E, T> {
     default <U> ApplyBuilder._2<E, T, U> and(Validation<E, U> vb) {
         return new ApplyBuilder._2<E, T, U>(this, vb);
     }
-
-    /**
-     * Downgrade this value into an {@link java.util.Optional}.
-     * @return a populated {@code Optional} value if this is a {Code Success},
-     * otherwise an empty {@code Optional}
-     */
-    Optional<T> asOptional();
 
     /**
      * Success type
