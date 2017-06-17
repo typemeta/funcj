@@ -7,7 +7,19 @@ import java.util.Optional;
 
 public abstract class TestBase {
 
+    protected static final boolean printData = true;
+
     protected abstract <T> void roundTrip(T val, Class<T> clazz);
+
+    @Test
+    public void testCommonNulls() {
+        roundTrip(new CommonData(), CommonData.class);
+    }
+
+    @Test
+    public void testCommon() {
+        roundTrip(new CommonData(Init.INIT), CommonData.class);
+    }
 
     @Test
     public void testBooleanNulls() {

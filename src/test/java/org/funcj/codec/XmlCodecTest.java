@@ -30,8 +30,8 @@ public class XmlCodecTest extends TestBase {
 
         final T val2 = codec.decode(clazz, elem);
 
-        if (!val.equals(val2)) {
-            java.lang.System.out.println(nodeToString(doc, true));
+        if (printData || !val.equals(val2)) {
+            java.lang.System.out.println(nodeToString(elem, true));
         }
 
         Assert.assertEquals(val, val2);

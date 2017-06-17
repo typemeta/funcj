@@ -9,7 +9,7 @@ import java.io.*;
 import java.util.Optional;
 
 public class XmlUtils {
-    public static String nodeToString(Document doc, boolean pretty) {
+    public static String nodeToString(Node node, boolean pretty) {
         try {
             final Transformer tf = TransformerFactory.newInstance().newTransformer();
             tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -19,7 +19,7 @@ public class XmlUtils {
             }
 
             final Writer out = new StringWriter();
-            tf.transform(new DOMSource(doc), new StreamResult(out));
+            tf.transform(new DOMSource(node), new StreamResult(out));
             return out.toString();
         } catch (TransformerException ex) {
             throw new XmlCodecException(ex);

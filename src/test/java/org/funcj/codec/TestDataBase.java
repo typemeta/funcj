@@ -5,6 +5,57 @@ import java.util.*;
 import static org.funcj.codec.TestDataUtils.*;
 
 public class TestDataBase {
+
+    public static class CommonData {
+        public static class Empty {
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                return o != null && getClass() == o.getClass();
+            }
+
+            @Override
+            public String toString() {
+                return "Empty{}";
+            }
+        }
+
+        private final Empty empty;
+        private final Optional<Empty> optEmptyE;
+        private final Optional<Empty> optEmptyF;
+
+        public CommonData() {
+            this.empty = null;
+            this.optEmptyE = null;
+            this.optEmptyF = null;
+        }
+
+        public CommonData(Init init) {
+            this.empty = new Empty();
+            this.optEmptyE = Optional.empty();
+            this.optEmptyF = Optional.of(new Empty());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CommonData commonData = (CommonData) o;
+            return Objects.equals(empty, commonData.empty) &&
+                    Objects.equals(optEmptyE, commonData.optEmptyE) &&
+                    Objects.equals(optEmptyF, commonData.optEmptyF);
+        }
+
+        @Override
+        public String toString() {
+            return "Common{" +
+                    "empty=" + empty +
+                    ", optEmptyE=" + optEmptyE +
+                    ", optEmptyF=" + optEmptyF +
+                    '}';
+        }
+    }
+
     enum Init {INIT}
 
     static class Base<T> {
@@ -152,11 +203,6 @@ public class TestDataBase {
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), val, valArr);
-        }
-
-        @Override
         public String toString() {
             return "BoolData{" +
                     "val=" + val +
@@ -217,11 +263,6 @@ public class TestDataBase {
             if (!Objects.equals(listVal, rhs.listVal)) return false;
             if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
             return super.equals(rhs);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), val, valArr);
         }
 
         @Override
@@ -288,11 +329,6 @@ public class TestDataBase {
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), val, valArr);
-        }
-
-        @Override
         public String toString() {
             return "CharData{" +
                     "val=" + val +
@@ -353,11 +389,6 @@ public class TestDataBase {
             if (!Objects.equals(listVal, rhs.listVal)) return false;
             if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
             return super.equals(rhs);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), val, valArr);
         }
 
         @Override
@@ -424,11 +455,6 @@ public class TestDataBase {
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), val, valArr);
-        }
-
-        @Override
         public String toString() {
             return "IntegerData{" +
                     "val=" + val +
@@ -489,11 +515,6 @@ public class TestDataBase {
             if (!Objects.equals(listVal, rhs.listVal)) return false;
             if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
             return super.equals(rhs);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), val, valArr);
         }
 
         @Override
@@ -560,11 +581,6 @@ public class TestDataBase {
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), val, valArr);
-        }
-
-        @Override
         public String toString() {
             return "FloatData{" +
                     "val=" + val +
@@ -625,11 +641,6 @@ public class TestDataBase {
             if (!Objects.equals(listVal, rhs.listVal)) return false;
             if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
             return super.equals(rhs);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), val, valArr);
         }
 
         @Override

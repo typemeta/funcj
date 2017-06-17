@@ -39,6 +39,11 @@ public class XmlCodecCore extends CodecCore<Element> {
         return "value";
     }
 
+
+    public String metaAttrName() {
+        return "meta";
+    }
+
     public Element addEntryElement(Element parent) {
         return addElement(parent, entryElemName());
     }
@@ -49,14 +54,17 @@ public class XmlCodecCore extends CodecCore<Element> {
     }
 
     protected final Codec.NullCodec<Element> nullCodec = new Codec.NullCodec<Element>() {
+
+        private static final String nullAttrVal = "null";
+
         @Override
         public boolean isNull(Element enc) {
-            return !enc.hasChildNodes() && !enc.hasAttributes();
+            return XmlUtils.getAttrValue(enc, metaAttrName()).equals(nullAttrVal);
         }
 
         @Override
         public Element encode(Object val, Element enc) {
-            return enc;
+            return XmlUtils.setAttrValue(enc, metaAttrName(), nullAttrVal);
         }
 
         @Override
