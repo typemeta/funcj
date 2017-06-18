@@ -122,6 +122,16 @@ public abstract class TestBase {
     }
 
     @Test
+    public void testCustomNulls() {
+        roundTrip(new Custom(), Custom.class);
+    }
+
+    @Test
+    public void testCustom() {
+        roundTrip(new Custom(Init.INIT), Custom.class);
+    }
+
+    @Test
     public void testRecursive() {
         final Recursive rec = new Recursive(null, 0);
         roundTrip(rec, Recursive.class);

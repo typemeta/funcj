@@ -1,5 +1,6 @@
 package org.funcj.codec;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.funcj.codec.TestDataUtils.*;
@@ -748,6 +749,40 @@ public class TestDataBase {
             Recursive recursive = (Recursive) o;
             return id == recursive.id &&
                     Objects.equals(next, recursive.next);
+        }
+    }
+
+    static class Custom {
+        enum Colour {RED, GREEN, BLUE};
+
+        final Colour colour;
+        final LocalDate date;
+
+        Custom() {
+            this.colour = null;
+            this.date = null;
+        }
+
+        Custom(Init init) {
+            this.colour = Colour.GREEN;
+            this.date = LocalDate.now();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Custom custom = (Custom) o;
+            return colour == custom.colour &&
+                    Objects.equals(date, custom.date);
+        }
+
+        @Override
+        public String toString() {
+            return "Custom{" +
+                    "colour=" + colour +
+                    ", date=" + date +
+                    '}';
         }
     }
 }

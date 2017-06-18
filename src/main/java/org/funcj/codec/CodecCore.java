@@ -4,12 +4,13 @@ import org.funcj.codec.utils.ReflectionUtils;
 import org.funcj.control.Exceptions;
 
 import java.lang.reflect.*;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.funcj.codec.TypeConstructor.createTypeConstructor;
 
 /**
- * Base class for implementations which implement a specific encoing.
+ * Base class for classes which implement a specific encoding.
  * @param <E> encoded type
  */
 public abstract class CodecCore<E> {
@@ -20,6 +21,7 @@ public abstract class CodecCore<E> {
 
     protected CodecCore() {
         registerCodec(Class.class, new Codecs.ClassCodec(this));
+        registerCodec(LocalDate.class, new Codecs.LocalDateCodec(this));
     }
 
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, E> codec) {
@@ -48,7 +50,7 @@ public abstract class CodecCore<E> {
 
     public abstract RuntimeException wrapException(Exception ex);
 
-    public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
+    public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz)     {
         final String name = classToName(clazz);
         return (TypeConstructor<T>)typeCtors.computeIfAbsent(
                 name,
