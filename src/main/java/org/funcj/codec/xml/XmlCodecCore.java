@@ -3,7 +3,6 @@ package org.funcj.codec.xml;
 import org.funcj.codec.*;
 import org.funcj.control.Exceptions;
 import org.funcj.util.Folds;
-import org.funcj.util.Functions.F;
 import org.w3c.dom.*;
 
 import java.lang.reflect.*;

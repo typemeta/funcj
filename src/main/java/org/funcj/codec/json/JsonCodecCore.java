@@ -4,12 +4,9 @@ import org.funcj.codec.*;
 import org.funcj.control.Exceptions;
 import org.funcj.json.*;
 import org.funcj.util.*;
-import org.funcj.util.Functions.F;
 
 import java.lang.reflect.Array;
 import java.util.*;
-
-import static java.util.stream.Collectors.toList;
 
 public class JsonCodecCore extends CodecCore<JSValue> {
 

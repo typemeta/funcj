@@ -1,6 +1,6 @@
 package org.funcj.codec.xml;
 
-import org.funcj.codec.*;
+import org.funcj.codec.Codecs;
 import org.w3c.dom.Element;
 
 import java.util.Optional;
