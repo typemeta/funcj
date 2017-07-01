@@ -3,6 +3,7 @@ package org.funcj.codec;
 import org.funcj.codec.TestDataBase.*;
 import org.junit.Test;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 public abstract class TestBase {
@@ -119,6 +120,17 @@ public abstract class TestBase {
     @Test
     public void testNoEmptyCtor() {
         roundTrip(NoEmptyCtor.create(true), NoEmptyCtor.class);
+    }
+
+    static <E> void registerLocalDateCodec(CodecCore<E> core) {
+        core.registerCodec(
+                LocalDate.class,
+                ObjectCodecBuilder.of(LocalDate.class, core)
+                    .field("year", LocalDate::getYear, Integer.class)
+                    .field("month", LocalDate::getMonthValue, Integer.class)
+                    .field("day", LocalDate::getDayOfMonth, Integer.class)
+                    .map(LocalDate::of)
+        );
     }
 
     @Test

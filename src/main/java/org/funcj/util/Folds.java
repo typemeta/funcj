@@ -9,22 +9,32 @@ import java.util.List;
  */
 public abstract class Folds {
     /**
-     * Left-fold a function over an Iterable.
+     * Left-fold a function over an {@link java.lang.Iterable}.
+     * @param f binary function to be applied for the fold
+     * @param z starting value for the fold
+     * @param iter Iterable to be folded over
+     * @param <T> iterable element type
+     * @param <R> result type of fold operation
+     * @return the folded value
      */
-    public static <T, R> R foldLeft(F2<R, T, R> f, R z, Iterable<T> ts) {
+    public static <T, R> R foldLeft(F2<R, T, R> f, R z, Iterable<T> iter) {
         R acc = z;
-        for (T t : ts) {
+        for (T t : iter) {
             acc = f.apply(acc, t);
         }
         return acc;
     }
 
     /**
-     * Left-fold a function over a non-empty Iterable.
-     */
-    public static <T> T foldLeft1(Op2<T> f, Iterable<T> ts) {
+     * Left-fold a function over a non-empty {@link java.lang.Iterable}.
+     * @param f binary operator to be applied for the fold
+     * @param iter Iterable to be folded over
+     * @param <T> iterable element type
+     * @return the folded value
+     * */
+    public static <T> T foldLeft1(Op2<T> f, Iterable<T> iter) {
         T acc = null;
-        for (T t : ts) {
+        for (T t : iter) {
             if (acc == null) {
                 acc = t;
             } else {
@@ -35,7 +45,7 @@ public abstract class Folds {
     }
 
     /**
-     * Right-fold a function over an {@code List}.
+     * Right-fold a function over an {@link java.util.List}.
      */
     public static <T, R> R foldRight(F2<T, R, R> f, R z, List<T> ts) {
         R acc = z;
@@ -46,7 +56,7 @@ public abstract class Folds {
     }
 
     /**
-     * Right-fold a function over an {@code List}.
+     * Right-fold a function over an {@link java.util.List}.
      */
     public static <T> T foldRight1(Op2<T> f, List<T> ts) {
         final int i0 = ts.size() - 1;

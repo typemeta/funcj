@@ -47,7 +47,7 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Construct a list from an Iterable.
+     * Construct a list from an {@link java.lang.Iterable}.
      * @param <T> element type
      */
     public static <T> IList<T> ofIterable(Iterable<T> elems) {
@@ -83,7 +83,7 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Convert a list of Characters into a String.
+     * Convert a list of {@link java.lang.Character}s into a {@link java.lang.String}.
      */
     public static String listToString(IList<Character> l) {
         final StringBuilder sb = new StringBuilder();
@@ -94,7 +94,7 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Convert a String into a list of Characters.
+     * Convert a {@link java.lang.String} into a list of {@link java.lang.Character}s.
      */
     public static IList<Character> stringToList(String s) {
         IList<Character> r = nil();
@@ -129,7 +129,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Returns Optional.empty() if this list is empty,
-     * otherwise it returns an Optional which wraps the non-empty list.
+     * otherwise it returns an {@link java.util.Optional} which wraps the non-empty list.
      */
     public abstract Optional<NonEmpty<T>> nonEmpty();
 
@@ -140,7 +140,7 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract T head();
 
     /**
-     * @return the head of this list or Option.empty.
+     * @return the head of this list or an empty {@link java.util.Optional}.
      */
     public abstract Optional<T> headOpt();
 
@@ -151,7 +151,7 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract IList<T> tail();
 
     /**
-     * @return the tail of this list or Option.empty.
+     * @return the tail of this list or an empty {@link java.util.Optional}.
      */
     public abstract Optional<IList<T>> tailOpt();
 
@@ -162,7 +162,7 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract T get(int index);
 
     /**
-     * Append the contents of this list to a StringBuilder.
+     * Append the contents of this list to a {@link java.lang.StringBuilder}.
      * @param sb the StringBuilder to be appended to
      * @return the StringBuilder
      */
@@ -245,13 +245,13 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract T foldLeft1(Op2<T> f);
 
     /**
-     * Create a spliterator.
+     * Create a {@link java.util.Spliterator}.
      * @return the spliterator
      */
     public abstract Spliterator<T> spliterator();
 
     /**
-     * Create a Stream onto this list.
+     * Create a {@link java.util.stream.Stream} onto this list.
      * @return the stream
      */
     public Stream<T> stream() {
@@ -259,7 +259,7 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Create a parallel Stream onto this list.
+     * Create a parallel {@link java.util.stream.Stream} onto this list.
      * @return the stream
      */
     public Stream<T> parallelStream() {
@@ -267,7 +267,7 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Create an iterator over this list.
+     * Create an {@link java.util.Iterator} over this list.
      * @return the iterator
      */
     public abstract Iterator<T> iterator();

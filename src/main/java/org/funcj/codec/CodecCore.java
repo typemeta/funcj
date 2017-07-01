@@ -2,11 +2,14 @@ package org.funcj.codec;
 
 import org.funcj.codec.utils.ReflectionUtils;
 import org.funcj.control.Exceptions;
+import org.funcj.util.Functions.F;
 
 import java.lang.reflect.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.*;
 
+import static java.util.stream.Collectors.toList;
 import static org.funcj.codec.TypeConstructor.createTypeConstructor;
 
 /**
@@ -299,7 +302,7 @@ public abstract class CodecCore<E> {
     }
 
     public <T> Codec<T, E> createObjectCodec(Class<T> type) {
-        final Map<String, FieldCodec<E>> fieldCodecs = new LinkedHashMap<>();
+        final Map<String, FieldCodec> fieldCodecs = new LinkedHashMap<>();
         Class<?> clazz = type;
         for (int depth = 0; !clazz.equals(Object.class); depth++) {
             final Field[] fields = clazz.getDeclaredFields();
@@ -313,12 +316,151 @@ public abstract class CodecCore<E> {
             clazz = clazz.getSuperclass();
         }
 
-        return createObjectCodec(type, fieldCodecs);
+        return createObjectCodec(fieldCodecs);
     }
 
-    public abstract <T> Codec<T, E> createObjectCodec(
-            Class<T> type,
-            Map<String, FieldCodec<E>> fieldCodecs);
+    public static abstract class ObjectMeta<T, E> implements Iterable<ObjectMeta.Field<T, E>>{
+        public interface ResultAccumlator<T> {
+            T construct();
+        }
+
+        public interface Field<T, E> {
+            String name();
+            E encodeField(T val, E enc);
+            ResultAccumlator<T> decodeField(ResultAccumlator<T> acc, E enc);
+        }
+
+        public abstract ResultAccumlator<T> startDecode(Class<T> type);
+
+        public Stream<Field<T, E>> stream() {
+            return StreamSupport.stream(spliterator(), false);
+        }
+
+        public abstract int size();
+
+    }
+
+    public <T> Codec<T, E> createObjectCodec(Map<String, FieldCodec> fieldCodecs) {
+        final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
+            final T val;
+
+            ResultAccumlatorImpl(Class<T> type) {
+                this.val = Exceptions.wrap(
+                        () -> getTypeConstructor(type).construct(),
+                        CodecCore.this::wrapException);
+            }
+
+            @Override
+            public T construct() {
+                return val;
+            }
+        }
+
+        final List<ObjectMeta.Field<T, E>> fieldMetas = fieldCodecs.entrySet().stream()
+                .map(en -> {
+                    final String name = en.getKey();
+                    final FieldCodec<E> codec = en.getValue();
+                    return (ObjectMeta.Field<T, E>)new ObjectMeta.Field<T, E>() {
+                        @Override
+                        public String name() {
+                            return name;
+                        }
+
+                        @Override
+                        public E encodeField(T val, E enc) {
+                            return codec.encodeField(val, enc);
+                        }
+
+                        @Override
+                        public ObjectMeta.ResultAccumlator<T> decodeField(ObjectMeta.ResultAccumlator<T> acc, E enc) {
+                            codec.decodeField(((ResultAccumlatorImpl)acc).val, enc);
+                            return acc;
+                        }
+                    };
+                }).collect(toList());
+
+        return createObjectCodec(new ObjectMeta<T, E>() {
+
+            @Override
+            public Iterator<Field<T, E>> iterator() {
+                return fieldMetas.iterator();
+            }
+
+            @Override
+            public ResultAccumlator<T> startDecode(Class<T> type) {
+                return new ResultAccumlatorImpl(type);
+            }
+
+            @Override
+            public int size() {
+                return fieldMetas.size();
+            }
+        });
+    }
+
+    public <T> Codec<T, E> createObjectCodec(
+            Map<String, ObjectCodecBuilder.FieldCodec<T, E>> fieldCodecs,
+            F<Object[], T> ctor) {
+        final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
+            final Object[] ctorArgs;
+            int i = 0;
+
+            ResultAccumlatorImpl(Class<T> type) {
+                this.ctorArgs = new Object[fieldCodecs.size()];
+            }
+
+            @Override
+            public T construct() {
+                return ctor.apply(ctorArgs);
+            }
+        }
+
+
+        final List<ObjectMeta.Field<T, E>> fieldMetas = fieldCodecs.entrySet().stream()
+                .map(en -> {
+                    final String name = en.getKey();
+                    final ObjectCodecBuilder.FieldCodec<T, E> codec = en.getValue();
+                    return (ObjectMeta.Field<T, E>)new ObjectMeta.Field<T, E>() {
+                        @Override
+                        public String name() {
+                            return name;
+                        }
+
+                        @Override
+                        public E encodeField(T val, E enc) {
+                            return codec.encodeField(val, enc);
+                        }
+
+                        @Override
+                        public ObjectMeta.ResultAccumlator<T> decodeField(ObjectMeta.ResultAccumlator<T> acc, E enc) {
+                            final ResultAccumlatorImpl acc2 = (ResultAccumlatorImpl)acc;
+                            acc2.ctorArgs[acc2.i++] = codec.decodeField(enc);
+                            return acc;
+                        }
+                    };
+                }).collect(toList());
+
+
+        return createObjectCodec(new ObjectMeta<T, E>() {
+
+            @Override
+            public Iterator<Field<T, E>> iterator() {
+                return fieldMetas.iterator();
+            }
+
+            @Override
+            public ResultAccumlator<T> startDecode(Class<T> type) {
+                return new ResultAccumlatorImpl(type);
+            }
+
+            @Override
+            public int size() {
+                return fieldMetas.size();
+            }
+        });
+    }
+
+    public abstract <T> Codec<T, E> createObjectCodec(ObjectMeta<T, E> objMeta);
 
     public String getFieldName(Field field, int depth, Set<String> existingNames) {
         String name = field.getName();
@@ -328,7 +470,7 @@ public abstract class CodecCore<E> {
         return name;
     }
 
-    public <T> FieldCodec<E> getFieldCodec(Field field) {
+    public <T> FieldCodec getFieldCodec(Field field) {
         final Class<T> stcType = (Class<T>)field.getType();
         if (stcType.isPrimitive()) {
             if (stcType.equals(boolean.class)) {

@@ -3,9 +3,13 @@ package org.funcj.codec.json;
 import org.funcj.codec.*;
 import org.funcj.control.Exceptions;
 import org.funcj.json.*;
+import org.funcj.util.*;
+import org.funcj.util.Functions.F;
 
 import java.lang.reflect.Array;
 import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 public class JsonCodecCore extends CodecCore<JSValue> {
 
@@ -615,28 +619,27 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     }
 
     @Override
-    public <T> Codec<T, JSValue> createObjectCodec(
-            Class<T> type,
-            Map<String, FieldCodec<JSValue>> fieldCodecs) {
+    public <T> Codec<T, JSValue> createObjectCodec(ObjectMeta<T, JSValue> objMeta) {
         return new Codec<T, JSValue>() {
 
             @Override
             public JSValue encode(T val, JSValue enc) {
-                final List<JSObject.Field> fields = new ArrayList<>(fieldCodecs.size());
-                fieldCodecs.forEach((name, codec) -> fields.add(JSObject.field(name, codec.encodeField(val, enc))));
+                final List<JSObject.Field> fields =
+                        Functors.map(
+                                field -> JSObject.field(field.name(), field.encodeField(val, enc)),
+                                objMeta
+                        );
                 return JSObject.of(fields);
             }
 
             @Override
             public T decode(Class<T> dynType, JSValue enc) {
                 final JSObject objNode = enc.asObject();
-                final T val = Exceptions.wrap(
-                        () -> getTypeConstructor(dynType).construct(),
-                        ex -> wrapException(ex));
-                fieldCodecs.forEach((name, codec) -> {
-                    codec.decodeField(val, objNode.get(name));
-                });
-                return val;
+                return Folds.foldLeft(
+                        (acc, field) -> field.decodeField(acc, objNode.get(field.name())),
+                        objMeta.startDecode(dynType),
+                        objMeta
+                ).construct();
             }
         };
     }

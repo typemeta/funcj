@@ -2,6 +2,8 @@ package org.funcj.codec.xml;
 
 import org.funcj.codec.*;
 import org.funcj.control.Exceptions;
+import org.funcj.util.Folds;
+import org.funcj.util.Functions.F;
 import org.w3c.dom.*;
 
 import java.lang.reflect.*;
@@ -693,27 +695,24 @@ public class XmlCodecCore extends CodecCore<Element> {
     }
 
     @Override
-    public <T> Codec<T, Element> createObjectCodec(
-            Class<T> type,
-            Map<String, FieldCodec<Element>> fieldCodecs) {
+    public <T> Codec<T, Element> createObjectCodec(ObjectMeta<T, Element> objMeta) {
         return new Codec<T, Element>() {
+
             @Override
             public Element encode(T val, Element enc) {
-                fieldCodecs.forEach((name, codec) -> {
-                    codec.encodeField(val, addElement(enc, name));
+                objMeta.forEach(field -> {
+                    field.encodeField(val, addElement(enc, field.name()));
                 });
                 return enc;
             }
 
             @Override
             public T decode(Class<T> dynType, Element enc) {
-                final T val = Exceptions.wrap(
-                        () -> getTypeConstructor(dynType).construct(),
-                        ex -> wrapException(ex));
-                fieldCodecs.forEach((name, codec) -> {
-                    codec.decodeField(val, firstChildElement(enc, name));
-                });
-                return val;
+                return Folds.foldLeft(
+                        (acc, field) -> field.decodeField(acc, firstChildElement(enc, field.name())),
+                        objMeta.startDecode(dynType),
+                        objMeta
+                ).construct();
             }
         };
     }
