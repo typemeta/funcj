@@ -31,7 +31,7 @@ public abstract class Folds {
      * @param iter Iterable to be folded over
      * @param <T> iterable element type
      * @return the folded value
-     * */
+     */
     public static <T> T foldLeft1(Op2<T> f, Iterable<T> iter) {
         T acc = null;
         for (T t : iter) {
@@ -41,31 +41,47 @@ public abstract class Folds {
                 acc = f.apply(acc, t);
             }
         }
-        return acc;
+
+        if (acc == null) {
+            throw new IllegalArgumentException("Supplied Iterable argument is empty");
+        } else {
+            return acc;
+        }
     }
 
     /**
-     * Right-fold a function over an {@link java.util.List}.
+     *
+     * Right-fold a function over an {@link java.util.List}}
+     * @param f binary function to be applied for the fold
+     * @param z starting value for the fold
+     * @param l list to fold over
+     * @param <T> list element type
+     * @param <R> result type of fold operation
+     * @return the folded value
      */
-    public static <T, R> R foldRight(F2<T, R, R> f, R z, List<T> ts) {
+    public static <T, R> R foldRight(F2<T, R, R> f, R z, List<T> l) {
         R acc = z;
-        for (int i = ts.size() - 1; i >= 0; --i) {
-            acc = f.apply(ts.get(i), acc);
+        for (int i = l.size() - 1; i >= 0; --i) {
+            acc = f.apply(l.get(i), acc);
         }
         return acc;
     }
 
     /**
-     * Right-fold a function over an {@link java.util.List}.
+     * Right-fold a function over a non-empty {@link java.util.List}.
+     * @param f binary operator to be applied for the fold
+     * @param l {@code List} to fold over
+     * @param <T> list element type
+     * @return the folded value
      */
-    public static <T> T foldRight1(Op2<T> f, List<T> ts) {
-        final int i0 = ts.size() - 1;
+    public static <T> T foldRight1(Op2<T> f, List<T> l) {
+        final int i0 = l.size() - 1;
         T acc = null;
         for (int i = i0; i >= 0; --i) {
             if (i == i0) {
-                acc = ts.get(i);
+                acc = l.get(i);
             } else {
-                acc = f.apply(ts.get(i), acc);
+                acc = f.apply(l.get(i), acc);
             }
         }
         return acc;
