@@ -694,7 +694,7 @@ public class XmlCodecCore extends CodecCore<Element> {
     }
 
     @Override
-    public <T> Codec<T, Element> createObjectCodec(ObjectMeta<T, Element> objMeta) {
+    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, Element> createObjectCodec(ObjectMeta<T, Element, RA> objMeta) {
         return new Codec<T, Element>() {
 
             @Override

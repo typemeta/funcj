@@ -616,7 +616,9 @@ public class JsonCodecCore extends CodecCore<JSValue> {
     }
 
     @Override
-    public <T> Codec<T, JSValue> createObjectCodec(ObjectMeta<T, JSValue> objMeta) {
+    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, JSValue> createObjectCodec(
+            ObjectMeta<T, JSValue, RA> objMeta
+    ) {
         return new Codec<T, JSValue>() {
 
             @Override
