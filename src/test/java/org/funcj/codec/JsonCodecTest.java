@@ -12,6 +12,7 @@ public class JsonCodecTest extends TestBase {
     static {
         codec.registerTypeConstructor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));
         registerLocalDateCodec(codec);
+        registerCustomCodec(codec);
     }
 
     @Override

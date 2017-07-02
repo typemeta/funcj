@@ -8,6 +8,9 @@ import static org.funcj.codec.TestDataUtils.*;
 public class TestDataBase {
 
     public static class CommonData {
+        public enum Side {
+            LEFT, RIGHT
+        }
         public static class Empty {
             @Override
             public boolean equals(Object o) {
@@ -24,17 +27,20 @@ public class TestDataBase {
         private final Empty empty;
         private final Optional<Empty> optEmptyE;
         private final Optional<Empty> optEmptyF;
+        private final Optional<Side> side;
 
         public CommonData() {
             this.empty = null;
             this.optEmptyE = null;
             this.optEmptyF = null;
+            this.side = null;
         }
 
         public CommonData(Init init) {
             this.empty = new Empty();
             this.optEmptyE = Optional.empty();
             this.optEmptyF = Optional.of(new Empty());
+            this.side =  Optional.of(Side.LEFT);
         }
 
         @Override
@@ -44,7 +50,8 @@ public class TestDataBase {
             CommonData commonData = (CommonData) o;
             return Objects.equals(empty, commonData.empty) &&
                     Objects.equals(optEmptyE, commonData.optEmptyE) &&
-                    Objects.equals(optEmptyF, commonData.optEmptyF);
+                    Objects.equals(optEmptyF, commonData.optEmptyF) &&
+                    Objects.equals(side, commonData.side);
         }
 
         @Override
@@ -53,6 +60,7 @@ public class TestDataBase {
                     "empty=" + empty +
                     ", optEmptyE=" + optEmptyE +
                     ", optEmptyF=" + optEmptyF +
+                    ", side=" + side +
                     '}';
         }
     }
@@ -753,19 +761,37 @@ public class TestDataBase {
     }
 
     static class Custom {
+
         enum Colour {RED, GREEN, BLUE};
 
         final Colour colour;
         final LocalDate date;
+        final boolean flag;
+        final String name;
+        final double age;
+
+        Custom(Colour colour, LocalDate date, boolean flag, String name, double age) {
+            this.colour = colour;
+            this.date = date;
+            this.flag = flag;
+            this.name = name;
+            this.age = age;
+        }
 
         Custom() {
             this.colour = null;
             this.date = null;
+            this.flag = false;
+            this.name = null;
+            this.age = 0.0;
         }
 
         Custom(Init init) {
             this.colour = Colour.GREEN;
             this.date = LocalDate.now();
+            this.flag = true;
+            this.name = "zap";
+            this.age = 3.141592;
         }
 
         @Override
@@ -774,7 +800,9 @@ public class TestDataBase {
             if (o == null || getClass() != o.getClass()) return false;
             Custom custom = (Custom) o;
             return colour == custom.colour &&
-                    Objects.equals(date, custom.date);
+                    Objects.equals(date, custom.date) &&
+                    flag == custom.flag &&
+                    Objects.equals(name, custom.name);
         }
 
         @Override
@@ -782,6 +810,8 @@ public class TestDataBase {
             return "Custom{" +
                     "colour=" + colour +
                     ", date=" + date +
+                    ", flag=" + flag +
+                    ", name=" + name +
                     '}';
         }
     }

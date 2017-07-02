@@ -16,9 +16,13 @@ public class XmlCodecTest extends TestBase {
     public static final DocumentBuilder docBuilder;
 
     static {
-        docBuilder = (Exceptions.wrap(
-                () -> DocumentBuilderFactory.newInstance().newDocumentBuilder()));
+        docBuilder = Exceptions.wrap(
+                () -> DocumentBuilderFactory.newInstance().newDocumentBuilder());
+    }
+    static {
         codec.registerTypeConstructor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));
+        registerLocalDateCodec(codec);
+        registerCustomCodec(codec);
     }
 
     @Override
