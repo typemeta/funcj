@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public abstract class TestBase {
 
-    protected static final boolean printData = true;
+    protected static final boolean printData = false;
 
     protected abstract <T> void roundTrip(T val, Class<T> clazz);
 

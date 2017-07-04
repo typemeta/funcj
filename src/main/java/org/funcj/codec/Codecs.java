@@ -1,8 +1,17 @@
 package org.funcj.codec;
 
-import java.time.LocalDate;
+import org.funcj.util.Functions;
+import org.funcj.util.Functions.F;
+
+import java.time.*;
 
 public class Codecs {
+    public static <E> void registerAll(CodecCore<E> core) {
+        core.registerCodec(Class.class, new ClassCodec<E>(core));
+        core.registerCodec(LocalDate.class, new LocalDateCodec<E>(core));
+        core.registerCodec(OffsetDateTime.class, new OffsetDateTimeCodec<E>(core));
+    }
+
     public static abstract class CodecBase<T, E> implements Codec<T, E> {
 
         protected final CodecCore<E> core;
@@ -12,37 +21,52 @@ public class Codecs {
         }
     }
 
-    public static class ClassCodec<T, E> extends CodecBase<Class<T>, E> {
+    public static class ClassCodec<E> extends CodecBase<Class, E> {
 
         protected ClassCodec(CodecCore<E> core) {
             super(core);
         }
 
         @Override
-        public E encode(Class<T> val, E enc) {
+        public E encode(Class val, E enc) {
             return core.stringCodec().encode(core.classToName(val), enc);
         }
 
         @Override
-        public Class<T> decode(E enc) {
+        public Class decode(E enc) {
             return core.nameToClass(core.stringCodec().decode(enc));
         }
     }
 
-    public static class LocalDateCodec<E> extends CodecBase<LocalDate, E> {
+    public static class StringProxyCodec<T, E> extends CodecBase<T, E> {
 
-        protected LocalDateCodec(CodecCore<E> core) {
+        protected final F<String, T> parser;
+
+        public StringProxyCodec(CodecCore<E> core, F<String, T> parser) {
             super(core);
+            this.parser = parser;
         }
 
         @Override
-        public E encode(LocalDate val, E enc) {
+        public E encode(T val, E enc) {
             return core.stringCodec().encode(val.toString(), enc);
         }
 
         @Override
-        public LocalDate decode(E enc) {
-            return LocalDate.parse(core.stringCodec().decode(enc));
+        public T decode(E enc) {
+            return parser.apply(core.stringCodec().decode(enc));
+        }
+    }
+
+    public static class LocalDateCodec<E> extends StringProxyCodec<LocalDate, E> {
+        public LocalDateCodec(CodecCore<E> core) {
+            super(core, LocalDate::parse);
+        }
+    }
+
+    public static class OffsetDateTimeCodec<E> extends StringProxyCodec<OffsetDateTime, E> {
+        public OffsetDateTimeCodec(CodecCore<E> core) {
+            super(core, OffsetDateTime::parse);
         }
     }
 }
