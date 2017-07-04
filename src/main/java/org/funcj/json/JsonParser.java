@@ -3,6 +3,7 @@ package org.funcj.json;
 import org.funcj.data.*;
 import org.funcj.parser.*;
 
+import java.io.Reader;
 import java.util.*;
 
 import static org.funcj.parser.Parser.*;
@@ -143,7 +144,7 @@ public class JsonParser {
     }
 
     /**
-     * Parser (primarily for compising with other Parsers).
+     * Parser (primarily for composing with other Parsers).
      */
     public static final Parser<Chr, JSValue> parser;
 
@@ -156,14 +157,14 @@ public class JsonParser {
         return parser.run(Input.of(str));
     }
 
+
     /**
-     * Parse a JSON string into a {@code JSValue}.
-     * @param str JSON string
-     * @return a {@code JSValue} if parse is successful
-     * @throws RuntimeException if parse is unsuccessful
+     * Parse a JSON input stream into a parse result.
+     * @param rdr JSON input stream
+     * @return parse result
      */
-    public static JSValue parseOrThrow(String str) throws RuntimeException {
-        return parse(str).getOrThrow();
+    public static Result<Chr, JSValue> parse(Reader rdr) {
+        return parser.run(Input.of(rdr));
     }
 }
 

@@ -38,7 +38,7 @@ public class JsonTest {
 
     private static void roundTrip(String json) {
         //System.out.println(" Parsing: " + json);
-        final JSValue node = JsonParser.parseOrThrow(json);
+        final JSValue node = JsonParser.parse(json).getOrThrow();
 
         final String json2 = node.toString();
         //System.out.println(json2);
@@ -86,5 +86,4 @@ abstract class FileUtils {
             }
         });
     }
-
 }
