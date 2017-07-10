@@ -1,6 +1,6 @@
 package org.funcj.codec;
 
-import org.funcj.codec.utils.Utils;
+import org.funcj.codec.utils.OperationNotImplementedException;
 
 /**
  * Interface for classes that encapsulates the logic for encoding a value of type {@code T}
@@ -49,7 +49,7 @@ public interface Codec<T, E> {
         }
 
         public E encodePrim(boolean val) {
-            throw Utils.opnNotImplError();
+            throw new OperationNotImplementedException();
         }
 
         public abstract boolean decodePrim(E enc);
@@ -81,7 +81,7 @@ public interface Codec<T, E> {
         }
 
         public E encodePrim(byte val) {
-            throw Utils.opnNotImplError();
+            throw new OperationNotImplementedException();
         }
 
         public abstract byte decodePrim(E enc);
@@ -113,7 +113,7 @@ public interface Codec<T, E> {
         }
 
         public E encodePrim(char val) {
-            throw Utils.opnNotImplError();
+            throw new OperationNotImplementedException();
         }
 
         public abstract char decodePrim(E enc);
@@ -145,7 +145,7 @@ public interface Codec<T, E> {
         }
 
         public E encodePrim(short val) {
-            throw Utils.opnNotImplError();
+            throw new OperationNotImplementedException();
         }
 
         public abstract short decodePrim(E enc);
@@ -177,7 +177,7 @@ public interface Codec<T, E> {
         }
 
         public E encodePrim(int val) {
-            throw Utils.opnNotImplError();
+            throw new OperationNotImplementedException();
         }
 
         public abstract int decodePrim(E enc);
@@ -209,7 +209,7 @@ public interface Codec<T, E> {
         }
 
         public E encodePrim(long val) {
-            throw Utils.opnNotImplError();
+            throw new OperationNotImplementedException();
         }
 
         public abstract long decodePrim(E enc);
@@ -241,7 +241,7 @@ public interface Codec<T, E> {
         }
 
         public E encodePrim(float val) {
-            throw Utils.opnNotImplError();
+            throw new OperationNotImplementedException();
         }
 
         public abstract float decodePrim(E enc);
@@ -273,7 +273,7 @@ public interface Codec<T, E> {
         }
 
         public E encodePrim(double val) {
-            throw Utils.opnNotImplError();
+            throw new OperationNotImplementedException();
         }
 
         public abstract double decodePrim(E enc);
@@ -305,6 +305,6 @@ public interface Codec<T, E> {
      * @return decoded value
      */
     default T decode(E enc) {
-        throw Utils.opnNotImplError();
+        throw new OperationNotImplementedException();
     }
 }

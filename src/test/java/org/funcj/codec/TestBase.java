@@ -123,32 +123,26 @@ public abstract class TestBase {
     }
 
     static <E> void registerLocalDateCodec(CodecCore<E> core) {
-        core.registerCodec(
-                LocalDate.class,
-                ObjectCodecBuilder.of(LocalDate.class, core)
-                    .field("year", LocalDate::getYear, Integer.class)
-                    .field("month", LocalDate::getMonthValue, Integer.class)
-                    .field("day", LocalDate::getDayOfMonth, Integer.class)
-                    .map(LocalDate::of)
-        );
+        core.codecBuilder(LocalDate.class)
+                .field("year", LocalDate::getYear, Integer.class)
+                .field("month", LocalDate::getMonthValue, Integer.class)
+                .field("day", LocalDate::getDayOfMonth, Integer.class)
+                .map(LocalDate::of);
     }
 
     static <E> void registerCustomCodec(CodecCore<E> core) {
-        core.registerCodec(
-                Custom.class,
-                ObjectCodecBuilder.of(Custom.class, core)
-                        .fieldN("colour", c -> c.colour, Custom.Colour.class)
-                        .fieldN("date", c -> c.date, LocalDate.class)
-                        .field("flag", c -> c.flag, Boolean.class)
-                        .fieldN("name", c -> c.name, String.class)
-                        .field("age", c -> c.age, Double.class)
-                        .map(args -> new Custom(
-                                (Custom.Colour)args[0],
-                                (LocalDate)args[1],
-                                (Boolean)args[2],
-                                (String)args[3],
-                                (Double)args[4]))
-        );
+        core.codecBuilder(Custom.class)
+                .nullField("colour", c -> c.colour, Custom.Colour.class)
+                .nullField("date", c -> c.date, LocalDate.class)
+                .field("flag", c -> c.flag, Boolean.class)
+                .nullField("name", c -> c.name, String.class)
+                .field("age", c -> c.age, Double.class)
+                .map(args -> new Custom(
+                        (Custom.Colour)args[0],
+                        (LocalDate)args[1],
+                        (Boolean)args[2],
+                        (String)args[3],
+                        (Double)args[4]));
     }
 
     @Test

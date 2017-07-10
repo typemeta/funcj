@@ -30,6 +30,10 @@ public abstract class CodecCore<E> {
         codecs.put(classToName(clazz), codec);
     }
 
+    public <T> ObjectCodecBuilder<T, E> codecBuilder(Class<T> clazz) {
+        return objectCodecDeferredRegister(clazz);
+    }
+
     public <T> void registerTypeConstructor(Class<? extends T> clazz, TypeConstructor<T> typeCtor) {
         typeCtors.put(classToName(clazz), typeCtor);
     }
@@ -395,6 +399,20 @@ public abstract class CodecCore<E> {
         });
     }
 
+    public <T> ObjectCodecBuilder<T, E> objectCodec(Class<T> clazz) {
+        return new ObjectCodecBuilder<T, E>(this);
+    }
+
+    public <T> ObjectCodecBuilder<T, E> objectCodecDeferredRegister(Class<T> clazz) {
+        return new ObjectCodecBuilder<T, E>(this) {
+            @Override
+            protected Codec<T, E> registration(Codec<T, E> codec) {
+                registerCodec(clazz, codec);
+                return codec;
+            }
+        };
+    }
+
     public <T> Codec<T, E> createObjectCodec(
             Map<String, ObjectCodecBuilder.FieldCodec<T, E>> fieldCodecs,
             F<Object[], T> ctor) {
@@ -411,7 +429,6 @@ public abstract class CodecCore<E> {
                 return ctor.apply(ctorArgs);
             }
         }
-
 
         final List<ObjectMeta.Field<T, E, ResultAccumlatorImpl>> fieldMetas = fieldCodecs.entrySet().stream()
                 .map(en -> {
