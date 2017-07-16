@@ -8,6 +8,10 @@ import static org.funcj.parser.Parser.*;
  * Parser combinators for working with Chr streams.
  */
 public abstract class Text {
+    public static Parser<Chr, Chr> pure(char c) {
+        return Parser.pure(Chr.valueOf(c));
+    }
+
     public static Parser<Chr, Chr> chr(char c) {
         return value(Chr.valueOf(c));
     }
@@ -30,9 +34,9 @@ public abstract class Text {
 
     private static final Parser<Chr, Boolean> sign =
             choice(
-                    chr('+').andR(pure(true)),
-                    chr('-').andR(pure(false)),
-                    pure(true)
+                    chr('+').andR(Parser.pure(true)),
+                    chr('-').andR(Parser.pure(false)),
+                    Parser.pure(true)
             );
 
     public static final Parser<Chr, Integer> uintr =

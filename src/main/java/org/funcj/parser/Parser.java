@@ -52,7 +52,16 @@ public interface Parser<I, A> {
      * @return the parser result
      */
     default Result<I, A> run(Input<I> in) {
-        return this.andL(eof()).parse(in, SymSet.empty());
+        final Parser<I, A> parserAndEof = this.andL(eof());
+        if (acceptsEmpty().apply()) {
+            return parserAndEof.parse(in, SymSet.empty());
+        } else if (in.isEof()) {
+            return failureEof(this, in);
+        } else if (firstSet().apply().matches(in.get())) {
+            return parserAndEof.parse(in, SymSet.empty());
+        } else {
+            return failure(this, in);
+        }
     }
 
     /**
@@ -74,7 +83,7 @@ public interface Parser<I, A> {
 
     /**
      * Functor map operation.
-     * If this parser succeeds then apply the function {Gcode f} to the result,
+     * If this parser succeeds then apply the function {@code f} to the result,
      * otherwise return the failure.
      * @param f function to be mapped over this parser
      * @param <B> function return type

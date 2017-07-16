@@ -4,6 +4,7 @@ import org.funcj.control.Exceptions;
 import org.funcj.data.Chr;
 
 import java.io.Reader;
+import java.util.*;
 
 /**
  * {code Input} represents a position in a stream of input symbols,
@@ -91,7 +92,8 @@ class StringInput implements Input<Chr> {
 
     @Override
     public String toString() {
-        return "StringInput{" + position + ",data=\"" + data[position] + "\"";
+        final String dataStr = isEof() ? "EOF" : String.valueOf(data[position]);
+        return "StringInput{" + position + ",data=\"" + dataStr + "\"";
     }
 
     @Override
@@ -112,6 +114,20 @@ class StringInput implements Input<Chr> {
     @Override
     public Object position() {
         return position;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StringInput that = (StringInput) o;
+        return position == that.position &&
+                data == that.data;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(data, position);
     }
 }
 
@@ -182,5 +198,19 @@ class ReaderInput implements Input<Chr> {
     @Override
     public Object position() {
         return position;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReaderInput that = (ReaderInput) o;
+        return position == that.position &&
+                reader == that.reader;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(position, reader);
     }
 }

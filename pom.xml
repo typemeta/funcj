@@ -39,9 +39,12 @@
 
     <properties>
         <jdk.version>1.8</jdk.version>
+
+        <immutables.version>2.5.1</immutables.version>
         <jmh.version>1.18</jmh.version>
         <junit.version>4.12</junit.version>
-        <immutables.version>2.5.1</immutables.version>
+        <junit-quickcheck.version>0.7</junit-quickcheck.version>
+
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <uberjar.name>benchmarks</uberjar.name>
@@ -73,6 +76,20 @@
             <version>${immutables.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.pholser</groupId>
+            <artifactId>junit-quickcheck-core</artifactId>
+            <version>${junit-quickcheck.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.pholser</groupId>
+            <artifactId>junit-quickcheck-generators</artifactId>
+            <version>${junit-quickcheck.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
