@@ -7,7 +7,7 @@ import static org.funcj.parser.Parser.*;
 /**
  * Parser combinators for working with Chr streams.
  */
-public class Text {
+public abstract class Text {
     public static Parser<Chr, Chr> chr(char c) {
         return value(Chr.valueOf(c));
     }
@@ -86,9 +86,9 @@ public class Text {
                     public Result<Chr, String> parse(Input<Chr> in, SymSet<Chr> follow) {
                         for (int i = 0; i < s.length(); ++i) {
                             if (in.isEof()) {
-                                return failureEof(in);
+                                return ParserUtils.failureEof(this, in);
                             } else if(!in.get().equals(s.charAt(i))) {
-                                return failure(in);
+                                return ParserUtils.failure(this, in);
                             } else {
                                 in = in.next();
                             }

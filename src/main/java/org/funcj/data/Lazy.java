@@ -5,14 +5,15 @@ import java.util.Objects;
 import static org.funcj.util.Functions.F0;
 
 /**
- * Interface for values which are acquired lazily.
+ * Wrapper for values which are acquired lazily.
  * @param <T> type of value
  */
 public interface Lazy<T> extends F0<T> {
     /**
-     * Construct a lazy value from value supplier.
-     * The lazy value is not thead-safe, meaning the supplier may be invoked
-     * multiple times if the {@code Lazy} value is passed to multiple threads.
+     * Construct a lazy value from a value supplier.
+     * The lazy value is not thread-safe, meaning the supplier may be invoked
+     * multiple times if the {@code Lazy} value is passed to multiple threads
+     * before it is computed.
      * @param get supplier of the value
      * @param <T> value type
      * @return lazy value
@@ -22,8 +23,8 @@ public interface Lazy<T> extends F0<T> {
     }
 
     /**
-     * Construct a lazy value from value supplier.
-     * The lazy value is thead-safe, meaning the supplier will only be invoked
+     * Construct a lazy value from a value supplier.
+     * The lazy value is thread-safe, meaning the supplier will only be invoked
      * once, even if the {@code Lazy} value is passed to multiple threads.
      * @param get supplier of the value
      * @param <T> value type
