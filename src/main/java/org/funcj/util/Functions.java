@@ -7,7 +7,6 @@ public abstract class Functions {
 
     /**
      * Function of arity 0.
-     *
      * @param <R> return type
      */
     @FunctionalInterface
@@ -25,7 +24,8 @@ public abstract class Functions {
 
     /**
      * Function of arity 1.
-     *
+     * Note: if the input type to {@code F} fixed to type T then the result is a monad,
+     * where pure = {@code konst} and bind = {@code flatMap}.
      * @param <A> 1st argument type
      * @param <R> return type
      */
@@ -49,14 +49,29 @@ public abstract class Functions {
 
         R apply(A a);
 
-        default <T> F<T, R> compose(F<T, A> f) {
+        default <T> F<T, R> compose(F<? super T, ? extends A> f) {
             return t -> this.apply(f.apply(t));
+        }
+
+        default <T> F<A, T> andThen(F<? super R, ? extends T> f) {
+            return t -> f.apply(this.apply(t));
+        }
+
+        default <U> F<A, U> map(F<R, U> f) {
+            return f.compose(this);
+        }
+
+        default <B> F<A, B> app(F<A, F<R, B>> f) {
+            return s -> f.apply(s).apply(apply(s));
+        }
+
+        default <U> F<A, U> flatMap(F<R, F<A, U>> f) {
+            return s -> f.apply(apply(s)).apply(s);
         }
     }
 
     /**
      * Function of arity 2.
-     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <R> return type
@@ -100,7 +115,6 @@ public abstract class Functions {
 
     /**
      * Function of arity 3.
-     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -137,7 +151,6 @@ public abstract class Functions {
 
     /**
      * Function of arity 4.
-     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -179,7 +192,6 @@ public abstract class Functions {
 
     /**
      * Function of arity 5.
-     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -226,7 +238,6 @@ public abstract class Functions {
 
     /**
      * Function of arity 6.
-     *
      * @param <A> 1st argument type
      * @param <B> 2nd argument type
      * @param <C> 3rd argument type
@@ -278,7 +289,6 @@ public abstract class Functions {
 
     /**
      * Unary operator interface.
-     *
      * @param <T> operand type
      */
     @FunctionalInterface
@@ -288,7 +298,6 @@ public abstract class Functions {
 
     /**
      * Binary operator interface.
-     *
      * @param <T> operand type
      */
     @FunctionalInterface
@@ -302,6 +311,7 @@ public abstract class Functions {
 
     /**
      * Predicate interface
+     * @param <T> operand type
      */
     @FunctionalInterface
     public interface Predicate<T> extends F<T, Boolean> {

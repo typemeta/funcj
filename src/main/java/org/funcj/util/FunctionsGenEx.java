@@ -25,6 +25,8 @@ public abstract class FunctionsGenEx {
 
     /**
      * Function of arity 1.
+     * Note: if the input type to {@code F} fixed to type T then the result is a monad,
+     * where pure = {@code konst} and bind = {@code flatMap}.
      * @param <A> 1st argument type
      * @param <R> return type
      * @param <X> exception type
@@ -49,8 +51,21 @@ public abstract class FunctionsGenEx {
 
         R apply(A a) throws X;
 
-        default <T> F<T, R, X> compose(F<T, A, X> f) {
+
+        default <T> F<T, R, X> compose(F<? super T, ? extends A, X> f) {
             return t -> this.apply(f.apply(t));
+        }
+
+        default <T> F<A, T, X> andThen(F<? super R, ? extends T, X> f) {
+            return t -> f.apply(this.apply(t));
+        }
+
+        default <U> F<A, U, X> map(F<R, U, X> f) {
+            return f.compose(this);
+        }
+
+        default <U> F<A, U, X> flatMap(F<R, F<A, U, X>, X> f) {
+            return of(s -> f.compose(this).apply(s).apply(s));
         }
     }
 
@@ -302,6 +317,8 @@ public abstract class FunctionsGenEx {
 
     /**
      * Predicate interface
+     * @param <T> operand type
+     * @param <X> exception type
      */
     @FunctionalInterface
     public interface Predicate<T, X extends Exception> extends F<T, Boolean, X> {
