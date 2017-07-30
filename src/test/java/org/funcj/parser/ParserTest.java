@@ -135,7 +135,6 @@ public class ParserTest {
                 .fails();
     }
 
-    private static
     @Property
     public void satisfyWorks(char c0) {
         final char c1;
