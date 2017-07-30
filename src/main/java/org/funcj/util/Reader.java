@@ -25,8 +25,8 @@ public abstract class Reader {
     /**
      * Standard applicative sequencing.
      */
-    static <S, A> F<S, IList<A>> sequence(IList<? extends F<S, A>> lsa) {
-        return lsa.foldRight(
+    static <S, A> F<S, IList<A>> sequence(IList<? extends F<S, A>> lfsa) {
+        return lfsa.foldRight(
                 (sa, sla) -> sa.app(sla.map(l -> l::add)),
                 F.konst(IList.nil())
         );

@@ -293,6 +293,10 @@ public abstract class Functions {
      */
     @FunctionalInterface
     public interface Op<T> extends F<T, T> {
+        static <T> Op<T> of(Op<T> op) {
+            return op;
+        }
+
         T apply(T t);
     }
 
@@ -302,6 +306,10 @@ public abstract class Functions {
      */
     @FunctionalInterface
     public interface Op2<T> extends F2<T, T, T> {
+        static <T> Op2<T> of(Op2<T> op) {
+            return op;
+        }
+
         T apply(T l, T r);
 
         default Op2<T> flip() {
@@ -315,6 +323,10 @@ public abstract class Functions {
      */
     @FunctionalInterface
     public interface Predicate<T> extends F<T, Boolean> {
+        static <T> Predicate<T> of(Predicate<T> pr) {
+            return pr;
+        }
+
         Boolean apply(T t);
     }
 }

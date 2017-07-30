@@ -9,7 +9,7 @@ import org.funcj.data.Tuple2;
 public interface RNG {
 
     static RNG xorShiftRNG(long seed) {
-        return new Utils.XorShiftRNG(seed);
+        return new RNGUtils.XorShiftRNG(seed);
     }
 
     static State<RNG, Double> nextDbl() {
@@ -25,7 +25,7 @@ public interface RNG {
      */
     default Tuple2<RNG, Double> nextDouble0To1() {
         final Tuple2<RNG, Long> rngLng = nextLong();
-        final double d = (rngLng._2.doubleValue() - (double)Long.MIN_VALUE) / Utils.SCALE;
+        final double d = (rngLng._2.doubleValue() - (double)Long.MIN_VALUE) / RNGUtils.SCALE;
         return rngLng.with2(d);
     }
 
@@ -34,13 +34,13 @@ public interface RNG {
      */
     default Tuple2<RNG, Long> nextLong() {
         final Tuple2<RNG, Double> rngDbl = nextDouble0To1();
-        final long l = (long)(rngDbl._2 * Utils.SCALE + (double)Long.MIN_VALUE);
+        final long l = (long)(rngDbl._2 * RNGUtils.SCALE + (double)Long.MIN_VALUE);
         return rngDbl.with2(l);
     }
 
 }
 
-class Utils {
+class RNGUtils {
     final static double SCALE = (double)Long.MAX_VALUE - (double)Long.MIN_VALUE + 1.0;
 
     protected static class XorShiftRNG implements RNG {

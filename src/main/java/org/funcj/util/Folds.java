@@ -2,7 +2,7 @@ package org.funcj.util;
 
 import org.funcj.util.Functions.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Fold operations.
@@ -85,5 +85,29 @@ public abstract class Folds {
             }
         }
         return acc;
+    }
+
+    /**
+     * Right-fold a function over an {@link Set}}
+     * @param f binary function to be applied for the fold
+     * @param z starting value for the fold
+     * @param s set to fold over
+     * @param <T> set element type
+     * @param <R> result type of fold operation
+     * @return the folded value
+     */
+    public static <T, R> R foldRight(F2<T, R, R> f, R z, Set<T> s) {
+        return foldRight(f, z, (List<T>)new ArrayList<T>(s));
+    }
+
+    /**
+     * Right-fold a function over a non-empty  {@link Set}}
+     * @param f binary function to be applied for the fold
+     * @param s set to fold over
+     * @param <T> set element type
+     * @return the folded value
+     */
+    public static <T> T foldRight1(Op2<T> f, Set<T> s) {
+        return foldRight1(f, (List<T>)new ArrayList<T>(s));
     }
 }
