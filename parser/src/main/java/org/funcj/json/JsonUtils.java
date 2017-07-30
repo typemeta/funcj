@@ -77,27 +77,31 @@ class JsonUtils {
         );
     }
 
-    static RuntimeException asNull(Class<?> clazz) {
-        return new RuntimeException("Expecting JSNull but encountered a " + clazz.getSimpleName());
+    static RuntimeException nullTypeError(Class<?> clazz) {
+        return new RuntimeException(typeErrorMessage(JSNull.class, clazz));
     }
 
-    static RuntimeException asBool(Class<?> clazz) {
-        return new RuntimeException("Expecting JSBool but encountered a " + clazz.getSimpleName());
+    static RuntimeException boolTypeError(Class<?> clazz) {
+        return new RuntimeException(typeErrorMessage(JSBool.class, clazz));
     }
 
-    static RuntimeException asNumber(Class<?> clazz) {
-        return new RuntimeException("Expecting JSNumber but encountered a " + clazz.getSimpleName());
+    static RuntimeException numberTypeError(Class<?> clazz) {
+        return new RuntimeException(typeErrorMessage(JSNumber.class, clazz));
     }
 
-    static RuntimeException asString(Class<?> clazz) {
-        return new RuntimeException("Expecting JSString but encountered a " + clazz.getSimpleName());
+    static RuntimeException stringTypeError(Class<?> clazz) {
+        return new RuntimeException(typeErrorMessage(JSString.class, clazz));
     }
 
-    static RuntimeException asArray(Class<?> clazz) {
-        return new RuntimeException("Expecting JSArray but encountered a " + clazz.getSimpleName());
+    static RuntimeException arrayTypeError(Class<?> clazz) {
+        return new RuntimeException(typeErrorMessage(JSArray.class, clazz));
     }
 
-    static RuntimeException asObject(Class<?> clazz) {
-        return new RuntimeException("Expecting JSObject but encountered a " + clazz.getSimpleName());
+    static RuntimeException objectTypeError(Class<?> clazz) {
+        return new RuntimeException(typeErrorMessage(JSObject.class, clazz));
+    }
+
+    private static String typeErrorMessage(Class<?> expType, Class<?> actualType) {
+        return "Expecting " + expType.getSimpleName() + " but encountered a " + actualType.getSimpleName();
     }
 }

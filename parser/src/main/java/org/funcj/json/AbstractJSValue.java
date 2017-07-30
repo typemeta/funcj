@@ -40,26 +40,26 @@ public abstract class AbstractJSValue implements JSValue {
     }
 
     public JSNull asNull() {
-        throw JsonUtils.asNull(getClass());
+        throw JsonUtils.nullTypeError(getClass());
     }
 
     public JSBool asBool() {
-        throw JsonUtils.asBool(getClass());
+        throw JsonUtils.boolTypeError(getClass());
     }
 
     public JSNumber asNumber() {
-        throw JsonUtils.asNumber(getClass());
+        throw JsonUtils.numberTypeError(getClass());
     }
 
     public JSString asString() {
-        throw JsonUtils.asString(getClass());
+        throw JsonUtils.stringTypeError(getClass());
     }
 
     public JSArray asArray() {
-        throw JsonUtils.asArray(getClass());
+        throw JsonUtils.arrayTypeError(getClass());
     }
 
     public JSObject asObject() {
-        throw JsonUtils.asObject(getClass());
+        throw JsonUtils.objectTypeError(getClass());
     }
 }

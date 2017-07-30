@@ -73,26 +73,26 @@ public enum JSNull implements JSValue {
 
     @Override
     public JSBool asBool() {
-        throw JsonUtils.asBool(getClass());
+        throw JsonUtils.boolTypeError(getClass());
     }
 
     @Override
     public JSNumber asNumber() {
-        throw JsonUtils.asNumber(getClass());
+        throw JsonUtils.numberTypeError(getClass());
     }
 
     @Override
     public JSString asString() {
-        throw JsonUtils.asString(getClass());
+        throw JsonUtils.stringTypeError(getClass());
     }
 
     @Override
     public JSArray asArray() {
-        throw JsonUtils.asArray(getClass());
+        throw JsonUtils.arrayTypeError(getClass());
     }
 
     @Override
     public JSObject asObject() {
-        throw JsonUtils.asObject(getClass());
+        throw JsonUtils.objectTypeError(getClass());
     }
 }

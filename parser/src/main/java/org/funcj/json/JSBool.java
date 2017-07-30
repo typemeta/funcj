@@ -79,7 +79,7 @@ public enum JSBool implements JSValue {
 
     @Override
     public JSNull asNull() {
-        throw JsonUtils.asNull(getClass());
+        throw JsonUtils.nullTypeError(getClass());
     }
 
     @Override
@@ -89,21 +89,21 @@ public enum JSBool implements JSValue {
 
     @Override
     public JSNumber asNumber() {
-        throw JsonUtils.asNumber(getClass());
+        throw JsonUtils.numberTypeError(getClass());
     }
 
     @Override
     public JSString asString() {
-        throw JsonUtils.asString(getClass());
+        throw JsonUtils.stringTypeError(getClass());
     }
 
     @Override
     public JSArray asArray() {
-        throw JsonUtils.asArray(getClass());
+        throw JsonUtils.arrayTypeError(getClass());
     }
 
     @Override
     public JSObject asObject() {
-        throw JsonUtils.asObject(getClass());
+        throw JsonUtils.objectTypeError(getClass());
     }
 }
