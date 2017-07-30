@@ -4,7 +4,6 @@ import org.funcj.control.Try;
 import org.funcj.data.Chr;
 import org.funcj.parser.*;
 import org.junit.Test;
-import org.openjdk.jmh.annotations.Benchmark;
 
 import java.io.*;
 import java.util.*;
@@ -61,12 +60,6 @@ public class JsonTest {
 
         //System.out.println(node.toString());
         assertEquals("Round-tripped JSON", json, json2);
-    }
-
-    @Benchmark
-    public void benchSuccessParse() throws IOException {
-        final Result<Chr, JSValue> result = JsonParser.parse(json);
-        final JSValue node = result.getOrThrow();
     }
 }
 

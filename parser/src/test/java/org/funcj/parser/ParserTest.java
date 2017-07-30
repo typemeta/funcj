@@ -1,17 +1,15 @@
 package org.funcj.parser;
 
-import com.pholser.junit.quickcheck.*;
+import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.funcj.data.*;
+import org.funcj.data.Chr;
 import org.funcj.util.Functions.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assume.assumeThat;
 
 @RunWith(JUnitQuickcheck.class)
 public class ParserTest {
@@ -98,7 +96,7 @@ public class ParserTest {
 
     @Property
     public void mapTransformsValue(char c1, char c2) {
-        assumeThat(c1, not(c2));
+        Assume.assumeThat(c1, not(c2));
 
         final Input<Chr> input = Input.of(String.valueOf(c1));
         final Input<Chr> input2 = Input.of(String.valueOf(c2));

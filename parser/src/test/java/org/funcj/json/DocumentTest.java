@@ -1,6 +1,5 @@
-package org.funcj.document;
+package org.funcj.json;
 
-import org.funcj.json.*;
 import org.junit.Test;
 
 import java.util.Arrays;

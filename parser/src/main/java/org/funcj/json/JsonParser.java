@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.util.*;
 
 import static org.funcj.parser.Parser.*;
+import static org.funcj.parser.Parser.pure;
 import static org.funcj.parser.Text.*;
 
 /**

@@ -4,14 +4,16 @@
     <groupId>org.funcj</groupId>
     <artifactId>funcj</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A set of functional data structures and algorithms.</description>
     <url>https://github.com/jon-hanson/${project.artifactId}</url>
 
+    <packaging>pom</packaging>
+
     <modules>
         <module>core</module>
+        <module>parser</module>
         <module>codec</module>
     </modules>
 
@@ -92,13 +94,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.immutables</groupId>
-                <artifactId>value</artifactId>
-                <version>${immutables.version}</version>
-                <scope>compile</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>com.pholser</groupId>
                 <artifactId>junit-quickcheck-core</artifactId>
                 <version>${junit-quickcheck.version}</version>
@@ -113,42 +108,6 @@
 
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.immutables</groupId>
-            <artifactId>value</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.pholser</groupId>
-            <artifactId>junit-quickcheck-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.pholser</groupId>
-            <artifactId>junit-quickcheck-generators</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
 
     <build>
         <plugins>

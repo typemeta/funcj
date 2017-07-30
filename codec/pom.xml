@@ -4,7 +4,6 @@
     <groupId>org.funcj</groupId>
     <artifactId>codec</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
     <parent>
         <groupId>org.funcj</groupId>
@@ -16,10 +15,12 @@
     <description>A set of functional data structures and algorithms.</description>
     <url>https://github.com/jon-hanson/funcj/codec</url>
 
+    <packaging>jar</packaging>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>parser</artifactId>
             <version>${project.version}</version>
         </dependency>
 
