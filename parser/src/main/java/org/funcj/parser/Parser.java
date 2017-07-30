@@ -200,6 +200,13 @@ public interface Parser<I, A> {
         };
     }
 
+    /**
+     * Combine this parser with another to form a parser which applies the two parsers,
+     * and if they are both successfult then returns the pair of results.
+     * @param pb second parser
+     * @param <B> result type of second parser
+     * @return a parser which returns a pair of values
+     */
     default <B> Parser<I, Tuple2<A, B>> product(Parser<I, B> pb) {
         return ap(this.map(curry(Tuple2::new)), pb);
     }
