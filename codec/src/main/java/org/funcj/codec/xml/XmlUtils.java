@@ -8,7 +8,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.Optional;
 
-public class XmlUtils {
+public abstract class XmlUtils {
     public static String nodeToString(Node node, boolean pretty) {
         try {
             final Transformer tf = TransformerFactory.newInstance().newTransformer();

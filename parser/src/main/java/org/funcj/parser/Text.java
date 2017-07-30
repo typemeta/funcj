@@ -90,9 +90,9 @@ public abstract class Text {
                     public Result<Chr, String> parse(Input<Chr> in, SymSet<Chr> follow) {
                         for (int i = 0; i < s.length(); ++i) {
                             if (in.isEof()) {
-                                return ParserUtils.failureEof(this, in);
+                                return Utils.failureEof(this, in);
                             } else if(!in.get().equals(s.charAt(i))) {
-                                return ParserUtils.failure(this, in);
+                                return Utils.failure(this, in);
                             } else {
                                 in = in.next();
                             }

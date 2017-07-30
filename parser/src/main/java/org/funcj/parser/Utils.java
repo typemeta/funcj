@@ -2,7 +2,7 @@ package org.funcj.parser;
 
 import org.funcj.data.Lazy;
 
-abstract class ParserUtils {
+abstract class Utils {
 
     static final Lazy<Boolean> LTRUE = () -> true;
     static final Lazy<Boolean> LFALSE = () -> false;
@@ -32,7 +32,6 @@ abstract class ParserUtils {
             SymSet<I> fs2) {
         return acceptsEmpty ? fs1.union(fs2) : fs1;
     }
-
 
     static <I, A> Result<I, A> failure(Parser<I, A> parser, Input<I> in) {
         return Result.failure(in, parser.firstSet().apply());

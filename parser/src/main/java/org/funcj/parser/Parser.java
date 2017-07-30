@@ -6,7 +6,7 @@ import org.funcj.util.Functions.*;
 import java.util.Optional;
 
 import static org.funcj.parser.Parser.pure;
-import static org.funcj.parser.ParserUtils.*;
+import static org.funcj.parser.Utils.*;
 import static org.funcj.util.Functions.F2.curry;
 
 /**
@@ -118,7 +118,7 @@ public interface Parser<I, A> {
     static <I, A, B>
     Parser<I, B> ap(Parser<I, F<A, B>> pf, Parser<I, A> pa) {
         return new ParserImpl<I, B>(
-            ParserUtils.and(pf.acceptsEmpty(), pa.acceptsEmpty()),
+            Utils.and(pf.acceptsEmpty(), pa.acceptsEmpty()),
             combine(pf.acceptsEmpty(), pf.firstSet(), pa.firstSet())
         ) {
             @Override
@@ -168,7 +168,7 @@ public interface Parser<I, A> {
      */
     default Parser<I, A> or(Parser<I, A> rhs) {
         return new ParserImpl<I, A>(
-            ParserUtils.or(Parser.this.acceptsEmpty(), rhs.acceptsEmpty()),
+            Utils.or(Parser.this.acceptsEmpty(), rhs.acceptsEmpty()),
             union(Parser.this.firstSet(), rhs.firstSet())
         ) {
             @Override

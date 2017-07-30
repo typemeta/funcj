@@ -2,7 +2,8 @@ package org.funcj.json;
 
 import org.funcj.document.*;
 
-class JsonUtils {
+abstract class Utils {
+
     static <T> T duplicateKeyError(T u, T v) {
         throw new IllegalStateException("Duplicate keys - " + u + " & " + v);
     }

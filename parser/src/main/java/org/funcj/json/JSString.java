@@ -21,7 +21,7 @@ public final class JSString extends AbstractJSValue {
 
     @Override
     public String toString() {
-        return JsonUtils.format(value);
+        return Utils.format(value);
     }
 
     @Override
@@ -31,7 +31,7 @@ public final class JSString extends AbstractJSValue {
 
     @Override
     public StringBuilder toString(StringBuilder sb) {
-        return JsonUtils.format(value, sb);
+        return Utils.format(value, sb);
     }
 
     @Override

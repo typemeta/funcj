@@ -5,7 +5,8 @@ import java.util.Objects;
 import static org.funcj.util.Functions.F0;
 
 /**
- * Wrapper for values which are acquired lazily.
+ * Wrapper for values which are computed lazily, i.e. on demand.
+ * The result is computed once and cached.
  * @param <T> type of value
  */
 public interface Lazy<T> extends F0<T> {

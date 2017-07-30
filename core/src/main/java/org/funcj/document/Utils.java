@@ -1,12 +1,11 @@
 package org.funcj.document;
 
-public abstract class Utils {
-    public static final String trimTrailing(String s) {
+abstract class Utils {
+    static String trimTrailing(String s) {
         final char[] data = s.toCharArray();
         int len = data.length;
-        char[] val = data;
 
-        while ((0 < len) && (val[len - 1] <= ' ')) {
+        while ((0 < len) && (data[len - 1] <= ' ')) {
             len--;
         }
 

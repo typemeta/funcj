@@ -23,7 +23,7 @@ public final class JSNumber extends AbstractJSValue {
 
     @Override
     public String toString() {
-        return JsonUtils.format(value);
+        return Utils.format(value);
     }
 
     @Override

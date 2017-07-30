@@ -62,7 +62,7 @@ public final class JSObject extends AbstractJSValue
                         .collect(toMap(
                                 Field::getName,
                                 Function.identity(),
-                                JsonUtils::duplicateKeyError,
+                                Utils::duplicateKeyError,
                                 LinkedHashMap::new
                         ));
         return of(fieldMap);
@@ -74,7 +74,7 @@ public final class JSObject extends AbstractJSValue
                         .collect(toMap(
                                 Field::getName,
                                 Function.identity(),
-                                JsonUtils::duplicateKeyError,
+                                Utils::duplicateKeyError,
                                 LinkedHashMap::new
                         ));
         return of(fieldMap);
@@ -142,7 +142,7 @@ public final class JSObject extends AbstractJSValue
                 API.text('{'),
                 API.text(", "),
                 API.text('}'),
-                Functors.map(JsonUtils::toDoc, fields.values())
+                Functors.map(Utils::toDoc, fields.values())
         );
     }
 
@@ -156,7 +156,7 @@ public final class JSObject extends AbstractJSValue
             } else {
                 sb.append(',');
             }
-            JsonUtils.format(field.name, sb).append(':');
+            Utils.format(field.name, sb).append(':');
             field.value.toString(sb);
         }
         return sb.append('}');
