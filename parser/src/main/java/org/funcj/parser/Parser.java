@@ -205,16 +205,32 @@ public interface Parser<I, A> {
      * and if they are both successfult then returns the pair of results.
      * @param pb second parser
      * @param <B> result type of second parser
-     * @return a parser which returns a pair of values
+     * @return a parser that applies two parsers consecutively and returns the pair of values
      */
     default <B> Parser<I, Tuple2<A, B>> product(Parser<I, B> pb) {
         return ap(this.map(curry(Tuple2::new)), pb);
     }
 
+    /**
+     * Combine this parser with another to form a parser which applies two parsers,
+     * throws away the result of the right-hand parser,
+     * and returns the result of the left-hand parser
+     * @param pb second parser
+     * @param <B> result type of second parser
+     * @return a parser that applies two parsers consecutively and returns the result of the first
+     */
     default <B> Parser<I, A> andL(Parser<I, B> pb) {
         return this.and(pb).map(F2.first());
     }
-
+    /**
+     *
+     * Combine this parser with another to form a parser which applies two parsers,
+     * throws away the result of the left-hand parser
+     * and returns the result of the right-hand parser
+     * @param pb second parser
+     * @param <B> result type of second parser
+     * @return a parser that applies two parsers consecutively and returns the result of the second
+     */
     default <B> Parser<I, B> andR(Parser<I, B> pb) {
         return this.and(pb).map(F2.second());
     }
