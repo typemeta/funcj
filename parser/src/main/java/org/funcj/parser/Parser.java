@@ -160,10 +160,25 @@ public interface Parser<I, A> {
     }
 
     /**
+     * A parser that always fails.
+     * @param <I> input stream symbol type
+     * @param <A> parse result type
+     * @return a parser that always fails.
+     */
+    static <I, A> Parser<I, A> fail() {
+        return new ParserImpl<I, A>(() -> true, SymSet::empty) {
+            @Override
+            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+                return failure(this, in);
+            }
+        };
+    }
+
+    /**
      * Alternative.
      * Construct a parser which returns the result of either this parser or,
      * if it fails, then the result of the {@code rhs} parser.
-     * @param rhs alternative parser
+     * @param rhs second parser to attempt
      * @return a parser which returns the result of either this parser or the {@code rhs} parser.
      */
     default Parser<I, A> or(Parser<I, A> rhs) {
@@ -202,7 +217,7 @@ public interface Parser<I, A> {
 
     /**
      * Combine this parser with another to form a parser which applies the two parsers,
-     * and if they are both successfult then returns the pair of results.
+     * and if they are both successful then returns the pair of results.
      * @param pb second parser
      * @param <B> result type of second parser
      * @return a parser that applies two parsers consecutively and returns the pair of values
@@ -213,6 +228,7 @@ public interface Parser<I, A> {
 
     /**
      * Combine this parser with another to form a parser which applies two parsers,
+     * and if they are both successful
      * throws away the result of the right-hand parser,
      * and returns the result of the left-hand parser
      * @param pb second parser
@@ -222,9 +238,10 @@ public interface Parser<I, A> {
     default <B> Parser<I, A> andL(Parser<I, B> pb) {
         return this.and(pb).map(F2.first());
     }
+
     /**
-     *
      * Combine this parser with another to form a parser which applies two parsers,
+     * and if they are both successful
      * throws away the result of the left-hand parser
      * and returns the result of the right-hand parser
      * @param pb second parser
@@ -235,37 +252,21 @@ public interface Parser<I, A> {
         return this.and(pb).map(F2.second());
     }
 
+    /**
+     * Combine this parser with another to form a builder which accumulates the parse results.
+     * @param pb second parser
+     * @param <B> result type of second parser
+     * @return an {@link ApplyBuilder} which accumulates the parse results.
+     */
     default <B> ApplyBuilder._2<I, A, B> and(Parser<I, B> pb) {
         return new ApplyBuilder._2<I, A, B>(this, pb);
     }
 
-    default Parser<I, A> chainl1(Parser<I, Op2<A>> op) {
-        final Parser<I, IList<Op<A>>> plf =
-            many(op.and(this)
-                .map((f, y) -> x -> f.apply(x, y)));
-        return this.and(plf)
-            .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
-    }
-
-    static <I, A> Parser<I, A> fail() {
-        return new ParserImpl<I, A>(() -> true, SymSet::empty) {
-            @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
-                return failure(this, in);
-            }
-        };
-    }
-
-    static <I, A, B>
-    F<Parser<I, A>, Parser<I, B>> liftA(F<A, B> f) {
-        return a -> a.map(f);
-    }
-
-    static <I, A, B, C>
-    F<Parser<I, A>, F<Parser<I, B>, Parser<I, C>>> liftA2(F<A, F<B, C>> f) {
-        return a -> b -> ap(a.map(f), b);
-    }
-
+    /**
+     * A parser that succeeds iff we are at the end of the input.
+     * @param <I> input stream symbol type
+     * @return a parser that succeeds iff we are at the end of the input.
+     */
     static <I> Parser<I, Unit> eof() {
         return new ParserImpl<I, Unit>(LTRUE, SymSet::empty) {
             @Override
@@ -277,6 +278,13 @@ public interface Parser<I, A> {
         };
     }
 
+    /**
+     * A parser that succeeds if the next input symbol satisfies the supplied predicate.
+     * @param name a name for the parser (used for error messages)
+     * @param pred predicate to be applied to the next input
+     * @param <I> input stream symbol type
+     * @return a parser that succeeds if the next input symbol satisfies the supplied predicate.
+     */
     static <I> Parser<I, I> satisfy(String name, Predicate<I> pred) {
         return new ParserImpl<I, I>(LFALSE, () -> SymSet.pred(name, pred)) {
             @Override
@@ -286,10 +294,24 @@ public interface Parser<I, A> {
         };
     }
 
+    /**
+     * A parser that succeeds if the next inout symbol equals the supplied {@code value},
+     * and returns the value.
+     * @param val value returned by the parser
+     * @param <I> input stream symbol type
+     * @return A parser that succeeds if the next inout symbol equals the supplied {@code value}
+     */
     static <I> Parser<I, I> value(I val) {
         return value(val, val);
     }
 
+    /**
+     * A parser that succeeds if the next inout symbol equals the supplied {@code value},
+     * and returns the supplied {@code res} value.
+     * @param val value returned by the parser
+     * @param <I> input stream symbol type
+     * @return A parser that succeeds if the next inout symbol equals the supplied {@code value}
+     */
     static <I, A> Parser<I, A> value(I val, A res) {
         return new ParserImpl<I, A>(LFALSE, () -> SymSet.value(val)) {
             @Override
@@ -308,6 +330,22 @@ public interface Parser<I, A> {
                     Result.success(in.get(), in.next());
             }
         };
+    }
+
+    /**
+     * A parser for an operand, followed by one or more operands
+     * that separated by operators.
+     * This can, for example, be used to eliminate left recursion
+     * which typically occurs in expression grammars.
+     * @param op parser for the operator
+     * @return a parser for operator expressions
+     */
+    default Parser<I, A> chainl1(Parser<I, Op2<A>> op) {
+        final Parser<I, IList<Op<A>>> plOps =
+                many(op.and(this)
+                        .map((f, y) -> x -> f.apply(x, y)));
+        return this.and(plOps)
+                .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
     }
 
     static <I, A>
