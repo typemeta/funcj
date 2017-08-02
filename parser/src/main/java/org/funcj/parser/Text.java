@@ -2,8 +2,6 @@ package org.funcj.parser;
 
 import org.funcj.data.Chr;
 
-import static org.funcj.parser.Parser.*;
-
 /**
  * Parser combinators for working with Chr streams.
  */
@@ -13,16 +11,16 @@ public abstract class Text {
     }
 
     public static Parser<Chr, Chr> chr(char c) {
-        return value(Chr.valueOf(c));
+        return Combinators.value(Chr.valueOf(c));
     }
 
-    public static final Parser<Chr, Chr> alpha = satisfy("letter", Chr::isLetter);
+    public static final Parser<Chr, Chr> alpha = Combinators.satisfy("letter", Chr::isLetter);
 
-    public static final Parser<Chr, Chr> digit = satisfy("digit", Chr::isDigit);
+    public static final Parser<Chr, Chr> digit = Combinators.satisfy("digit", Chr::isDigit);
 
-    public static final Parser<Chr, Chr> alphaNum = satisfy("letterOrDigit", Chr::isLetterOrDigit);
+    public static final Parser<Chr, Chr> alphaNum = Combinators.satisfy("letterOrDigit", Chr::isLetterOrDigit);
 
-    public static final Parser<Chr, Chr> ws = satisfy("ws", Chr::isWhitespace);
+    public static final Parser<Chr, Chr> ws = Combinators.satisfy("ws", Chr::isWhitespace);
 
     private static int digitToInt(char c) {
         return Chr.getNumericValue(c);
@@ -33,14 +31,14 @@ public abstract class Text {
     }
 
     private static final Parser<Chr, Boolean> sign =
-            choice(
+            Combinators.choice(
                     chr('+').andR(Parser.pure(true)),
                     chr('-').andR(Parser.pure(false)),
                     Parser.pure(true)
             );
 
     public static final Parser<Chr, Integer> uintr =
-            many1(digit.map(Text::digitToInt))
+            Combinators.many1(digit.map(Text::digitToInt))
                     .map(l -> l.foldLeft1((acc, x) -> acc * 10 + x));
 
     public static final Parser<Chr, Integer> intr =
@@ -48,7 +46,7 @@ public abstract class Text {
                     .map((sign, i) -> sign ? i : -i);
 
     public static final Parser<Chr, Long> ulng =
-            many1(digit.map(c -> (long)digitToInt(c)))
+            Combinators.many1(digit.map(c -> (long)digitToInt(c)))
                     .map(l -> l.foldLeft1((acc, x) -> acc * 10 + x));
 
     public static final Parser<Chr, Long> lng =
@@ -56,7 +54,7 @@ public abstract class Text {
                     .map((sign, i) -> sign ? i : -i);
 
     private static final Parser<Chr, Double> floating =
-            many(digit.map(Text::digitToInt))
+            Combinators.many(digit.map(Text::digitToInt))
                     .map(l -> l.foldRight((d, acc) -> d + acc / 10.0, 0.0) / 10.0);
 
     private static final Parser<Chr, Integer> expnt =
@@ -64,8 +62,8 @@ public abstract class Text {
                     .andR(intr);
 
     public static final Parser<Chr, Double> dble =
-            sign.and(ulng).and(optional(chr('.').andR(floating)))
-                    .and(optional(expnt))
+            sign.and(ulng).and(Combinators.optional(chr('.').andR(floating)))
+                    .and(Combinators.optional(expnt))
                     .map((sn, i, f, exp) -> {
                         double r = i.doubleValue();
                         if (f.isPresent()) {
@@ -79,7 +77,7 @@ public abstract class Text {
 
     public static Parser<Chr, String> string(String s) {
         switch (s.length()) {
-            case 0: return fail();
+            case 0: return Combinators.fail();
             case 1: return chr(s.charAt(0)).map(Object::toString);
             default: {
                 return new ParserImpl<Chr, String>(

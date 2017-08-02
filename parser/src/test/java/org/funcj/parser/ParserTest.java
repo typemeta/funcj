@@ -83,7 +83,7 @@ public class ParserTest {
         final Input<Chr> input = Input.of( String.valueOf(c1));
         final Input<Chr> input2 = Input.of(String.valueOf(c2));
 
-        final Parser<Chr, Chr> parser = Parser.value(Chr.valueOf(c1));
+        final Parser<Chr, Chr> parser = Combinators.value(Chr.valueOf(c1));
 
         ParserCheck.parser(parser)
                 .withInput(input)
@@ -102,7 +102,7 @@ public class ParserTest {
         final Input<Chr> input2 = Input.of(String.valueOf(c2));
 
         final Parser<Chr, Chr> parser =
-                Parser.value(Chr.valueOf(c1))
+                Combinators.value(Chr.valueOf(c1))
                         .map(x -> Chr.valueOf(x.charValue() + 1));
 
         ParserCheck.parser(parser)
@@ -122,7 +122,7 @@ public class ParserTest {
         final Parser<Chr, Optional<Chr>> parser =
                 Parser.ap(
                         Parser.pure(F.of(Optional::of)),
-                        Parser.value(Chr.valueOf(c1)));
+                        Combinators.value(Chr.valueOf(c1)));
 
         ParserCheck.parser(parser)
                 .withInput(input)
@@ -149,7 +149,7 @@ public class ParserTest {
         final Input<Chr> input2 = Input.of(String.valueOf(c2));
 
         final Parser<Chr, Chr> parser =
-                Parser.satisfy("test", Predicate.of((Chr c) -> c.charValue() % 2 == 0));
+                Combinators.satisfy("test", Predicate.of((Chr c) -> c.charValue() % 2 == 0));
 
         ParserCheck.parser(parser)
                 .withInput(input1)

@@ -3,8 +3,6 @@ package org.funcj.parser;
 import org.funcj.data.*;
 import org.funcj.util.Functions.*;
 
-import java.util.Optional;
-
 import static org.funcj.parser.Parser.pure;
 import static org.funcj.parser.Utils.*;
 import static org.funcj.util.Functions.F2.curry;
@@ -13,7 +11,7 @@ import static org.funcj.util.Functions.F2.curry;
  * A parser is essentially a function from an input stream to a parse {@link org.funcj.parser.Result}.
  * The {@code Parser} type along with the {@code pure} and {@code ap} functions constitute an applicative functor.
  * @param <I> input stream symbol type
- * @param <A> parse result type
+ * @param <A> parser result type
  */
 public interface Parser<I, A> {
 
@@ -52,7 +50,7 @@ public interface Parser<I, A> {
      * @return the parser result
      */
     default Result<I, A> run(Input<I> in) {
-        final Parser<I, A> parserAndEof = this.andL(eof());
+        final Parser<I, A> parserAndEof = this.andL(Combinators.eof());
         if (acceptsEmpty().apply()) {
             return parserAndEof.parse(in, SymSet.empty());
         } else if (in.isEof()) {
@@ -69,7 +67,7 @@ public interface Parser<I, A> {
      * Construct a parser that always returns the supplied value, without consuming any input.
      * @param a value
      * @param <I> input stream symbol type
-     * @param <A> parse result type
+     * @param <A> parser result type
      * @return a parser that always returns the supplied value
      */
     static <I, A> Parser<I, A> pure(A a) {
@@ -157,21 +155,6 @@ public interface Parser<I, A> {
     static <I, A, B>
     Parser<I, B> ap(F<A, B> f, Parser<I, A> pa) {
         return ap(pure(f), pa);
-    }
-
-    /**
-     * A parser that always fails.
-     * @param <I> input stream symbol type
-     * @param <A> parser result type
-     * @return a parser that always fails.
-     */
-    static <I, A> Parser<I, A> fail() {
-        return new ParserImpl<I, A>(() -> true, SymSet::empty) {
-            @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
-                return failure(this, in);
-            }
-        };
     }
 
     /**
@@ -263,81 +246,6 @@ public interface Parser<I, A> {
     }
 
     /**
-     * A parser that succeeds iff we are at the end of the input.
-     * @param <I> input stream symbol type
-     * @return a parser that succeeds iff we are at the end of the input.
-     */
-    static <I> Parser<I, Unit> eof() {
-        return new ParserImpl<I, Unit>(LTRUE, SymSet::empty) {
-            @Override
-            public Result<I, Unit> parse(Input<I> in, SymSet<I> follow) {
-                return in.isEof() ?
-                    Result.success(Unit.UNIT, in) :
-                    failure(this, in);
-            }
-        };
-    }
-
-    /**
-     * A parser that succeeds if the next input symbol satisfies the supplied predicate.
-     * @param name a name for the parser (used for error messages)
-     * @param pred predicate to be applied to the next input
-     * @param <I> input stream symbol type
-     * @return a parser that succeeds if the next input symbol satisfies the supplied predicate.
-     */
-    static <I> Parser<I, I> satisfy(String name, Predicate<I> pred) {
-        return new ParserImpl<I, I>(LFALSE, () -> SymSet.pred(name, pred)) {
-            @Override
-            public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
-                return Result.success(in.get(), in.next());
-            }
-        };
-    }
-
-    /**
-     * A parser that succeeds if the next inout symbol equals the supplied {@code value},
-     * and returns the value.
-     * @param val value returned by the parser
-     * @param <I> input stream symbol type
-     * @return A parser that succeeds if the next inout symbol equals the supplied {@code value}
-     */
-    static <I> Parser<I, I> value(I val) {
-        return value(val, val);
-    }
-
-    /**
-     * A parser that succeeds if the next inout symbol equals the supplied {@code value},
-     * and returns the supplied {@code res} value.
-     * @param val value returned by the parser
-     * @param <I> input stream symbol type
-     * @return A parser that succeeds if the next inout symbol equals the supplied {@code value}
-     */
-    static <I, A> Parser<I, A> value(I val, A res) {
-        return new ParserImpl<I, A>(LFALSE, () -> SymSet.value(val)) {
-            @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
-                return Result.success(res, in.next());
-            }
-        };
-    }
-
-    /**
-     * A parser that succeeds on any input symbol, and that returns that symbol.
-     * @param <I> input stream symbol type
-     * @return a parser that succeeds on any input symbol
-     */
-    static <I> Parser<I, I> any() {
-        return new ParserImpl<I, I>(LTRUE, SymSet::all) {
-            @Override
-            public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
-                return in.isEof() ?
-                    failureEof(this, in) :
-                    Result.success(in.get(), in.next());
-            }
-        };
-    }
-
-    /**
      * A parser for an operand, followed by one or more operands
      * that separated by operators.
      * This can, for example, be used to eliminate left recursion
@@ -347,100 +255,17 @@ public interface Parser<I, A> {
      */
     default Parser<I, A> chainl1(Parser<I, Op2<A>> op) {
         final Parser<I, IList<Op<A>>> plOps =
-                many(op.and(this)
+                Combinators.many(op.and(this)
                         .map((f, y) -> x -> f.apply(x, y)));
         return this.and(plOps)
                 .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
-    }
-
-    /**
-     * A parser which applies {@code p} repeatedly until it fails,
-     * and then returns an {@link org.funcj.data.IList} of the results.
-     * Note, if {@code p} fails immediately then this parser succeeds,
-     * with an empty list of results.
-     * @param p parser to be applied repeatedly
-     * @param <I> input stream symbol type
-     * @param <A> parse result type
-     * @return a parser which applies {@code p} repeatedly until it fails
-     */
-    static <I, A>
-    Parser<I, IList<A>> many(Parser<I, A> p) {
-        return new ParserImpl<I, IList<A>>(LTRUE, p.firstSet()) {
-            @Override
-            public Result<I, IList<A>> parse(Input<I> in, SymSet<I> follow) {
-                IList<A> acc = IList.of();
-                final SymSet<I> follow2 = follow.union(p.firstSet().apply());
-                while (true) {
-                    if (!in.isEof()) {
-                        final I i = in.get();
-                        if (firstSet().apply().matches(i)) {
-                            final Result<I, A> r = p.parse(in, follow2);
-                            if (r.isSuccess()) {
-                                final Result.Success<I, A> succ = (Result.Success<I, A>) r;
-                                acc = acc.add(succ.value());
-                                in = succ.next();
-                                continue;
-                            } else {
-                                return ((Result.Failure<I, A>)r).cast();
-                            }
-                        }
-                    }
-                    return Result.success(acc.reverse(), in);
-                }
-            }
-        };
-    }
-
-    static <I, A>
-    Parser<I, IList.NonEmpty<A>> many1(Parser<I, A> p) {
-        return p.and(many(p))
-            .map(a -> l -> l.add(a));
-    }
-
-    static <I, A>
-    Parser<I, Unit> skipMany(Parser<I, A> p) {
-        return many(p).map(u -> Unit.UNIT);
-    }
-
-    static <I, A, SEP>
-    Parser<I, IList<A>> sepBy(Parser<I, A> p, Parser<I, SEP> sep) {
-        return sepBy1(p, sep).or(pure(IList.nil()));
-    }
-
-    static <I, A, SEP>
-    Parser<I, IList<A>> sepBy1(Parser<I, A> p, Parser<I, SEP> sep) {
-        return p.and(many(sep.andR(p)))
-            .map(a -> l -> l.add(a));
-    }
-
-    static <I, A>
-    Parser<I, Optional<A>> optional(Parser<I, A> p) {
-        return p.map(Optional::of).or(pure(Optional.empty()));
-    }
-
-    static <I, A, OPEN, CLOSE>
-    Parser<I, A> between(
-            Parser<I, OPEN> open,
-            Parser<I, CLOSE> close,
-            Parser<I, A> p) {
-        return open.andR(p).andL(close);
-    }
-
-    static <I, A>
-    Parser<I, A> choice(Parser<I, A>... ps) {
-        return choice(IList.ofArray(ps));
-    }
-
-    static <I, A>
-    Parser<I, A> choice(IList<Parser<I, A>> ps) {
-        return ps.foldLeft1(Parser::or);
     }
 }
 
 /**
  * Base class for {@code Parser} implementations.
  * @param <I> input stream symbol type
- * @param <A> parse result type
+ * @param <A> parser result type
  */
 abstract class ParserImpl<I, A> implements Parser<I, A> {
 
