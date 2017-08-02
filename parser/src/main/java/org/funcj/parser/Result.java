@@ -6,9 +6,9 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * A parse result. Either a {@code Success} or a {@code Failure}
+ * A parse result is either a {@code Success} or a {@code Failure}.
  * @param <I> input stream symbol type
- * @param <A> parse result type
+ * @param <A> parser result type
  */
 public interface Result<I, A> {
     static <I, A> Result<I, A> success(A result, Input<I> next) {
@@ -37,6 +37,13 @@ public interface Result<I, A> {
 
     <B> B match(F<Success<I, A>, B> success, F<Failure<I, A>, B> failure);
 
+    /**
+     * The result of a successful parse.
+     * Consists of the parsed value, and a reference to the point in the input symbol stream
+     * immediately after the parsed input.
+     * @param <I> input stream symbol type
+     * @param <A> parser result type
+     */
     class Success<I, A> implements Result<I, A> {
         private final A value;
         private final Input<I> next;
@@ -102,6 +109,11 @@ public interface Result<I, A> {
         }
     }
 
+    /**
+     * Base class for the results of a failed parse.
+     * @param <I> input stream symbol type
+     * @param <A> parser result type
+     */
     abstract class Failure<I, A> implements Result<I, A> {
         protected final Input<I> input;
 
@@ -156,6 +168,11 @@ public interface Result<I, A> {
         }
     }
 
+    /**
+     * The result of a failed parse, where the failure was due an expected symbol not being found.
+     * @param <I> input stream symbol type
+     * @param <A> parser result type
+     */
     final class FailureOnExpected<I, A> extends Failure<I, A> {
         private final SymSet<I> expected;
 
@@ -223,6 +240,11 @@ public interface Result<I, A> {
         }
     }
 
+    /**
+     * The result of a failed parse, where the failure is descriobed by an error message.
+     * @param <I> input stream symbol type
+     * @param <A> parser result type
+     */
     class FailureMessage<I, A> extends Failure<I, A> {
         private final String error;
 

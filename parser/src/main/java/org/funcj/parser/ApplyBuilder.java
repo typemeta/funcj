@@ -4,6 +4,10 @@ import org.funcj.util.Functions.*;
 
 import static org.funcj.parser.Parser.ap;
 
+/**
+ * ApplyBuilder accumulates parsers via successive calls to {@code and} and {@code andL}.
+ * The results of the parsers are handled by calling the {@code map) method.
+ */
 public class ApplyBuilder {
     public static class _2<I, A, B> {
         private final Parser<I, A> pa;
