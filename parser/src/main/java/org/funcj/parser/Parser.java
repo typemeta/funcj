@@ -162,7 +162,7 @@ public interface Parser<I, A> {
     /**
      * A parser that always fails.
      * @param <I> input stream symbol type
-     * @param <A> parse result type
+     * @param <A> parser result type
      * @return a parser that always fails.
      */
     static <I, A> Parser<I, A> fail() {
@@ -321,6 +321,11 @@ public interface Parser<I, A> {
         };
     }
 
+    /**
+     * A parser that succeeds on any input symbol, and that returns that symbol.
+     * @param <I> input stream symbol type
+     * @return a parser that succeeds on any input symbol
+     */
     static <I> Parser<I, I> any() {
         return new ParserImpl<I, I>(LTRUE, SymSet::all) {
             @Override
@@ -348,6 +353,16 @@ public interface Parser<I, A> {
                 .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
     }
 
+    /**
+     * A parser which applies {@code p} repeatedly until it fails,
+     * and then returns an {@link org.funcj.data.IList} of the results.
+     * Note, if {@code p} fails immediately then this parser succeeds,
+     * with an empty list of results.
+     * @param p parser to be applied repeatedly
+     * @param <I> input stream symbol type
+     * @param <A> parse result type
+     * @return a parser which applies {@code p} repeatedly until it fails
+     */
     static <I, A>
     Parser<I, IList<A>> many(Parser<I, A> p) {
         return new ParserImpl<I, IList<A>>(LTRUE, p.firstSet()) {
