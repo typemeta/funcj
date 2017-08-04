@@ -17,6 +17,7 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Construct an empty list.
      * @param <T> element type
+     * @return empty list
      */
     public static <T> IList<T> nil() {
         return Empty.EMPTY;
@@ -25,6 +26,7 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Construct an empty list.
      * @param <T> element type
+     * @return empty list
      */
     public static <T> IList<T> of() {
         return nil();
@@ -32,23 +34,30 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list with one element.
+     * @param elem element
      * @param <T> element type
+     * @return list with one element
      */
     public static <T> NonEmpty<T> of(T elem) {
         return IList.<T>nil().add(elem);
     }
 
     /**
-     * Construct a list with multiple elements.
+     * Construct a list with one or more elements.
+     * @param elem first element
+     * @param elems remaining elements
      * @param <T> element type
+     * @return list with one or more element
      */
     public static <T> NonEmpty<T> of(T elem, T... elems) {
         return ofArray(elems).add(elem);
     }
 
     /**
-     * Construct a list from an {@link java.lang.Iterable}.
+     * Construct a list from an {@link java.lang.Iterable} collection of elements.
+     * @param elems iterable collection of elements
      * @param <T> element type
+     * @return list with multiple elements
      */
     public static <T> IList<T> ofIterable(Iterable<T> elems) {
         IList<T> r = nil();
@@ -60,7 +69,9 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list from an array.
+     * @param elems array of elements
      * @param <T> element type
+     * @return list with multiple elements
      */
     public static <T> IList<T> ofArray(T[] elems) {
         IList<T> r = nil();
@@ -71,8 +82,11 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Concatenate two lists.
+     * Concatenate two lists to form a new list
+     * @param l1 first list
+     * @param l2 second list
      * @param <T> element type
+     * @return concatenated list
      */
     public static <T> IList<T> concat(IList<? extends T> l1, IList<? extends T>  l2) {
         IList<T> r = (IList<T>)l2;
@@ -84,6 +98,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Convert a list of {@link java.lang.Character}s into a {@link java.lang.String}.
+     * @param l list of {@code Character}s
+     * @return a {@code String}
      */
     public static String listToString(IList<Character> l) {
         final StringBuilder sb = new StringBuilder();
@@ -95,6 +111,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Convert a {@link java.lang.String} into a list of {@link java.lang.Character}s.
+     * @param s {@code String}
+     * @return a list of {@code Character}s
      */
     public static IList<Character> stringToList(String s) {
         IList<Character> r = nil();
@@ -106,6 +124,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a new list by adding an element to the head of this list.
+     * @param head element to add onto head of this list
+     * @return new list
      */
     public NonEmpty<T> add(T head) {
         return new NonEmpty<T>(head, this);
@@ -113,6 +133,9 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a new list by adding multiple elements to the head of this list.
+     * @param l list to be added to the head of this list
+     * @param <S> list element type
+     * @return new list
      */
     public <S extends T> IList<T> addAll(IList<S> l) {
         IList<T> r = this;
@@ -123,24 +146,29 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Is this list empty?
+     * Return true if this list is empty otherwise false
+     * @return true if this list is empty otherwise false
      */
     public abstract boolean isEmpty();
 
     /**
      * Returns Optional.empty() if this list is empty,
      * otherwise it returns an {@link java.util.Optional} which wraps the non-empty list.
+     * @return Optional.empty() if this list is empty, otherwise an {@code Optional} which wraps the
+     * non-empty list.
      */
-    public abstract Optional<NonEmpty<T>> nonEmpty();
+    public abstract Optional<NonEmpty<T>> nonEmptyOpt();
 
     /**
+     * Return the head element of this list.
      * @return the head of this list.
      * @throws UnsupportedOperationException if the list is empty.
      */
     public abstract T head();
 
     /**
-     * @return the head of this list or an empty {@link java.util.Optional}.
+     * Return an {@link java.util.Optional} which wraps the head element of this list.
+     * @return the head of this list or an empty {@code Optional}.
      */
     public abstract Optional<T> headOpt();
 
