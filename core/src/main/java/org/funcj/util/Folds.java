@@ -97,7 +97,7 @@ public abstract class Folds {
      * @return the folded value
      */
     public static <T, R> R foldRight(F2<T, R, R> f, R z, Set<T> s) {
-        return foldRight(f, z, (List<T>)new ArrayList<T>(s));
+        return foldRight(f, z, new ArrayList<T>(s));
     }
 
     /**
@@ -108,6 +108,6 @@ public abstract class Folds {
      * @return the folded value
      */
     public static <T> T foldRight1(Op2<T> f, Set<T> s) {
-        return foldRight1(f, (List<T>)new ArrayList<T>(s));
+        return foldRight1(f, new ArrayList<T>(s));
     }
 }

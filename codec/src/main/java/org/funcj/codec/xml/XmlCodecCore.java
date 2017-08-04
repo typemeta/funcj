@@ -603,8 +603,8 @@ public class XmlCodecCore extends CodecCore<Element> {
         return new Codec<T[], Element>() {
             @Override
             public Element encode(T[] vals, Element enc) {
-                for (int i = 0; i < vals.length; ++i) {
-                    elemCodec.encode(vals[i], addEntryElement(enc));
+                for (T val : vals) {
+                    elemCodec.encode(val, addEntryElement(enc));
                 }
 
                 return enc;
@@ -699,9 +699,7 @@ public class XmlCodecCore extends CodecCore<Element> {
 
             @Override
             public Element encode(T val, Element enc) {
-                objMeta.forEach(field -> {
-                    field.encodeField(val, addElement(enc, field.name()));
-                });
+                objMeta.forEach(field -> field.encodeField(val, addElement(enc, field.name())));
                 return enc;
             }
 

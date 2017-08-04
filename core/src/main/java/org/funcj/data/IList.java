@@ -1,6 +1,5 @@
 package org.funcj.data;
 
-import org.funcj.util.Functions;
 import org.funcj.util.Functions.*;
 
 import java.util.*;
@@ -20,7 +19,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @return empty list
      */
     public static <T> IList<T> nil() {
-        return Empty.EMPTY;
+        return (IList<T>)Empty.EMPTY;
     }
 
     /**

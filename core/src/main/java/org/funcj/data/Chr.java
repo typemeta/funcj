@@ -140,7 +140,7 @@ public final class Chr implements Comparable<Chr> {
 
     @Override
     public int compareTo(Chr rhs) {
-        return (value < rhs.value) ? -1 : ((value == rhs.value) ? 0 : 1);
+        return Character.compare(value, rhs.value);
     }
 
     @Override

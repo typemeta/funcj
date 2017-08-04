@@ -15,7 +15,7 @@ public class JsonCodecs {
         @Override
         public JSValue encode(Optional<T> val, JSValue enc) {
             return val.map(t -> core.dynamicCodec().encode(t, enc))
-                    .orElseGet(() -> JSObject.of());
+                    .orElseGet(JSObject::of);
         }
 
         @Override

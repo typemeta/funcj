@@ -15,7 +15,7 @@ public interface FieldCodec<E> {
 
         protected final Field field;
 
-        protected boolean isAccessible;
+        protected final boolean isAccessible;
 
         protected Impl(Field field) {
             this.field = field;
@@ -29,7 +29,8 @@ public interface FieldCodec<E> {
             }
         }
     }
-    static class BooleanFieldCodec<E> extends Impl<E> {
+
+    class BooleanFieldCodec<E> extends Impl<E> {
 
         protected final Codec.BooleanCodec<E> codec;
 
@@ -55,7 +56,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class BooleanArrayFieldCodec<E> extends Impl<E> {
+    class BooleanArrayFieldCodec<E> extends Impl<E> {
 
         protected final Codec<boolean[], E> codec;
 
@@ -81,7 +82,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class ByteFieldCodec<E> extends Impl<E> {
+    class ByteFieldCodec<E> extends Impl<E> {
 
         protected final Codec.ByteCodec<E> codec;
 
@@ -107,7 +108,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class ByteArrayFieldCodec<E> extends Impl<E> {
+    class ByteArrayFieldCodec<E> extends Impl<E> {
 
         protected final Codec<byte[], E> codec;
 
@@ -133,7 +134,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class CharFieldCodec<E> extends Impl<E> {
+    class CharFieldCodec<E> extends Impl<E> {
 
         protected final Codec.CharCodec<E> codec;
 
@@ -159,7 +160,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class CharArrayFieldCodec<E> extends Impl<E> {
+    class CharArrayFieldCodec<E> extends Impl<E> {
 
         protected final Codec<char[], E> codec;
 
@@ -185,7 +186,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class ShortFieldCodec<E> extends Impl<E> {
+    class ShortFieldCodec<E> extends Impl<E> {
 
         protected final Codec.ShortCodec<E> codec;
 
@@ -211,7 +212,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class ShortArrayFieldCodec<E> extends Impl<E> {
+    class ShortArrayFieldCodec<E> extends Impl<E> {
 
         protected final Codec<short[], E> codec;
 
@@ -237,7 +238,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class IntegerFieldCodec<E> extends Impl<E> {
+    class IntegerFieldCodec<E> extends Impl<E> {
 
         protected final Codec.IntCodec<E> codec;
 
@@ -262,7 +263,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class IntegerArrayFieldCodec<E> extends Impl<E> {
+    class IntegerArrayFieldCodec<E> extends Impl<E> {
 
         protected final Codec<int[], E> codec;
 
@@ -288,7 +289,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class LongFieldCodec<E> extends Impl<E> {
+    class LongFieldCodec<E> extends Impl<E> {
 
         protected final Codec.LongCodec<E> codec;
 
@@ -314,7 +315,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class LongArrayFieldCodec<E> extends Impl<E> {
+    class LongArrayFieldCodec<E> extends Impl<E> {
 
         protected final Codec<long[], E> codec;
 
@@ -340,7 +341,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class FloatFieldCodec<E> extends Impl<E> {
+    class FloatFieldCodec<E> extends Impl<E> {
 
         protected final Codec.FloatCodec<E> codec;
 
@@ -366,7 +367,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class FloatArrayFieldCodec<E> extends Impl<E> {
+    class FloatArrayFieldCodec<E> extends Impl<E> {
 
         protected final Codec<float[], E> codec;
 
@@ -392,7 +393,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class DoubleFieldCodec<E> extends Impl<E> {
+    class DoubleFieldCodec<E> extends Impl<E> {
 
         protected final Codec.DoubleCodec<E> codec;
 
@@ -418,7 +419,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class DoubleArrayFieldCodec<E> extends Impl<E> {
+    class DoubleArrayFieldCodec<E> extends Impl<E> {
 
         protected final Codec<double[], E> codec;
 
@@ -444,7 +445,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class ObjectFieldCodec<T, E> extends Impl<E> {
+    class ObjectFieldCodec<T, E> extends Impl<E> {
 
         protected final Codec<T, E> codec;
 
@@ -470,7 +471,7 @@ public interface FieldCodec<E> {
         }
     }
 
-    static class ObjectArrayFieldCodec<T, E> extends Impl<E> {
+    class ObjectArrayFieldCodec<T, E> extends Impl<E> {
 
         protected final Codec<T[], E> codec;
 
@@ -502,12 +503,12 @@ public interface FieldCodec<E> {
      * @param enc encoded parent value
      * @return encoded value
      */
-    public abstract E encodeField(Object obj, E enc);
+    E encodeField(Object obj, E enc);
 
     /**
      * One of the two {@code decode} methods must be implemented by sub-classes.
      * @param obj object to which the field belongs
      * @param enc the encoded value
      */
-    public abstract void decodeField(Object obj, E enc);
+    void decodeField(Object obj, E enc);
 }

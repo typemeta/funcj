@@ -61,7 +61,7 @@ public class DocFormat {
         }
     }
 
-    private StringBuilder line = new StringBuilder();
+    private final StringBuilder line = new StringBuilder();
     private final Writer wtr;
     private final int width;
 

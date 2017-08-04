@@ -8,7 +8,7 @@ import static org.funcj.parser.Parser.ap;
  * ApplyBuilder combines parsers via successive calls to {@code and} and {@code andL}.
  * <p>
  * ApplyBuilder provides a fluent interface for combining parsers.
- * The first two parsers are combined by a calling the {@link Parser#map(F)},
+ * The first two parsers are combined by a calling {@link Parser#map(F f) Parser.map},
  * which returns an {@code ApplyBuilder} instance.
  * Each successive parser is incorporated by passing it to a call to {@code and} or {@code andL}.
  * The chain of calls is concluded by calling {@code map} with a handler for the parse results.

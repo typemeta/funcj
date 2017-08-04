@@ -44,7 +44,7 @@ public interface SymSet<I> {
     }
 
     class Empty<I> implements SymSet<I> {
-        static final Empty<Unit> INSTANCE = new Empty<>();;
+        static final Empty<Unit> INSTANCE = new Empty<>();
 
         @Override
         public Type type() {
