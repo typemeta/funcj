@@ -5,8 +5,16 @@ import org.funcj.util.Functions.*;
 import static org.funcj.parser.Parser.ap;
 
 /**
- * ApplyBuilder accumulates parsers via successive calls to {@code and} and {@code andL}.
- * The results of the parsers are handled by calling the {@code map} method.
+ * ApplyBuilder combines parsers via successive calls to {@code and} and {@code andL}.
+ * <p>
+ * ApplyBuilder provides a fluent interface for combining parsers.
+ * The first two parsers are combined by a calling the {@link Parser#map(F)},
+ * which returns an {@code ApplyBuilder} instance.
+ * Each successive parser is incorporated by passing it to a call to {@code and} or {@code andL}.
+ * The chain of calls is concluded by calling {@code map} with a handler for the parse results.
+ * <p>
+ * ApplyBuilder is a concise and more readable way of using {@code Parser#ap} -
+ * {@code pa.and(pb).and(pc).map(f)} is equivalent to {@code ap(ap(ap(pa.map(f), pb), pc), pd)}.
  */
 public class ApplyBuilder {
     public static class _2<I, A, B> {

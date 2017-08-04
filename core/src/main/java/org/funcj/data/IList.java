@@ -167,21 +167,10 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract T head();
 
     /**
-     * Return an {@link java.util.Optional} which wraps the head element of this list.
-     * @return the head of this list or an empty {@code Optional}.
-     */
-    public abstract Optional<T> headOpt();
-
-    /**
      * @return the tail of this list.
      * @throws UnsupportedOperationException if the list is empty.
      */
     public abstract IList<T> tail();
-
-    /**
-     * @return the tail of this list or an empty {@link java.util.Optional}.
-     */
-    public abstract Optional<IList<T>> tailOpt();
 
     /**
      * @return the indexed element of this list.
@@ -318,7 +307,7 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public Optional<NonEmpty<T>> nonEmpty() {
+        public Optional<NonEmpty<T>> nonEmptyOpt() {
             return Optional.empty();
         }
 
@@ -328,18 +317,8 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public Optional<T> headOpt() {
-            return Optional.empty();
-        }
-
-        @Override
         public IList<T> tail() {
             throw new UnsupportedOperationException("Cannot take the tail of an empty list");
-        }
-
-        @Override
-        public Optional<IList<T>> tailOpt() {
-            return Optional.empty();
         }
 
         @Override
@@ -480,7 +459,7 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public Optional<NonEmpty<T>> nonEmpty() {
+        public Optional<NonEmpty<T>> nonEmptyOpt() {
             return Optional.of(this);
         }
 
@@ -490,40 +469,27 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public Optional<T> headOpt() {
-            return Optional.of(head);
-        }
-
-        @Override
         public IList<T> tail() {
             return tail;
         }
 
         @Override
-        public Optional<IList<T>> tailOpt() {
-            return Optional.of(tail);
-        }
-
-        @Override
         public T get(int index) {
-            final Functions.F0<RuntimeException> raiseError =
-                () -> new IndexOutOfBoundsException("Index " + index + " out of bounds");
-
             if (index < 0) {
-                throw raiseError.apply();
+                throw new IndexOutOfBoundsException("Index " + index + " out of bounds");
             } else if (index == 0) {
                 return head;
             } else {
                 IList<T> next = tail;
                 for (int i = 1; i < index; ++i) {
                     if (next.isEmpty()) {
-                        throw raiseError.apply();
+                        throw new IndexOutOfBoundsException("Index " + index + " out of bounds");
                     } else {
                         next = ((NonEmpty<T>)next).tail;
                     }
                 }
                 if (next.isEmpty()) {
-                    throw raiseError.apply();
+                    throw new IndexOutOfBoundsException("Index " + index + " out of bounds");
                 } else {
                     return ((NonEmpty<T>)next).head;
                 }

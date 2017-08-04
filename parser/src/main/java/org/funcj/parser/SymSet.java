@@ -8,10 +8,15 @@ import java.util.*;
 import static org.funcj.parser.SymSetUtils.typeError;
 
 /**
- * A set of "symbols", used for first sets and follow sets.
- * We include support for predicates to avoid having to enumerate
- * every symbol that satisfies the predicate.
- * @param <I>
+ * An abstraction for an immutable set of symbols.
+ * <p>
+ * A {code SymSet} represents an immutable set of symbols,
+ * {@code SymSet}s are used for First Sets and Follow Sets.
+ * Since the {@link Combinators#value(Object)} parsers are expressed using predictaes,
+ * {@code SymSet} has to support these directly else every symbol that satisfies the predicate,
+ * would have to be enumerated.
+ * Consequently, a SymSet is expressed as the composition of symbols, predicates and set operations.
+ * @param <I>   input stream symbol type
  */
 public interface SymSet<I> {
     enum Type {
