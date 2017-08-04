@@ -74,8 +74,8 @@ public abstract class Combinators {
     /**
      * A parser that succeeds if the next inout symbol equals the supplied {@code value},
      * and returns the supplied {@code res} value.
-     * @param val   value returned by the parser
-     * @param res
+     * @param val   value expected by the parser
+     * @param res   value returned by the parser
      * @param <I>   input stream symbol type
      * @param <A>   parser result type
      * @return      a parser that succeeds if the next input symbol equals the supplied {@code value}

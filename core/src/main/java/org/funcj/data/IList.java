@@ -167,13 +167,16 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract T head();
 
     /**
+     * Return the tail of this list.
      * @return the tail of this list.
      * @throws UnsupportedOperationException if the list is empty.
      */
     public abstract IList<T> tail();
 
     /**
-     * @return the indexed element of this list.
+     * Returns the element at the specified position in this list.
+     * @param index the position of the element to return
+     * @return      the element of this list at the specified position.
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
     public abstract T get(int index);
@@ -199,21 +202,26 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Type-safe list equality.
-     * @return true if this list and rhs are equal in terms of their elements.
+     * @param rhs   list to be cpmpared
+     * @return      true if this list and rhs are equal in terms of their elements.
      */
     public abstract boolean equals(IList<T> rhs);
 
     /**
      * Apply one of two functions depending on whether this list is empty or not.
-     * @return the r of applying the appropriate function.
+     * @param nonEmptyF     function to be applied if the list is non-empty
+     * @param emptyF        function to be applied if the list is empty
+     * @param <S>           return type of both functions
+     * @return              the result of applying the appropriate function.
      */
-    public abstract <S> S match(F<NonEmpty<T>, S> nonEmpty, F<Empty<T>, S> empty);
+    public abstract <S> S match(F<NonEmpty<T>, S> nonEmptyF, F<Empty<T>, S> emptyF);
 
     /**
      * Create a new list by appending an element to the end of this list.
-     * @return concatenated list
+     * @param l     list to be appended to the end of this list
+     * @return      new list
      */
-    public abstract IList<T> append(IList<T> l);
+    public abstract IList<T> appendAll(IList<T> l);
 
     /**
      * @return the length of this list.
@@ -221,55 +229,69 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract int size();
 
     /**
-     * @return this list in reverse.
+     * @return      this list in reverse.
      */
     public abstract IList<T> reverse();
 
     /**
-     * Map a function over this list.
-     * @return mapped list
+     * Apply the function {code f} to each element in this list,
+     * and store the results in a new list.
+     * @param f     function to be applied to each element
+     * @param <U>   function return type
+     * @return      the new list
      */
     public abstract <U> IList<U> map(F<? super T, ? extends U> f);
 
     /**
-     * FlatMap a function over this list.
-     * @return mapped list
+     * Apply a function that returns an {@code IList} to each element
+     * in this list and concatenate the results into a single list.
+     * @param f     function to be applied
+     * @param <U>   element type for the list returned by the function
+     * @return      the new list
      */
     public abstract <U> IList<U> flatMap(F<? super T, IList<? extends U>> f);
 
     /**
      * Right-fold a function over this list.
-     * @return folded r
+     * @param f     function to be folded
+     * @param z     initial value for the fold (typically the identity value of {@code f})
+     * @param <U>   fold result type
+     * @return      folded result
      */
     public abstract <U> U foldRight(F2<T, U, U> f, U z);
 
     /**
      * Left-fold a function over this list.
-     * @return folded r
+     * @param f     function to be folded
+     * @param z     initial value for the fold (typically the identity value of {@code f})
+     * @param <U>   fold result type
+     * @return      folded result
      */
     public abstract <U> U foldLeft(F2<U, T, U> f, U z);
 
     /**
      * Right-fold a function over this non-empty list.
-     * @return folded r
+     * @param f     function to be folded
+     * @return      folded result
      */
     public abstract T foldRight1(Op2<T> f);
 
     /**
      * Left-fold a function over this non-empty list.
-     * @return folded r
+     * @param f     function to be folded
+     * @return      folded result
      */
     public abstract T foldLeft1(Op2<T> f);
 
     /**
      * Create a {@link java.util.Spliterator}.
-     * @return the spliterator
+     * @return      the spliterator
      */
     public abstract Spliterator<T> spliterator();
 
     /**
      * Create a {@link java.util.stream.Stream} onto this list.
-     * @return the stream
+     * @return      the new stream
      */
     public Stream<T> stream() {
         return StreamSupport.stream(spliterator(), false);
@@ -277,7 +299,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a parallel {@link java.util.stream.Stream} onto this list.
-     * @return the stream
+     * @return      the new stream
      */
     public Stream<T> parallelStream() {
         return StreamSupport.stream(spliterator(), true);
@@ -347,12 +369,12 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <S> S match(F<NonEmpty<T>, S> nonEmpty, F<Empty<T>, S> empty) {
-            return empty.apply(this);
+        public <S> S match(F<NonEmpty<T>, S> nonEmptyF, F<Empty<T>, S> emptyF) {
+            return emptyF.apply(this);
         }
 
         @Override
-        public IList<T> append(IList<T> l) {
+        public IList<T> appendAll(IList<T> l) {
             return l;
         }
 
@@ -534,13 +556,13 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <S> S match(F<NonEmpty<T>, S> nonEmpty, F<Empty<T>, S> empty) {
-            return nonEmpty.apply(this);
+        public <S> S match(F<NonEmpty<T>, S> nonEmptyF, F<Empty<T>, S> emptyF) {
+            return nonEmptyF.apply(this);
         }
 
         @Override
-        public IList<T> append(IList<T> l) {
-            return new NonEmpty<T>(head, tail.append(l));
+        public IList<T> appendAll(IList<T> l) {
+            return new NonEmpty<T>(head, tail.appendAll(l));
         }
 
         @Override
