@@ -5,8 +5,10 @@ import org.funcj.util.Functions;
 
 import java.util.Optional;
 
+import static org.funcj.parser.Parser.ap;
 import static org.funcj.parser.Parser.pure;
 import static org.funcj.parser.Utils.*;
+import static org.funcj.util.Functions.F2.curry;
 
 /**
  * Combinators provides functions for combining parsers to form new parsers.
@@ -103,6 +105,34 @@ public abstract class Combinators {
                         Result.success(in.get(), in.next());
             }
         };
+    }
+
+    /**
+     * Combine two parser to form a parser which applies both parsers,
+     * and if they are both successful then returns a {@link Tuple2} of the results.
+     * @param pa first parser
+     * @param pb second parser
+     * @param <A> result type of first parser
+     * @param <B> result type of second parser
+     * @return a parser that applies two parsers consecutively and returns the pair of values
+     */
+    public static <I, A, B> Parser<I, Tuple2<A, B>> product(Parser<I, A> pa, Parser<I, B> pb) {
+        return pa.and(pb).map(Tuple2::of);
+    }
+
+    /**
+     * Combine three parsers to form a parser which applies all parsers,
+     * and if they are successful then returns {@link Tuple3} of the results.
+     * @param pa first parser
+     * @param pb second parser
+     * @param pc third parser
+     * @param <A> result type of first parser
+     * @param <B> result type of second parser
+     * @param <C> result type of third parser
+     * @return a parser that applies two parsers consecutively and returns the pair of values
+     */
+    public static <I, A, B, C> Parser<I, Tuple3<A, B, C>> product(Parser<I, A> pa, Parser<I, B> pb, Parser<I, C> pc) {
+        return pa.and(pb).and(pc).map(Tuple3::of);
     }
 
     /**

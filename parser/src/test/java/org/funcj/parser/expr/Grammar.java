@@ -16,7 +16,7 @@ public abstract class Grammar {
 
     static {
         // To get around circular references.
-        final Ref<Chr, Expr> expr = Ref.of();
+        final Ref<Chr, Expr> expr = Parser.ref();
 
         final Parser<Chr, Chr> open = chr('(');
         final Parser<Chr, Chr> close = chr(')');

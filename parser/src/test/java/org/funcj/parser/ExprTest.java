@@ -7,7 +7,7 @@ import static org.funcj.parser.Text.*;
 
 public abstract class ExprTest {
 
-    static final public Ref<Chr, Double> expr = Ref.of();
+    static final public Ref<Chr, Double> expr = Parser.ref();
 
     static {
         final Parser<Chr, Op2<Double>> add =

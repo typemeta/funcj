@@ -15,6 +15,14 @@ import static org.funcj.util.Functions.F2.curry;
  */
 public interface Parser<I, A> {
 
+    static <I, A> Ref<I, A> ref() {
+        return new Ref<I, A>();
+    }
+
+    static <I, A> Ref<I, A> ref(Parser<I, A> p) {
+        return new Ref<I, A>(p);
+    }
+
     /**
      * Indicate whether this parser accepts the empty symbol.
      * @return a lazy wrapper for true iff the parser accepts the empty symbol
@@ -193,17 +201,6 @@ public interface Parser<I, A> {
                 }
             }
         };
-    }
-
-    /**
-     * Combine this parser with another to form a parser which applies the two parsers,
-     * and if they are both successful then returns the pair of results.
-     * @param pb second parser
-     * @param <B> result type of second parser
-     * @return a parser that applies two parsers consecutively and returns the pair of values
-     */
-    default <B> Parser<I, Tuple2<A, B>> product(Parser<I, B> pb) {
-        return ap(this.map(curry(Tuple2::new)), pb);
     }
 
     /**

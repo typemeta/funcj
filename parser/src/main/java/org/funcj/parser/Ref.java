@@ -5,20 +5,15 @@ import org.funcj.data.*;
 import java.util.Objects;
 
 /**
- * A reference to a parser. Typically used to allow parsers with circular
+ * A reference to a parser.
+ * <p>
+ * A reference to a {link Parser}. At creation the reference The reference is eventually
+ * Typically used to allow parsers with circular
  * dependencies to be constructed.
  * @param <I> input stream symbol type
  * @param <A> parser result type
  */
 public class Ref<I, A> implements Parser<I, A> {
-
-    public static <I, A> Ref<I, A> of() {
-        return new Ref<I, A>();
-    }
-
-    public static <I, A> Ref<I, A> of(Parser<I, A> p) {
-        return new Ref<I, A>(p);
-    }
 
     private enum Null implements Parser<Unit, Unit> {
         INSTANCE {
@@ -44,11 +39,11 @@ public class Ref<I, A> implements Parser<I, A> {
 
     private Parser<I, A> impl;
 
-    private Ref(Parser<I, A> p) {
+    Ref(Parser<I, A> p) {
         this.impl = Objects.requireNonNull(impl);
     }
 
-    private Ref() {
+    Ref() {
         this.impl = Null.of();
     }
 

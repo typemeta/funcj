@@ -2,8 +2,7 @@ package org.funcj.parser;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.funcj.data.Chr;
-import org.funcj.util.Functions;
+import org.funcj.data.*;
 import org.funcj.util.Functions.F;
 import org.junit.Assume;
 import org.junit.runner.RunWith;
@@ -28,7 +27,6 @@ public class ParserTest {
                 .withInput(input)
                 .succeedsWithResult(Chr.valueOf(c1), input);
     }
-
 
     @Property
     public void mapTransformsValue(char c1, char c2) {
@@ -86,5 +84,19 @@ public class ParserTest {
         ParserCheck.parser(parser)
                 .withInput(input3)
                 .fails();
+    }
+
+    @Property
+    public void andWithMapAppliesF(char c1, char c2) {
+        // String.toCharArray returns a new array each time, so ensure we call it only once.
+        final char[] data = ("" + c1 + c2).toCharArray();
+        final Input<Chr> input = Input.of(data);
+
+        final Parser<Chr, Tuple2<Chr, Chr>> parser = Combinators.<Chr>any().and(any()).map(Tuple2::of);
+
+        final Input<Chr> expInp = Input.of(data).next().next();
+        ParserCheck.parser(parser)
+                .withInput(input)
+                .succeedsWithResult(Tuple2.of(Chr.valueOf(c1), Chr.valueOf(c2)), expInp);
     }
 }

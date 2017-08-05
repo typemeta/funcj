@@ -40,7 +40,7 @@ public interface Input<I> {
     }
 
     /**
-     * Returns true iff this input is at the end of the input stream.
+     * Returns true if and only if this input is at the end of the input stream.
      * @return true if this input is at the end of the input stream
      */
     boolean isEof();
