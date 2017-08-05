@@ -59,7 +59,6 @@ public class ParserTest {
                 .succeedsWithResult(Chr.valueOf(c1 + 1), input.next());
     }
 
-
     @Property
     public void orAppliesEitherParser(char c1, char c2, char c3) {
         Assume.assumeThat(c1, not(c2));

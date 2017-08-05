@@ -80,8 +80,8 @@ public interface Parser<I, A> {
     }
 
     /**
-     * Functor map operation.
-     * If this parser succeeds then apply the function {@code f} to the result,
+     * Construct a parser that, if this parser succeeds then returns the result
+     * of applying the function {@code f} to the result,
      * otherwise return the failure.
      * @param f function to be mapped over this parser
      * @param <B> function return type
@@ -100,7 +100,6 @@ public interface Parser<I, A> {
     }
 
     /**
-     * Applicative application.
      * Construct a parser that, if {@code pf} succeeds, yielding a function {@code f},
      * and if {@code pa} succeeds, yielding a value {@code a},
      * then it returns the result of applying function {@code f} to value {@code a}.
@@ -141,7 +140,6 @@ public interface Parser<I, A> {
     }
 
     /**
-     * Applicative application.
      * Construct a parser that, if {@code pa} succeeds, yielding a function {@code a},
      * then it returns the result of applying function {@code f} to value {@code a}.
      * If {@code pa} fails then the parser returns the failure.
@@ -158,7 +156,6 @@ public interface Parser<I, A> {
     }
 
     /**
-     * Alternative.
      * Construct a parser which returns the result of either this parser or,
      * if it fails, then the result of the {@code rhs} parser.
      * @param rhs second parser to attempt
@@ -210,6 +207,16 @@ public interface Parser<I, A> {
     }
 
     /**
+     * Combine this parser with another to form a builder which accumulates the parse results.
+     * @param pb second parser
+     * @param <B> result type of second parser
+     * @return an {@link ApplyBuilder} which accumulates the parse results.
+     */
+    default <B> ApplyBuilder._2<I, A, B> and(Parser<I, B> pb) {
+        return new ApplyBuilder._2<I, A, B>(this, pb);
+    }
+
+    /**
      * Combine this parser with another to form a parser which applies two parsers,
      * and if they are both successful
      * throws away the result of the right-hand parser,
@@ -233,32 +240,6 @@ public interface Parser<I, A> {
      */
     default <B> Parser<I, B> andR(Parser<I, B> pb) {
         return this.and(pb).map(F2.second());
-    }
-
-    /**
-     * Combine this parser with another to form a builder which accumulates the parse results.
-     * @param pb second parser
-     * @param <B> result type of second parser
-     * @return an {@link ApplyBuilder} which accumulates the parse results.
-     */
-    default <B> ApplyBuilder._2<I, A, B> and(Parser<I, B> pb) {
-        return new ApplyBuilder._2<I, A, B>(this, pb);
-    }
-
-    /**
-     * A parser for an operand, followed by one or more operands
-     * that separated by operators.
-     * This can, for example, be used to eliminate left recursion
-     * which typically occurs in expression grammars.
-     * @param op parser for the operator
-     * @return a parser for operator expressions
-     */
-    default Parser<I, A> chainl1(Parser<I, Op2<A>> op) {
-        final Parser<I, IList<Op<A>>> plOps =
-                Combinators.many(op.and(this)
-                        .map((f, y) -> x -> f.apply(x, y)));
-        return this.and(plOps)
-                .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
     }
 }
 

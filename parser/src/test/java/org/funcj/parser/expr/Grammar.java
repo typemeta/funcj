@@ -4,6 +4,7 @@ import org.funcj.data.Chr;
 import org.funcj.parser.*;
 import org.funcj.util.Functions.Op2;
 
+import static org.funcj.parser.Combinators.chainl1;
 import static org.funcj.parser.Text.*;
 import static org.funcj.parser.expr.Model.*;
 
@@ -78,10 +79,10 @@ public abstract class Grammar {
             num.or(brackExpr).or(funcN).or(var); //.or(signedExpr);
 
         // prod = term chainl1 multDiv
-        final Parser<Chr, Expr> prod = term.chainl1(multDiv);
+        final Parser<Chr, Expr> prod = chainl1(term, multDiv);
 
         // expr = prod chainl1 addSub
-        parser = expr.set(prod.chainl1(addSub));
+        parser = expr.set(chainl1(prod, addSub));
     }
 
     public static final Parser<Chr, Expr> parser;

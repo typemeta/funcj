@@ -269,4 +269,23 @@ public abstract class Combinators {
     Parser<I, A> choice(IList<Parser<I, A>> ps) {
         return ps.foldLeft1(Parser::or);
     }
+
+    /**
+     * A parser for an operand, followed by one or more operands
+     * that separated by operators.
+     * This can, for example, be used to eliminate left recursion
+     * which typically occurs in expression grammars.
+     * @param p     parser
+     * @param op    parser for the operator
+     * @param <I>   input stream symbol type
+     * @param <A>   parser result type
+     * @return      a parser for operator expressions
+     */
+    public static <I, A> Parser<I, A> chainl1(Parser<I, A> p, Parser<I, Functions.Op2<A>> op) {
+        final Parser<I, IList<Functions.Op<A>>> plo =
+                Combinators.many(op.and(p)
+                        .map((f, y) -> x -> f.apply(x, y)));
+        return p.and(plo)
+                .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
+    }
 }
