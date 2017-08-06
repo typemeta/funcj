@@ -132,7 +132,7 @@ public class CombinatorsTest {
     }
 
     @Property
-    public void manyMatchesAnything(char c1, char c2) {
+    public void manyMatchesMany(char c1, char c2) {
         final String s = "" + c1 + c2;
         final char[] ca = s.toCharArray();
 
@@ -152,5 +152,28 @@ public class CombinatorsTest {
         ParserCheck.parser(parser)
                 .withInput(input)
                 .succeedsWithResult("", input);
+    }
+
+    @Property
+    public void many1MatchesMany(char c1, char c2) {
+        final String s = "" + c1 + c2;
+        final char[] ca = s.toCharArray();
+
+        final Parser<Chr, String> parser = many1(Combinators.<Chr>any()).map(Chr::listToString);
+
+        ParserCheck.parser(parser)
+                .withInput(Input.of(ca))
+                .succeedsWithResult(s, Input.of(ca).next().next());
+    }
+
+    @Property
+    public void many1FailsOnNonEmptyInput() {
+        final Input<Chr> input = Input.of("");
+
+        final Parser<Chr, String> parser = many1(Combinators.<Chr>any()).map(Chr::listToString);
+
+        ParserCheck.parser(parser)
+                .withInput(input)
+                .fails();
     }
 }
