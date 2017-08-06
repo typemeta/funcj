@@ -47,22 +47,6 @@ public abstract class Combinators {
     }
 
     /**
-     * A parser that succeeds if the next input symbol satisfies the supplied predicate.
-     * @param name  a name for the parser (used for error messages)
-     * @param pred  predicate to be applied to the next input
-     * @param <I>   input stream symbol type
-     * @return      a parser that succeeds if the next input symbol satisfies the supplied predicate.
-     */
-    public static <I> Parser<I, I> satisfy(String name, Functions.Predicate<I> pred) {
-        return new ParserImpl<I, I>(LFALSE, () -> SymSet.pred(name, pred)) {
-            @Override
-            public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
-                return Result.success(in.get(), in.next());
-            }
-        };
-    }
-
-    /**
      * A parser that succeeds if the next inout symbol equals the supplied {@code value},
      * and returns the value.
      * @param val   value returned by the parser
@@ -92,7 +76,23 @@ public abstract class Combinators {
     }
 
     /**
-     * A parser that succeeds on any input symbol, and that returns that symbol.
+     * A parser that succeeds if the next input symbol satisfies the supplied predicate.
+     * @param name  a name for the parser (used for error messages)
+     * @param pred  predicate to be applied to the next input
+     * @param <I>   input stream symbol type
+     * @return      a parser that succeeds if the next input symbol satisfies the supplied predicate.
+     */
+    public static <I> Parser<I, I> satisfy(String name, Functions.Predicate<I> pred) {
+        return new ParserImpl<I, I>(LFALSE, () -> SymSet.pred(name, pred)) {
+            @Override
+            public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
+                return Result.success(in.get(), in.next());
+            }
+        };
+    }
+
+    /**
+     * A parser that succeeds on any input symbol, and returns that symbol.
      * @param <I>   input stream symbol type
      * @return      a parser that succeeds on any input symbol
      */

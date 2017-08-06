@@ -69,7 +69,6 @@ public class ParserTest {
 
         final Chr cc1 = Chr.valueOf(c1);
         final Chr cc2 = Chr.valueOf(c2);
-        final Chr cc3 = Chr.valueOf(c3);
 
         final Parser<Chr, Chr> parser = value(cc1).or(value(cc2));
 
@@ -92,9 +91,11 @@ public class ParserTest {
         final char[] data = ("" + c1 + c2).toCharArray();
         final Input<Chr> input = Input.of(data);
 
-        final Parser<Chr, Tuple2<Chr, Chr>> parser = Combinators.<Chr>any().and(any()).map(Tuple2::of);
+        final Parser<Chr, Tuple2<Chr, Chr>> parser =
+                Combinators.<Chr>any().and(any()).map(Tuple2::of);
 
         final Input<Chr> expInp = Input.of(data).next().next();
+
         ParserCheck.parser(parser)
                 .withInput(input)
                 .succeedsWithResult(Tuple2.of(Chr.valueOf(c1), Chr.valueOf(c2)), expInp);
