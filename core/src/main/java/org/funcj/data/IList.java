@@ -8,6 +8,10 @@ import java.util.stream.*;
 
 /**
  * Simple recursive, immutable linked list.
+ * <p>
+ * Each {code IList} is either {code Empty} or it is {@code NonEmpty},
+ * in which case it has a head element value and a tail.
+ * The tail is itself an {@code IList}.
  * Null elements are not allowed.
  * @param <T> element type
  */
