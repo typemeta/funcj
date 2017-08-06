@@ -10,7 +10,8 @@ import java.util.function.Consumer;
 /**
  * Simple monadic wrapper for computations which result in either a successfully computed value
  * or a list of errors.
- * Validation is effectively a discriminated union of {@code Success} (which wraps a value)
+ * <p>
+ * Validation is essentially a discriminated union of {@code Success} (which wraps a value)
  * and {@code Failure} (which wraps a list of errors).
  * @param <E> error type
  * @param <T> successful result type

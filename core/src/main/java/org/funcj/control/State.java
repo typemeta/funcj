@@ -7,39 +7,46 @@ import static org.funcj.data.Unit.UNIT;
 
 /**
  * State monad.
+ * <p>
  * Each State instance is a state processor that takes a state of type S,
  * and produces a new state S' and a result of type A.
- * @param <S> type of state
- * @param <A> type of result
+ * @param <S>   the type of state
+ * @param <A>   the type of result
  */
 @FunctionalInterface
 public interface State<S, A> {
 
     /**
-     * A state which leaves the state unchanged and sets the result to a.
-     * Monadic/applicative unit operation.
+     * A construct a state instance which leaves the input state unchanged and sets the result to a.
+     * @param a     state result value
+     * @param <S>   the state type
+     * @param <A>   the state result type
      */
-    static <S, A> State<S, A> result(A x) {
-        return st -> Tuple2.of(st, x);
+    static <S, A> State<S, A> pure(A a) {
+        return st -> Tuple2.of(st, a);
     }
 
     /**
      * Apply a function provided by a state to a state.
-     * Applicative apply operation.
+     * @param sf    state that wraps a function type
+     * @param sa    state that wraps the function argument type
+     * @param <S>   the state type
+     * @param <A>   the function argument type
+     * @param <B>   the function return type
      */
     static <S, A, B> State<S, B> ap(State<S, F<A, B>> sf, State<S, A> sa) {
         return sa.apply(sf);
     }
 
     /**
-     * A state which sets the state to st and sets the result to UNIT.
+     * A state which sets the state to {@code st} and sets the result to {@link Unit#UNIT}.
      */
     static <S> State<S, Unit> put(S st) {
         return u -> Tuple2.of(st, UNIT);
     }
 
     /**
-     * A state which leaves the state unchanged and sets the result to the state.
+     * A state which leaves the state unchanged and sets the result to the supplied state.
      */
     static <S> State<S, S> get() {
         return s -> Tuple2.of(s, s);
@@ -47,7 +54,7 @@ public interface State<S, A> {
 
     /**
      * A state which applies a function to the state,
-     * and sets the result to UNIT.
+     * and sets the result to {@link org.funcj.data.Unit#UNIT}.
      */
     static <S> State<S, Unit> modify(F<S, S> f) {
         return State.<S>get().flatMap(x ->
@@ -69,7 +76,7 @@ public interface State<S, A> {
     static <S, A, B> State<S, IList<B>> traverse(IList<A> lt, F<A, State<S, B>> f) {
         return lt.foldRight(
             (a, slb) -> f.apply(a).apply(slb.map(l -> l::add)),
-            result(IList.nil())
+            pure(IList.nil())
         );
     }
 
@@ -79,7 +86,7 @@ public interface State<S, A> {
     static <S, A> State<S, IList<A>> sequence(IList<? extends State<S, A>> lsa) {
         return lsa.foldRight(
             (sa, sla) -> sa.apply(sla.map(l -> l::add)),
-            result(IList.nil())
+            pure(IList.nil())
         );
     }
 

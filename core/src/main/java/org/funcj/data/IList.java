@@ -19,8 +19,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct an empty list.
-     * @param <T> element type
-     * @return empty list
+     * @param <T>   element type
+     * @return      empty list
      */
     public static <T> IList<T> nil() {
         return (IList<T>)Empty.EMPTY;
@@ -28,8 +28,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct an empty list.
-     * @param <T> element type
-     * @return empty list
+     * @param <T>   element type
+     * @return      empty list
      */
     public static <T> IList<T> of() {
         return nil();
@@ -37,9 +37,9 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list with one element.
-     * @param elem element
-     * @param <T> element type
-     * @return list with one element
+     * @param elem  element
+     * @param <T>   element type
+     * @return      the new list with one element
      */
     public static <T> NonEmpty<T> of(T elem) {
         return IList.<T>nil().add(elem);
@@ -47,10 +47,10 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list with one or more elements.
-     * @param elem first element
+     * @param elem  first element
      * @param elems remaining elements
-     * @param <T> element type
-     * @return list with one or more element
+     * @param <T>   element type
+     * @return      the new list with one or more element
      */
     public static <T> NonEmpty<T> of(T elem, T... elems) {
         return ofArray(elems).add(elem);
@@ -59,8 +59,8 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Construct a list from an {@link java.lang.Iterable} collection of elements.
      * @param elems iterable collection of elements
-     * @param <T> element type
-     * @return list with multiple elements
+     * @param <T>   element type
+     * @return      the new list with multiple elements
      */
     public static <T> IList<T> ofIterable(Iterable<T> elems) {
         IList<T> r = nil();
@@ -73,8 +73,8 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Construct a list from an array.
      * @param elems array of elements
-     * @param <T> element type
-     * @return list with multiple elements
+     * @param <T>   element type
+     * @return      the new list with multiple elements
      */
     public static <T> IList<T> ofArray(T[] elems) {
         IList<T> r = nil();
@@ -86,10 +86,10 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Concatenate two lists to form a new list
-     * @param l1 first list
-     * @param l2 second list
-     * @param <T> element type
-     * @return concatenated list
+     * @param l1    first list
+     * @param l2    second list
+     * @param <T>   element type
+     * @return      the new concatenated list
      */
     public static <T> IList<T> concat(IList<? extends T> l1, IList<? extends T>  l2) {
         IList<T> r = (IList<T>)l2;
@@ -101,8 +101,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Convert a list of {@link java.lang.Character}s into a {@link java.lang.String}.
-     * @param l list of {@code Character}s
-     * @return a {@code String}
+     * @param l     list of {@code Character}s
+     * @return      a {@code String}
      */
     public static String listToString(IList<Character> l) {
         final StringBuilder sb = new StringBuilder();
@@ -114,8 +114,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Convert a {@link java.lang.String} into a list of {@link java.lang.Character}s.
-     * @param s {@code String}
-     * @return a list of {@code Character}s
+     * @param       s {@code String}
+     * @return      a list of {@code Character}s
      */
     public static IList<Character> stringToList(String s) {
         IList<Character> r = nil();
@@ -127,8 +127,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a new list by adding an element to the head of this list.
-     * @param head element to add onto head of this list
-     * @return new list
+     * @param head  element to add onto head of this list
+     * @return      the new list
      */
     public NonEmpty<T> add(T head) {
         return new NonEmpty<T>(head, this);
@@ -136,9 +136,9 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a new list by adding multiple elements to the head of this list.
-     * @param l list to be added to the head of this list
-     * @param <S> list element type
-     * @return new list
+     * @param l     list to be added to the head of this list
+     * @param <S>   list element type
+     * @return      the new list
      */
     public <S extends T> IList<T> addAll(IList<S> l) {
         IList<T> r = this;
@@ -150,29 +150,29 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Return true if this list is empty otherwise false
-     * @return true if this list is empty otherwise false
+     * @return      true if this list is empty otherwise false
      */
     public abstract boolean isEmpty();
 
     /**
      * Returns Optional.empty() if this list is empty,
      * otherwise it returns an {@link java.util.Optional} which wraps the non-empty list.
-     * @return Optional.empty() if this list is empty, otherwise an {@code Optional} which wraps the
+     * @return      Optional.empty() if this list is empty, otherwise an {@code Optional} which wraps the
      * non-empty list.
      */
     public abstract Optional<NonEmpty<T>> nonEmptyOpt();
 
     /**
      * Return the head element of this list.
-     * @return the head of this list.
-     * @throws UnsupportedOperationException if the list is empty.
+     * @return      the head of this list.
+     * @throws      UnsupportedOperationException if the list is empty.
      */
     public abstract T head();
 
     /**
      * Return the tail of this list.
-     * @return the tail of this list.
-     * @throws UnsupportedOperationException if the list is empty.
+     * @return      the tail of this list.
+     * @throws      UnsupportedOperationException if the list is empty.
      */
     public abstract IList<T> tail();
 
@@ -180,7 +180,7 @@ public abstract class IList<T> implements Iterable<T> {
      * Returns the element at the specified position in this list.
      * @param index the position of the element to return
      * @return      the element of this list at the specified position.
-     * @throws IndexOutOfBoundsException if the index is out of bounds.
+     * @throws      IndexOutOfBoundsException if the index is out of bounds.
      */
     public abstract T get(int index);
 
@@ -193,7 +193,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * List equality.
-     * @return true if this list and rhs are equal in terms of their size and elements.
+     * @return      true if this list and rhs are equal in terms of their size and elements.
      */
     @Override
     public boolean equals(Object rhs) {
@@ -222,12 +222,12 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Create a new list by appending an element to the end of this list.
      * @param l     list to be appended to the end of this list
-     * @return      new list
+     * @return      the new list
      */
     public abstract IList<T> appendAll(IList<T> l);
 
     /**
-     * @return the length of this list.
+     * @return      the length of this list.
      */
     public abstract int size();
 
@@ -259,7 +259,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @param f     function to be folded
      * @param z     initial value for the fold (typically the identity value of {@code f})
      * @param <U>   fold result type
-     * @return      folded result
+     * @return      the folded result
      */
     public abstract <U> U foldRight(F2<T, U, U> f, U z);
 
@@ -268,21 +268,21 @@ public abstract class IList<T> implements Iterable<T> {
      * @param f     function to be folded
      * @param z     initial value for the fold (typically the identity value of {@code f})
      * @param <U>   fold result type
-     * @return      folded result
+     * @return      the folded result
      */
     public abstract <U> U foldLeft(F2<U, T, U> f, U z);
 
     /**
      * Right-fold a function over this non-empty list.
      * @param f     function to be folded
-     * @return      folded result
+     * @return      the folded result
      */
     public abstract T foldRight1(Op2<T> f);
 
     /**
      * Left-fold a function over this non-empty list.
      * @param f     function to be folded
-     * @return      folded result
+     * @return      the folded result
      */
     public abstract T foldLeft1(Op2<T> f);
 
@@ -310,13 +310,13 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create an {@link java.util.Iterator} over this list.
-     * @return the iterator
+     * @return      the iterator
      */
     public abstract Iterator<T> iterator();
 
     /**
      * Convert to a Java List implementation, albeit an immutable one.
-     * @return Java List.
+     * @return      the Java List.
      */
     public abstract List<T> toList();
 
@@ -669,100 +669,100 @@ public abstract class IList<T> implements Iterable<T> {
             return new ListAdaptor<T>(this);
         }
     }
-}
 
-class ListAdaptor<T> extends AbstractSequentialList<T> {
+    private static class ListAdaptor<T> extends AbstractSequentialList<T> {
 
-    private final IList<T> impl;
-    private final int size;
+        private final IList<T> impl;
+        private final int size;
 
-    ListAdaptor(IList<T> impl) {
-        this.impl = impl;
-        size = impl.size();
-    }
+        ListAdaptor(IList<T> impl) {
+            this.impl = impl;
+            size = impl.size();
+        }
 
-    @Override
-    public ListIterator<T> listIterator(int index) {
+        @Override
+        public ListIterator<T> listIterator(int index) {
 
-        return new ListIterator<T>() {
+            return new ListIterator<T>() {
 
-            private IList<T> move(IList<T> node, int count) {
-                for (int i = 0; i < count; ++i) {
-                    node = node.tail();
+                private IList<T> move(IList<T> node, int count) {
+                    for (int i = 0; i < count; ++i) {
+                        node = node.tail();
+                    }
+                    return node;
                 }
-                return node;
-            }
 
-            private int pos = index;
-            private IList<T> node = move(impl, index);
+                private int pos = index;
+                private IList<T> node = move(impl, index);
 
-            @Override
-            public boolean hasNext() {
-                return pos < size;
-            }
-
-            @Override
-            public T next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                } else {
-                    final T ret = node.head();
-                    node = node.tail();
-                    ++pos;
-                    return ret;
+                @Override
+                public boolean hasNext() {
+                    return pos < size;
                 }
-            }
 
-            @Override
-            public boolean hasPrevious() {
-                return pos >= 0;
-            }
-
-            @Override
-            public T previous() {
-                if (!hasPrevious()) {
-                    throw new NoSuchElementException();
-                } else {
-                    --pos;
-                    node = move(impl, pos);
-                    ++pos;
-                    return node.head();
+                @Override
+                public T next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    } else {
+                        final T ret = node.head();
+                        node = node.tail();
+                        ++pos;
+                        return ret;
+                    }
                 }
-            }
 
-            @Override
-            public int nextIndex() {
-                return pos;
-            }
+                @Override
+                public boolean hasPrevious() {
+                    return pos >= 0;
+                }
 
-            @Override
-            public int previousIndex() {
-                return pos - 1;
-            }
+                @Override
+                public T previous() {
+                    if (!hasPrevious()) {
+                        throw new NoSuchElementException();
+                    } else {
+                        --pos;
+                        node = move(impl, pos);
+                        ++pos;
+                        return node.head();
+                    }
+                }
 
-            @Override
-            public void remove() {
-                throw modError();
-            }
+                @Override
+                public int nextIndex() {
+                    return pos;
+                }
 
-            @Override
-            public void set(T t) {
-                throw modError();
-            }
+                @Override
+                public int previousIndex() {
+                    return pos - 1;
+                }
 
-            @Override
-            public void add(T t) {
-                throw modError();
-            }
+                @Override
+                public void remove() {
+                    throw modError();
+                }
 
-            private UnsupportedOperationException modError() {
-                return new UnsupportedOperationException("IList can not be modified");
-            }
-        };
-    }
+                @Override
+                public void set(T t) {
+                    throw modError();
+                }
 
-    @Override
-    public int size() {
-        return size;
+                @Override
+                public void add(T t) {
+                    throw modError();
+                }
+
+                private UnsupportedOperationException modError() {
+                    return new UnsupportedOperationException("IList can not be modified");
+                }
+            };
+        }
+
+        @Override
+        public int size() {
+            return size;
+        }
     }
 }

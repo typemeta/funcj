@@ -4,7 +4,7 @@ import org.funcj.control.State;
 import org.funcj.data.Tuple2;
 
 /**
- * Pseudo-random number generator, using the {@code State} monad.
+ * Pseudo-random number generator, using the {@link State} monad.
  */
 public interface RNG {
 

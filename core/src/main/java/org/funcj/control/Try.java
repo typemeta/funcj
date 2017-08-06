@@ -10,7 +10,8 @@ import java.util.function.Consumer;
 /**
  * Simple monadic wrapper for computations which result in either a successfully computed value
  * or an error.
- * Try is effectively a discriminated union of {@code Success} (which wraps the result value)
+ * <p>
+ * Try is essentially a discriminated union of {@code Success} (which wraps the result value)
  * and {@code Failure} (which wraps an exception).
  * @param <T> successful result type
  */

@@ -15,7 +15,7 @@ public class RNGTest {
         return
             RNG.nextDbl().flatMap(d ->
                 RNG.nextLng().flatMap(l ->
-                    State.result(d + " : " + l)
+                    State.pure(d + " : " + l)
                 )
             );
     }
