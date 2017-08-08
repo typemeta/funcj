@@ -138,7 +138,16 @@ public interface Parser<I, A> {
 
                 if (r.isSuccess()) {
                     final Result.Success<I, F<A, B>> succ = (Result.Success<I, F<A, B>>) r;
-                    final Result<I, A> r2 = pa.parse(succ.next(), follow);
+                    final Input<I> next = succ.next();
+                    if (!pa.acceptsEmpty().apply()) {
+                        if (next.isEof()) {
+                            return failureEof(this, next);
+                        } else if (!pa.firstSet().apply().matches(next.get())) {
+                            return failure(this, next);
+                        }
+                    }
+
+                    final Result<I, A> r2 = pa.parse(next, follow);
                     return r2.map(succ.value());
                 } else {
                     return ((Result.Failure<I, F<A, B>>) r).cast();

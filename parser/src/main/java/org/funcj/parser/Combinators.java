@@ -17,8 +17,8 @@ public abstract class Combinators {
 
     /**
      * A parser that always fails.
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
      * @return      a parser that always fails.
      */
     public static <I, A> Parser<I, A> fail() {
@@ -32,7 +32,7 @@ public abstract class Combinators {
 
     /**
      * A parser that succeeds if the end of the input has been reached.
-     * @param <I>   input stream symbol type
+     * @param <I>   the input stream symbol type
      * @return      a parser that succeeds iff we are at the end of the input.
      */
     public static <I> Parser<I, Unit> eof() {
@@ -49,8 +49,8 @@ public abstract class Combinators {
     /**
      * A parser that succeeds if the next inout symbol equals the supplied {@code value},
      * and returns the value.
-     * @param val   value returned by the parser
-     * @param <I>   input stream symbol type
+     * @param val   the value returned by the parser
+     * @param <I>   the input stream symbol type
      * @return      as parser that succeeds if the next input symbol equals the supplied {@code value}
      */
     public static <I> Parser<I, I> value(I val) {
@@ -60,16 +60,18 @@ public abstract class Combinators {
     /**
      * A parser that succeeds if the next inout symbol equals the supplied {@code value},
      * and returns the supplied {@code res} value.
-     * @param val   value expected by the parser
-     * @param res   value returned by the parser
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
+     * @param val   the value expected by the parser
+     * @param res   the value returned by the parser
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
      * @return      a parser that succeeds if the next input symbol equals the supplied {@code value}
      */
     public static <I, A> Parser<I, A> value(I val, A res) {
         return new ParserImpl<I, A>(LFALSE, () -> SymSet.value(val)) {
             @Override
             public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+
+                boolean check = val.equals(in.get());
                 return Result.success(res, in.next());
             }
         };
@@ -78,14 +80,15 @@ public abstract class Combinators {
     /**
      * A parser that succeeds if the next input symbol satisfies the supplied predicate.
      * @param name  a name for the parser (used for error messages)
-     * @param pred  predicate to be applied to the next input
-     * @param <I>   input stream symbol type
+     * @param pred  the predicate to be applied to the next input
+     * @param <I>   the input stream symbol type
      * @return      a parser that succeeds if the next input symbol satisfies the supplied predicate.
      */
     public static <I> Parser<I, I> satisfy(String name, Functions.Predicate<I> pred) {
         return new ParserImpl<I, I>(LFALSE, () -> SymSet.pred(name, pred)) {
             @Override
             public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
+                boolean check = pred.apply(in.get());
                 return Result.success(in.get(), in.next());
             }
         };
@@ -93,7 +96,7 @@ public abstract class Combinators {
 
     /**
      * A parser that succeeds on any input symbol, and returns that symbol.
-     * @param <I>   input stream symbol type
+     * @param <I>   the input stream symbol type
      * @return      a parser that succeeds on any input symbol
      */
     public static <I> Parser<I, I> any() {
@@ -110,11 +113,12 @@ public abstract class Combinators {
     /**
      * Combine two parser to form a parser which applies both parsers,
      * and if they are both successful then returns a {@link Tuple2} of the results.
-     * @param pa first parser
-     * @param pb second parser
-     * @param <A> result type of first parser
-     * @param <B> result type of second parser
-     * @return a parser that applies two parsers consecutively and returns the pair of values
+     * @param pa    the first parser
+     * @param pb    the second parser
+     * @param <I>   the input stream symbol type
+     * @param <A>   the result type of first parser
+     * @param <B>   the result type of second parser
+     * @return      a parser that applies two parsers consecutively and returns the pair of values
      */
     public static <I, A, B> Parser<I, Tuple2<A, B>> product(Parser<I, A> pa, Parser<I, B> pb) {
         return pa.and(pb).map(Tuple2::of);
@@ -123,13 +127,14 @@ public abstract class Combinators {
     /**
      * Combine three parsers to form a parser which applies all parsers,
      * and if they are successful then returns {@link Tuple3} of the results.
-     * @param pa first parser
-     * @param pb second parser
-     * @param pc third parser
-     * @param <A> result type of first parser
-     * @param <B> result type of second parser
-     * @param <C> result type of third parser
-     * @return a parser that applies two parsers consecutively and returns the pair of values
+     * @param pa    the first parser
+     * @param pb    the second parser
+     * @param pc    the third parser
+     * @param <I>   input stream symbol type
+     * @param <A>   the result type of first parser
+     * @param <B>   the result type of second parser
+     * @param <C>   the result type of third parser
+     * @return      a parser that applies two parsers consecutively and returns the pair of values
      */
     public static <I, A, B, C> Parser<I, Tuple3<A, B, C>> product(Parser<I, A> pa, Parser<I, B> pb, Parser<I, C> pc) {
         return pa.and(pb).and(pc).map(Tuple3::of);
@@ -140,9 +145,9 @@ public abstract class Combinators {
      * and then returns an {@link org.funcj.data.IList} of the results.
      * Note, if {@code p} fails on the first attempt then this parser succeeds,
      * with an empty list of results.
-     * @param p     parser to be applied repeatedly
-     * @param <I>   input stream symbol type
-     * @param <A>   parse result type
+     * @param p     the parser to be applied repeatedly
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parse result type
      * @return      a parser which applies {@code p} zero or more times until it fails
      */
     public static <I, A>
@@ -177,9 +182,9 @@ public abstract class Combinators {
      * A parser which applies {@code p} one or more times until it fails,
      * and then returns an {@link IList} of the results.
      * Note, if {@code p} fails on the first attempt then this parser fails.
-     * @param p     parser to be applied repeatedly
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
+     * @param p     the parser to be applied repeatedly
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
      * @return      a parser which applies {@code p} repeatedly until it fails
      */
     public static <I, A>
@@ -192,9 +197,9 @@ public abstract class Combinators {
      * A parser which applies {@code p} zero or more times until it fails,
      * and throws away the results.
      * Note, if {@code p} fails on the first attempt then this parser succeeds.
-     * @param p     parser to be applied repeatedly
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
+     * @param p     the parser to be applied repeatedly
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
      * @return      a parser which applies {@code p} repeatedly until it fails
      */
     public static <I, A>
@@ -207,11 +212,11 @@ public abstract class Combinators {
      * alternating with calls to the {@code sep} parser.
      * The results of the {@code p} parser are collected in a {@link IList}
      * and returned by the parser.
-     * @param p     symbol parser
-     * @param sep   separator parser
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
-     * @param <SEP> separator type
+     * @param p     the symbol parser
+     * @param sep   the separator parser
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
+     * @param <SEP> the separator type
      * @return      a parser which applies {@code p} zero or more times alternated with {@code sep}
      */
     public static <I, A, SEP>
@@ -224,11 +229,11 @@ public abstract class Combinators {
      * alternating with calls to the {@code sep} parser.
      * The results of the {@code p} parser are collected in a {@link IList}
      * and returned by the parser.
-     * @param p     symbol parser
-     * @param sep   separator parser
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
-     * @param <SEP> separator type
+     * @param p     the symbol parser
+     * @param sep   the separator parser
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
+     * @param <SEP> the separator type
      * @return      a parser which applies {@code p} one or more times alternated with {@code sep}
      */
     public static <I, A, SEP>
@@ -241,9 +246,9 @@ public abstract class Combinators {
      * A parser that applies the {@code p} parser, and, if it succeeds,
      * returns the result wrapped in an {@link Optional},
      * otherwise returns an empty {@code Optional}.
-     * @param p     symbol parser
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
+     * @param p     the symbol parser
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
      * @return      an optional parser
      */
     public static <I, A>
@@ -257,13 +262,13 @@ public abstract class Combinators {
      * A parser which applies the {@code open} parser, then the {@code p} parser,
      * and then {@code close} parser.
      * If all three succeed then the result of the {@code p} parser is returned.
-     * @param open      open symbol parser
-     * @param close     close symbol parser
-     * @param p         enclosed symbol parser
-     * @param <I>       input stream symbol type
-     * @param <A>       enclosed parser result type
-     * @param <OPEN>    open parser result type
-     * @param <CLOSE>   close parser result type
+     * @param open      the open symbol parser
+     * @param close     the close symbol parser
+     * @param p         the enclosed symbol parser
+     * @param <I>       the input stream symbol type
+     * @param <A>       the enclosed parser result type
+     * @param <OPEN>    the open parser result type
+     * @param <CLOSE>   the close parser result type
      * @return          a parser for expressions with enclosing symbols
      */
     public static <I, A, OPEN, CLOSE>
@@ -277,9 +282,9 @@ public abstract class Combinators {
     /**
      * A parser that attempts one or more parsers in turn and returns the result
      * of the first that succeeds, or else fails.
-     * @param ps    var-arg list of parsers
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
+     * @param ps    the var-arg list of parsers
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
      * @return      a parser that attempts one or more parsers in turn
      */
     public static <I, A>
@@ -290,9 +295,9 @@ public abstract class Combinators {
     /**
      * A parser that attempts one or more parsers in turn and returns the result
      * of the first that succeeds, or else fails.
-     * @param ps    list of parsers
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
+     * @param ps    the list of parsers
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
      * @return      a parser that attempts one or more parsers in turn
      */
     public static <I, A>
@@ -305,10 +310,10 @@ public abstract class Combinators {
      * that separated by operators.
      * This can, for example, be used to eliminate left recursion
      * which typically occurs in expression grammars.
-     * @param p     parser
-     * @param op    parser for the operator
-     * @param <I>   input stream symbol type
-     * @param <A>   parser result type
+     * @param p     the parser
+     * @param op    the parser for the operator
+     * @param <I>   the input stream symbol type
+     * @param <A>   the parser result type
      * @return      a parser for operator expressions
      */
     public static <I, A> Parser<I, A> chainl1(Parser<I, A> p, Parser<I, Functions.Op2<A>> op) {

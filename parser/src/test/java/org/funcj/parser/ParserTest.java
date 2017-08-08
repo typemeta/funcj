@@ -3,6 +3,7 @@ package org.funcj.parser;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.funcj.data.*;
+import org.funcj.util.Functions;
 import org.funcj.util.Functions.F;
 import org.junit.Assume;
 import org.junit.runner.RunWith;
@@ -12,6 +13,7 @@ import static org.funcj.parser.Combinators.value;
 import static org.funcj.parser.Parser.ap;
 import static org.funcj.parser.Parser.pure;
 import static org.funcj.parser.TestUtils.*;
+import static org.funcj.util.Functions.*;
 import static org.hamcrest.CoreMatchers.not;
 
 @RunWith(JUnitQuickcheck.class)
@@ -29,11 +31,8 @@ public class ParserTest {
     }
 
     @Property
-    public void mapTransformsValue(char c1, char c2) {
-        Assume.assumeThat(c1, not(c2));
-
+    public void mapTransformsValue(char c1) {
         final Input<Chr> input = Input.of(String.valueOf(c1));
-        final Input<Chr> input2 = Input.of(String.valueOf(c2));
 
         final Parser<Chr, Chr> parser =
                 value(Chr.valueOf(c1))
@@ -55,6 +54,28 @@ public class ParserTest {
         ParserCheck.parser(parser)
                 .withInput(input)
                 .succeedsWithResult(Chr.valueOf(c1 + 1), input.next());
+    }
+
+    @Property
+    public void apChainsParsers(char c1, char c2) {
+        Assume.assumeThat(c1, not(c2));
+
+        final Chr cc1 = Chr.valueOf(c1);
+        final Chr cc2 = Chr.valueOf(c2);
+
+        // String.toCharArray returns a new array each time, so ensure we call it only once.
+        final char[] ca12 = String.valueOf("" + c1 + c2).toCharArray();
+        final char[] ca11 = String.valueOf("" + c1 + c1).toCharArray();
+
+        final Parser<Chr, Tuple2<Chr, Chr>> parser = ap(ap(a -> b -> Tuple2.of(a, b), value(cc1)), value(cc2));
+
+        ParserCheck.parser(parser)
+                .withInput(Input.of(ca12))
+                .succeedsWithResult(Tuple2.of(cc1, cc2), Input.of(ca12).next().next());
+
+        ParserCheck.parser(parser)
+                .withInput(Input.of(ca11))
+                .fails();
     }
 
     @Property
@@ -92,7 +113,9 @@ public class ParserTest {
         final Input<Chr> input = Input.of(data);
 
         final Parser<Chr, Tuple2<Chr, Chr>> parser =
-                Combinators.<Chr>any().and(any()).map(Tuple2::of);
+                Combinators.<Chr>any()
+                        .and(any())
+                        .map(Tuple2::of);
 
         final Input<Chr> expInp = Input.of(data).next().next();
 
