@@ -10,6 +10,8 @@ Some notable features include:
 * Informative error messages in the event of parse failures.
 * Thread-safe due to immutable parsers and inputs.
 * Lightweight library with zero dependencies (aside from JUnit for the tests).
+* The framework computes first sets and follow sets,
+used to select the correct alternative when presented with a choice.
 
 ## Parser Combinators
 
@@ -34,7 +36,7 @@ are an extension of recursive descent parsing,
 that use an applicative functor (or a monad) to encapsulate the plumbing.
 The framework provides the basic building blocks -
 parsers for constituent language elements such as characters, words and numbers,
-as well as combinators that allow more complex parsers to be constructed by composing existing parsers.
+as well as combinators that allow more complex parsers to be constructed by composing existing ones.
 The framework effectively provides a Domain Specific Language for expressing language grammars,
 whereby each grammar instance implements an executable parser.
 
@@ -110,6 +112,5 @@ A typical approach to using the library to implement a parser for a language is 
 1. Define a model for language, i.e. a set of classes that represent the language elements.
 2. Define a grammar for the language - a set of production rules.
 3. Translate the production rules into parsers using the library combinators. The parsers will typically construct values from the model.
-4. Book-end the parser for the top-level element with the `eof` combinator.
-5. Invoke the parser by passing a `Input` object, usually constructed from a `String`, to the `parse` method.
-6. The resultant `Reply` result holds either the successfully parsed value or an error message.
+4. Invoke the parser by passing a `Input` object, usually constructed from a `String`, to the `run` method.
+5. The `Result` value returned  by `run` holds either the successfully parsed value or an error message.

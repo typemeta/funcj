@@ -4,6 +4,9 @@ import org.funcj.codec.TestDataBase.NoEmptyCtor;
 import org.funcj.codec.xml.XmlCodecCore;
 import org.funcj.control.Exceptions;
 import org.junit.Assert;
+import org.w3c.dom.*;
+
+import javax.xml.parsers.*;
 
 import static org.funcj.codec.xml.XmlUtils.nodeToString;
 

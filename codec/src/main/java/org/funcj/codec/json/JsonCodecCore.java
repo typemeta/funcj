@@ -459,7 +459,8 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
             @Override
             public EM decode(Class<EM> dynType, JSValue enc) {
-                return EM.valueOf(dynType, enc.asString().getValue());
+                Class<EM> type = dynType != null ? dynType : (Class<EM>)enumType;
+                return EM.valueOf(type, enc.asString().getValue());
             }
         };
     }
@@ -493,11 +494,13 @@ public class JsonCodecCore extends CodecCore<JSValue> {
                 final Collection<T> vals = Exceptions.wrap(
                         () -> getTypeConstructor(dynType).construct(),
                         ex -> wrapException(ex));
-                int i = 0;
+
                 for (JSValue node : arrNode) {
                     vals.add(elemCodec.decode(dynElemType, node));
                 }
+
                 return vals;
+
             }
         };
     }

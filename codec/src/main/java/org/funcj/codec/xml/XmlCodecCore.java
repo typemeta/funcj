@@ -542,7 +542,8 @@ public class XmlCodecCore extends CodecCore<Element> {
 
             @Override
             public EM decode(Class<EM> dynType, Element enc) {
-                return EM.valueOf(dynType, firstChildText(enc).getWholeText());
+                Class<EM> type = dynType != null ? dynType : (Class<EM>)enumType;
+                return EM.valueOf(type, firstChildText(enc).getWholeText());
             }
         };
     }
