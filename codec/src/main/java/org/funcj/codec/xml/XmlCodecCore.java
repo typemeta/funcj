@@ -12,8 +12,13 @@ import static org.funcj.codec.xml.XmlUtils.*;
 
 public class XmlCodecCore extends CodecCore<Element> {
 
-    public XmlCodecCore() {
-        registerCodec(Optional.class, new XmlCodecs.OptionalCodec(this));
+    public static XmlCodecCore of() {
+        final XmlCodecCore codec = new XmlCodecCore();
+        codec.registerCodec(Optional.class, new XmlCodecs.OptionalCodec(codec));
+        return Codecs.registerAll(codec);
+    }
+
+    protected XmlCodecCore() {
     }
 
     public String entryElemName() {

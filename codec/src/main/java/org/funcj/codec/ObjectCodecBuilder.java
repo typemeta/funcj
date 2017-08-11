@@ -33,7 +33,7 @@ public class ObjectCodecBuilder<T, E> {
 
     private final CodecCore<E> core;
 
-    public final Map<String, FieldCodec<T, E>> fields = new LinkedHashMap<>();
+    final Map<String, FieldCodec<T, E>> fields = new LinkedHashMap<>();
 
     public ObjectCodecBuilder(CodecCore<E> core) {
         this.core = core;

@@ -8,7 +8,7 @@ import org.junit.Assert;
 
 public class JsonCodecTest extends TestBase {
 
-    final static JsonCodecCore codec = new JsonCodecCore();
+    final static JsonCodecCore codec = JsonCodecCore.of();
 
     static {
         codec.registerTypeConstructor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));

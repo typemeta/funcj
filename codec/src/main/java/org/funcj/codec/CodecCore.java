@@ -22,7 +22,6 @@ public abstract class CodecCore<E> {
     protected final Map<String, TypeConstructor<?>> typeCtors = new HashMap<>();
 
     protected CodecCore() {
-        Codecs.registerAll(this);
     }
 
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, E> codec) {

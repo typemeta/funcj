@@ -3,6 +3,7 @@ package org.funcj.codec;
 import org.funcj.control.Exceptions;
 
 import java.lang.reflect.*;
+import java.util.Objects;
 
 /**
  * A {@code FieldCodec} encapsulates encoding a field
@@ -36,7 +37,7 @@ public interface FieldCodec<E> {
 
         BooleanFieldCodec(Field field, Codec.BooleanCodec<E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -62,7 +63,7 @@ public interface FieldCodec<E> {
 
         BooleanArrayFieldCodec(Field field, Codec<boolean[], E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -88,7 +89,7 @@ public interface FieldCodec<E> {
 
         ByteFieldCodec(Field field, Codec.ByteCodec<E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -114,7 +115,7 @@ public interface FieldCodec<E> {
 
         ByteArrayFieldCodec(Field field, Codec<byte[], E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -140,7 +141,7 @@ public interface FieldCodec<E> {
 
         CharFieldCodec(Field field, Codec.CharCodec<E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -166,7 +167,7 @@ public interface FieldCodec<E> {
 
         CharArrayFieldCodec(Field field, Codec<char[], E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -192,7 +193,7 @@ public interface FieldCodec<E> {
 
         ShortFieldCodec(Field field, Codec.ShortCodec<E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -218,7 +219,7 @@ public interface FieldCodec<E> {
 
         ShortArrayFieldCodec(Field field, Codec<short[], E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -244,7 +245,7 @@ public interface FieldCodec<E> {
 
         IntegerFieldCodec(Field field, Codec.IntCodec<E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -269,7 +270,7 @@ public interface FieldCodec<E> {
 
         IntegerArrayFieldCodec(Field field, Codec<int[], E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -295,7 +296,7 @@ public interface FieldCodec<E> {
 
         LongFieldCodec(Field field, Codec.LongCodec<E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -321,7 +322,7 @@ public interface FieldCodec<E> {
 
         LongArrayFieldCodec(Field field, Codec<long[], E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -347,7 +348,7 @@ public interface FieldCodec<E> {
 
         FloatFieldCodec(Field field, Codec.FloatCodec<E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -373,7 +374,7 @@ public interface FieldCodec<E> {
 
         FloatArrayFieldCodec(Field field, Codec<float[], E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -399,7 +400,7 @@ public interface FieldCodec<E> {
 
         DoubleFieldCodec(Field field, Codec.DoubleCodec<E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -425,7 +426,7 @@ public interface FieldCodec<E> {
 
         DoubleArrayFieldCodec(Field field, Codec<double[], E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -451,7 +452,7 @@ public interface FieldCodec<E> {
 
         protected ObjectFieldCodec(Field field, Codec<T, E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
@@ -477,7 +478,7 @@ public interface FieldCodec<E> {
 
         protected ObjectArrayFieldCodec(Field field, Codec<T[], E> codec) {
             super(field);
-            this.codec = codec;
+            this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
