@@ -8,6 +8,7 @@ The framework uses Reflection to determine the structure of Java classes,
 which is then mirrored in the structure of the serialised data.
 Custom codecs can be registered with the framework, to handle "difficult" types,
 or to simply override the default serialisation provided by the framework.
+A DSL is provided to simplify the creation of custom codecs.    
 
 # Getting Started
 
@@ -44,18 +45,17 @@ static class Person {
 
     final String name;
     final double height;
-    final LocalDate birthDate;
+    final LocalDateTime birthDate;
     final Set<Colour> favColours;
 
-    Person(String name, double height, LocalDate birthDate, Colour... favColours) {
+    Person(String name, double height, LocalDateTime birthDate, Colour... favColours) {
         this.name = name;
         this.height = height;
         this.birthDate = birthDate;
         this.favColours = new HashSet<>(Arrays.asList(favColours));
     }
 
-    @Deprecated
-    Person() {
+    private Person() {
         this.name = null;
         this.height = 0;
         this.birthDate = null;
@@ -74,7 +74,7 @@ Then, to round trip the data via JSON:
 ```java
 final JsonCodecCore codec = new JsonCodecCore();
 
-final Person person = new Person("Jon", 1.86, LocalDate.of(1970, 04, 19), Colour.GREEN, Colour.BLUE);
+final Person person = new Person("Jon", 1.86, LocalDateTime.of(1970, 04, 19, 17, 5, 41), Colour.GREEN, Colour.BLUE);
 
 // Serialise to JSON.
 final JSValue json = codec.encode(Person.class, person);
@@ -91,7 +91,19 @@ The serialised JSON looks like this:
 {
     "name" : "Jon",
     "height" : 1.86,
-    "birthDate" : "1970-04-19",
+    "birthDate" : {
+        "date" : {
+            "year" : 1970,
+            "month" : 4,
+            "day" : 19
+        },
+        "time" : {
+            "hours" : 17,
+            "mins" : 5,
+            "secs" : 41,
+            "nanos" : 0
+        }
+    },
     "favColours" : {
         "@type" : "java.util.HashSet",
         "@value" : ["GREEN", "BLUE"]
@@ -124,7 +136,19 @@ and the resultant XML is as follows:
 <?xml version="1.0" encoding="UTF-8"?><person>
     <name>Jon</name>
     <height>1.86</height>
-    <birthDate>1970-04-19</birthDate>
+    <birthDate>
+        <date>
+            <year>1970</year>
+            <month>4</month>
+            <day>19</day>
+        </date>
+        <time>
+            <hours>17</hours>
+            <mins>5</mins>
+            <secs>41</secs>
+            <nanos>0</nanos>
+        </time>
+    </birthDate>
     <favColours type="java.util.HashSet">
         <elem>GREEN</elem>
         <elem>BLUE</elem>
