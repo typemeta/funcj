@@ -2,7 +2,7 @@
 
 **funcj.codec** is a Java framework for serialising Java values
 to serialised structured data formats such as JSON and XML,
-and for deserialising the same data back into Java types.
+and for deserialising the same data back into Java values.
 
 The framework uses Reflection to determine the structure of Java classes,
 which is then mirrored in the structure of the serialised data.
