@@ -6,6 +6,8 @@ import java.time.*;
 
 public class Codecs {
     public static <E, C extends CodecCore<E>> C registerAll(C core) {
+        core.registerTypeRemap("java.time.ZoneRegion", ZoneId.class);
+
         core.registerCodec(Class.class, new ClassCodec<E>(core));
         core.registerCodec(OffsetDateTime.class, new OffsetDateTimeCodec<E>(core));
 
@@ -27,6 +29,10 @@ public class Codecs {
                 .field("time", LocalDateTime::toLocalTime, LocalTime.class)
                 .map(LocalDateTime::of);
 
+        core.codecBuilder(ZoneId.class)
+                .field("id", ZoneId::getId, String.class)
+                .map(ZoneId::of);
+
         core.codecBuilder(ZoneOffset.class)
                 .field("id", ZoneOffset::getId, String.class)
                 .map(ZoneOffset::of);
@@ -40,6 +46,12 @@ public class Codecs {
                 .field("time", OffsetDateTime::toLocalDateTime, LocalDateTime.class)
                 .field("offset", OffsetDateTime::getOffset, ZoneOffset.class)
                 .map(OffsetDateTime::of);
+
+        core.codecBuilder(ZonedDateTime.class)
+                .field("time", ZonedDateTime::toLocalDateTime, LocalDateTime.class)
+                .field("zone", ZonedDateTime::getZone, ZoneId.class)
+                .field("offset", ZonedDateTime::getOffset, ZoneOffset.class)
+                .map(ZonedDateTime::ofLocal);
 
         return core;
     }

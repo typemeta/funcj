@@ -45,10 +45,10 @@ static class Person {
 
     final String name;
     final double height;
-    final LocalDateTime birthDate;
+    final ZonedDateTime birthDate;
     final Set<Colour> favColours;
 
-    Person(String name, double height, LocalDateTime birthDate, Colour... favColours) {
+    Person(String name, double height, ZonedDateTime birthDate, Colour... favColours) {
         this.name = name;
         this.height = height;
         this.birthDate = birthDate;
@@ -74,7 +74,13 @@ Then, to round trip the data via JSON:
 ```java
 final JsonCodecCore codec = new JsonCodecCore();
 
-final Person person = new Person("Jon", 1.86, LocalDateTime.of(1970, 04, 19, 17, 5, 41), Colour.GREEN, Colour.BLUE);
+final Person person = new Person(
+        "Jon",
+        1.86,
+        ZonedDateTime.of(
+                LocalDateTime.of(1970, 04, 19, 17, 05, 41),
+                ZoneId.of("GMT")),
+        Colour.GREEN, Colour.BLUE);
 
 // Serialise to JSON.
 final JSValue json = codec.encode(Person.class, person);
@@ -92,17 +98,24 @@ The serialised JSON looks like this:
     "name" : "Jon",
     "height" : 1.86,
     "birthDate" : {
-        "date" : {
-            "year" : 1970,
-            "month" : 4,
-            "day" : 19
-        },
         "time" : {
-            "hours" : 17,
-            "mins" : 5,
-            "secs" : 41,
-            "nanos" : 0
-        }
+            "date" : {
+                "year" : 1970,
+                "month" : 4,
+                "day" : 19
+            },
+            "time" : {
+                "hours" : 17,
+                "mins" : 5,
+                "secs" : 41,
+                "nanos" : 0
+            }
+        },
+        "zone" : {
+            "@type" : "java.time.ZoneRegion",
+            "@value" : {"id" : "GMT"}
+        },
+        "offset" : {"id" : "Z"}
     },
     "favColours" : {
         "@type" : "java.util.HashSet",
@@ -137,17 +150,25 @@ and the resultant XML is as follows:
     <name>Jon</name>
     <height>1.86</height>
     <birthDate>
-        <date>
-            <year>1970</year>
-            <month>4</month>
-            <day>19</day>
-        </date>
         <time>
-            <hours>17</hours>
-            <mins>5</mins>
-            <secs>41</secs>
-            <nanos>0</nanos>
+            <date>
+                <year>1970</year>
+                <month>4</month>
+                <day>19</day>
+            </date>
+            <time>
+                <hours>17</hours>
+                <mins>5</mins>
+                <secs>41</secs>
+                <nanos>0</nanos>
+            </time>
         </time>
+        <zone type="java.time.ZoneRegion">
+            <id>GMT</id>
+        </zone>
+        <offset>
+            <id>Z</id>
+        </offset>
     </birthDate>
     <favColours type="java.util.HashSet">
         <elem>GREEN</elem>

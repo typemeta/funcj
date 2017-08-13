@@ -56,7 +56,11 @@ public class XmlCodecCore extends CodecCore<Element> {
 
     @Override
     public XmlCodecException wrapException(Exception ex) {
-        return new XmlCodecException(ex);
+        if (ex instanceof XmlCodecException) {
+            return (XmlCodecException)ex;
+        } else {
+            return new XmlCodecException(ex);
+        }
     }
 
     protected final Codec.NullCodec<Element> nullCodec = new Codec.NullCodec<Element>() {

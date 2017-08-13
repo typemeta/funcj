@@ -21,11 +21,25 @@ public abstract class CodecCore<E> {
 
     protected final Map<String, TypeConstructor<?>> typeCtors = new HashMap<>();
 
+    protected final Map<String, Class<?>> typeMap = new HashMap<>();
+
     protected CodecCore() {
     }
 
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, E> codec) {
         codecs.put(classToName(clazz), codec);
+    }
+
+    public <T> void registerCodec(String className, Codec<T, E> codec) {
+        codecs.put(className, codec);
+    }
+
+    public <T> void registerTypeRemap(Class<?> fromClass, Class<?> toClass) {
+        registerTypeRemap(classToName(fromClass), toClass);
+    }
+
+    public <T> void registerTypeRemap(String fromClass, Class<?> toClass) {
+        typeMap.put(fromClass, toClass);
     }
 
     public <T> ObjectCodecBuilder<T, E> codecBuilder(Class<T> clazz) {
@@ -46,6 +60,15 @@ public abstract class CodecCore<E> {
 
     public String classToName(Class<?> clazz) {
         return clazz.getName();
+    }
+
+    public <X> Class<X> remapType(Class<X> type) {
+        final String typeName = classToName(type);
+        if (typeMap.containsKey(typeName)) {
+            return (Class<X>)typeMap.get(typeName);
+        } else {
+            return type;
+        }
     }
 
     public <T> Class<T> nameToClass(String name) {
@@ -168,8 +191,9 @@ public abstract class CodecCore<E> {
     }
 
     public <T> Codec<T, E> getNullUnsafeCodec(Class<T> type) {
-        final String name = classToName(type);
-        return (Codec<T, E>)codecs.computeIfAbsent(name, n -> getNullUnsafeCodecImplDyn(type));
+        final Class<T> type2 = remapType(type);
+        final String name = classToName(type2);
+        return (Codec<T, E>)codecs.computeIfAbsent(name, n -> getNullUnsafeCodecImplDyn(type2));
     }
 
     public <T> Codec<T, E> getNullUnsafeCodecImplDyn(Class<T> dynType) {

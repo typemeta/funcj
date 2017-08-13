@@ -55,7 +55,11 @@ public class JsonCodecCore extends CodecCore<JSValue> {
 
     @Override
     public JsonCodecException wrapException(Exception ex) {
-        return new JsonCodecException(ex);
+        if (ex instanceof JsonCodecException) {
+            return (JsonCodecException)ex;
+        } else {
+            return new JsonCodecException(ex);
+        }
     }
 
     @Override
