@@ -6,7 +6,7 @@ and for deserialising the same data back into Java values.
 
 The framework uses Reflection to determine the structure of Java classes,
 which is then mirrored in the structure of the serialised data.
-Custom codecs can be registered with the framework, to handle "difficult" types,
+Custom codecs can be registered with the framework, to handle awkward types,
 or to simply override the default serialisation provided by the framework.
 A DSL is provided to simplify the creation of custom codecs.    
 
@@ -98,7 +98,7 @@ The serialised JSON looks like this:
     "name" : "Jon",
     "height" : 1.86,
     "birthDate" : {
-        "time" : {
+        "dateTime" : {
             "date" : {
                 "year" : 1970,
                 "month" : 4,
@@ -150,7 +150,7 @@ and the resultant XML is as follows:
     <name>Jon</name>
     <height>1.86</height>
     <birthDate>
-        <time>
+        <dateTime>
             <date>
                 <year>1970</year>
                 <month>4</month>

@@ -43,12 +43,12 @@ public class Codecs {
                 .map(OffsetTime::of);
 
         core.codecBuilder(OffsetDateTime.class)
-                .field("time", OffsetDateTime::toLocalDateTime, LocalDateTime.class)
+                .field("dateTime", OffsetDateTime::toLocalDateTime, LocalDateTime.class)
                 .field("offset", OffsetDateTime::getOffset, ZoneOffset.class)
                 .map(OffsetDateTime::of);
 
         core.codecBuilder(ZonedDateTime.class)
-                .field("time", ZonedDateTime::toLocalDateTime, LocalDateTime.class)
+                .field("dateTime", ZonedDateTime::toLocalDateTime, LocalDateTime.class)
                 .field("zone", ZonedDateTime::getZone, ZoneId.class)
                 .field("offset", ZonedDateTime::getOffset, ZoneOffset.class)
                 .map(ZonedDateTime::ofLocal);
