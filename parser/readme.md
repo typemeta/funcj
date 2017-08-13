@@ -1,9 +1,9 @@
 # Introduction
 
 **funcj.parser** is a Java parser combinator framework for constructing [LL(1) parsers](http://en.wikipedia.org/wiki/LL_parser).
-It is largely based on the "Deterministic, error-correcting combinator parsers" paper
-by S.D. Swierstra & L. Duponcheel, and draws inspiration by various parsers in the Haskell world,
-as well as [ParsecJ](https://github.com/jon-hanson/parsecj).
+It's based primarily on the "Deterministic, error-correcting combinator parsers" paper
+by S.D. Swierstra & L. Duponcheel, and draws inspiration from various parsers in the Haskell world,
+as well as the [ParsecJ](https://github.com/jon-hanson/parsecj) library.
 
 Some notable features include:
 * Composable parser combinators, which provide a DSL for constructing parsers from grammars.
