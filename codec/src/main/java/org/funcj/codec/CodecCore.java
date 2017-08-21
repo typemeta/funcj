@@ -12,8 +12,8 @@ import static java.util.stream.Collectors.toList;
 import static org.funcj.codec.TypeConstructor.createTypeConstructor;
 
 /**
- * Base class for classes which implement a specific encoding.
- * @param <E> encoded type
+ * Base class for classes which implement an encoding into a specific target type.
+ * @param <E> the encoded type
  */
 public abstract class CodecCore<E> {
 
@@ -21,39 +21,106 @@ public abstract class CodecCore<E> {
 
     protected final Map<String, TypeConstructor<?>> typeCtors = new HashMap<>();
 
-    protected final Map<String, Class<?>> typeMap = new HashMap<>();
+    protected final Map<String, Class<?>> typeProxies = new HashMap<>();
 
     protected CodecCore() {
     }
 
+    /**
+     * Register a {@code Codec} for a class.
+     * @param clazz the class to register codec against
+     * @param codec the codec
+     * @param <T> the codec value type
+     */
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, E> codec) {
-        codecs.put(classToName(clazz), codec);
+        registerCodec(classToName(clazz), codec);
     }
 
+    /**
+     * Register a {@code Codec} for a class.
+     * @param className name of class to register codec against
+     * @param codec the codec
+     * @param <T> the codec value type
+     */
     public <T> void registerCodec(String className, Codec<T, E> codec) {
         codecs.put(className, codec);
     }
 
-    public <T> void registerTypeRemap(Class<?> fromClass, Class<?> toClass) {
-        registerTypeRemap(classToName(fromClass), toClass);
+    /**
+     * Register a type proxy.
+     * A type proxy maps a type to its proxy before selecting its {@code Codec}.
+     * @param type type to be mapped
+     * @param proxyType proxy type
+     */
+    public void registerTypeProxy(Class<?> type, Class<?> proxyType) {
+        registerTypeProxy(classToName(type), proxyType);
     }
 
-    public <T> void registerTypeRemap(String fromClass, Class<?> toClass) {
-        typeMap.put(fromClass, toClass);
+    /**
+     * Register a type proxy.
+     * A type proxy maps a type to its proxy before selecting its {@code Codec}.
+     * @param typeName name of type to be mapped
+     * @param proxyType proxy type
+     */
+    public void registerTypeProxy(String typeName, Class<?> proxyType) {
+        typeProxies.put(typeName, proxyType);
     }
 
+    /**
+     * Create a {@code ObjectCodecBuilder} for the specified class.
+     * <p>
+     * Create a {@code ObjectCodecBuilder}, essentially a fluent interface
+     * for creating and registering a {@code Codec}.
+     * @param clazz the class to register codec against
+     * @param <T> the codec value type
+     * @return an {@code ObjectCodecBuilder}
+     */
     public <T> ObjectCodecBuilder<T, E> codecBuilder(Class<T> clazz) {
         return objectCodecDeferredRegister(clazz);
     }
 
-    public <T> void registerTypeConstructor(Class<? extends T> clazz, TypeConstructor<T> typeCtor) {
+    /**
+     * Register a {@code TypeConstructor} for the specified class.
+     * @param clazz the class to register the {@code TypeConstructor} against
+     * @param typeCtor the {@code TypeConstructor}
+     * @param <T> the type constructed by the {@code TypeConstructor}
+     */
+    public <T> void registerTypeConstructor(
+            Class<? extends T> clazz,
+            TypeConstructor<T> typeCtor) {
         typeCtors.put(classToName(clazz), typeCtor);
     }
 
+    /**
+     * Encode a non-null value of type {@code T} into encoded form {@code E}
+     * @param val the value to encode
+     * @param enc the encoded parent (may be null for certain encodings)
+     * @param <T> the unencoded value type
+     * @return the encoded value
+     */
+    public <T> E encode(T val, E enc) {
+        return encode((Class<T>)val.getClass(), val, enc);
+    }
+
+    /**
+     * Encode a value of type {@code T} into encoded form {@code E}.
+     * @param type the class of the unencoded value
+     * @param val the value to encode
+     * @param enc the encoded parent (may be null for certain encodings)
+     * @param <T> the unencoded value type
+     * @return the encoded value
+     */
     public <T> E encode(Class<T> type, T val, E enc) {
         return dynamicCodec(type).encode(val, enc);
     }
 
+    /**
+     * Decode a value of type {@code T} from encoded value of type {@code E}.
+     * @param type the type of unencoded value
+     * @param enc the value to decode
+     * @param <T> the unencoded value type
+     * @return
+     */
     public <T> T decode(Class<T> type, E enc) {
         return dynamicCodec(type).decode(enc);
     }
@@ -64,8 +131,8 @@ public abstract class CodecCore<E> {
 
     public <X> Class<X> remapType(Class<X> type) {
         final String typeName = classToName(type);
-        if (typeMap.containsKey(typeName)) {
-            return (Class<X>)typeMap.get(typeName);
+        if (typeProxies.containsKey(typeName)) {
+            return (Class<X>) typeProxies.get(typeName);
         } else {
             return type;
         }

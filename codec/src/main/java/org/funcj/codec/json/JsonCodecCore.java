@@ -49,6 +49,10 @@ public class JsonCodecCore extends CodecCore<JSValue> {
         }
     };
 
+    public <T> JSValue encode(T val) {
+        return encode((Class<T>)val.getClass(), val);
+    }
+
     public <T> JSValue encode(Class<T> type, T val) {
         return super.encode(type, val, null);
     }

@@ -6,7 +6,7 @@ import java.time.*;
 
 public class Codecs {
     public static <E, C extends CodecCore<E>> C registerAll(C core) {
-        core.registerTypeRemap("java.time.ZoneRegion", ZoneId.class);
+        core.registerTypeProxy("java.time.ZoneRegion", ZoneId.class);
 
         core.registerCodec(Class.class, new ClassCodec<E>(core));
         core.registerCodec(OffsetDateTime.class, new OffsetDateTimeCodec<E>(core));

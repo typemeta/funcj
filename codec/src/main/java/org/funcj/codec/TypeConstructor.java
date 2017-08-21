@@ -6,7 +6,7 @@ import java.util.*;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Interface for constructing a value of type {@code T}.
+ * Interface for constructing an uninitialised value of type {@code T}.
  * @param <T> type of value to be constructed
  */
 public interface TypeConstructor<T> {
