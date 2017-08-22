@@ -83,7 +83,7 @@ final Person person = new Person(
         Colour.GREEN, Colour.BLUE);
 
 // Serialise to JSON.
-final JSValue json = codec.encode(Person.class, person);
+final JSValue json = codec.encode(person);
 System.out.println(json.toJson(40));
 
 // Deserialise back to Java.
