@@ -6,6 +6,7 @@ import org.funcj.util.Functions.F;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.*;
 
 import static java.util.stream.Collectors.toList;
@@ -17,11 +18,30 @@ import static org.funcj.codec.TypeConstructor.createTypeConstructor;
  */
 public abstract class CodecCore<E> {
 
-    protected final Map<String, Codec<?, E>> codecs = new HashMap<>();
+    /**
+     * A map from class name to {@code Codec}, associating a class with its {@code Codec}.
+     * Although {@code Codec}s can be registered by the caller prior to en/decoding,
+     * the primary populator of the registry is this {@code CodecCore} implementation.
+     * As and when new classes are encountered, they are inspected via Reflection,
+     * and a {@code Codec} is constructed and registered.
+     * To support thread-safe use of this class, this field is a {@code ConcurrentHashMap}.
+     */
+    protected final ConcurrentMap<String, Codec<?, E>> codecRegistry = new ConcurrentHashMap<>();
 
-    protected final Map<String, TypeConstructor<?>> typeCtors = new HashMap<>();
+    /**
+     * A map from class name to {@code TypeConstructor}, associating a class with its {@code TypeConstructor}.
+     * Although {@code TypeConstructor}s can be registered by the caller prior to en/decoding,
+     * the primary populator of the registry is this {@code CodecCore} implementation.
+     * As and when new classes are encountered, they are inspected via Reflection,
+     * and a {@code TypeConstructor} is constructed and registered.
+     * To support thread-safe use of this class, this field is a {@code ConcurrentHashMap}.
+     */
+    protected final ConcurrentMap<String, TypeConstructor<?>> typeCtorRegistry = new ConcurrentHashMap<>();
 
-    protected final Map<String, Class<?>> typeProxies = new HashMap<>();
+    /**
+     * A map from class name to its type proxy, associating a class with its type proxy.
+     */
+    protected final Map<String, Class<?>> typeProxyRegistry = new HashMap<>();
 
     protected CodecCore() {
     }
@@ -43,7 +63,7 @@ public abstract class CodecCore<E> {
      * @param <T> the codec value type
      */
     public <T> void registerCodec(String className, Codec<T, E> codec) {
-        codecs.put(className, codec);
+        codecRegistry.put(className, codec);
     }
 
     /**
@@ -63,7 +83,7 @@ public abstract class CodecCore<E> {
      * @param proxyType proxy type
      */
     public void registerTypeProxy(String typeName, Class<?> proxyType) {
-        typeProxies.put(typeName, proxyType);
+        typeProxyRegistry.put(typeName, proxyType);
     }
 
     /**
@@ -88,7 +108,7 @@ public abstract class CodecCore<E> {
     public <T> void registerTypeConstructor(
             Class<? extends T> clazz,
             TypeConstructor<T> typeCtor) {
-        typeCtors.put(classToName(clazz), typeCtor);
+        typeCtorRegistry.put(classToName(clazz), typeCtor);
     }
 
     /**
@@ -125,14 +145,20 @@ public abstract class CodecCore<E> {
         return dynamicCodec(type).decode(enc);
     }
 
+    /**
+     * Map a class to a class name.
+     * This method exists primarily to allow it to be overridden in one place.
+     * @param clazz the class
+     * @return the class name
+     */
     public String classToName(Class<?> clazz) {
         return clazz.getName();
     }
 
     public <X> Class<X> remapType(Class<X> type) {
         final String typeName = classToName(type);
-        if (typeProxies.containsKey(typeName)) {
-            return (Class<X>) typeProxies.get(typeName);
+        if (typeProxyRegistry.containsKey(typeName)) {
+            return (Class<X>) typeProxyRegistry.get(typeName);
         } else {
             return type;
         }
@@ -146,7 +172,7 @@ public abstract class CodecCore<E> {
 
     public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz)     {
         final String name = classToName(clazz);
-        return (TypeConstructor<T>)typeCtors.computeIfAbsent(
+        return (TypeConstructor<T>) typeCtorRegistry.computeIfAbsent(
                 name,
                 n -> Exceptions.wrap(() -> createTypeConstructor(clazz), this::wrapException));
     }
@@ -260,7 +286,7 @@ public abstract class CodecCore<E> {
     public <T> Codec<T, E> getNullUnsafeCodec(Class<T> type) {
         final Class<T> type2 = remapType(type);
         final String name = classToName(type2);
-        return (Codec<T, E>)codecs.computeIfAbsent(name, n -> getNullUnsafeCodecImplDyn(type2));
+        return (Codec<T, E>) codecRegistry.computeIfAbsent(name, n -> getNullUnsafeCodecImplDyn(type2));
     }
 
     public <T> Codec<T, E> getNullUnsafeCodecImplDyn(Class<T> dynType) {
@@ -277,7 +303,7 @@ public abstract class CodecCore<E> {
         if (codec == null) {
             if (Modifier.isFinal(stcType.getModifiers())) {
                 final String name = classToName(stcType);
-                return (Codec<T, E>)codecs.computeIfAbsent(name, n -> createObjectCodec(stcType));
+                return (Codec<T, E>) codecRegistry.computeIfAbsent(name, n -> createObjectCodec(stcType));
             } else {
                 return dynamicCodec(stcType);
             }
