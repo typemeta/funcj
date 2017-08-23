@@ -9,7 +9,7 @@ import javax.xml.parsers.*;
 import java.time.*;
 import java.util.*;
 
-public class Test {
+public class Example {
     enum Colour {RED, GREEN, BLUE}
 
     static class Person {
@@ -71,7 +71,7 @@ public class Test {
     }
 
     static void xmlTest() throws ParserConfigurationException {
-        final CodecCore<Element> codec = XmlCodecCore.of();
+        final XmlCodecCore codec = XmlCodecCore.of();
 
         final DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         final Document doc = docBuilder.newDocument();
