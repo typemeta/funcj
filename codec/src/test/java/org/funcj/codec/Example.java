@@ -73,8 +73,11 @@ public class Example {
     static void xmlTest() throws ParserConfigurationException {
         final XmlCodecCore codec = Codecs.xmlCodec();
 
-        final DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        final Document doc = docBuilder.newDocument();
+        final Document doc =
+                DocumentBuilderFactory
+                        .newInstance()
+                        .newDocumentBuilder()
+                        .newDocument();
 
         // Serialise to XML.
         final Element elem = codec.encode(Person.class, person, doc.createElement("person"));
