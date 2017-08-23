@@ -10,7 +10,7 @@ import java.util.*;
 
 public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCodecCore {
 
-    protected JsonCodecCoreImpl() {
+    public JsonCodecCoreImpl() {
     }
 
     public String typeFieldName() {

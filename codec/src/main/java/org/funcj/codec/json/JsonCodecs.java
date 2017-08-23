@@ -6,6 +6,11 @@ import org.funcj.json.*;
 import java.util.Optional;
 
 public class JsonCodecs {
+    public static JsonCodecCoreImpl registerAll(JsonCodecCoreImpl core) {
+        core.registerCodec(Optional.class, new JsonCodecs.OptionalCodec(core));
+        return Codecs.registerAll(core);
+    }
+
     public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, JSValue> {
 
         protected OptionalCodec(BaseCodecCore<JSValue> core) {

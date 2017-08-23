@@ -11,7 +11,7 @@ import javax.xml.parsers.*;
 import static org.funcj.codec.xml.XmlUtils.nodeToString;
 
 public class XmlCodecTest extends TestBase {
-    final static XmlCodecCore codec = XmlCodecCore.of();
+    final static XmlCodecCore codec = Codecs.xmlCodec();
 
     public static final DocumentBuilder docBuilder;
 

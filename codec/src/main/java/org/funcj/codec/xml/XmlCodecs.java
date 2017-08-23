@@ -6,6 +6,11 @@ import org.w3c.dom.Element;
 import java.util.Optional;
 
 public class XmlCodecs {
+    public static XmlCodecCoreImpl registerAll(XmlCodecCoreImpl core) {
+        core.registerCodec(Optional.class, new XmlCodecs.OptionalCodec(core));
+        return Codecs.registerAll(core);
+    }
+
     public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, Element> {
 
         private static final String emptyAttrVal = "empty";

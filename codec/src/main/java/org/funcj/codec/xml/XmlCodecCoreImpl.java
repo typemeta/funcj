@@ -12,7 +12,7 @@ import static org.funcj.codec.xml.XmlUtils.*;
 
 public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodecCore {
 
-    protected XmlCodecCoreImpl() {
+    public XmlCodecCoreImpl() {
     }
 
     public String entryElemName() {

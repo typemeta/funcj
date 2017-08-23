@@ -59,7 +59,7 @@ public class Example {
             Colour.GREEN, Colour.BLUE);
 
     static void jsonTest() {
-        final JsonCodecCore codec = JsonCodecCore.of();
+        final JsonCodecCore codec = Codecs.jsonCodec();
 
         // Serialise to JSON.
         final JSValue json = codec.encode(person);
@@ -71,7 +71,7 @@ public class Example {
     }
 
     static void xmlTest() throws ParserConfigurationException {
-        final XmlCodecCore codec = XmlCodecCore.of();
+        final XmlCodecCore codec = Codecs.xmlCodec();
 
         final DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         final Document doc = docBuilder.newDocument();
