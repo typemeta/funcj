@@ -1,6 +1,6 @@
 package org.funcj.codec;
 
-import org.funcj.codec.json.JsonCodecCore;
+import org.funcj.codec.json.*;
 import org.funcj.codec.xml.*;
 import org.funcj.json.JSValue;
 import org.w3c.dom.*;
@@ -71,7 +71,7 @@ public class Test {
     }
 
     static void xmlTest() throws ParserConfigurationException {
-        final XmlCodecCore codec = XmlCodecCore.of();
+        final CodecCore<Element> codec = XmlCodecCore.of();
 
         final DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         final Document doc = docBuilder.newDocument();

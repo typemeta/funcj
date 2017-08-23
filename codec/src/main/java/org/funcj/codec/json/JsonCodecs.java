@@ -8,7 +8,7 @@ import java.util.Optional;
 public class JsonCodecs {
     public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, JSValue> {
 
-        protected OptionalCodec(CodecCore<JSValue> core) {
+        protected OptionalCodec(BaseCodecCore<JSValue> core) {
             super(core);
         }
 

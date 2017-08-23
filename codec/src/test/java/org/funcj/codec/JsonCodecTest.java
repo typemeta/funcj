@@ -1,10 +1,9 @@
 package org.funcj.codec;
 
 import org.funcj.codec.TestDataBase.NoEmptyCtor;
-import org.funcj.codec.json.JsonCodecCore;
+import org.funcj.codec.json.*;
 import org.funcj.json.JSValue;
 import org.junit.Assert;
-
 
 public class JsonCodecTest extends TestBase {
 

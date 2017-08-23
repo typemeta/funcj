@@ -11,12 +11,12 @@ import static org.funcj.codec.xml.XmlUtils.*;
 public abstract class XmlMapCodecs {
 
     public static class MapCodec<K, V> implements Codec<Map<K, V>, Element> {
-        private final XmlCodecCore core;
+        private final XmlCodecCoreImpl core;
         private final Codec<K, Element> keyCodec;
         private final Codec<V, Element> valueCodec;
 
         public MapCodec(
-                XmlCodecCore core,
+                XmlCodecCoreImpl core,
                 Codec<K, Element> keyCodec,
                 Codec<V, Element> valueCodec) {
             this.core = core;
@@ -61,10 +61,10 @@ public abstract class XmlMapCodecs {
     }
 
     public static class StringMapCodec<V> implements Codec<Map<String, V>, Element> {
-        private final XmlCodecCore core;
+        private final XmlCodecCoreImpl core;
         private final Codec<V, Element> valueCodec;
 
-        public StringMapCodec(XmlCodecCore core, Codec<V, Element> valueCodec) {
+        public StringMapCodec(XmlCodecCoreImpl core, Codec<V, Element> valueCodec) {
             this.core = core;
             this.valueCodec = valueCodec;
         }

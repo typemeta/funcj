@@ -13,12 +13,12 @@ import static java.util.stream.Collectors.toList;
 public abstract class JsonMapCodecs {
 
     public static class MapCodec<K, V> implements Codec<Map<K, V>, JSValue> {
-        private final JsonCodecCore core;
+        private final JsonCodecCoreImpl core;
         private final Codec<K, JSValue> keyCodec;
         private final Codec<V, JSValue> valueCodec;
 
         public MapCodec(
-                JsonCodecCore core,
+                JsonCodecCoreImpl core,
                 Codec<K, JSValue> keyCodec,
                 Codec<V, JSValue> valueCodec) {
             this.core = core;
@@ -65,10 +65,10 @@ public abstract class JsonMapCodecs {
     }
 
     public static class StringMapCodec<V> implements Codec<Map<String, V>, JSValue> {
-        private final JsonCodecCore core;
+        private final JsonCodecCoreImpl core;
         private final Codec<V, JSValue> valueCodec;
 
-        public StringMapCodec(JsonCodecCore core, Codec<V, JSValue> valueCodec) {
+        public StringMapCodec(JsonCodecCoreImpl core, Codec<V, JSValue> valueCodec) {
             this.core = core;
             this.valueCodec = valueCodec;
         }

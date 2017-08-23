@@ -13,7 +13,7 @@ public class XmlCodecs {
 
         private final String attrName;
 
-        protected OptionalCodec(XmlCodecCore core) {
+        protected OptionalCodec(XmlCodecCoreImpl core) {
             super(core);
             attrName = core.metaAttrName();
         }

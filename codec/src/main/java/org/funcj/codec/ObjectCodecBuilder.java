@@ -31,11 +31,11 @@ public class ObjectCodecBuilder<T, E> {
         }
     }
 
-    private final CodecCore<E> core;
+    private final BaseCodecCore<E> core;
 
     final Map<String, FieldCodec<T, E>> fields = new LinkedHashMap<>();
 
-    public ObjectCodecBuilder(CodecCore<E> core) {
+    public ObjectCodecBuilder(BaseCodecCore<E> core) {
         this.core = core;
     }
 

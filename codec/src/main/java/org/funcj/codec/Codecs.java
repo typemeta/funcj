@@ -5,7 +5,7 @@ import org.funcj.util.Functions.F;
 import java.time.*;
 
 public class Codecs {
-    public static <E, C extends CodecCore<E>> C registerAll(C core) {
+    public static <E, C extends BaseCodecCore<E>> C registerAll(C core) {
         core.registerTypeProxy("java.time.ZoneRegion", ZoneId.class);
 
         core.registerCodec(Class.class, new ClassCodec<E>(core));
@@ -76,16 +76,16 @@ public class Codecs {
 
     public static abstract class CodecBase<T, E> implements Codec<T, E> {
 
-        protected final CodecCore<E> core;
+        protected final BaseCodecCore<E> core;
 
-        protected CodecBase(CodecCore<E> core) {
+        protected CodecBase(BaseCodecCore<E> core) {
             this.core = core;
         }
     }
 
     public static class ClassCodec<E> extends CodecBase<Class, E> {
 
-        protected ClassCodec(CodecCore<E> core) {
+        protected ClassCodec(BaseCodecCore<E> core) {
             super(core);
         }
 
@@ -104,7 +104,7 @@ public class Codecs {
 
         protected final F<String, T> parser;
 
-        public StringProxyCodec(CodecCore<E> core, F<String, T> parser) {
+        public StringProxyCodec(BaseCodecCore<E> core, F<String, T> parser) {
             super(core);
             this.parser = parser;
         }
@@ -121,13 +121,13 @@ public class Codecs {
     }
 
     public static class LocalDateCodec<E> extends StringProxyCodec<LocalDate, E> {
-        public LocalDateCodec(CodecCore<E> core) {
+        public LocalDateCodec(BaseCodecCore<E> core) {
             super(core, LocalDate::parse);
         }
     }
 
     public static class OffsetDateTimeCodec<E> extends StringProxyCodec<OffsetDateTime, E> {
-        public OffsetDateTimeCodec(CodecCore<E> core) {
+        public OffsetDateTimeCodec(BaseCodecCore<E> core) {
             super(core, OffsetDateTime::parse);
         }
     }
