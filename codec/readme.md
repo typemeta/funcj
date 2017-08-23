@@ -131,8 +131,11 @@ but the basics are the same:
 ```java
 final XmlCodecCore codec = Codecs.xmlCodec();
 
-final DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-final Document doc = docBuilder.newDocument();
+final Document doc =
+        DocumentBuilderFactory
+                .newInstance()
+                .newDocumentBuilder()
+                .newDocument();
 
 // Serialise to XML.
 final Element elem = codec.encode(Person.class, person, doc.createElement("person"));
