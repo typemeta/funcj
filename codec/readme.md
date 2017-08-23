@@ -14,7 +14,7 @@ A DSL is provided to simplify the creation of custom codecs.
 
 ## Requirements
 
-funcj.parser requires Java 1.8 (or higher).
+funcj.codec requires Java 1.8 (or higher).
 
 ## Resources
 
