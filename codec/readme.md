@@ -139,7 +139,7 @@ final Document doc =
 
 // Serialise to XML.
 final Element elem = codec.encode(Person.class, person, doc.createElement("person"));
-System.out.println(XmlUtils.nodeToString(elem,true));
+System.out.println(XmlUtils.nodeToString(elem, true));
 
 // Deserialise back to Java.
 final Person person2 = codec.decode(Person.class, elem);
