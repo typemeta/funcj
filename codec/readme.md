@@ -72,7 +72,7 @@ static class Person {
 Then, to round trip the data via JSON:
 
 ```java
-final JsonCodecCore codec = new JsonCodecCore();
+final JsonCodecCore codec = Codecs.jsonCodec();
 
 final Person person = new Person(
         "Jon",
@@ -129,7 +129,7 @@ then since it's XML there's a little more ceremony,
 but the basics are the same:
 
 ```java
-final XmlCodecCore codec = new XmlCodecCore();
+final XmlCodecCore codec = Codecs.xmlCodec();
 
 final DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 final Document doc = docBuilder.newDocument();
