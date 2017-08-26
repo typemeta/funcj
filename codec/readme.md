@@ -69,6 +69,14 @@ static class Person {
         // Implementation elided.
     }
 }
+
+final Person person = new Person(
+        "Marconi",
+        1.86,
+        ZonedDateTime.of(
+                LocalDateTime.of(1874, 04, 25, 17, 05, 41),
+                ZoneId.of("GMT")),
+        Colour.GREEN, Colour.BLUE);
 ```
 
 ### JSON
@@ -77,14 +85,6 @@ To round trip the data via JSON:
 
 ```java
 final JsonCodecCore codec = Codecs.jsonCodec();
-
-final Person person = new Person(
-        "Jon",
-        1.86,
-        ZonedDateTime.of(
-                LocalDateTime.of(1970, 04, 19, 17, 05, 41),
-                ZoneId.of("GMT")),
-        Colour.GREEN, Colour.BLUE);
 
 // Serialise to JSON.
 final JSValue json = codec.encode(person);
@@ -99,14 +99,14 @@ The serialised JSON then looks like this:
 
 ```json
 {
-    "name" : "Jon",
+    "name" : "Marconi",
     "height" : 1.86,
     "birthDate" : {
         "dateTime" : {
             "date" : {
-                "year" : 1970,
+                "year" : 1874,
                 "month" : 4,
-                "day" : 19
+                "day" : 25
             },
             "time" : {
                 "hours" : 17,
@@ -156,14 +156,14 @@ and the resultant XML is as follows:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?><person>
-    <name>Jon</name>
+    <name>Marconi</name>
     <height>1.86</height>
     <birthDate>
         <dateTime>
             <date>
-                <year>1970</year>
+                <year>1874</year>
                 <month>4</month>
-                <day>19</day>
+                <day>25</day>
             </date>
             <time>
                 <hours>17</hours>
@@ -202,10 +202,10 @@ The serialised result is then:
 
 ```Json
 {
-    "name" : "Jon",
+    "name" : "Marconi",
     "height" : 1.86,
     "birthDate" : {
-        "time" : "1970-04-19T17:05:41Z[GMT]"
+        "time" : "1874-04-25T17:05:41Z[GMT]"
     },
     "favColours" : {
         "@type" : "java.util.HashSet",
@@ -218,10 +218,10 @@ and:
 
 ```XML
 <?xml version="1.0" encoding="UTF-8"?><person>
-    <name>Jon</name>
+    <name>Marconi</name>
     <height>1.86</height>
     <birthDate>
-        <time>1970-04-19T17:05:41Z[GMT]</time>
+        <time>1874-04-25T17:05:41Z[GMT]</time>
     </birthDate>
     <favColours type="java.util.HashSet">
         <elem>GREEN</elem>
