@@ -19,7 +19,7 @@ funcj.codec requires Java 1.8 (or higher).
 ## Resources
 
 * **Release builds** are available on the [Releases](https://github.com/jon-hanson/funcj/releases) page.
-* **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.parser)
+* **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.codec)
 * **Javadocs** are for the latest build are on the [Javadocs](http://jon-hanson.github.io/funcj/javadocs/) page.
 
 ## Maven
@@ -91,7 +91,7 @@ final Person person2 = codec.decode(Person.class, json);
 assert(person.equals(person2));
 ```
 
-The serialised JSON looks like this:
+The serialised JSON then looks like this:
 
 ```json
 {
@@ -179,3 +179,46 @@ and the resultant XML is as follows:
     </favColours>
 </person>
 ```
+
+If we want to override how the ZonedDateTime type is serialised,
+for example to serialise it as a string,
+we can do so like thids:
+
+```Java
+codec.registerCodec(ZonedDateTime.class)
+        .field("time", ZonedDateTime::toString, String.class)
+        .map(ZonedDateTime::parse);
+```
+
+The serialised result is then:
+
+```Json
+{
+    "name" : "Jon",
+    "height" : 1.86,
+    "birthDate" : {
+        "time" : "1970-04-19T17:05:41Z[GMT]"
+    },
+    "favColours" : {
+        "@type" : "java.util.HashSet",
+        "@value" : ["GREEN", "BLUE"]
+    }
+}
+```
+
+and:
+
+```XML
+<?xml version="1.0" encoding="UTF-8"?><person>
+    <name>Jon</name>
+    <height>1.86</height>
+    <birthDate>
+        <time>1970-04-19T17:05:41Z[GMT]</time>
+    </birthDate>
+    <favColours type="java.util.HashSet">
+        <elem>GREEN</elem>
+        <elem>BLUE</elem>
+    </favColours>
+</person>
+```
+
