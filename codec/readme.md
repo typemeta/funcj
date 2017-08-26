@@ -188,8 +188,9 @@ and the resultant XML is as follows:
 
 ### Custom Codec
 
-If we want to override how the `ZonedDateTime` type is serialised,
-for example to serialise it as a `String`,
+The framework allows custom codecs to be registered to override the default behaviour.
+If, for example, we want to override how the `ZonedDateTime` type is serialised,
+to serialise it as a `String`,
 we can do so like this:
 
 ```Java
@@ -228,4 +229,14 @@ and:
         <elem>BLUE</elem>
     </favColours>
 </person>
+```
+
+For reference, the default codec for `ZonedDateTime` is defined as this:
+
+```Java
+core.registerCodec(ZonedDateTime.class)
+        .field("dateTime", ZonedDateTime::toLocalDateTime, LocalDateTime.class)
+        .field("zone", ZonedDateTime::getZone, ZoneId.class)
+        .field("offset", ZonedDateTime::getOffset, ZoneOffset.class)
+        .map(ZonedDateTime::ofLocal);
 ```
