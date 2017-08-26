@@ -180,9 +180,9 @@ and the resultant XML is as follows:
 </person>
 ```
 
-If we want to override how the ZonedDateTime type is serialised,
-for example to serialise it as a string,
-we can do so like thids:
+If we want to override how the `ZonedDateTime` type is serialised,
+for example to serialise it as a `String`,
+we can do so like this:
 
 ```Java
 codec.registerCodec(ZonedDateTime.class)
