@@ -14,7 +14,7 @@ A DSL is provided to simplify the creation of custom codecs.
 
 ## Requirements
 
-funcj.parser requires Java 1.8 (or higher).
+funcj.codec requires Java 1.8 (or higher).
 
 ## Resources
 
@@ -72,7 +72,7 @@ static class Person {
 Then, to round trip the data via JSON:
 
 ```java
-final JsonCodecCore codec = new JsonCodecCore();
+final JsonCodecCore codec = Codecs.jsonCodec();
 
 final Person person = new Person(
         "Jon",
@@ -129,14 +129,17 @@ then since it's XML there's a little more ceremony,
 but the basics are the same:
 
 ```java
-final XmlCodecCore codec = new XmlCodecCore();
+final XmlCodecCore codec = Codecs.xmlCodec();
 
-final DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-final Document doc = docBuilder.newDocument();
+final Document doc =
+        DocumentBuilderFactory
+                .newInstance()
+                .newDocumentBuilder()
+                .newDocument();
 
 // Serialise to XML.
 final Element elem = codec.encode(Person.class, person, doc.createElement("person"));
-System.out.println(XmlUtils.nodeToString(elem,true));
+System.out.println(XmlUtils.nodeToString(elem, true));
 
 // Deserialise back to Java.
 final Person person2 = codec.decode(Person.class, elem);
