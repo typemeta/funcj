@@ -1,14 +1,16 @@
 # Introduction
 
-**funcj.codec** is a Java framework for serialising Java values
-to serialised structured data formats such as JSON and XML,
-and for deserialising the same data back into Java values.
+**funcj.codec** is a Java framework for round-tripping Java data via a structured data format such as JSON and XML.
+It can serialise Java values into serialised form,
+and can deserialise the same data back into Java values.
 
 The framework uses Reflection to determine the structure of Java classes,
 which is then mirrored in the structure of the serialised data.
 Custom codecs can be registered with the framework, to handle awkward types,
 or to simply override the default serialisation provided by the framework.
 A DSL is provided to simplify the creation of custom codecs.    
+
+The framework is extensible allowing support for further data formats to be added.
 
 # Getting Started
 
@@ -69,7 +71,9 @@ static class Person {
 }
 ```
 
-Then, to round trip the data via JSON:
+### JSON
+
+To round trip the data via JSON:
 
 ```java
 final JsonCodecCore codec = Codecs.jsonCodec();
@@ -123,6 +127,8 @@ The serialised JSON then looks like this:
     }
 }
 ```
+
+### XML
 
 If, instead, we want to serialise via XML,
 then since it's XML there's a little more ceremony,
@@ -180,6 +186,8 @@ and the resultant XML is as follows:
 </person>
 ```
 
+### Custom Codec
+
 If we want to override how the `ZonedDateTime` type is serialised,
 for example to serialise it as a `String`,
 we can do so like this:
@@ -221,4 +229,3 @@ and:
     </favColours>
 </person>
 ```
-
