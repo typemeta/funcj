@@ -2,7 +2,7 @@
 
 **funcj.codec** is a Java framework for round-tripping Java data via a structured data format such as JSON and XML.
 It can serialise Java object graphs into serialised form,
-and can deserialise the data back into the same Java values.
+and can deserialise the data to reconstruct the original Java values.
 
 ## Features
 
