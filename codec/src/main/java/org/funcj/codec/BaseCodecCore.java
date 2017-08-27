@@ -2,6 +2,7 @@ package org.funcj.codec;
 
 import org.funcj.codec.utils.ReflectionUtils;
 import org.funcj.control.Exceptions;
+import org.funcj.util.Functions;
 import org.funcj.util.Functions.F;
 
 import java.lang.reflect.*;
@@ -57,6 +58,19 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
     }
 
     @Override
+    public <T> ObjectCodecBuilder<T, E> registerCodec(Class<T> clazz) {
+        return objectCodecDeferredRegister(clazz);
+    }
+
+    @Override
+    public <T> void registerStringProxyCodec(
+            Class<T> clazz,
+            Functions.F<T, String> encode,
+            Functions.F<String, T> decode) {
+        registerCodec(clazz, new Codecs.StringProxyCodec<T, E>(this, encode, decode));
+    }
+
+    @Override
     public void registerTypeProxy(Class<?> type, Class<?> proxyType) {
         registerTypeProxy(classToName(type), proxyType);
     }
@@ -64,11 +78,6 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
     @Override
     public void registerTypeProxy(String typeName, Class<?> proxyType) {
         typeProxyRegistry.put(typeName, proxyType);
-    }
-
-    @Override
-    public <T> ObjectCodecBuilder<T, E> codecBuilder(Class<T> clazz) {
-        return objectCodecDeferredRegister(clazz);
     }
 
     @Override

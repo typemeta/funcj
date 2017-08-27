@@ -189,6 +189,9 @@ and the resultant XML is as follows:
 ### Custom Codec
 
 The framework allows custom codecs to be registered to override the default behaviour.
+
+#### Custom Codec Builder
+
 If, for example, we want to override how the `ZonedDateTime` type is serialised,
 to serialise it as a `String`,
 we can do so like this:
@@ -199,7 +202,7 @@ codec.registerCodec(ZonedDateTime.class)
         .map(ZonedDateTime::parse);
 ```
 
-The serialised result is then:
+The serialised results are then:
 
 ```Json
 {
@@ -239,4 +242,43 @@ core.registerCodec(ZonedDateTime.class)
         .field("zone", ZonedDateTime::getZone, ZoneId.class)
         .field("offset", ZonedDateTime::getOffset, ZoneOffset.class)
         .map(ZonedDateTime::ofLocal);
+```
+
+#### StringProxyCodec
+
+Alternatively, we can use `StringProxyCodec` to encode the `ZonedDateTime` as a `String`:
+
+```Java
+codec.registerStringProxyCodec(
+        ZonedDateTime.class,
+        ZonedDateTime::toString,
+        ZonedDateTime::parse);
+```
+
+The serialised results are then:
+
+```Json
+{
+    "name" : "Jon",
+    "height" : 1.86,
+    "birthDate" : "1874-04-25T17:05:41Z[GMT]",
+    "favColours" : {
+        "@type" : "java.util.HashSet",
+        "@value" : ["GREEN", "BLUE"]
+    }
+}
+```
+
+and:
+
+```XML
+<?xml version="1.0" encoding="UTF-8"?><person>
+    <name>Jon</name>
+    <height>1.86</height>
+    <birthDate>1874-04-25T17:05:41Z[GMT]</birthDate>
+    <favColours type="java.util.HashSet">
+        <elem>GREEN</elem>
+        <elem>BLUE</elem>
+    </favColours>
+</person>
 ```

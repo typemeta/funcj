@@ -32,43 +32,43 @@ public class Codecs {
 
         core.registerTypeProxy("java.time.ZoneRegion", ZoneId.class);
 
-        core.codecBuilder(LocalDate.class)
+        core.registerCodec(LocalDate.class)
                 .field("year", LocalDate::getYear, Integer.class)
                 .field("month", LocalDate::getMonthValue, Integer.class)
                 .field("day", LocalDate::getDayOfMonth, Integer.class)
                 .map(LocalDate::of);
 
-        core.codecBuilder(LocalTime.class)
+        core.registerCodec(LocalTime.class)
                 .field("hours", LocalTime::getHour, Integer.class)
                 .field("mins", LocalTime::getMinute, Integer.class)
                 .field("secs", LocalTime::getSecond, Integer.class)
                 .field("nanos", LocalTime::getNano, Integer.class)
                 .map(LocalTime::of);
 
-        core.codecBuilder(LocalDateTime.class)
+        core.registerCodec(LocalDateTime.class)
                 .field("date", LocalDateTime::toLocalDate, LocalDate.class)
                 .field("time", LocalDateTime::toLocalTime, LocalTime.class)
                 .map(LocalDateTime::of);
 
-        core.codecBuilder(ZoneId.class)
+        core.registerCodec(ZoneId.class)
                 .field("id", ZoneId::getId, String.class)
                 .map(ZoneId::of);
 
-        core.codecBuilder(ZoneOffset.class)
+        core.registerCodec(ZoneOffset.class)
                 .field("id", ZoneOffset::getId, String.class)
                 .map(ZoneOffset::of);
 
-        core.codecBuilder(OffsetTime.class)
+        core.registerCodec(OffsetTime.class)
                 .field("time", OffsetTime::toLocalTime, LocalTime.class)
                 .field("offset", OffsetTime::getOffset, ZoneOffset.class)
                 .map(OffsetTime::of);
 
-        core.codecBuilder(OffsetDateTime.class)
+        core.registerCodec(OffsetDateTime.class)
                 .field("dateTime", OffsetDateTime::toLocalDateTime, LocalDateTime.class)
                 .field("offset", OffsetDateTime::getOffset, ZoneOffset.class)
                 .map(OffsetDateTime::of);
 
-        core.codecBuilder(ZonedDateTime.class)
+        core.registerCodec(ZonedDateTime.class)
                 .field("dateTime", ZonedDateTime::toLocalDateTime, LocalDateTime.class)
                 .field("zone", ZonedDateTime::getZone, ZoneId.class)
                 .field("offset", ZonedDateTime::getOffset, ZoneOffset.class)
@@ -77,6 +77,11 @@ public class Codecs {
         return core;
     }
 
+    /**
+     * Base class for {@code Codec}s.
+     * @param <T> the raw type to be encoded/decoded
+     * @param <E> the encoded type
+     */
     public static abstract class CodecBase<T, E> implements Codec<T, E> {
 
         protected final BaseCodecCore<E> core;
@@ -86,6 +91,10 @@ public class Codecs {
         }
     }
 
+    /**
+     * A {@code Codec} for the {@link Class} type.
+     * @param <E> the encoded type
+     */
     public static class ClassCodec<E> extends CodecBase<Class, E> {
 
         protected ClassCodec(BaseCodecCore<E> core) {
@@ -103,29 +112,34 @@ public class Codecs {
         }
     }
 
+    /**
+     * Utility class for creating a {@code Codec} that encodes a type
+     * as a {@code String}.
+     * @param <T> the raw type to be encoded/decoded
+     * @param <E> the encoded type
+     */
     public static class StringProxyCodec<T, E> extends CodecBase<T, E> {
 
-        protected final F<String, T> parser;
+        protected final F<T, String> encode;
+        protected final F<String, T> decode;
 
-        public StringProxyCodec(BaseCodecCore<E> core, F<String, T> parser) {
+        public StringProxyCodec(
+                BaseCodecCore<E> core,
+                F<T, String> encode,
+                F<String, T> decode) {
             super(core);
-            this.parser = parser;
+            this.encode = encode;
+            this.decode = decode;
         }
 
         @Override
         public E encode(T val, E enc) {
-            return core.stringCodec().encode(val.toString(), enc);
+            return core.stringCodec().encode(encode.apply(val), enc);
         }
 
         @Override
         public T decode(E enc) {
-            return parser.apply(core.stringCodec().decode(enc));
-        }
-    }
-
-    public static class OffsetDateTimeCodec<E> extends StringProxyCodec<OffsetDateTime, E> {
-        public OffsetDateTimeCodec(BaseCodecCore<E> core) {
-            super(core, OffsetDateTime::parse);
+            return decode.apply(core.stringCodec().decode(enc));
         }
     }
 }

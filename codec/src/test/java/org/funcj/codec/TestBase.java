@@ -123,7 +123,7 @@ public abstract class TestBase {
     }
 
     static <E> void registerLocalDateCodec(CodecCore<E> core) {
-        core.codecBuilder(LocalDate.class)
+        core.registerCodec(LocalDate.class)
                 .field("year", LocalDate::getYear, Integer.class)
                 .field("month", LocalDate::getMonthValue, Integer.class)
                 .field("day", LocalDate::getDayOfMonth, Integer.class)
@@ -131,7 +131,7 @@ public abstract class TestBase {
     }
 
     static <E> void registerCustomCodec(CodecCore<E> core) {
-        core.codecBuilder(Custom.class)
+        core.registerCodec(Custom.class)
                 .nullField("colour", c -> c.colour, Custom.Colour.class)
                 .nullField("date", c -> c.date, LocalDate.class)
                 .field("flag", c -> c.flag, Boolean.class)

@@ -1,5 +1,7 @@
 package org.funcj.codec;
 
+import org.funcj.util.Functions;
+
 /**
  * Interface for classes which implement an encoding into a specific target type {code E}.
  * Unlike {@link Codec}, which can only encode a single type,
@@ -25,6 +27,29 @@ public interface CodecCore<E> {
     <T> void registerCodec(String className, Codec<T, E> codec);
 
     /**
+     * Create a {@code ObjectCodecBuilder} for the specified class.
+     * <p>
+     * Create a {@code ObjectCodecBuilder}, essentially a fluent interface
+     * for creating and registering a {@code Codec}.
+     * @param clazz the class to register codec against
+     * @param <T> the codec value type
+     * @return an {@code ObjectCodecBuilder}
+     */
+    <T> ObjectCodecBuilder<T, E> registerCodec(Class<T> clazz);
+
+    /**
+     * Create and register a {@link Codecs.StringProxyCodec} for a class.
+     * @param clazz the class to register codec against
+     * @param encode a function to encode a value of type {@code T} as a {@link String}
+     * @param decode a function to decode a {@code String} back into a value of type {@code T}
+     * @param <T> the codec value type
+     */
+    <T> void registerStringProxyCodec(
+            Class<T> clazz,
+            Functions.F<T, String> encode,
+            Functions.F<String, T> decode);
+
+    /**
      * Register a type proxy.
      * A type proxy maps a type to its proxy before selecting its {@code Codec}.
      * @param type type to be mapped
@@ -39,17 +64,6 @@ public interface CodecCore<E> {
      * @param proxyType proxy type
      */
     void registerTypeProxy(String typeName, Class<?> proxyType);
-
-    /**
-     * Create a {@code ObjectCodecBuilder} for the specified class.
-     * <p>
-     * Create a {@code ObjectCodecBuilder}, essentially a fluent interface
-     * for creating and registering a {@code Codec}.
-     * @param clazz the class to register codec against
-     * @param <T> the codec value type
-     * @return an {@code ObjectCodecBuilder}
-     */
-    <T> ObjectCodecBuilder<T, E> codecBuilder(Class<T> clazz);
 
     /**
      * Register a {@code TypeConstructor} for the specified class.

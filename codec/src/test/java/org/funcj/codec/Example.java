@@ -60,6 +60,10 @@ public class Example {
 
     static void jsonTest() {
         final JsonCodecCore codec = Codecs.jsonCodec();
+        codec.registerStringProxyCodec(
+                ZonedDateTime.class,
+                ZonedDateTime::toString,
+                ZonedDateTime::parse);
 
         // Serialise to JSON.
         final JSValue json = codec.encode(person);
@@ -72,7 +76,10 @@ public class Example {
 
     static void xmlTest() throws ParserConfigurationException {
         final XmlCodecCore codec = Codecs.xmlCodec();
-
+        codec.registerStringProxyCodec(
+                ZonedDateTime.class,
+                ZonedDateTime::toString,
+                ZonedDateTime::parse);
         final Document doc =
                 DocumentBuilderFactory
                         .newInstance()
