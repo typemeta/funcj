@@ -25,28 +25,28 @@ public interface Parser<I, A> {
 
     /**
      * Indicate whether this parser accepts the empty symbol.
-     * @return a lazy wrapper for true iff the parser accepts the empty symbol
+     * @return          a lazy wrapper for true iff the parser accepts the empty symbol
      */
     Lazy<Boolean> acceptsEmpty();
 
     /**
      * The First Set for this parser.
-     * @return lazy symbol set
+     * @return          lazy symbol set
      */
     Lazy<SymSet<I>> firstSet();
 
     /**
      * Apply this parser to the input stream.
-     * @param in input stream
-     * @param follow dynamic follow set
-     * @return the parse result
+     * @param in        input stream
+     * @param follow    dynamic follow set
+     * @return          the parse result
      */
     Result<I, A> parse(Input<I> in, SymSet<I> follow);
 
     /**
      * Apply this parser to the input stream.
-     * @param in input stream
-     * @return the parser result
+     * @param in        input stream
+     * @return          the parser result
      */
     default Result<I, A> parse(Input<I> in) {
         return this.parse(in, SymSet.empty());
@@ -54,8 +54,8 @@ public interface Parser<I, A> {
 
     /**
      * Apply this parser to the input stream. Fail if eof isn't reached.
-     * @param in input stream
-     * @return the parser result
+     * @param in        input stream
+     * @return          the parser result
      */
     default Result<I, A> run(Input<I> in) {
         final Parser<I, A> parserAndEof = this.andL(Combinators.eof());
@@ -73,10 +73,10 @@ public interface Parser<I, A> {
     /**
      * Applicative unit/pure function.
      * Construct a parser that always returns the supplied value, without consuming any input.
-     * @param a value
-     * @param <I> input stream symbol type
-     * @param <A> parser result type
-     * @return a parser that always returns the supplied value
+     * @param a         the value
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
+     * @return          a parser that always returns the supplied value
      */
     static <I, A> Parser<I, A> pure(A a) {
         return new ParserImpl<I, A>(LTRUE, SymSet::empty) {
@@ -91,9 +91,9 @@ public interface Parser<I, A> {
      * Construct a parser that, if this parser succeeds then returns the result
      * of applying the function {@code f} to the result,
      * otherwise return the failure.
-     * @param f function to be mapped over this parser
-     * @param <B> function return type
-     * @return a parser that returns {@code f} mapped over this parser's result
+     * @param f         the function to be mapped over this parser
+     * @param <B>       the function return type
+     * @return          a parser that returns {@code f} mapped over this parser's result
      */
     default <B> Parser<I, B> map(F<A, B> f) {
         return new ParserImpl<I, B>(
@@ -113,12 +113,12 @@ public interface Parser<I, A> {
      * then it returns the result of applying function {@code f} to value {@code a}.
      * Otherwise, if {@code pf} fails then the parser returns the failure,
      * else if {@code pa} fails then it returns that failure.
-     * @param pf parser that returns a function result
-     * @param pa parser that returns a value result
-     * @param <I> input stream symbol type
-     * @param <A> input type of the function
-     * @param <B> return type of the function
-     * @return a parser that returns the result of applying the parsed function to the parsed value
+     * @param pf        the parser that returns a function result
+     * @param pa        the parser that returns a value result
+     * @param <I>       the input stream symbol type
+     * @param <A>       the input type of the function
+     * @param <B>       the return type of the function
+     * @return          a parser that returns the result of applying the parsed function to the parsed value
      */
     static <I, A, B>
     Parser<I, B> ap(Parser<I, F<A, B>> pf, Parser<I, A> pa) {
@@ -160,12 +160,12 @@ public interface Parser<I, A> {
      * Construct a parser that, if {@code pa} succeeds, yielding a function {@code a},
      * then it returns the result of applying function {@code f} to value {@code a}.
      * If {@code pa} fails then the parser returns the failure.
-     * @param f a function
-     * @param pa parser that returns a value result
-     * @param <I> input stream symbol type
-     * @param <A> input type of the function
-     * @param <B> return type of the function
-     * @return a parser that returns the result of applying the function to the parsed value
+     * @param f         the function
+     * @param pa        the parser that returns a value result
+     * @param <I>       the input stream symbol type
+     * @param <A>       the input type of the function
+     * @param <B>       the return type of the function
+     * @return          a parser that returns the result of applying the function to the parsed value
      */
     static <I, A, B>
     Parser<I, B> ap(F<A, B> f, Parser<I, A> pa) {
@@ -175,8 +175,8 @@ public interface Parser<I, A> {
     /**
      * Construct a parser which returns the result of either this parser or,
      * if it fails, then the result of the {@code rhs} parser.
-     * @param rhs second parser to attempt
-     * @return a parser which returns the result of either this parser or the {@code rhs} parser.
+     * @param rhs       the second parser to attempt
+     * @return          a parser which returns the result of either this parser or the {@code rhs} parser.
      */
     default Parser<I, A> or(Parser<I, A> rhs) {
         return new ParserImpl<I, A>(
@@ -214,8 +214,8 @@ public interface Parser<I, A> {
 
     /**
      * Combine this parser with another to form a builder which accumulates the parse results.
-     * @param pb second parser
-     * @param <B> result type of second parser
+     * @param pb        the second parser
+     * @param <B>       the result type of second parser
      * @return an {@link ApplyBuilder} which accumulates the parse results.
      */
     default <B> ApplyBuilder._2<I, A, B> and(Parser<I, B> pb) {
@@ -227,9 +227,9 @@ public interface Parser<I, A> {
      * and if they are both successful
      * throws away the result of the right-hand parser,
      * and returns the result of the left-hand parser
-     * @param pb second parser
-     * @param <B> result type of second parser
-     * @return a parser that applies two parsers consecutively and returns the result of the first
+     * @param pb        the second parser
+     * @param <B>       the result type of second parser
+     * @return          a parser that applies two parsers consecutively and returns the result of the first
      */
     default <B> Parser<I, A> andL(Parser<I, B> pb) {
         return this.and(pb).map(F2.first());
@@ -240,9 +240,9 @@ public interface Parser<I, A> {
      * and if they are both successful
      * throws away the result of the left-hand parser
      * and returns the result of the right-hand parser
-     * @param pb second parser
-     * @param <B> result type of second parser
-     * @return a parser that applies two parsers consecutively and returns the result of the second
+     * @param pb        the second parser
+     * @param <B>       the result type of second parser
+     * @return          a parser that applies two parsers consecutively and returns the result of the second
      */
     default <B> Parser<I, B> andR(Parser<I, B> pb) {
         return this.and(pb).map(F2.second());
@@ -251,8 +251,8 @@ public interface Parser<I, A> {
 
 /**
  * Base class for {@code Parser} implementations.
- * @param <I> input stream symbol type
- * @param <A> parser result type
+ * @param <I>           the input stream symbol type
+ * @param <A>           the parser result type
  */
 abstract class ParserImpl<I, A> implements Parser<I, A> {
 

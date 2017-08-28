@@ -8,53 +8,63 @@ import static org.funcj.data.Unit.UNIT;
 /**
  * State monad.
  * <p>
- * Each State instance is a state processor that takes a state of type S,
- * and produces a new state S' and a result of type A.
- * @param <S>   the type of state
- * @param <A>   the type of result
+ * Each {@code State} instance is a state processor that takes a state of type {@code S},
+ * and produces a new state and a result of type {@code A}.
+ * @param <S>       the state type
+ * @param <A>       the result type
  */
 @FunctionalInterface
 public interface State<S, A> {
 
     /**
-     * A construct a state instance which leaves the input state unchanged and sets the result to a.
-     * @param a     state result value
-     * @param <S>   the state type
-     * @param <A>   the state result type
+     * A construct a {@code State} instance which leaves the input state unchanged and sets the result to a.
+     * @param a         the state result value
+     * @param <S>       the state type
+     * @param <A>       the result type
+     * @return          the new {@code State} instance
      */
     static <S, A> State<S, A> pure(A a) {
         return st -> Tuple2.of(st, a);
     }
 
     /**
-     * Apply a function provided by a state to a state.
-     * @param sf    state that wraps a function type
-     * @param sa    state that wraps the function argument type
-     * @param <S>   the state type
-     * @param <A>   the function argument type
-     * @param <B>   the function return type
+     * Take a function provided by a {@code State} and apply it to a value in another {@code State}.
+     * @param sf        the state that wraps a function type
+     * @param sa        the state that wraps the function argument type
+     * @param <S>       the state type
+     * @param <A>       the function argument type
+     * @param <B>       the function return type
+     * @return          a new {@code State} instance which contains the result of applying the function
      */
     static <S, A, B> State<S, B> ap(State<S, F<A, B>> sf, State<S, A> sa) {
         return sa.apply(sf);
     }
 
     /**
-     * A state which sets the state to {@code st} and sets the result to {@link Unit#UNIT}.
+     * Construct a {@code State} which sets the state to {@code st} and sets the result to {@link Unit#UNIT}.
+     * @param st        the state value
+     * @param <S>       the state type
+     * @return          the new {@code State} instance
      */
     static <S> State<S, Unit> put(S st) {
         return u -> Tuple2.of(st, UNIT);
     }
 
     /**
-     * A state which leaves the state unchanged and sets the result to the supplied state.
+     * Construct a {@code State} which leaves the state value unchanged and sets the result to the supplied value.
+     * @param <S>       the state type
+     * @return          the new {@code State} instance
      */
     static <S> State<S, S> get() {
         return s -> Tuple2.of(s, s);
     }
 
     /**
-     * A state which applies a function to the state,
+     * Construct a {@code State} which applies a function to the state,
      * and sets the result to {@link org.funcj.data.Unit#UNIT}.
+     * @param f         the function
+     * @param <S>       the state type
+     * @return          the new {@code State} instance
      */
     static <S> State<S, Unit> modify(F<S, S> f) {
         return State.<S>get().flatMap(x ->
@@ -65,6 +75,10 @@ public interface State<S, A> {
     /**
      * A state which leaves the state unchanged,
      * and sets the result to the function f applied to the state.
+     * @param f         the function
+     * @param <S>       the state type
+     * @param <A>       the result type
+     * @return          the new {@code State} instance
      */
     static <S, A> State<S, A> gets(F<S, A> f) {
         return State.<S>get().map(f);
@@ -72,6 +86,12 @@ public interface State<S, A> {
 
     /**
      * Standard applicative traversal.
+     * @param lt        list of values
+     * @param f         function to be applied to each value in the list
+     * @param <S>       the state type
+     * @param <A>       type of list elements
+     * @param <B>       the state result type
+     * @return          a {@code State} which wraps an {@link org.funcj.data.IList} of values
      */
     static <S, A, B> State<S, IList<B>> traverse(IList<A> lt, F<A, State<S, B>> f) {
         return lt.foldRight(
@@ -82,6 +102,10 @@ public interface State<S, A> {
 
     /**
      * Standard applicative sequencing.
+     * @param lsa       the list of {@code State} values
+     * @param <S>       the state type
+     * @param <A>       the state result type
+     * @return          a {@code State} which wraps an {@link org.funcj.data.IList} of values
      */
     static <S, A> State<S, IList<A>> sequence(IList<? extends State<S, A>> lsa) {
         return lsa.foldRight(

@@ -53,8 +53,8 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
     }
 
     @Override
-    public <T> void registerCodec(String className, Codec<T, E> codec) {
-        codecRegistry.put(className, codec);
+    public <T> void registerCodec(String name, Codec<T, E> codec) {
+        codecRegistry.put(name, codec);
     }
 
     @Override

@@ -58,7 +58,7 @@ public interface Either<E, S> {
      * @param <E> left-hand, error type of the {@code Either} returned by the function
      * @param <S> type of list elements
      * @param <T> right-hand, success type of the {@code Either} returned by the function
-     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     * @return a {@code Either} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, S, T> Either<E, IList<T>> traverse(IList<S> ls, F<S, Either<E, T>> f) {
         return ls.foldRight(
@@ -74,7 +74,7 @@ public interface Either<E, S> {
      * @param <E> left-hand, error type of the {@code Either} returned by the function
      * @param <S> type of list elements
      * @param <T> right-hand, success type of the {@code Either} returned by the function
-     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     * @return a {@code Either} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, S, T> Either<E, List<T>> traverse(List<S> ls, F<S, Either<E, T>> f) {
         return Folds.foldRight(

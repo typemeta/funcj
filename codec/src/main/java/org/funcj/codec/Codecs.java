@@ -10,7 +10,7 @@ public class Codecs {
 
     /**
      * Construct and return a new instance of a {@code JsonCodecCore}.
-     * @return the new a {@code JsonCodecCore}
+     * @return the new {@code JsonCodecCore}
      */
     public static JsonCodecCore jsonCodec() {
         final JsonCodecCoreImpl codec = new JsonCodecCoreImpl();
@@ -19,7 +19,7 @@ public class Codecs {
 
     /**
      * Construct and return a new instance of a {@code XmlCodecCore}.
-     * @return the new a {@code XmlCodecCore}
+     * @return the new {@code XmlCodecCore}
      */
     public static XmlCodecCore xmlCodec() {
         final XmlCodecCoreImpl codec = new XmlCodecCoreImpl();
