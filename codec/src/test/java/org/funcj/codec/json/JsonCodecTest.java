@@ -1,6 +1,7 @@
-package org.funcj.codec;
+package org.funcj.codec.json;
 
-import org.funcj.codec.TestDataBase.NoEmptyCtor;
+import org.funcj.codec.*;
+import org.funcj.codec.TestTypes.NoEmptyCtor;
 import org.funcj.codec.json.*;
 import org.funcj.json.JSValue;
 import org.junit.Assert;
@@ -11,7 +12,6 @@ public class JsonCodecTest extends TestBase {
 
     static {
         codec.registerTypeConstructor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));
-        registerLocalDateCodec(codec);
         registerCustomCodec(codec);
     }
 

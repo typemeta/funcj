@@ -1,6 +1,6 @@
 package org.funcj.codec;
 
-import org.funcj.codec.TestDataBase.*;
+import org.funcj.codec.TestTypes.*;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -122,15 +122,7 @@ public abstract class TestBase {
         roundTrip(NoEmptyCtor.create(true), NoEmptyCtor.class);
     }
 
-    static <E> void registerLocalDateCodec(CodecCore<E> core) {
-        core.registerCodec(LocalDate.class)
-                .field("year", LocalDate::getYear, Integer.class)
-                .field("month", LocalDate::getMonthValue, Integer.class)
-                .field("day", LocalDate::getDayOfMonth, Integer.class)
-                .map(LocalDate::of);
-    }
-
-    static <E> void registerCustomCodec(CodecCore<E> core) {
+    public static <E> void registerCustomCodec(CodecCore<E> core) {
         core.registerCodec(Custom.class)
                 .nullField("colour", c -> c.colour, Custom.Colour.class)
                 .nullField("date", c -> c.date, LocalDate.class)

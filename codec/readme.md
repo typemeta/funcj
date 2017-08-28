@@ -7,7 +7,8 @@ and can deserialise the data to reconstruct the original Java values.
 ## Features
 
 * Supports serialisation via JSON and XML, and can be extended to support further formats.
-* Serialised form mirrors the structure of the Java data.
+* Serialisation is driven by Reflection ,consequently the serialised form mirrors the structure of the Java data.
+  * Static type information is used where possible to reduce the amount of type meta data present in the serialised data.
 * Custom codecs can be registered with the framework, to handle awkward types,
 or to simply override the default serialisation provided by the framework.
   * A fluent API is provided to simplify the creation of custom codecs.
@@ -201,7 +202,7 @@ If, for example, we want to override how the `ZonedDateTime` type is serialised,
 to serialise it as a `String`,
 we can do so like this:
 
-```Java
+```java
 codec.registerCodec(ZonedDateTime.class)
         .field("time", ZonedDateTime::toString, String.class)
         .map(ZonedDateTime::parse);
@@ -209,7 +210,7 @@ codec.registerCodec(ZonedDateTime.class)
 
 The serialised results are then:
 
-```Json
+```json
 {
     "name" : "Marconi",
     "height" : 1.86,
@@ -225,7 +226,7 @@ The serialised results are then:
 
 and:
 
-```XML
+```xml
 <?xml version="1.0" encoding="UTF-8"?><person>
     <name>Marconi</name>
     <height>1.86</height>
@@ -241,7 +242,7 @@ and:
 
 For reference, the default codec for `ZonedDateTime` is defined as this:
 
-```Java
+```java
 core.registerCodec(ZonedDateTime.class)
         .field("dateTime", ZonedDateTime::toLocalDateTime, LocalDateTime.class)
         .field("zone", ZonedDateTime::getZone, ZoneId.class)
@@ -253,7 +254,7 @@ core.registerCodec(ZonedDateTime.class)
 
 Alternatively, we can use `StringProxyCodec` to encode the `ZonedDateTime` as a `String`:
 
-```Java
+```java
 codec.registerStringProxyCodec(
         ZonedDateTime.class,
         ZonedDateTime::toString,
@@ -262,7 +263,7 @@ codec.registerStringProxyCodec(
 
 The serialised results are then:
 
-```Json
+```json
 {
     "name" : "Jon",
     "height" : 1.86,
@@ -276,7 +277,7 @@ The serialised results are then:
 
 and:
 
-```XML
+```xml
 <?xml version="1.0" encoding="UTF-8"?><person>
     <name>Jon</name>
     <height>1.86</height>

@@ -7,7 +7,7 @@ import java.util.Objects;
 
 /**
  * A {@code FieldCodec} encapsulates encoding a field
- * to encoded type {@code E}, and vice-versa.
+ * to an encoded type {@code E}, and vice-versa.
  * @param <E> encoded type
  */
 public interface FieldCodec<E> {

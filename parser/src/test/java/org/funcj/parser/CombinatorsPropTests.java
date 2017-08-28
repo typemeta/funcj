@@ -12,7 +12,7 @@ import static org.funcj.parser.TestUtils.*;
 import static org.hamcrest.CoreMatchers.not;
 
 @RunWith(JUnitQuickcheck.class)
-public class CombinatorsTest {
+public class CombinatorsPropTests {
 
     @Property
     public void failAlwaysFails(char c1) {

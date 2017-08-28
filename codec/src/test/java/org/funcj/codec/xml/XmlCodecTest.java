@@ -1,6 +1,7 @@
-package org.funcj.codec;
+package org.funcj.codec.xml;
 
-import org.funcj.codec.TestDataBase.NoEmptyCtor;
+import org.funcj.codec.*;
+import org.funcj.codec.TestTypes.NoEmptyCtor;
 import org.funcj.codec.xml.*;
 import org.funcj.control.Exceptions;
 import org.junit.Assert;
@@ -21,7 +22,6 @@ public class XmlCodecTest extends TestBase {
     }
     static {
         codec.registerTypeConstructor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));
-        registerLocalDateCodec(codec);
         registerCustomCodec(codec);
     }
 

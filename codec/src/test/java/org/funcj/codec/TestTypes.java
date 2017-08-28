@@ -5,7 +5,7 @@ import java.util.*;
 
 import static org.funcj.codec.TestDataUtils.*;
 
-public class TestDataBase {
+public abstract class TestTypes {
 
     public static class CommonData {
         public enum Side {

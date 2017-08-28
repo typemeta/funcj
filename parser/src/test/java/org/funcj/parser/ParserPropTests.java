@@ -17,7 +17,7 @@ import static org.funcj.util.Functions.*;
 import static org.hamcrest.CoreMatchers.not;
 
 @RunWith(JUnitQuickcheck.class)
-public class ParserTest {
+public class ParserPropTests {
 
     @Property
     public void pureConsumesNoInput(char c1) {

@@ -12,7 +12,7 @@ public class Codecs {
      * Construct and return a new instance of a {@code JsonCodecCore}.
      * @return the new a {@code JsonCodecCore}
      */
-    static JsonCodecCore jsonCodec() {
+    public static JsonCodecCore jsonCodec() {
         final JsonCodecCoreImpl codec = new JsonCodecCoreImpl();
         return JsonCodecs.registerAll(codec);
     }
@@ -21,7 +21,7 @@ public class Codecs {
      * Construct and return a new instance of a {@code XmlCodecCore}.
      * @return the new a {@code XmlCodecCore}
      */
-    static XmlCodecCore xmlCodec() {
+    public static XmlCodecCore xmlCodec() {
         final XmlCodecCoreImpl codec = new XmlCodecCoreImpl();
         return XmlCodecs.registerAll(codec);
     }
