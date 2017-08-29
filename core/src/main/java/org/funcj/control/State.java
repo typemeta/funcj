@@ -10,6 +10,7 @@ import static org.funcj.data.Unit.UNIT;
  * <p>
  * Each {@code State} instance is a state processor that takes a state of type {@code S},
  * and produces a new state and a result of type {@code A}.
+ * The state processor is represented by the {@link State#runState(Object)} SAM.
  * @param <S>       the state type
  * @param <A>       the result type
  */
@@ -116,19 +117,32 @@ public interface State<S, A> {
 
     /**
      * The state processor.
+     * <p>
+     * This the SAM that implementations implement, typically via a lambda,
+     * {@code runState} is essentially a function that can be applied to a
+     * state {@code S} to yield a new state and a result.
+     * @param state     the input state.
+     * @return          the new state and a result
      */
     Tuple2<S, A> runState(S state);
 
     /**
      * Map a function over the state processor.
+     * @param f         the function to be mapped
+     * @param <B>       the return type of the function
+     * @return          the new {@code State}
      */
     default <B> State<S, B> map(F<? super A, ? extends B> f) {
         return st -> runState(st).map2(f::apply);
     }
 
     /**
-     * Apply a function provided by a state to this state.
+     * Combine a {@code State} that wraps a function with a {@code State} that wraps a value,
+     * to yield a {@code State} that wraps the result of applying the function to the value.
      * Applicative apply operation (with args reversed).
+     * @param sf        the {@code State} that wraps a function
+     * @param <B>       the {@code State} that wraps a value
+     * @return          a {@code State} that wraps the result of applying the function to the value
      */
     default <B> State<S, B> apply(State<S, F<A, B>> sf) {
         return st -> {
@@ -139,7 +153,13 @@ public interface State<S, A> {
 
     /**
      * FlatMap a function over the state.
-     * Monadic bind operation.
+     * <p>
+     * Compose a {@code State} with a function that yields another a {@code State},
+     * to form a new a {@code State}.
+     * A.k.a. monadic bind operation.
+     * @param f         the function that yields a {@code State}
+     * @param <B>       result value type
+     * @return          a {@code State}
      */
     default <B> State<S, B> flatMap(F<A, State<S, B>> f) {
         return st -> {
@@ -149,22 +169,18 @@ public interface State<S, A> {
     }
 
     /**
-     * FlatMap a const function over the state.
-     * Monadic bind operation.
-     */
-    default <B> State<S, B> then(State<S, B> sb) {
-        return flatMap(u -> sb);
-    }
-
-    /**
-     * @return the state yielded by the processor
+     * Return the state value yielded by running this state processor.
+     * @param s         a state value to supply to the state processor
+     * @return          the state value yielded by running this state processor
      */
     default S exec(S s) {
         return runState(s)._1;
     }
 
     /**
-     * @return the result yielded by the processor
+     * Return the state result yielded by running this state processor.
+     * @param s         a state value to supply to the state processor
+     * @return          the state result yielded by running this state processor
      */
     default A eval(S s) {
         return runState(s)._2;

@@ -7,9 +7,9 @@ public class StateTest {
     public void testState() {
         final String r =
             State.put("efgh")
-                .then(State.get())
+                .flatMap(u -> State.get())
                 .flatMap(s -> State.put(s + "1234"))
-                .then(State.get())
+                .flatMap(u -> State.get())
                 .eval("abcd");
 
         Assert.assertEquals("efgh1234", r);
@@ -20,7 +20,7 @@ public class StateTest {
         final String r =
             State.<String>get()
                 .flatMap(s -> State.put(s + "1234"))
-                .then(State.get())
+                .flatMap(u -> State.get())
                 .eval("abcd");
         Assert.assertEquals("abcd1234", r);
     }
