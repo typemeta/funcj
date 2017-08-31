@@ -10,4 +10,4 @@ At present the project consists of three sub-libraries:
 
 * [core](https://github.com/jon-hanson/funcj/tree/master/core) - primarily data and control structures.
 * [parser](https://github.com/jon-hanson/funcj/tree/master/parser) - a combinator parser framework.
-* [codec](https://github.com/jon-hanson/funcj/tree/master/codec) - a codec framework.
+* [codec](https://github.com/jon-hanson/funcj/tree/master/codec) - a framework for serialising Java data.
