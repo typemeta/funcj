@@ -7,7 +7,7 @@ public abstract class Functions {
 
     /**
      * Function of arity 0.
-     * @param <R> return type
+     * @param <R>       return type
      */
     @FunctionalInterface
     public interface F0<R> {
@@ -15,10 +15,20 @@ public abstract class Functions {
             return f;
         }
 
+        /**
+         * Return a zero-argument constant function that always returns the same value.
+         * @param r         the value the function always returns
+         * @param <R>       the value type
+         * @return          a zero-argument constant function that always returns the same value
+         */
         static <R> F0<R> konst(R r) {
             return () -> r;
         }
 
+        /**
+         * Apply this function
+         * @return          the result of applying this function
+         */
         R apply();
     }
 
@@ -26,8 +36,8 @@ public abstract class Functions {
      * Function of arity 1.
      * Note: if the input type to {@code F} fixed to type T then the result is a monad,
      * where pure = {@code konst} and bind = {@code flatMap}.
-     * @param <A> 1st argument type
-     * @param <R> return type
+     * @param <A>       1st argument type
+     * @param <R>       return type
      */
     @FunctionalInterface
     public interface F<A, R> {
@@ -35,29 +45,76 @@ public abstract class Functions {
             return f;
         }
 
+        /**
+         * The identity function, that simply returns its argument.
+         * @param <A>       input and output type of function
+         * @return          the identity function
+         */
         static <A> F<A, A> id() {
             return x -> x;
         }
 
+        /**
+         * The constant function, that always returns the same value, regardless of its argument
+         * @param r         the value the constant function will return
+         * @param <A>       the input type of the function
+         * @param <R>       the type of the constant value {@code r}
+         * @return          the constant function
+         */
         static <A, R> F<A, R> konst(R r) {
             return a -> r;
         }
 
+        /**
+         * Translate a curried function by inverting the order of its arguments
+         * @param f         the function to be flipped
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <R>       the function's return type
+         * @return          the flipped function
+         */
         static <A, B, R> F<B, F<A, R>> flip(F<A, F<B, R>> f) {
             return b -> a -> f.apply(a).apply(b);
         }
 
+        /**
+         * Apply this function
+         * @param a         the function argument
+         * @return          the result of applying this function
+         */
         R apply(A a);
 
+        /**
+         * Compose this function with another,
+         * to create a function that first applies {@code f}
+         * and then applies this function to the result.
+         * @param f         the function to compose with
+         * @param <T>       the argument type to {@code f}
+         * @return          a function that first applies {@code f} and then applies this function to the result.
+         */
         default <T> F<T, R> compose(F<? super T, ? extends A> f) {
             return t -> this.apply(f.apply(t));
         }
 
+        /**
+         * Compose this function with another,
+         * to create a function that first applies this function
+         * and then applies {@code f} to the result.
+         * @param f         the function to compose with
+         * @param <T>       the argument type to {@code f}
+         * @return          a function that first applies this function and then applies {@code f} to the result.
+         */
         default <T> F<A, T> andThen(F<? super R, ? extends T> f) {
             return t -> f.apply(this.apply(t));
         }
 
-        default <U> F<A, U> map(F<R, U> f) {
+        /**
+         * Variant of {@link F#compose(F)} that lacks the wildcard generic types.
+         * @param f         the function to compose with
+         * @param <T>       the argument type to {@code f}
+         * @return          a function that first applies {@code f} and then applies this function to the result.
+         */
+        default <T> F<A, T> map(F<R, T> f) {
             return f.compose(this);
         }
 
