@@ -6,9 +6,12 @@ import org.funcj.util.Functions.F;
 import java.io.Writer;
 
 /**
- * A model structure for formattable documents.
+ * A composable model structure for formattable documents.
  */
 public interface Document {
+    /**
+     * A null or empty document.
+     */
     enum Nil implements Document {
         INSTANCE {
             @Override
@@ -24,6 +27,9 @@ public interface Document {
         }
     }
 
+    /**
+     * A line break.
+     */
     enum Break implements Document {
         INSTANCE {
             @Override
@@ -39,6 +45,11 @@ public interface Document {
         }
     }
 
+    /**
+     * A text fragment.
+     * <p>
+     * A section of text which does not contain newlines, and should not get broken up.
+     */
     final class Text implements Document {
 
         public final String text;
@@ -59,6 +70,12 @@ public interface Document {
         }
     }
 
+    /**
+     * A grouped document.
+     * <p>
+     * Defines document elements that can be grouped onto a single line
+     * (if it fits within the current width) by removing line breaks.
+     */
     final class Group implements Document {
 
         public final Document doc;
@@ -79,6 +96,11 @@ public interface Document {
         }
     }
 
+    /**
+     * A nested document.
+     * <p>
+     * Indicate that the specified doc should formatted with nesting (i.e. indentation)
+     */
     final class Nest implements Document {
 
         public final int indent;
@@ -101,6 +123,9 @@ public interface Document {
         }
     }
 
+    /**
+     * A concatenation of documents.
+     */
     final class Concat implements Document {
 
         public final IList<Document> children;
