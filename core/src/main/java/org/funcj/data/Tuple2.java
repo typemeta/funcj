@@ -30,12 +30,12 @@ final public class Tuple2<A, B> {
         return _2;
     }
 
-    public <C> Tuple2<C, B> with1(C c) {
-        return Tuple2.of(c, _2);
+    public <T> Tuple2<T, B> with1(T t) {
+        return Tuple2.of(t, _2);
     }
 
-    public <C> Tuple2<A, C> with2(C c) {
-        return Tuple2.of(_1, c);
+    public <T> Tuple2<A, T> with2(T t) {
+        return Tuple2.of(_1, t);
     }
 
     public <T> Tuple2<T, B> map1(F<? super A, ? extends T> f) {

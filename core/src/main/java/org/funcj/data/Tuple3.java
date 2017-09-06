@@ -37,6 +37,18 @@ final public class Tuple3<A, B, C> {
         return _3;
     }
 
+    public <T> Tuple3<T, B, C> with1(T t) {
+        return Tuple3.of(t, _2, _3);
+    }
+
+    public <T> Tuple3<A, T, C> with2(T t) {
+        return Tuple3.of(_1, t, _3);
+    }
+
+    public <T> Tuple3<A, B, T> with3(T t) {
+        return Tuple3.of(_1, _2, t);
+    }
+
     public <T> Tuple3<T, B, C> map1(F<? super A, ? extends T> f) {
         return of(f.apply(_1), _2, _3);
     }
