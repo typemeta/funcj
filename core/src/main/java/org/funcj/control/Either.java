@@ -180,7 +180,7 @@ public interface Either<E, S> {
      * @param <R> type parameter to the {@code Either} returned by the function
      * @return the result of combining this value with the function {@code f}
      */
-    <R> Either<E, R> flatMap(F<? super S, Either<E, R>> f);
+    <R> Either<E, R> flatMap(F<? super S, Either<E, ? extends R>> f);
 
     /**
      * Builder API for chaining together n {@code Validation}s,
@@ -302,7 +302,7 @@ public interface Either<E, S> {
             return f.apply(value);
         }
     }
-    
+
     class ApplyBuilder {
         public static class _2<E, A, B> {
             private final Either<E, A> va;
