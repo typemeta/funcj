@@ -68,8 +68,6 @@ public abstract class Combinators {
         return new ParserImpl<I, A>(LFALSE, () -> SymSet.value(val)) {
             @Override
             public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
-
-                boolean check = val.equals(in.get());
                 return Result.success(res, in.next());
             }
         };
@@ -86,7 +84,6 @@ public abstract class Combinators {
         return new ParserImpl<I, I>(LFALSE, () -> SymSet.pred(name, pred)) {
             @Override
             public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
-                boolean check = pred.apply(in.get());
                 return Result.success(in.get(), in.next());
             }
         };
