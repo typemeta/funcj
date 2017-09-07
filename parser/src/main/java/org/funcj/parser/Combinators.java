@@ -5,10 +5,8 @@ import org.funcj.util.Functions;
 
 import java.util.Optional;
 
-import static org.funcj.parser.Parser.ap;
 import static org.funcj.parser.Parser.pure;
 import static org.funcj.parser.Utils.*;
-import static org.funcj.util.Functions.F2.curry;
 
 /**
  * Combinators provides functions for combining parsers to form new parsers.

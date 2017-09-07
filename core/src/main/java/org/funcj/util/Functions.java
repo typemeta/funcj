@@ -7,10 +7,16 @@ public abstract class Functions {
 
     /**
      * Function of arity 0.
-     * @param <R>       return type
+     * @param <R>       the function return type
      */
     @FunctionalInterface
     public interface F0<R> {
+        /**
+         * Static constructor.
+         * @param f         the function
+         * @param <R>       the function return type
+         * @return          the function
+         */
         static <R> F0<R> of(F0<R> f) {
             return f;
         }
@@ -36,11 +42,18 @@ public abstract class Functions {
      * Function of arity 1.
      * Note: if the input type to {@code F} fixed to type T then the result is a monad,
      * where pure = {@code konst} and bind = {@code flatMap}.
-     * @param <A>       1st argument type
-     * @param <R>       return type
+     * @param <A>       the function argument type
+     * @param <R>       the function return type
      */
     @FunctionalInterface
     public interface F<A, R> {
+        /**
+         * Static constructor.
+         * @param f         the function
+         * @param <A>       the function argument type
+         * @param <R>       the function return type
+         * @return          the function
+         */
         static <A, R> F<A, R> of(F<A, R> f) {
             return f;
         }
@@ -66,7 +79,7 @@ public abstract class Functions {
         }
 
         /**
-         * Translate a curried function by inverting the order of its arguments
+         * Convert a curried function by reversing the order of its arguments
          * @param f         the function to be flipped
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
@@ -105,11 +118,12 @@ public abstract class Functions {
          * @return          a function that first applies this function and then applies {@code f} to the result.
          */
         default <T> F<A, T> andThen(F<? super R, ? extends T> f) {
-            return t -> f.apply(this.apply(t));
+            return a -> f.apply(this.apply(a));
         }
 
         /**
-         * Variant of {@link F#compose(F)} that lacks the wildcard generic types.
+         * Map a function over this oemn.
+         * Essentially {@link F#compose} without the wildcard generic types.
          * @param f         the function to compose with
          * @param <T>       the argument type to {@code f}
          * @return          a function that first applies {@code f} and then applies this function to the result.
@@ -118,53 +132,120 @@ public abstract class Functions {
             return f.compose(this);
         }
 
+        /**
+         * Applicative function composition.
+         * @param f         the function to compose with
+         * @param <B>       the return type of the function returned by {code f}
+         * @return          the composed function
+         */
         default <B> F<A, B> app(F<A, F<R, B>> f) {
-            return s -> f.apply(s).apply(apply(s));
+            return a -> f.apply(a).apply(apply(a));
         }
 
-        default <U> F<A, U> flatMap(F<R, F<A, U>> f) {
-            return s -> f.apply(apply(s)).apply(s);
+        /**
+         * Monadic function composition.
+         * @param f         the function to compose with
+         * @param <B>       the return type of the function returned by {code f}
+         * @return          the composed function
+         */
+        default <B> F<A, B> flatMap(F<R, F<A, B>> f) {
+            return a -> f.apply(apply(a)).apply(a);
         }
     }
 
     /**
      * Function of arity 2.
-     * @param <A> 1st argument type
-     * @param <B> 2nd argument type
-     * @param <R> return type
+     * @param <A>       the function's 1st argument type
+     * @param <B>       the function's 2nd argument type
+     * @param <R>       the function return type
      */
     @FunctionalInterface
     public interface F2<A, B, R> {
+        /**
+         * Static constructor.
+         * @param f         the function
+         * @param <A>       the function's 1st argument type
+         * @param <B>       the function's 2nd argument type
+         * @param <R>       the function return type
+         * @return          the function
+         */
         static <A, B, R> F2<A, B, R> of(F2<A, B, R> f) {
             return f;
         }
 
+        /**
+         * Convert an uncurried function to its curried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's 1st argument type
+         * @param <B>       the function's 2nd argument type
+         * @param <R>       the function return type
+         * @return          the curried function
+         */
         static <A, B, R> F<A, F<B, R>> curry(F2<A, B, R> f) {
             return f.curry();
         }
 
+        /**
+         * Convert an curried function to its uncurried equivalent.
+         * @param f         the curried function
+         * @param <A>       the function's 1st argument type
+         * @param <B>       the function's 2nd argument type
+         * @param <R>       the function return type
+         * @return          the uncurried function
+         */
         static <A, B, R> F2<A, B, R> uncurry(F<A, F<B, R>> f) {
             return (a, b) -> f.apply(a).apply(b);
         }
 
+        /**
+         * A function that always returns its 1st argument.
+         * @param <A>       the function's 1st argument type
+         * @param <B>       the function's 2nd argument type
+         * @return          a function that always returns its 1st argument.
+         */
         static <A, B> F2<A, B, A> first() {
             return (a, b) -> a;
         }
 
+        /**
+         * A function that always returns its 2nd argument.
+         * @param <A>       the function's 1st argument type
+         * @param <B>       the function's 2nd argument type
+         * @return          a function that always returns its 2nd argument.
+         */
         static <A, B> F2<A, B, B> second() {
             return (a, b) -> b;
         }
 
+        /**
+         * Apply this function.
+         * @param a         the function's 1st argument
+         * @param b         the function's 2nd argument
+         * @return          the result of applying this function
+         */
         R apply(A a, B b);
 
+        /**
+         * Partially apply this function.
+         * @param a         the value to partially apply this function to
+         * @return          the partially applied function
+         */
         default F<B, R> partial(A a) {
             return b -> apply(a, b);
         }
 
+        /**
+         * Curry this function
+         * @return          the curried equivalent of this function
+         */
         default F<A, F<B, R>> curry() {
             return a -> b -> apply(a, b);
         }
 
+        /**
+         * Flip this function by reversing the order of its arguments.
+         * @return          the flipped function
+         */
         default F2<B, A, R> flip() {
             return (b, a) -> apply(a, b);
         }
@@ -172,10 +253,10 @@ public abstract class Functions {
 
     /**
      * Function of arity 3.
-     * @param <A> 1st argument type
-     * @param <B> 2nd argument type
-     * @param <C> 3rd argument type
-     * @param <R> return type
+     * @param <A>       1st argument type
+     * @param <B>       2nd argument type
+     * @param <C>       3rd argument type
+     * @param <R>       return type
      */
     @FunctionalInterface
     public interface F3<A, B, C, R> {
@@ -208,11 +289,11 @@ public abstract class Functions {
 
     /**
      * Function of arity 4.
-     * @param <A> 1st argument type
-     * @param <B> 2nd argument type
-     * @param <C> 3rd argument type
-     * @param <D> 4th argument type
-     * @param <R> return type
+     * @param <A>       1st argument type
+     * @param <B>       2nd argument type
+     * @param <C>       3rd argument type
+     * @param <D>       4th argument type
+     * @param <R>       return type
      */
     @FunctionalInterface
     public interface F4<A, B, C, D, R> {
@@ -249,12 +330,12 @@ public abstract class Functions {
 
     /**
      * Function of arity 5.
-     * @param <A> 1st argument type
-     * @param <B> 2nd argument type
-     * @param <C> 3rd argument type
-     * @param <D> 4th argument type
-     * @param <E> 5th argument type
-     * @param <R> return type
+     * @param <A>       1st argument type
+     * @param <B>       2nd argument type
+     * @param <C>       3rd argument type
+     * @param <D>       4th argument type
+     * @param <E>       5th argument type
+     * @param <R>       return type
      */
     @FunctionalInterface
     public interface F5<A, B, C, D, E, R> {
@@ -295,13 +376,13 @@ public abstract class Functions {
 
     /**
      * Function of arity 6.
-     * @param <A> 1st argument type
-     * @param <B> 2nd argument type
-     * @param <C> 3rd argument type
-     * @param <D> 4th argument type
-     * @param <E> 5th argument type
-     * @param <G> 6th argument type
-     * @param <R> return type
+     * @param <A>       1st argument type
+     * @param <B>       2nd argument type
+     * @param <C>       3rd argument type
+     * @param <D>       4th argument type
+     * @param <E>       5th argument type
+     * @param <G>       6th argument type
+     * @param <R>       return type
      */
     @FunctionalInterface
     public interface F6<A, B, C, D, E, G, R> {
@@ -345,8 +426,8 @@ public abstract class Functions {
     }
 
     /**
-     * Unary operator interface.
-     * @param <T> operand type
+     * Unary operator function.
+     * @param <T>       operand type
      */
     @FunctionalInterface
     public interface Op<T> extends F<T, T> {
@@ -358,8 +439,8 @@ public abstract class Functions {
     }
 
     /**
-     * Binary operator interface.
-     * @param <T> operand type
+     * Binary operator function.
+     * @param <T>       operand type
      */
     @FunctionalInterface
     public interface Op2<T> extends F2<T, T, T> {
@@ -375,8 +456,8 @@ public abstract class Functions {
     }
 
     /**
-     * Predicate interface
-     * @param <T> operand type
+     * Predicate function
+     * @param <T>       operand type
      */
     @FunctionalInterface
     public interface Predicate<T> extends F<T, Boolean> {

@@ -9,7 +9,7 @@ import org.funcj.util.Functions.F;
  */
 public abstract class Reader {
     static <S> F<S, S> ask() {
-        return F.of(s -> s);
+        return s -> s;
     }
 
     /**
