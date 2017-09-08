@@ -185,12 +185,12 @@ public interface Either<E, S> {
     /**
      * Builder API for chaining together n {@code Validation}s,
      * and applying an n-ary function at the end.
-     * @param vb next {@code Validation} value to chain
+     * @param eb next {@code Validation} value to chain
      * @param <T> successful result type for next {@code Validation}
      * @return next builder
      */
-    default <T> ApplyBuilder._2<E, S, T> and(Either<E, T> vb) {
-        return new ApplyBuilder._2<E, S, T>(this, vb);
+    default <T> ApplyBuilder._2<E, S, T> and(Either<E, T> eb) {
+        return new ApplyBuilder._2<E, S, T>(this, eb);
     }
 
     /**
@@ -302,95 +302,95 @@ public interface Either<E, S> {
             return f.apply(value);
         }
     }
-    
+
     class ApplyBuilder {
         public static class _2<E, A, B> {
-            private final Either<E, A> va;
-            private final Either<E, B> vb;
+            private final Either<E, A> ea;
+            private final Either<E, B> eb;
 
-            _2(Either<E, A> va, Either<E, B> vb) {
-                this.va = va;
-                this.vb = vb;
+            _2(Either<E, A> ea, Either<E, B> eb) {
+                this.ea = ea;
+                this.eb = eb;
             }
 
             public <R> Either<E, R> map(F<A, F<B, R>> f) {
-                return vb.apply(va.map(f));
+                return eb.apply(ea.map(f));
             }
 
             public <R> Either<E, R> map(Functions.F2<A, B, R> f) {
                 return map(f.curry());
             }
 
-            public <C> _3<C> and(Either<E, C> vc) {
-                return new _3<C>(vc);
+            public <C> _3<C> and(Either<E, C> ec) {
+                return new _3<C>(ec);
             }
 
             public class _3<C> {
-                private final Either<E, C> vc;
+                private final Either<E, C> ec;
 
-                private _3(Either<E, C> vc) {
-                    this.vc = vc;
+                private _3(Either<E, C> ec) {
+                    this.ec = ec;
                 }
 
                 public <R> Either<E, R> map(F<A, F<B, F<C, R>>> f) {
-                    return ap(_2.this.map(f), vc);
+                    return ap(_2.this.map(f), ec);
                 }
 
                 public <R> Either<E, R> map(Functions.F3<A, B, C, R> f) {
                     return map(f.curry());
                 }
 
-                public <D> _4<D> and(Either<E, D> vd) {
-                    return new _4<D>(vd);
+                public <D> _4<D> and(Either<E, D> ed) {
+                    return new _4<D>(ed);
                 }
 
                 public class _4<D> {
-                    private final Either<E, D> vd;
+                    private final Either<E, D> ed;
 
-                    private _4(Either<E, D> vd) {
-                        this.vd = vd;
+                    private _4(Either<E, D> ed) {
+                        this.ed = ed;
                     }
 
                     public <R> Either<E, R> map(F<A, F<B, F<C, F<D, R>>>> f) {
-                        return ap(_3.this.map(f), vd);
+                        return ap(_3.this.map(f), ed);
                     }
 
                     public <R> Either<E, R> map(Functions.F4<A, B, C, D, R> f) {
                         return map(f.curry());
                     }
 
-                    public <G> _5<G> and(Either<E, G> ee) {
-                        return new _5<G>(ee);
+                    public <G> _5<G> and(Either<E, G> eg) {
+                        return new _5<G>(eg);
                     }
 
                     public class _5<G> {
-                        private final Either<E, G> ee;
+                        private final Either<E, G> eg;
 
-                        private _5(Either<E, G> ee) {
-                            this.ee = ee;
+                        private _5(Either<E, G> eg) {
+                            this.eg = eg;
                         }
 
                         public <R> Either<E, R> map(F<A, F<B, F<C, F<D, F<G, R>>>>> f) {
-                            return ap(_4.this.map(f), ee);
+                            return ap(_4.this.map(f), eg);
                         }
 
                         public <R> Either<E, R> map(Functions.F5<A, B, C, D, G, R> f) {
                             return map(f.curry());
                         }
 
-                        public <H> _6<H> and(Either<E, H> eg) {
-                            return new _6<H>(eg);
+                        public <H> _6<H> and(Either<E, H> eh) {
+                            return new _6<H>(eh);
                         }
 
                         public class _6<H> {
-                            private final Either<E, H> eg;
+                            private final Either<E, H> eh;
 
-                            private _6(Either<E, H> eg) {
-                                this.eg = eg;
+                            private _6(Either<E, H> eh) {
+                                this.eh = eh;
                             }
 
                             public <R> Either<E, R> map(F<A, F<B, F<C, F<D, F<G, F<H, R>>>>>> f) {
-                                return ap(_5.this.map(f), eg);
+                                return ap(_5.this.map(f), eh);
                             }
 
                             public <R> Either<E, R> map(Functions.F6<A, B, C, D, G, H, R> f) {
