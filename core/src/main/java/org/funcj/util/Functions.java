@@ -40,7 +40,7 @@ public abstract class Functions {
 
     /**
      * Function of arity 1.
-     * Note: if the input type to {@code F} fixed to type T then the result is a monad,
+     * Note: if the input type to {@code F} is fixed to type T then the result is a monad,
      * where pure = {@code konst} and bind = {@code flatMap}.
      * @param <A>       the function argument type
      * @param <R>       the function return type
@@ -155,8 +155,8 @@ public abstract class Functions {
 
     /**
      * Function of arity 2.
-     * @param <A>       the function's 1st argument type
-     * @param <B>       the function's 2nd argument type
+     * @param <A>       the function's first argument type
+     * @param <B>       the function's second argument type
      * @param <R>       the function return type
      */
     @FunctionalInterface
@@ -164,8 +164,8 @@ public abstract class Functions {
         /**
          * Static constructor.
          * @param f         the function
-         * @param <A>       the function's 1st argument type
-         * @param <B>       the function's 2nd argument type
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
          * @param <R>       the function return type
          * @return          the function
          */
@@ -176,8 +176,8 @@ public abstract class Functions {
         /**
          * Convert an uncurried function to its curried equivalent.
          * @param f         the uncurried function
-         * @param <A>       the function's 1st argument type
-         * @param <B>       the function's 2nd argument type
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
          * @param <R>       the function return type
          * @return          the curried function
          */
@@ -188,8 +188,8 @@ public abstract class Functions {
         /**
          * Convert an curried function to its uncurried equivalent.
          * @param f         the curried function
-         * @param <A>       the function's 1st argument type
-         * @param <B>       the function's 2nd argument type
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
          * @param <R>       the function return type
          * @return          the uncurried function
          */
@@ -198,20 +198,20 @@ public abstract class Functions {
         }
 
         /**
-         * A function that always returns its 1st argument.
-         * @param <A>       the function's 1st argument type
-         * @param <B>       the function's 2nd argument type
-         * @return          a function that always returns its 1st argument.
+         * A function that always returns its first argument.
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @return          a function that always returns its first argument.
          */
         static <A, B> F2<A, B, A> first() {
             return (a, b) -> a;
         }
 
         /**
-         * A function that always returns its 2nd argument.
-         * @param <A>       the function's 1st argument type
-         * @param <B>       the function's 2nd argument type
-         * @return          a function that always returns its 2nd argument.
+         * A function that always returns its second argument.
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @return          a function that always returns its second argument.
          */
         static <A, B> F2<A, B, B> second() {
             return (a, b) -> b;
@@ -219,8 +219,8 @@ public abstract class Functions {
 
         /**
          * Apply this function.
-         * @param a         the function's 1st argument
-         * @param b         the function's 2nd argument
+         * @param a         the function's first argument
+         * @param b         the function's second argument
          * @return          the result of applying this function
          */
         R apply(A a, B b);
@@ -235,7 +235,7 @@ public abstract class Functions {
         }
 
         /**
-         * Curry this function
+         * Convert this function to its curried equivalent.
          * @return          the curried equivalent of this function
          */
         default F<A, F<B, R>> curry() {
@@ -253,35 +253,84 @@ public abstract class Functions {
 
     /**
      * Function of arity 3.
-     * @param <A>       1st argument type
-     * @param <B>       2nd argument type
-     * @param <C>       3rd argument type
-     * @param <R>       return type
+     * @param <A>       the function's first argument type
+     * @param <B>       the function's second argument type
+     * @param <C>       the function's third argument type
+     * @param <R>       the function's return type
      */
     @FunctionalInterface
     public interface F3<A, B, C, R> {
+        /**
+         * Static constructor.
+         * @param f         the function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <R>       the function's return type
+         * @return          the function
+         */
         static <A, B, C, R> F3<A, B, C, R> of(F3<A, B, C, R> f) {
             return f;
         }
 
+        /**
+         * Convert an uncurried function to its curried equivalent.
+         * @param f         the function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <R>       the function's return type
+         * @return          the curried function
+         */
         static <A, B, C, R> F<A, F<B, F<C, R>>> curry(F3<A, B, C, R> f) {
             return f.curry();
         }
 
+        /**
+         * Convert an curried function to its uncurried equivalent.
+         * @param f         the function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <R>       the function's return type
+         * @return          the uncurried function
+         */
         static <A, B, C, R> F3<A, B, C, R> uncurry(F<A, F<B, F<C, R>>> f) {
             return (a, b, c) -> f.apply(a).apply(b).apply(c);
         }
 
+        /**
+         * Apply this function.
+         * @param a         the function's first argument
+         * @param b         the function's second argument
+         * @param c         the function's third argument
+         * @return          the result of applying this function
+         */
         R apply(A a, B b, C c);
 
+        /**
+         * Partially apply this function to one value.
+         * @param a         the value
+         * @return          the partially applied function
+         */
         default F2<B, C, R> partial(A a) {
             return (b, c) -> apply(a, b, c);
         }
 
+        /**
+         * Partially apply this function to two values.
+         * @param a         the first value
+         * @param b         the second value
+         * @return          the partially applied function
+         */
         default F<C, R> partial(A a, B b) {
             return c -> apply(a, b, c);
         }
 
+        /**
+         * Convert this function to its curried equivalent.
+         * @return          the curried equivalent of this function
+         */
         default F<A, F<B, F<C, R>>> curry() {
             return a -> b -> c -> apply(a, b, c);
         }
@@ -289,40 +338,100 @@ public abstract class Functions {
 
     /**
      * Function of arity 4.
-     * @param <A>       1st argument type
-     * @param <B>       2nd argument type
-     * @param <C>       3rd argument type
-     * @param <D>       4th argument type
-     * @param <R>       return type
+     * @param <A>       the function's first argument type
+     * @param <B>       the function's second argument type
+     * @param <C>       the function's third argument type
+     * @param <D>       the function's fourth argument type
+     * @param <R>       the function's return type
      */
     @FunctionalInterface
     public interface F4<A, B, C, D, R> {
+        /**
+         * Static constructor.
+         * @param f         the function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <R>       the function's return type
+         * @return          the function
+         */
         static <A, B, C, D, R> F4<A, B, C, D, R> of(F4<A, B, C, D, R> f) {
             return f;
         }
 
+        /**
+         * Convert an uncurried function to its curried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <R>       the function's return type
+         * @return          the curried function
+         */
         static <A, B, C, D, R> F<A, F<B, F<C, F<D, R>>>> curry(F4<A, B, C, D, R> f) {
             return f.curry();
         }
 
+        /**
+         * Convert an curried function to its uncurried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <R>       the function's return type
+         * @return          the uncurried function
+         */
         static <A, B, C, D, R> F4<A, B, C, D, R> uncurry(F<A, F<B, F<C, F<D, R>>>> f) {
             return (a, b, c, d) -> f.apply(a).apply(b).apply(c).apply(d);
         }
 
+        /**
+         * Apply this function.
+         * @param a         the function's first argument
+         * @param b         the function's second argument
+         * @param c         the function's third argument
+         * @param d         the function's fourth argument
+         * @return          the result of applying this function
+         */
         R apply(A a, B b, C c, D d);
 
+        /**
+         * Partially apply this function to one value.
+         * @param a         the first value
+         * @return
+         */
         default F3<B, C, D, R> partial(A a) {
             return (b, c, d) -> apply(a, b, c, d);
         }
 
+        /**
+         * Partially apply this function to two values.
+         * @param a         the first value
+         * @param b         the second value
+         * @return          the partially applied function
+         */
         default F2<C, D, R> partial(A a, B b) {
             return (c, d) -> apply(a, b, c, d);
         }
 
+        /**
+         * Partially apply this function to three values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @return          the partially applied function
+         */
         default F<D, R> partial(A a, B b, C c) {
             return d -> apply(a, b, c, d);
         }
 
+        /**
+         * Convert this function to its curried equivalent.
+         * @return          the curried equivalent of this function
+         */
         default F<A, F<B, F<C, F<D, R>>>> curry() {
             return a -> b -> c -> d -> apply(a, b, c, d);
         }
@@ -330,45 +439,117 @@ public abstract class Functions {
 
     /**
      * Function of arity 5.
-     * @param <A>       1st argument type
-     * @param <B>       2nd argument type
-     * @param <C>       3rd argument type
-     * @param <D>       4th argument type
-     * @param <E>       5th argument type
-     * @param <R>       return type
+     * @param <A>       the function's first argument type
+     * @param <B>       the function's second argument type
+     * @param <C>       the function's third argument type
+     * @param <D>       the function's fourth argument type
+     * @param <E>       the function's fifth argument type
+     * @param <R>       the function's return type
      */
     @FunctionalInterface
     public interface F5<A, B, C, D, E, R> {
+        /**
+         * Static constructor.
+         * @param f         the function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <R>       the function's return type
+         * @return          the function
+         */
         static <A, B, C, D, E, R> F5<A, B, C, D, E, R> of(F5<A, B, C, D, E, R> f) {
             return f;
         }
 
+        /**
+         * Convert an uncurried function to its curried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <R>       the function's return type
+         * @return          the curried function
+         */
         static <A, B, C, D, E, R> F<A, F<B, F<C, F<D, F<E, R>>>>> curry(F5<A, B, C, D, E, R> f) {
             return f.curry();
         }
 
+        /**
+         * Convert an curried function to its uncurried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <R>       the function's return type
+         * @return          the uncurried function
+         */
         static <A, B, C, D, E, R> F5<A, B, C, D, E, R> uncurry(F<A, F<B, F<C, F<D, F<E, R>>>>> f) {
             return (a, b, c, d, e) -> f.apply(a).apply(b).apply(c).apply(d).apply(e);
         }
 
+        /**
+         * Apply this function.
+         * @param a         the function's first argument
+         * @param b         the function's second argument
+         * @param c         the function's third argument
+         * @param d         the function's fourth argument
+         * @param e         the function's fifth argument
+         * @return          the result of applying this function
+         */
         R apply(A a, B b, C c, D d, E e);
 
+        /**
+         * Partially apply this function to one value.
+         * @param a         the first value
+         * @return          the partially applied function
+         */
         default F4<B, C, D, E, R> partial(A a) {
             return (b, c, d, e) -> apply(a, b, c, d, e);
         }
 
+        /**
+         * Partially apply this function to two values.
+         * @param a         the first value
+         * @param b         the second value
+         * @return          the partially applied function
+         */
         default F3<C, D, E, R> partial(A a, B b) {
             return (c, d, e) -> apply(a, b, c, d, e);
         }
 
+        /**
+         * Partially apply this function to three values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @return          the partially applied function
+         */
         default F2<D, E, R> partial(A a, B b, C c) {
             return (d, e) -> apply(a, b, c, d, e);
         }
 
+        /**
+         * Partially apply this function to four values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @return          the partially applied function
+         */
         default F<E, R> partial(A a, B b, C c, D d) {
             return e -> apply(a, b, c, d, e);
         }
 
+        /**
+         * Convert this function to its curried equivalent.
+         * @return          the curried equivalent of this function
+         */
         default F<A, F<B, F<C, F<D, F<E, R>>>>> curry() {
             return a -> b -> c -> d -> e -> apply(a, b, c, d, e);
         }
@@ -376,50 +557,135 @@ public abstract class Functions {
 
     /**
      * Function of arity 6.
-     * @param <A>       1st argument type
-     * @param <B>       2nd argument type
-     * @param <C>       3rd argument type
-     * @param <D>       4th argument type
-     * @param <E>       5th argument type
-     * @param <G>       6th argument type
-     * @param <R>       return type
+     * @param <A>       the function's first argument type
+     * @param <B>       the function's second argument type
+     * @param <C>       the function's third argument type
+     * @param <D>       the function's fourth argument type
+     * @param <E>       the function's fifth argument type
+     * @param <G>       the function's sixth argument type
+     * @param <R>       the function's return type
      */
     @FunctionalInterface
     public interface F6<A, B, C, D, E, G, R> {
+        /**
+         * Static constructor.
+         * @param f         the function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <G>       the function's sixth argument type
+         * @param <R>       the function's return type
+         * @return          the function
+         */
         static <A, B, C, D, E, G, R> F6<A, B, C, D, E, G, R> of(F6<A, B, C, D, E, G, R> f) {
             return f;
         }
 
+        /**
+         * Convert an uncurried function to its curried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <G>       the function's sixth argument type
+         * @param <R>       the function's return type
+         * @return          the curried function
+         */
         static <A, B, C, D, E, G, R> F<A, F<B, F<C, F<D, F<E, F<G, R>>>>>> curry(F6<A, B, C, D, E, G, R> f) {
             return f.curry();
         }
 
+        /**
+         * Convert an curried function to its uncurried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <G>       the function's sixth argument type
+         * @param <R>       the function's return type
+         * @return          the uncurried function
+         */
         static <A, B, C, D, E, G, R> F6<A, B, C, D, E, G, R> uncurry(F<A, F<B, F<C, F<D, F<E, F<G, R>>>>>> f) {
             return (a, b, c, d, e, g) -> f.apply(a).apply(b).apply(c).apply(d).apply(e).apply(g);
         }
 
+        /**
+         * Apply this function.
+         * @param a         the function's first argument
+         * @param b         the function's second argument
+         * @param c         the function's third argument
+         * @param d         the function's fourth argument
+         * @param e         the function's fifth argument
+         * @param g         the function's sixth argument
+         * @return          the result of applying this function
+         */
         R apply(A a, B b, C c, D d, E e, G g);
 
+        /**
+         * Partially apply this function to one value.
+         * @param a         the first value
+         * @return          the partially applied function
+         */
         default F5<B, C, D, E, G, R> partial(A a) {
             return (b, c, d, e, g) -> apply(a, b, c, d, e, g);
         }
 
+        /**
+         * Partially apply this function to two values.
+         * @param a         the first value
+         * @param b         the second value
+         * @return          the partially applied function
+         */
         default F4<C, D, E, G, R> partial(A a, B b) {
             return (c, d, e, g) -> apply(a, b, c, d, e, g);
         }
 
+        /**
+         * Partially apply this function to three values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @return          the partially applied function
+         */
         default F3<D, E, G, R> partial(A a, B b, C c) {
             return (d, e, g) -> apply(a, b, c, d, e, g);
         }
 
+        /**
+         * Partially apply this function to four values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @return          the partially applied function
+         */
         default F2<E, G, R> partial(A a, B b, C c, D d) {
             return (e, g) -> apply(a, b, c, d, e, g);
         }
 
+        /**
+         * Partially apply this function to five values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @param e         the fifth value
+         * @return          the partially applied function
+         */
         default F<G, R> partial(A a, B b, C c, D d, E e) {
             return g -> apply(a, b, c, d, e, g);
         }
 
+        /**
+         * Convert this function to its curried equivalent.
+         * @return          the curried equivalent of this function
+         */
         default F<A, F<B, F<C, F<D, F<E, F<G, R>>>>>> curry() {
             return a -> b -> c -> d -> e -> g -> apply(a, b, c, d, e, g);
         }
@@ -427,7 +693,7 @@ public abstract class Functions {
 
     /**
      * Unary operator function.
-     * @param <T>       operand type
+     * @param <T>       the operand type
      */
     @FunctionalInterface
     public interface Op<T> extends F<T, T> {
@@ -440,16 +706,24 @@ public abstract class Functions {
 
     /**
      * Binary operator function.
-     * @param <T>       operand type
+     * @param <T>       the operand type
      */
     @FunctionalInterface
     public interface Op2<T> extends F2<T, T, T> {
+        /**
+         * Static constructor
+         * @param op        the operator function
+         * @param <T>       the operand type
+         * @return          the operator function
+         */
         static <T> Op2<T> of(Op2<T> op) {
             return op;
         }
 
-        T apply(T l, T r);
-
+        /**
+         * Flip this function by reversing the order of its arguments.
+         * @return          the flipped function
+         */
         default Op2<T> flip() {
             return (b, a) -> apply(a, b);
         }
@@ -457,14 +731,18 @@ public abstract class Functions {
 
     /**
      * Predicate function
-     * @param <T>       operand type
+     * @param <T>       the operand type
      */
     @FunctionalInterface
     public interface Predicate<T> extends F<T, Boolean> {
+        /**
+         * Static constructor
+         * @param pr        the predicate function
+         * @param <T>       the operand type
+         * @return          the predicate function
+         */
         static <T> Predicate<T> of(Predicate<T> pr) {
             return pr;
         }
-
-        Boolean apply(T t);
     }
 }

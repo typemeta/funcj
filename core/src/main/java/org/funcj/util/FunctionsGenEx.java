@@ -25,7 +25,7 @@ public abstract class FunctionsGenEx {
 
     /**
      * Function of arity 1.
-     * Note: if the input type to {@code F} fixed to type T then the result is a monad,
+     * Note: if the input type to {@code F} is fixed to type T then the result is a monad,
      * where pure = {@code konst} and bind = {@code flatMap}.
      * @param <A> 1st argument type
      * @param <R> return type

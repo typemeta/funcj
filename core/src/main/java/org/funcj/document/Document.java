@@ -99,7 +99,7 @@ public interface Document {
     /**
      * A nested document.
      * <p>
-     * Indicate that the specified doc should formatted with nesting (i.e. indentation)
+     * Indicates that the specified doc should formatted with nesting (i.e. indentation)
      */
     final class Nest implements Document {
 
