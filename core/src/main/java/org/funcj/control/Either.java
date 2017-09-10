@@ -8,20 +8,24 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * Standard tagged union type over two types.
- * A value of Either&lt;A, B&gt; wraps either a value of type A or a value of type B.
+ * Tagged union type over two types.
+ * <p>
+ * A value of {@code Either<A, B>} is either
+ * the sub-type {@code Either.Left<A, B>} which wraps a value of type A, or
+ * the sub-type {@code Either.Right<A, B>} which wraps a value of type A.
+ * <p>
  * Either has right-bias, meaning that map, apply and flatMap operate on the
- * Right value and bypass the Left value.
- * @param <E> left-hand type (possibly an error type)
- * @param <S> right-hand type (possibly a success type)
+ * {@code Right} value and bypass the {@code Left} value.
+ * @param <E>       the left-hand type (possibly an error type)
+ * @param <S>       the right-hand type (possibly a success type)
  */
 public interface Either<E, S> {
     /**
      * Construct a left value.
-     * @param value value to wrap
-     * @param <E> left-hand type
-     * @param <S> right-hand type
-     * @return a {@code Left} value
+     * @param value     the value to wrap
+     * @param <E>       the left-hand type
+     * @param <S>       the right-hand type
+     * @return          a {@code Left} value
      */
     static <E, S> Either<E, S> left(E value) {
         return new Left<E, S>(value);
@@ -29,10 +33,10 @@ public interface Either<E, S> {
 
     /**
      * Construct a right value.
-     * @param value value to wrap
-     * @param <E> left-hand type
-     * @param <S> right-hand type
-     * @return a {@code Right} value
+     * @param value     the value to wrap
+     * @param <E>       the left-hand type
+     * @param <S>       the right-hand type
+     * @return          a {@code Right} value
      */
     static <E, S> Either<E, S> right(S value) {
         return new Right<E, S>(value);
@@ -40,12 +44,12 @@ public interface Either<E, S> {
 
     /**
      * Applicative function application.
-     * @param ef function wrapped in a {@code Either}
-     * @param eb function argument wrapped in a {@code Either}
-     * @param <E> left-hand, error type
-     * @param <S> right-hand, success type
-     * @param <T> function return type
-     * @return the result of applying the function to the argument, wrapped in a {@code Either}
+     * @param ef        the function wrapped in a {@code Either}
+     * @param eb        the function argument wrapped in a {@code Either}
+     * @param <E>       the left-hand, error type
+     * @param <S>       the right-hand, success type
+     * @param <T>       the function return type
+     * @return          the result of applying the function to the argument, wrapped in a {@code Either}
      */
     static <E, S, T> Either<E, T> ap(Either<E, F<S, T>> ef, Either<E, S> eb) {
         return eb.apply(ef);
@@ -53,12 +57,12 @@ public interface Either<E, S> {
 
     /**
      * Standard applicative traversal.
-     * @param ls list of values
-     * @param f function to be applied to each value in the list
-     * @param <E> left-hand, error type of the {@code Either} returned by the function
-     * @param <S> type of list elements
-     * @param <T> right-hand, success type of the {@code Either} returned by the function
-     * @return a {@code Either} which wraps an {@link org.funcj.data.IList} of values
+     * @param ls        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <E>       the left-hand, error type of the {@code Either} returned by the function
+     * @param <S>       the type of list elements
+     * @param <T>       the right-hand, success type of the {@code Either} returned by the function
+     * @return          a {@code Either} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, S, T> Either<E, IList<T>> traverse(IList<S> ls, F<S, Either<E, T>> f) {
         return ls.foldRight(
@@ -69,12 +73,12 @@ public interface Either<E, S> {
 
     /**
      * Standard applicative traversal.
-     * @param ls list of values
-     * @param f function to be applied to each value in the list
-     * @param <E> left-hand, error type of the {@code Either} returned by the function
-     * @param <S> type of list elements
-     * @param <T> right-hand, success type of the {@code Either} returned by the function
-     * @return a {@code Either} which wraps an {@link org.funcj.data.IList} of values
+     * @param ls        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <E>       the left-hand, error type of the {@code Either} returned by the function
+     * @param <S>       the type of list elements
+     * @param <T>       the right-hand, success type of the {@code Either} returned by the function
+     * @return          a {@code Either} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, S, T> Either<E, List<T>> traverse(List<S> ls, F<S, Either<E, T>> f) {
         return Folds.foldRight(
@@ -86,10 +90,10 @@ public interface Either<E, S> {
 
     /**
      * Standard applicative sequencing.
-     * @param les list of {@code Try} values
-     * @param <E> left-hand, error type
-     * @param <S> right-hand, success type
-     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     * @param les       the list of {@code Try} values
+     * @param <E>       the left-hand, error type
+     * @param <S>       the right-hand, success type
+     * @return          a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, S> Either<E, IList<S>> sequence(IList<Either<E, S>> les) {
         return les.foldRight(
@@ -100,10 +104,10 @@ public interface Either<E, S> {
 
     /**
      * Standard applicative sequencing.
-     * @param les list of {@code Try} values
-     * @param <E> left-hand, error type
-     * @param <S> right-hand, success type
-     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     * @param les       the list of {@code Try} values
+     * @param <E>       the left-hand, error type
+     * @param <S>       the right-hand, success type
+     * @return          a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, S> Either<E, List<S>> sequence(List<Either<E, S>> les) {
         return Folds.foldRight(
@@ -115,30 +119,30 @@ public interface Either<E, S> {
 
     /**
      * Indicates if this is a {code Right} value.
-     * @return true if this value is a {code Right} value
+     * @return          true if this value is a {code Right} value
      */
     boolean isRight();
 
     /**
      * Downgrade this value into an {@link java.util.Optional}.
-     * @return a populated {@code Optional} value if this is a {Code Right} value,
-     * otherwise an empty {@code Optional}
+     * @return          a populated {@code Optional} value if this is a {Code Right} value,
+     *                  otherwise an empty {@code Optional}
      */
     Optional<S> asOptional();
 
     /**
      * Push the result to a {@link java.util.function.Consumer}.
-     * @param left consumer to be applied to {@code Left} values
-     * @param right consumer to be applied to {@code Right} values
+     * @param left      the consumer to be applied to {@code Left} values
+     * @param right     the consumer to be applied to {@code Right} values
      */
     void handle(Consumer<Left<E, S>> left, Consumer<Right<E, S>> right);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
-     * @param left function to be applied to {@code Left} values
-     * @param right function to be applied to {@code Right} values
-     * @param <R> return type of functions
-     * @return the result of applying either function
+     * @param left      the function to be applied to {@code Left} values
+     * @param right     the function to be applied to {@code Right} values
+     * @param <R>       the return type of functions
+     * @return          the result of applying either function
      */
     <R> R match(F<Left<E, S>, ? extends R> left, F<Right<E, S>, ? extends R> right);
 
@@ -146,9 +150,9 @@ public interface Either<E, S> {
      * Functor function application.
      * If this value is a {@code Right} then apply the function to the value,
      * otherwise if this is a {@code Left} then leave it untouched.
-     * @param f function to be applied
-     * @param <R> function return type
-     * @return an {@code Either} that wraps the function result, or the original {@code Left} value
+     * @param f         the function to be applied
+     * @param <R>       the function return type
+     * @return          an {@code Either} that wraps the function result, or the original {@code Left} value
      */
     <R> Either<E, R> map(F<? super S, ? extends R> f);
 
@@ -156,9 +160,9 @@ public interface Either<E, S> {
      * Function application for {@code Left} values.
      * If this value is a {@code Left} then apply the function to the value,
      * otherwise if this is a {@code Right} then leave it untouched.
-     * @param f function to be applied
-     * @param <R> function return type
-     * @return an {@code Either} that wraps the function result, or the original {@code Right} value
+     * @param f         the function to be applied
+     * @param <R>       the function return type
+     * @return          an {@code Either} that wraps the function result, or the original {@code Right} value
      */
     <R> Either<R, S> mapLeft(F<? super E, ? extends R> f);
 
@@ -166,9 +170,9 @@ public interface Either<E, S> {
      * Applicative function application (inverted).
      * If the {@code ef} parameter is a {@code Right} value and this is a {@code Right} value,
      * then apply the function wrapped in the {@code ef} to this.
-     * @param ef function wrapped in an {@code Either}
-     * @param <R> return type of function
-     * @return a {@code Either} wrapping the result of applying the function, or a {@code Left} value
+     * @param ef        the function wrapped in an {@code Either}
+     * @param <R>       the return type of function
+     * @return          a {@code Either} wrapping the result of applying the function, or a {@code Left} value
      */
     <R> Either<E, R> apply(Either<E, F<S, R>> ef);
 
@@ -176,18 +180,18 @@ public interface Either<E, S> {
      * Monadic bind/flatMap.
      * If this is a {@code Right} then apply the function to the value and return the result,
      * otherwise return the {@code Left} result.
-     * @param f function to be applied
-     * @param <R> type parameter to the {@code Either} returned by the function
-     * @return the result of combining this value with the function {@code f}
+     * @param f         the function to be applied
+     * @param <R>       the type parameter to the {@code Either} returned by the function
+     * @return          the result of combining this value with the function {@code f}
      */
     <R> Either<E, R> flatMap(F<? super S, Either<E, R>> f);
 
     /**
-     * Builder API for chaining together n {@code Validation}s,
+     * Builder API for chaining together n {@code Either}s,
      * and applying an n-ary function at the end.
-     * @param eb next {@code Validation} value to chain
-     * @param <T> successful result type for next {@code Validation}
-     * @return next builder
+     * @param eb        the next {@code Either} value to chain
+     * @param <T>       the successful result type for next {@code Either}
+     * @return          the next builder
      */
     default <T> ApplyBuilder._2<E, S, T> and(Either<E, T> eb) {
         return new ApplyBuilder._2<E, S, T>(this, eb);
@@ -195,14 +199,36 @@ public interface Either<E, S> {
 
     /**
      * Left value.
-     * @param <E> left-hand type
-     * @param <S> right-hand type
+     * @param <E>       the left-hand type
+     * @param <S>       the right-hand type
      */
     final class Left<E, S> implements Either<E, S> {
         public final E value;
 
         private Left(E value) {
             this.value = Objects.requireNonNull(value);
+        }
+
+        @Override
+        public String toString() {
+            return "Left{value=" + value + '}';
+        }
+
+        @Override
+        public boolean equals(Object rhs) {
+            if (this == rhs) {
+                return true;
+            } else if (rhs == null || getClass() != rhs.getClass()) {
+                return false;
+            } else {
+                Left<?, ?> left = (Left<?, ?>) rhs;
+                return Objects.equals(value, left.value);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
         }
 
         @Override
@@ -252,14 +278,36 @@ public interface Either<E, S> {
 
     /**
      * Right value.
-     * @param <E> left-hand type
-     * @param <S> right-hand type
+     * @param <E>       the left-hand type
+     * @param <S>       the right-hand type
      */
     final class Right<E, S> implements Either<E, S> {
         public final S value;
 
         private Right(S value) {
             this.value = Objects.requireNonNull(value);
+        }
+
+        @Override
+        public String toString() {
+            return "Right{value=" + value + '}';
+        }
+
+        @Override
+        public boolean equals(Object rhs) {
+            if (this == rhs) {
+                return true;
+            } else if (rhs == null || getClass() != rhs.getClass()) {
+                return false;
+            } else {
+                Right<?, ?> right = (Right<?, ?>) rhs;
+                return Objects.equals(value, right.value);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
         }
 
         @Override

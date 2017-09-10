@@ -8,20 +8,23 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * Simple monadic wrapper for computations which result in either a successfully computed value
- * or an error.
+ * Union type of a successful result and an exception.
  * <p>
- * Try is essentially a discriminated union of {@code Success} (which wraps the result value)
- * and {@code Failure} (which wraps an exception).
- * @param <T> successful result type
+ * A {@code Try<T>} value is either
+ * the sub-type {@code Try.Failure<T>} which wraps an exception, or
+ * the sub-type {@code Try.Success<T>} which wraps a value of type T.
+ * <p>
+ * Try is biased towards the {@code Try.Success<T>}, meaning that map, apply and flatMap operate on the
+ * {@code Success} value and bypass the {@code Failure} value.
+ * @param <T>       the successful result type
  */
 public interface Try<T> {
 
     /**
      * Create a {@code Success} value that wraps a successful result.
-     * @param value successful result to be wrapped
-     * @param <T> successful result type
-     * @return a {@code Success} value
+     * @param value     the successful result to be wrapped
+     * @param <T>       the successful result type
+     * @return          a {@code Success} value
      */
     static <T> Try<T> success(T value) {
         return new Success<T>(value);
@@ -29,9 +32,9 @@ public interface Try<T> {
 
     /**
      * Create a {@code Failure} value that wraps a error result.
-     * @param error error result
-     * @param <T> successful result type
-     * @return a {@code Failure} value
+     * @param error     the error result
+     * @param <T>       the successful result type
+     * @return          a {@code Failure} value
      */
     static <T> Try<T> failure(Exception error) {
         return new Failure<T>(error);
@@ -39,9 +42,9 @@ public interface Try<T> {
 
     /**
      * Create a {@code Try} value from a function which either yields a result or throws.
-     * @param f function which may throw
-     * @param <T> successful result type
-     * @return {@code Try} value which wraps the function result
+     * @param f         the function which may throw
+     * @param <T>       the successful result type
+     * @return          a {@code Try} value which wraps the function result
      */
     static <T> Try<T> of(FunctionsEx.F0<T> f) {
         try {
@@ -53,11 +56,11 @@ public interface Try<T> {
 
     /**
      * Applicative function application.
-     * @param tf function wrapped in a {@code Try}
-     * @param ta function argument wrapped in a {@code Try}
-     * @param <A> function argument type
-     * @param <B> function return type
-     * @return the result of applying the function to the argument, wrapped in a {@code Try}
+     * @param tf        the function wrapped in a {@code Try}
+     * @param ta        the function argument wrapped in a {@code Try}
+     * @param <A>       the function argument type
+     * @param <B>       the function return type
+     * @return          the result of applying the function to the argument, wrapped in a {@code Try}
      */
     static <A, B> Try<B> ap(Try<F<A, B>> tf, Try<A> ta) {
         return ta.apply(tf);
@@ -65,11 +68,11 @@ public interface Try<T> {
 
     /**
      * Standard applicative traversal.
-     * @param lt list of values
-     * @param f function to be applied to each value in the list
-     * @param <T> type of list elements
-     * @param <U> type wrapped by the {@code Try} returned by the function
-     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     * @param lt        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <T>       the type of list elements
+     * @param <U>       the type wrapped by the {@code Try} returned by the function
+     * @return          a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
         return lt.foldRight(
@@ -80,11 +83,11 @@ public interface Try<T> {
 
     /**
      * Standard applicative traversal.
-     * @param lt list of values
-     * @param f function to be applied to each value in the list
-     * @param <T> type of list elements
-     * @param <U> type wrapped by the {@code Try} returned by the function
-     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     * @param lt        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <T>       the type of list elements
+     * @param <U>       the type wrapped by the {@code Try} returned by the function
+     * @return          a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
     static <T, U> Try<List<U>> traverse(List<T> lt, F<T, Try<U>> f) {
         return Folds.foldRight(
@@ -96,9 +99,9 @@ public interface Try<T> {
 
     /**
      * Standard applicative sequencing.
-     * @param ltt list of {@code Try} values
-     * @param <T> type of list elements
-     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     * @param ltt       the list of {@code Try} values
+     * @param <T>       the type of list elements
+     * @return          a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
     static <T> Try<IList<T>> sequence(IList<Try<T>> ltt) {
         return ltt.foldRight(
@@ -109,9 +112,9 @@ public interface Try<T> {
 
     /**
      * Standard applicative sequencing.
-     * @param ltt list of {@code Try} values
-     * @param <T> type of list elements
-     * @return a {@code Try} which wraps an {@link org.funcj.data.IList} of values
+     * @param ltt       the list of {@code Try} values
+     * @param <T>       the type of list elements
+     * @return          a {@code Try} which wraps an {@link org.funcj.data.IList} of values
      */
     static <T> Try<List<T>> sequence(List<Try<T>> ltt) {
         return Folds.foldRight(
@@ -123,50 +126,50 @@ public interface Try<T> {
 
     /**
      * Indicates if this is a {code Success} value.
-     * @return true if this value is a {code Success} value
+     * @return          true if this value is a {code Success} value
      */
     boolean isSuccess();
 
     /**
      * Downgrade this value into an {@link java.util.Optional}.
-     * @return a populated {@code Optional} value if this is a {Code Success} value,
-     * otherwise an empty {@code Optional}
+     * @return          a populated {@code Optional} value if this is a {Code Success} value,
+     *                  otherwise an empty {@code Optional}
      */
     Optional<T> asOptional();
 
     /**
      * Either return the wrapped value if it's a {@code Success}, otherwise return the supplied default value.
      * @param defaultValue value to be returned if this is a failure value.
-     * @return the success result value if it's a {@code Success}, otherwise return the supplied default value.
+     * @return          the success result value if it's a {@code Success}, otherwise return the supplied default value.
      */
     T getOrElse(T defaultValue);
 
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
-     * @return the wrapped value if it's a {@code Success}
-     * @throws Exception if the wrapped value is a {@code Failure}
+     * @return          the wrapped value if it's a {@code Success}
+     * @throws          Exception if the wrapped value is a {@code Failure}
      */
     T getOrThrow() throws Exception;
 
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw a RuntimeException.
-     * @return the wrapped value if it's a {@code Success}
+     * @return          the wrapped value if it's a {@code Success}
      */
     T get();
 
     /**
      * Push the result to a {@link java.util.function.Consumer}.
-     * @param success consumer to be applied to {@code Success} values
-     * @param failure consumer to be applied to {@code Failure} values
+     * @param success   the consumer to be applied to {@code Success} values
+     * @param failure   the consumer to be applied to {@code Failure} values
      */
     void handle(Consumer<Success<T>> success, Consumer<Failure<T>> failure);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
-     * @param success function to be applied to {@code Success} values
-     * @param failure function to be applied to {@code Failure} values
-     * @param <R> return type of functions
-     * @return the result of applying either function
+     * @param success   the function to be applied to {@code Success} values
+     * @param failure   the function to be applied to {@code Failure} values
+     * @param <R>       the return type of functions
+     * @return          the result of applying either function
      */
     <R> R match(F<Success<T>, ? extends R> success, F<Failure<T>, ? extends R> failure);
 
@@ -174,9 +177,9 @@ public interface Try<T> {
      * Functor function application.
      * If this value is a {@code Success} then apply the function to the value,
      * otherwise if this is a {@code Failure} then leave it untouched.
-     * @param f function to be applied
-     * @param <R> function return type
-     * @return a {@code Try} that wraps the function result, or the original failure
+     * @param f         the function to be applied
+     * @param <R>       the function return type
+     * @return          a {@code Try} that wraps the function result, or the original failure
      */
     <R> Try<R> map(F<? super T, ? extends R> f);
 
@@ -184,9 +187,9 @@ public interface Try<T> {
      * Applicative function application (inverted).
      * If the {@code tf} parameter is a {@code Success} value and this is a {@code Success} value,
      * then apply the function wrapped in the {@code tf} to this.
-     * @param tf function wrapped in a {@code Try}
-     * @param <R> return type of function
-     * @return a {@code Try} wrapping the result of applying the function, or a {@code Failure} value
+     * @param tf        the function wrapped in a {@code Try}
+     * @param <R>       the return type of function
+     * @return          a {@code Try} wrapping the result of applying the function, or a {@code Failure} value
      */
     <R> Try<R> apply(Try<F<T, R>> tf);
 
@@ -194,17 +197,17 @@ public interface Try<T> {
      * Monadic bind/flatMap.
      * If this is a {@code Success} then apply the function to the value and return the result,
      * otherwise return the {@code Failure} result.
-     * @param f function to be applied
-     * @param <R> type parameter to the {@code Try} returned by the function
-     * @return the result of combining this value with the function {@code f}
+     * @param f         the function to be applied
+     * @param <R>       the type parameter to the {@code Try} returned by the function
+     * @return          the result of combining this value with the function {@code f}
      */
     <R> Try<R> flatMap(F<? super T, Try<R>> f);
 
     /**
      * Variant of flatMap which ignores this value.
-     * @param f function to be invoked
-     * @param <R> type parameter to the {@code Try} returned by the function
-     * @return the result of combining this value with the function {@code f}
+     * @param f         the function to be invoked
+     * @param <R>       the type parameter to the {@code Try} returned by the function
+     * @return          the result of combining this value with the function {@code f}
      */
     default <R> Try<R> flatMap(F0<Try<R>> f) {
         return flatMap(u -> f.apply());
@@ -213,9 +216,9 @@ public interface Try<T> {
     /**
      * Builder API for chaining together n {@code Try}s,
      * and applying an n-ary function at the end.
-     * @param tb next {@code Try} value to chain
-     * @param <U> successful result type for next {@code Try}
-     * @return next builder
+     * @param tb        the next {@code Try} value to chain
+     * @param <U>       the successful result type for next {@code Try}
+     * @return          the next builder
      */
     default <U> ApplyBuilder._2<T, U> and(Try<U> tb) {
         return new ApplyBuilder._2<T, U>(this, tb);
@@ -223,7 +226,7 @@ public interface Try<T> {
 
     /**
      * Success type.
-     * @param <T> successful result type
+     * @param <T>       the successful result type
      */
     final class Success<T> implements Try<T> {
 
@@ -231,6 +234,28 @@ public interface Try<T> {
 
         private Success(T value) {
             this.value = Objects.requireNonNull(value);
+        }
+
+        @Override
+        public String toString() {
+            return "Success(" + value + ")";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            } else if (!(obj instanceof Success<?>)) {
+                return false;
+            } else {
+                final Success<?> rhs = (Success<?>) obj;
+                return value.equals(rhs.value);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return value.hashCode();
         }
 
         @Override
@@ -282,35 +307,11 @@ public interface Try<T> {
         public Optional<T> asOptional() {
             return Optional.of(value);
         }
-
-        @Override
-        public String toString() {
-            return "Success(" + value + ")";
-        }
-
-        @Override
-        public int hashCode() {
-            return value.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-
-            if (obj == null)
-                return false;
-
-            if (!(obj instanceof Success<?>))
-                return false;
-
-            final Success<?> rhs = (Success<?>)obj;
-
-            return value.equals(rhs.value);
-        }
     }
 
     /**
      * Failure type
-     * @param <T> successful result type
+     * @param <T>       the successful result type
      */
     final class Failure<T> implements Try<T> {
 
@@ -318,6 +319,32 @@ public interface Try<T> {
 
         private Failure(Exception error) {
             this.error = Objects.requireNonNull(error);
+        }
+
+        @Override
+        public String toString() {
+            return "Failure(" + error + ")";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            } else if (!(obj instanceof Failure<?>)) {
+                return false;
+            } else {
+                final Failure<?> rhs = (Failure<?>) obj;
+
+                // In general the equals() method for Exception classes isn't implemented,
+                // which means we get object equality. This is rarely useful so here
+                // we instead compare the string representations.
+                return error.toString().equals(rhs.error.toString());
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return error.hashCode();
         }
 
         @Override
@@ -368,33 +395,6 @@ public interface Try<T> {
         @Override
         public Optional<T> asOptional() {
             return Optional.empty();
-        }
-
-        @Override
-        public String toString() {
-            return "Failure(" + error + ")";
-        }
-
-        @Override
-        public int hashCode() {
-            return error.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-
-            if (obj == null)
-                return false;
-
-            if (!(obj instanceof Failure<?>))
-                return false;
-
-            final Failure<?> rhs = (Failure<?>)obj;
-
-            // In general the equals() method for Exception classes isn't implemented,
-            // which means we get object equality. This is rarely useful so here
-            // we instead compare the string representations.
-            return error.toString().equals(rhs.error.toString());
         }
 
         private <U> Try<U> cast() {

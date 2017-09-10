@@ -8,21 +8,21 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * Simple monadic wrapper for computations which result in either a successfully computed value
- * or a list of errors.
+ * Union type of a successfult result and a list of errors.
  * <p>
- * Validation is essentially a discriminated union of {@code Success} (which wraps a value)
- * and {@code Failure} (which wraps a list of errors).
- * @param <E> error type
- * @param <T> successful result type
+ * A {@code Validation<T>} value is either
+ * the sub-type {@code Validation.Failure<T>} which wraps an list of errors, or
+ * the sub-type {@code Validation.Success<T>} which wraps a value of type T.
+ * @param <E>       the error type
+ * @param <T>       the successful result type
  */
 public interface Validation<E, T> {
     /**
      * Create a {@code Success} value that wraps a successful result.
      * @param result successful result to be wrapped
-     * @param <E> error type
-     * @param <T> successful result type
-     * @return a success value
+     * @param <E>       the error type
+     * @param <T>       the successful result type
+     * @return          a success value
      */
     static <E, T> Validation<E, T> success(T result) {
         return new Success<E, T>(result);
@@ -31,9 +31,9 @@ public interface Validation<E, T> {
     /**
      * Create a {@code Failure} value that wraps a error result.
      * @param errors list of failures result to be wrapped
-     * @param <E> error type
-     * @param <T> successful result type
-     * @return a failure value
+     * @param <E>       the error type
+     * @param <T>       the successful result type
+     * @return          a failure value
      */
     static <E, T> Validation<E, T> failure(IList<E> errors) {
         return new Failure<E, T>(errors);
@@ -42,9 +42,9 @@ public interface Validation<E, T> {
     /**
      * Create a {@code Failure} value that wraps a error result.
      * @param error single failure result to be wrapped
-     * @param <E> error type
-     * @param <T> successful result type
-     * @return a failure value
+     * @param <E>       the error type
+     * @param <T>       the successful result type
+     * @return          a failure value
      */
     static <E, T> Validation<E, T> failure(E error) {
         return new Failure<E, T>(IList.of(error));
@@ -54,10 +54,10 @@ public interface Validation<E, T> {
      * Create a {@code Validation} value from a function which either yields a result or throws.
      * @param f  function which may throw
      * @param error exception to error translator
-     * @param <E> error type
-     * @param <T> successful result type
-     * @param <X> exception type
-     * @return {@code Validation} value which wraps the function result
+     * @param <E>       the error type
+     * @param <T>       the successful result type
+     * @param <X>       the exception type
+     * @return          the {@code Validation} value which wraps the function result
      */
     static <E, T, X extends Exception>
     Validation<E, T> of(FunctionsGenEx.F0<T, X> f, F<X, E> error) {
@@ -70,12 +70,12 @@ public interface Validation<E, T> {
 
     /**
      * Applicative function application.
-     * @param vf function wrapped in a {@code Validation}
-     * @param va function argument wrapped in a {@code Validation}
-     * @param <E>  error type
-     * @param <A> function argument type
-     * @param <B> function return type
-     * @return the result of applying the function to the argument, wrapped in a {@code Validation}
+     * @param vf        the function wrapped in a {@code Validation}
+     * @param va        the function argument wrapped in a {@code Validation}
+     * @param <E>       the error type
+     * @param <A>       the function argument type
+     * @param <B>       the function return type
+     * @return          the result of applying the function to the argument, wrapped in a {@code Validation}
      */
     static <E, A, B> Validation<E, B> ap(Validation<E, F<A, B>> vf, Validation<E, A> va) {
         return va.apply(vf);
@@ -83,12 +83,12 @@ public interface Validation<E, T> {
 
     /**
      * Standard applicative traversal.
-     * @param lt list of values
-     * @param f function to be applied to each value in the list
-     * @param <E>  error type
-     * @param <T> type of list elements
-     * @param <U> type wrapped by the {@code Try} returned by the function
-     * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
+     * @param lt        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <E>       the error type
+     * @param <T>       the type of list elements
+     * @param <U>       the type wrapped by the {@code Try} returned by the function
+     * @return          a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, T, U> Validation<E, IList<U>> traverse(IList<T> lt, F<T, Validation<E, U>> f) {
         return lt.foldRight(
@@ -99,12 +99,12 @@ public interface Validation<E, T> {
 
     /**
      * Standard applicative traversal.
-     * @param lt list of values
-     * @param f function to be applied to each value in the list
-     * @param <E>  error type
-     * @param <T> type of list elements
-     * @param <U> type wrapped by the {@code Try} returned by the function
-     * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
+     * @param lt        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <E>       the error type
+     * @param <T>       the type of list elements
+     * @param <U>       the type wrapped by the {@code Try} returned by the function
+     * @return          a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, T, U> Validation<E, List<U>> traverse(List<T> lt, F<T, Validation<E, U>> f) {
         return Folds.foldRight(
@@ -116,10 +116,10 @@ public interface Validation<E, T> {
 
     /**
      * Standard applicative sequencing.
-     * @param lvt list of {@code Validation} values
-     * @param <E>  error type
-     * @param <T> type of list elements
-     * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
+     * @param lvt       the list of {@code Validation} values
+     * @param <E>       the error type
+     * @param <T>       the type of list elements
+     * @return          a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, T> Validation<E, IList<T>> sequence(IList<Validation<E, T>> lvt) {
         return lvt.foldRight(
@@ -130,10 +130,10 @@ public interface Validation<E, T> {
 
     /**
      * Standard applicative sequencing.
-     * @param lvt list of {@code Validation} values
-     * @param <E>  error type
-     * @param <T> type of list elements
-     * @return a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
+     * @param lvt       the list of {@code Validation} values
+     * @param <E>       the error type
+     * @param <T>       the type of list elements
+     * @return          a {@code Validation} which wraps an {@link org.funcj.data.IList} of values
      */
     static <E, T> Validation<E, List<T>> sequence(List<Validation<E, T>> lvt) {
         return Folds.foldRight(
@@ -145,30 +145,30 @@ public interface Validation<E, T> {
 
     /**
      * Indicates if this is a {code Success} value.
-     * @return true if this value is a {code Success} value
+     * @return          the true if this value is a {code Success} value
      */
     boolean isSuccess();
 
     /**
      * Downgrade this value into an {@link java.util.Optional}.
-     * @return a populated {@code Optional} value if this is a {Code Success} value,
+     * @return          a populated {@code Optional} value if this is a {Code Success} value,
      * otherwise an empty {@code Optional}
      */
     Optional<T> asOptional();
 
     /**
      * Push the result to a {@link java.util.function.Consumer}.
-     * @param success consumer to be applied to {@code Success} values
-     * @param failure consumer to be applied to {@code Failure} values
+     * @param success   the consumer to be applied to {@code Success} values
+     * @param failure   the consumer to be applied to {@code Failure} values
      */
     void handle(Consumer<Success<E, T>> success, Consumer<Failure<E, T>> failure);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
-     * @param success function to be applied to {@code Success} values
-     * @param failure function to be applied to {@code Failure} values
-     * @param <R> return type of functions
-     * @return the result of applying either function
+     * @param success   the function to be applied to {@code Success} values
+     * @param failure   the function to be applied to {@code Failure} values
+     * @param <R>       the return type of functions
+     * @return          the result of applying either function
      */
     <R> R match(F<Success<E, T>, R> success, F<Failure<E, T>, R> failure);
 
@@ -176,9 +176,9 @@ public interface Validation<E, T> {
      * Functor function application.
      * If this value is a {@code Success} then apply the function to the value,
      * otherwise if this is a {@code Failure} then leave it untouched.
-     * @param f function to be applied
-     * @param <R> function return type
-     * @return a {@code Validation} that wraps the function result, or the original failure
+     * @param f         the function to be applied
+     * @param <R>       the function return type
+     * @return          a {@code Validation} that wraps the function result, or the original failure
      */
     <R> Validation<E, R> map(F<T, R> f);
 
@@ -186,9 +186,9 @@ public interface Validation<E, T> {
      * Applicative function application (inverted).
      * If the {@code vf} parameter is a {@code Success} value and this is a {@code Success} value,
      * then apply the function wrapped in the {@code tf} to this.
-     * @param vf function wrapped in a {@code Validation}
-     * @param <R> return type of function
-     * @return a {@code Validation} wrapping the result of applying the function, or a {@code Failure} value
+     * @param vf        the function wrapped in a {@code Validation}
+     * @param <R>       the return type of function
+     * @return          a {@code Validation} wrapping the result of applying the function, or a {@code Failure} value
      */
     <R> Validation<E, R> apply(Validation<E, F<T, R>> vf);
 
@@ -196,33 +196,55 @@ public interface Validation<E, T> {
      * Monadic bind/flatMap.
      * If this is a {@code Success} then apply the function to the value and return the result,
      * otherwise return the {@code Failure} result.
-     * @param f function to be applied
-     * @param <R> type parameter to the {@code Validation} returned by the function
-     * @return the result of combining this value with the function {@code f}
+     * @param f         the function to be applied
+     * @param <R>       the type parameter to the {@code Validation} returned by the function
+     * @return          the result of combining this value with the function {@code f}
      */
     <R> Validation<E, R> flatMap(F<T, Validation<E, R>> f);
 
     /**
      * Builder API for chaining together n {@code Validation}s,
      * and applying an n-ary function at the end.
-     * @param vb next {@code Validation} value to chain
-     * @param <U> successful result type for next {@code Validation}
-     * @return next builder
+     * @param vb        the next {@code Validation} value to chain
+     * @param <U>       the successful result type for next {@code Validation}
+     * @return          the next builder
      */
     default <U> ApplyBuilder._2<E, T, U> and(Validation<E, U> vb) {
         return new ApplyBuilder._2<E, T, U>(this, vb);
     }
 
     /**
-     * Success type
-     * @param <E> error type
-     * @param <T> successful result type
+     * Success type.
+     * @param <E>       the error type
+     * @param <T>       the successful result type
      */
     class Success<E, T> implements Validation<E, T> {
         public final T value;
 
         public Success(T value) {
             this.value = Objects.requireNonNull(value);
+        }
+
+        @Override
+        public String toString() {
+            return "Success(" + value + ")";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            } else if (!(obj instanceof Success<?, ?>)) {
+                return false;
+            } else {
+                final Success<?, ?> rhs = (Success<?, ?>) obj;
+                return value.equals(rhs.value);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return value.hashCode();
         }
 
         @Override
@@ -262,15 +284,37 @@ public interface Validation<E, T> {
     }
 
     /**
-     * Failure type
-     * @param <E> error type
-     * @param <T> successful result type
+     * Failure type.
+     * @param <E>       the error type
+     * @param <T>       the successful result type
      */
     class Failure<E, T> implements Validation<E, T> {
         public final IList<E> errors;
 
         public Failure(IList<E> errors) {
             this.errors = Objects.requireNonNull(errors);
+        }
+
+        @Override
+        public String toString() {
+            return "Failure(" + errors + ")";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            } else if (!(obj instanceof Failure<?, ?>)) {
+                return false;
+            } else {
+                final Failure<?, ?> rhs = (Failure<?, ?>) obj;
+                return errors.equals(rhs.errors);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return errors.hashCode();
         }
 
         @Override

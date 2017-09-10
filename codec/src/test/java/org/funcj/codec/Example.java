@@ -2,7 +2,10 @@ package org.funcj.codec;
 
 import org.funcj.codec.json.*;
 import org.funcj.codec.xml.*;
+import org.funcj.control.Either;
 import org.funcj.json.JSValue;
+import org.funcj.util.Functions;
+import org.funcj.util.Functions.F2;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.*;
@@ -45,7 +48,7 @@ public class Example {
         }
     }
 
-    public static void main(String[] args) throws ParserConfigurationException {
+    public static void main2(String[] args) throws ParserConfigurationException {
         jsonTest();
         xmlTest();
     }
@@ -93,5 +96,40 @@ public class Example {
         // Deserialise back to Java.
         final Person person2 = codec.decode(Person.class, elem);
         assert(person.equals(person2));
+    }
+
+    static Either<String, Double> reciprocal(double x) {
+        return (x == 0) ? Either.left("Divide by zero") : Either.right(1.0 / x);
+    }
+
+    static Either<String, Double> sqrt(double x) {
+        return (x < 0) ? Either.left("Square root of -ve number") : Either.right(Math.sqrt(x));
+    }
+
+    static Either<String, Double> recipSqrt(double x) {
+        return reciprocal(x).flatMap(r -> sqrt(r));
+    }
+
+    public static void main(String[] args){
+        Either<String, Double> a = recipSqrt(0.25);
+        assert(a.equals(Either.right(2.0)));
+
+        Either<String, Double> b = recipSqrt(-1.0);
+        assert(b.equals(Either.left("Square root of -ve number")));
+
+        Either<String, Double> c = recipSqrt(0.0);
+        assert(c.equals(Either.left("Divide by zero")));
+
+        // map applies a function to the right-value only.
+        Either<String, Double> d = a.map(r -> r + 1.0);
+        assert(d.equals(Either.right(3.0)));
+
+        // match applies a left function to the left or a right function to the right value
+        String s = a.match(left -> left.value, right -> right.value.toString());
+        assert(s.equals("2.0"));
+
+        // and/map allow Either values to be collected before being passed to a function.
+        Either<String, Double> e = reciprocal(2.0).and(sqrt(4.0)).map(Double::sum);
+        assert(e.equals(Either.right(2.5)));
     }
 }

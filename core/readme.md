@@ -1,0 +1,110 @@
+# Introduction
+
+**funcj.core** is a set of data structures and algorithms.
+
+# Getting Started
+
+## Requirements
+
+funcj.core requires Java 1.8 (or higher).
+
+## Resources
+
+* **Release builds** are available on the [Releases](https://github.com/jon-hanson/funcj/releases) page.
+* **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.core)
+* **Javadocs** are for the latest build are on the [Javadocs](http://jon-hanson.github.io/funcj/javadocs/) page.
+
+## Maven
+
+Add this dependency to your project pom.xml:
+
+```xml
+<dependency>
+    <groupId>org.funcj</groupId>
+    <artifactId>core</artifactId>
+    <version>0.1-SNAPSHOT</version>
+</dependency>
+```
+
+# Guide
+
+## Control
+
+The `org.funcj.control` package contains data types relating to control of flow.
+
+### Either
+
+`Either<A, B>` is a right-biased union type,
+and can be an `Either.Left<A, B>` that holds a value of type `A`,
+or a `Either.Right<A, B>` that holds a value of type 'B'.
+It is right-biased in the sense that `Either.Left<A, B>` values short-circuit any further computations,
+whereas `Either.Right<A, B>` allows it to continue.
+Under this usage, the type parameter `A` typically represents an error,
+conversely `B` is a successful result type.
+
+#### Example
+
+Both of these functions can either fail by returning a `String` error message wrapped in an `Either.Left`,
+or by returning a successful `Double` wrapped in an `Either.Right`.
+
+```Java
+static Either<String, Double> reciprocal(double x) {
+    return (x == 0) ? Either.left("Divide by zero") : Either.right(1.0 / x);
+}
+
+static Either<String, Double> sqrt(double x) {
+    return (x < 0) ? Either.left("Square root of -ve number") : Either.right(Math.sqrt(x));
+}
+```
+
+We can combine these to form a new function using `flatMap`:
+
+```Java
+static Either<String, Double> recipSqrt(double x) {
+    return reciprocal(x).flatMap(r -> sqrt(r));
+}
+```
+
+The `sqrt` function is only invoked if `reciprocal` succeeds:
+
+```Java
+Either<String, Double> a = recipSqrt(0.25);
+assert(a.equals(Either.right(2.0)));
+
+Either<String, Double> b = recipSqrt(-1.0);
+assert(b.equals(Either.left("Square root of -ve number")));
+
+Either<String, Double> c = recipSqrt(0.0);
+assert(c.equals(Either.left("Divide by zero")));
+```
+
+#### Operations
+
+In addition to `flatMap` described above,
+`Either` supports other operations common to control data types.
+
+```Java
+// map applies a function to the right-value only.
+Either<String, Double> d = a.map(r -> r + 1.0);
+assert(d.equals(Either.right(3.0)));
+
+// match applies a left function to the left or a right function to the right value
+String s = a.match(left -> left.value, right -> right.value.toString());
+assert(s.equals("2.0"));
+
+// and/map allow Either values to be collected before being passed to a function.
+Either<String, Double> e = reciprocal(2.0).and(sqrt(4.0)).map(Double::sum);
+assert(e.equals(Either.right(2.5)));
+```
+
+### Try
+
+The `Try<T>` data type is equivalent to `Either<Exception, T>`.
+I.e. it is a union type between a `Failure` which contains an `Exception`,
+and a `Success` which contains a value of type `T`.
+
+### Validation
+
+The `Validation<E, T>` data type is equivalent to `Either<List<E>, T>`.
+I.e. it is a union type between a `Failure` which contains an `List<E>`,
+and a `Success` which contains a value of type `T`.
