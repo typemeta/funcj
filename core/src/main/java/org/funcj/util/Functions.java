@@ -401,7 +401,7 @@ public abstract class Functions {
         /**
          * Partially apply this function to one value.
          * @param a         the first value
-         * @return
+         * @return          the partially applied function
          */
         default F3<B, C, D, R> partial(A a) {
             return (b, c, d) -> apply(a, b, c, d);

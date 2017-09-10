@@ -18,7 +18,7 @@ public class ValidationTest {
     }
 
     @Test
-    public void testGoodGood() {
+    public void testAndMapGoodGood() {
         final Validation<String, Double> r =
             parseInt("1234")
                 .and(parseDbl("1.2"))
@@ -27,7 +27,7 @@ public class ValidationTest {
     }
 
     @Test
-    public void testGoodBad() {
+    public void testAndMapGoodBad() {
         final Validation<String, Double> r =
             parseInt("1234")
                 .and(parseDbl("1.2z"))
@@ -36,7 +36,7 @@ public class ValidationTest {
     }
 
     @Test
-    public void testBadGood() {
+    public void testAndMapBadGood() {
         final Validation<String, Double> r =
             parseInt("1234z")
                 .and(parseDbl("1.2"))
@@ -45,7 +45,7 @@ public class ValidationTest {
     }
 
     @Test
-    public void testBadBad() {
+    public void testAndMapBadBad() {
         final Validation<String, Double> r =
             parseInt("1234z")
                 .and(parseDbl("1.2z"))

@@ -3,7 +3,6 @@ package org.funcj.parser;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.funcj.data.*;
-import org.funcj.util.Functions;
 import org.funcj.util.Functions.F;
 import org.junit.Assume;
 import org.junit.runner.RunWith;
@@ -13,7 +12,6 @@ import static org.funcj.parser.Combinators.value;
 import static org.funcj.parser.Parser.ap;
 import static org.funcj.parser.Parser.pure;
 import static org.funcj.parser.TestUtils.*;
-import static org.funcj.util.Functions.*;
 import static org.hamcrest.CoreMatchers.not;
 
 @RunWith(JUnitQuickcheck.class)
