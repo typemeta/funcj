@@ -158,49 +158,49 @@ public interface Validation<E, T> {
 
     /**
      * Push the result to a {@link java.util.function.Consumer}.
-     * @param success   the consumer to be applied to {@code Success} values
      * @param failure   the consumer to be applied to {@code Failure} values
+     * @param success   the consumer to be applied to {@code Success} values
      */
-    void handle(Consumer<Success<E, T>> success, Consumer<Failure<E, T>> failure);
+    void handle(Consumer<Failure<E, T>> failure, Consumer<Success<E, T>> success);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
-     * @param success   the function to be applied to {@code Success} values
      * @param failure   the function to be applied to {@code Failure} values
+     * @param success   the function to be applied to {@code Success} values
      * @param <R>       the return type of functions
      * @return          the result of applying either function
      */
-    <R> R match(F<Success<E, T>, R> success, F<Failure<E, T>, R> failure);
+    <R> R match(F<Failure<E, T>, R> failure, F<Success<E, T>, R> success);
 
     /**
      * Functor function application.
      * If this value is a {@code Success} then apply the function to the value,
      * otherwise if this is a {@code Failure} then leave it untouched.
      * @param f         the function to be applied
-     * @param <R>       the function return type
+     * @param <U>       the function return type
      * @return          a {@code Validation} that wraps the function result, or the original failure
      */
-    <R> Validation<E, R> map(F<T, R> f);
+    <U> Validation<E, U> map(F<T, U> f);
 
     /**
      * Applicative function application (inverted).
      * If the {@code vf} parameter is a {@code Success} value and this is a {@code Success} value,
      * then apply the function wrapped in the {@code tf} to this.
      * @param vf        the function wrapped in a {@code Validation}
-     * @param <R>       the return type of function
+     * @param <U>       the return type of function
      * @return          a {@code Validation} wrapping the result of applying the function, or a {@code Failure} value
      */
-    <R> Validation<E, R> apply(Validation<E, F<T, R>> vf);
+    <U> Validation<E, U> apply(Validation<E, F<T, U>> vf);
 
     /**
      * Monadic bind/flatMap.
      * If this is a {@code Success} then apply the function to the value and return the result,
      * otherwise return the {@code Failure} result.
      * @param f         the function to be applied
-     * @param <R>       the type parameter to the {@code Validation} returned by the function
+     * @param <U>       the type parameter to the {@code Validation} returned by the function
      * @return          the result of combining this value with the function {@code f}
      */
-    <R> Validation<E, R> flatMap(F<T, Validation<E, R>> f);
+    <U> Validation<E, U> flatMap(F<T, Validation<E, U>> f);
 
     /**
      * Builder API for chaining together n {@code Validation}s,
@@ -253,12 +253,12 @@ public interface Validation<E, T> {
         }
 
         @Override
-        public void handle(Consumer<Success<E, T>> success, Consumer<Failure<E, T>> failure) {
+        public void handle(Consumer<Failure<E, T>> failure, Consumer<Success<E, T>> success) {
             success.accept(this);
         }
 
         @Override
-        public <U> U match(F<Success<E, T>, U> success, F<Failure<E, T>, U> failure) {
+        public <R> R match(F<Failure<E, T>, R> failure, F<Success<E, T>, R> success) {
             return success.apply(this);
         }
 
@@ -323,12 +323,12 @@ public interface Validation<E, T> {
         }
 
         @Override
-        public void handle(Consumer<Success<E, T>> success, Consumer<Failure<E, T>> failure) {
+        public void handle(Consumer<Failure<E, T>> failure, Consumer<Success<E, T>> success) {
             failure.accept(this);
         }
 
         @Override
-        public <U> U match(F<Success<E, T>, U> success, F<Failure<E, T>, U> failure) {
+        public <R> R match(F<Failure<E, T>, R> failure, F<Success<E, T>, R> success) {
             return failure.apply(this);
         }
 

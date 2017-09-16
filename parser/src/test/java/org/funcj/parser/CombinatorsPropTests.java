@@ -4,12 +4,10 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.funcj.data.*;
 import org.funcj.util.Functions.*;
-import org.junit.*;
 import org.junit.runner.RunWith;
 
 import static org.funcj.parser.Combinators.*;
 import static org.funcj.parser.TestUtils.*;
-import static org.hamcrest.CoreMatchers.not;
 
 @RunWith(JUnitQuickcheck.class)
 public class CombinatorsPropTests {

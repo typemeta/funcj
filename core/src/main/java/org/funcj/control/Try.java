@@ -159,57 +159,57 @@ public interface Try<T> {
 
     /**
      * Push the result to a {@link java.util.function.Consumer}.
-     * @param success   the consumer to be applied to {@code Success} values
      * @param failure   the consumer to be applied to {@code Failure} values
+     * @param success   the consumer to be applied to {@code Success} values
      */
-    void handle(Consumer<Success<T>> success, Consumer<Failure<T>> failure);
+    void handle(Consumer<Failure<T>> failure, Consumer<Success<T>> success);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
-     * @param success   the function to be applied to {@code Success} values
      * @param failure   the function to be applied to {@code Failure} values
+     * @param success   the function to be applied to {@code Success} values
      * @param <R>       the return type of functions
      * @return          the result of applying either function
      */
-    <R> R match(F<Success<T>, ? extends R> success, F<Failure<T>, ? extends R> failure);
+    <R> R match(F<Failure<T>, ? extends R> failure, F<Success<T>, ? extends R> success);
 
     /**
      * Functor function application.
      * If this value is a {@code Success} then apply the function to the value,
      * otherwise if this is a {@code Failure} then leave it untouched.
      * @param f         the function to be applied
-     * @param <R>       the function return type
+     * @param <U>       the function return type
      * @return          a {@code Try} that wraps the function result, or the original failure
      */
-    <R> Try<R> map(F<? super T, ? extends R> f);
+    <U> Try<U> map(F<? super T, ? extends U> f);
 
     /**
      * Applicative function application (inverted).
      * If the {@code tf} parameter is a {@code Success} value and this is a {@code Success} value,
      * then apply the function wrapped in the {@code tf} to this.
      * @param tf        the function wrapped in a {@code Try}
-     * @param <R>       the return type of function
+     * @param <U>       the return type of function
      * @return          a {@code Try} wrapping the result of applying the function, or a {@code Failure} value
      */
-    <R> Try<R> apply(Try<F<T, R>> tf);
+    <U> Try<U> apply(Try<F<T, U>> tf);
 
     /**
      * Monadic bind/flatMap.
      * If this is a {@code Success} then apply the function to the value and return the result,
      * otherwise return the {@code Failure} result.
      * @param f         the function to be applied
-     * @param <R>       the type parameter to the {@code Try} returned by the function
+     * @param <U>       the type parameter to the {@code Try} returned by the function
      * @return          the result of combining this value with the function {@code f}
      */
-    <R> Try<R> flatMap(F<? super T, Try<R>> f);
+    <U> Try<U> flatMap(F<? super T, Try<U>> f);
 
     /**
      * Variant of flatMap which ignores this value.
      * @param f         the function to be invoked
-     * @param <R>       the type parameter to the {@code Try} returned by the function
+     * @param <U>       the type parameter to the {@code Try} returned by the function
      * @return          the result of combining this value with the function {@code f}
      */
-    default <R> Try<R> flatMap(F0<Try<R>> f) {
+    default <U> Try<U> flatMap(F0<Try<U>> f) {
         return flatMap(u -> f.apply());
     }
 
@@ -279,27 +279,27 @@ public interface Try<T> {
         }
 
         @Override
-        public void handle(Consumer<Success<T>> success, Consumer<Failure<T>> failure) {
+        public void handle(Consumer<Failure<T>> failure, Consumer<Success<T>> success) {
             success.accept(this);
         }
 
         @Override
-        public <R> R match(F<Success<T>, ? extends R> success, F<Failure<T>, ? extends R> failure) {
+        public <R> R match(F<Failure<T>, ? extends R> failure, F<Success<T>, ? extends R> success) {
             return success.apply(this);
         }
 
         @Override
-        public <R> Try<R> map(F<? super T, ? extends R> f) {
+        public <U> Try<U> map(F<? super T, ? extends U> f) {
             return success(f.apply(value));
         }
 
         @Override
-        public <R> Try<R> apply(Try<F<T, R>> tf) {
+        public <U> Try<U> apply(Try<F<T, U>> tf) {
             return tf.map(f -> f.apply(value));
         }
 
         @Override
-        public <R> Try<R> flatMap(F<? super T, Try<R>> f) {
+        public <U> Try<U> flatMap(F<? super T, Try<U>> f) {
             return f.apply(value);
         }
 
@@ -368,27 +368,27 @@ public interface Try<T> {
         }
 
         @Override
-        public void handle(Consumer<Success<T>> success, Consumer<Failure<T>> failure) {
+        public void handle(Consumer<Failure<T>> failure, Consumer<Success<T>> success) {
             failure.accept(this);
         }
 
         @Override
-        public <R> R match(F<Success<T>, ? extends R> success, F<Failure<T>, ? extends R> failure) {
+        public <R> R match(F<Failure<T>, ? extends R> failure, F<Success<T>, ? extends R> success) {
             return failure.apply(this);
         }
 
         @Override
-        public <R> Try<R> map(F<? super T, ? extends R> f) {
+        public <U> Try<U> map(F<? super T, ? extends U> f) {
             return cast();
         }
 
         @Override
-        public <R> Try<R> apply(Try<F<T, R>> tf) {
+        public <U> Try<U> apply(Try<F<T, U>> tf) {
             return cast();
         }
 
         @Override
-        public <R> Try<R> flatMap(F<? super T, Try<R>> f) {
+        public <U> Try<U> flatMap(F<? super T, Try<U>> f) {
             return cast();
         }
 

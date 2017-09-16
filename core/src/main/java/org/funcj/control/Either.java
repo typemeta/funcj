@@ -151,40 +151,40 @@ public interface Either<E, S> {
      * If this value is a {@code Right} then apply the function to the value,
      * otherwise if this is a {@code Left} then leave it untouched.
      * @param f         the function to be applied
-     * @param <R>       the function return type
+     * @param <T>       the function return type
      * @return          an {@code Either} that wraps the function result, or the original {@code Left} value
      */
-    <R> Either<E, R> map(F<? super S, ? extends R> f);
+    <T> Either<E, T> map(F<? super S, ? extends T> f);
 
     /**
      * Function application for {@code Left} values.
      * If this value is a {@code Left} then apply the function to the value,
      * otherwise if this is a {@code Right} then leave it untouched.
      * @param f         the function to be applied
-     * @param <R>       the function return type
+     * @param <T>       the function return type
      * @return          an {@code Either} that wraps the function result, or the original {@code Right} value
      */
-    <R> Either<R, S> mapLeft(F<? super E, ? extends R> f);
+    <T> Either<T, S> mapLeft(F<? super E, ? extends T> f);
 
     /**
      * Applicative function application (inverted).
      * If the {@code ef} parameter is a {@code Right} value and this is a {@code Right} value,
      * then apply the function wrapped in the {@code ef} to this.
      * @param ef        the function wrapped in an {@code Either}
-     * @param <R>       the return type of function
+     * @param <T>       the return type of function
      * @return          a {@code Either} wrapping the result of applying the function, or a {@code Left} value
      */
-    <R> Either<E, R> apply(Either<E, F<S, R>> ef);
+    <T> Either<E, T> apply(Either<E, F<S, T>> ef);
 
     /**
      * Monadic bind/flatMap.
      * If this is a {@code Right} then apply the function to the value and return the result,
      * otherwise return the {@code Left} result.
      * @param f         the function to be applied
-     * @param <R>       the type parameter to the {@code Either} returned by the function
+     * @param <T>       the type parameter to the {@code Either} returned by the function
      * @return          the result of combining this value with the function {@code f}
      */
-    <R> Either<E, R> flatMap(F<? super S, Either<E, R>> f);
+    <T> Either<E, T> flatMap(F<? super S, Either<E, T>> f);
 
     /**
      * Builder API for chaining together n {@code Either}s,
