@@ -9,7 +9,7 @@ import java.util.stream.StreamSupport;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Utility functions for mapping functions over container types.
+ * Utility functions for mapping functions over Functor types, such as Collections.
  */
 public abstract class Functors {
     /**
