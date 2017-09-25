@@ -265,7 +265,7 @@ The serialised results are then:
 
 ```json
 {
-    "name" : "Jon",
+    "name" : "Marconi",
     "height" : 1.86,
     "birthDate" : "1874-04-25T17:05:41Z[GMT]",
     "favColours" : {
