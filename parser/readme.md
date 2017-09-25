@@ -44,13 +44,13 @@ whereby each grammar instance implements an executable parser.
 
 ## Requirements
 
-funcj.parser requires Java 1.8 (or higher).
+funcj-parser requires Java 1.8 (or higher).
 
 ## Resources
 
-* **Release builds** are available on the [Releases](https://github.com/jon-hanson/funcj/releases) page.
+* **Release builds** are available on the [Releases](https://github.com/typemeta/funcj/releases) page.
 * **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.parser)
-* **Javadocs** are for the latest build are on the [Javadocs](http://jon-hanson.github.io/funcj/javadocs/) page.
+* **Javadocs** are for the latest build are on the [Javadocs](http://typemeta.github.io/funcj/javadocs/) page.
 
 ## Maven
 
@@ -58,8 +58,8 @@ Add this dependency to your project pom.xml:
 
 ```xml
 <dependency>
-    <groupId>org.funcj</groupId>
-    <artifactId>parser</artifactId>
+    <groupId>org.typemeta</groupId>
+    <artifactId>funcj-parser</artifactId>
     <version>0.1-SNAPSHOT</version>
 </dependency>
 ```
