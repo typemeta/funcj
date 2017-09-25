@@ -7,7 +7,7 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A set of functional data structures and algorithms.</description>
-    <url>https://github.com/jon-hanson/${project.artifactId}</url>
+    <url>https://github.com/${project.groupId}/${project.artifactId}</url>
 
     <packaging>pom</packaging>
 
@@ -18,14 +18,14 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git@github.com:jon-hanson/${project.artifactId}.git</connection>
-        <developerConnection>scm:git:git@github.com:jon-hanson/${project.artifactId}.git</developerConnection>
-        <url>http://github.com:jon-hanson/${project.artifactId}/tree/master</url>
+        <connection>scm:git:git@github.com:typemeta/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:git@github.com:typemeta/${project.artifactId}.git</developerConnection>
+        <url>http://github.com:typemeta/${project.artifactId}/tree/master</url>
     </scm>
 
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/jon-hanson/${project.artifactId}/issues</url>
+        <url>https://github.com/typemeta/${project.artifactId}/issues</url>
     </issueManagement>
 
     <distributionManagement>
