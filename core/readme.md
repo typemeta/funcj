@@ -6,7 +6,7 @@
 
 ## Requirements
 
-funcj.core requires Java 1.8 (or higher).
+funcj-core requires Java 1.8 (or higher).
 
 ## Resources
 
