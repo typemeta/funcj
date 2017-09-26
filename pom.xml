@@ -45,13 +45,6 @@
         </developer>
     </developers>
 
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>hhttps://opensource.org/licenses/MIT</url>
-        </license>
-    </licenses>
-
     <properties>
         <!-- Java version -->
         <jdk.version>1.8</jdk.version>
@@ -77,6 +70,7 @@
         <junit.version>4.12</junit.version>
         <junit-quickcheck.version>0.7</junit-quickcheck.version>
     </properties>
+
 
     <dependencyManagement>
         <dependencies>
