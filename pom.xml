@@ -21,8 +21,7 @@
         <connection>scm:git:git@github.com:typemeta/${project.artifactId}.git</connection>
         <developerConnection>scm:git:git@github.com:typemeta/${project.artifactId}.git</developerConnection>
         <url>http://github.com:typemeta/${project.artifactId}/tree/master</url>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <issueManagement>
         <system>github</system>
@@ -44,6 +43,13 @@
             <url>https://github.com/jon-hanson</url>
         </developer>
     </developers>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>hhttps://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
 
     <properties>
         <!-- Java version -->
@@ -70,7 +76,6 @@
         <junit.version>4.12</junit.version>
         <junit-quickcheck.version>0.7</junit-quickcheck.version>
     </properties>
-
 
     <dependencyManagement>
         <dependencies>
