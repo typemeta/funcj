@@ -3,7 +3,7 @@
 
     <groupId>org.typemeta</groupId>
     <artifactId>funcj</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A set of functional data structures and algorithms.</description>
