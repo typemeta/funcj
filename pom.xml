@@ -44,6 +44,13 @@
         </developer>
     </developers>
 
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>hhttps://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
     <properties>
         <!-- Java version -->
         <jdk.version>1.8</jdk.version>
