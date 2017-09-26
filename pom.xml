@@ -3,7 +3,7 @@
 
     <groupId>org.typemeta</groupId>
     <artifactId>funcj</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A set of functional data structures and algorithms.</description>
@@ -21,7 +21,8 @@
         <connection>scm:git:git@github.com:typemeta/${project.artifactId}.git</connection>
         <developerConnection>scm:git:git@github.com:typemeta/${project.artifactId}.git</developerConnection>
         <url>http://github.com:typemeta/${project.artifactId}/tree/master</url>
-    </scm>
+      <tag>funcj-0.1</tag>
+  </scm>
 
     <issueManagement>
         <system>github</system>

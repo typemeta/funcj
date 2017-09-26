@@ -3,12 +3,12 @@
 
     <groupId>org.typemeta</groupId>
     <artifactId>funcj-parser</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
 
     <parent>
         <groupId>org.typemeta</groupId>
         <artifactId>funcj</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.1</version>
     </parent>
 
     <name>${project.groupId}:${project.artifactId}</name>
