@@ -692,6 +692,341 @@ public abstract class Functions {
     }
 
     /**
+     * Function of arity 7.
+     * @param <A>       the function's first argument type
+     * @param <B>       the function's second argument type
+     * @param <C>       the function's third argument type
+     * @param <D>       the function's fourth argument type
+     * @param <E>       the function's fifth argument type
+     * @param <G>       the function's sixth argument type
+     * @param <H>       the function's seventh argument type
+     * @param <R>       the function's return type
+     */
+    @FunctionalInterface
+    public interface F7<A, B, C, D, E, G, H, R> {
+        /**
+         * Static constructor.
+         * @param f         the function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <G>       the function's sixth argument type
+         * @param <H>       the function's seventh argument type
+         * @param <R>       the function's return type
+         * @return          the function
+         */
+        static <A, B, C, D, E, G, H, R> F7<A, B, C, D, E, G, H, R> of(F7<A, B, C, D, E, G, H, R> f) {
+            return f;
+        }
+
+        /**
+         * Convert an uncurried function to its curried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <G>       the function's sixth argument type
+         * @param <H>       the function's seventh argument type
+         * @param <R>       the function's return type
+         * @return          the curried function
+         */
+        static <A, B, C, D, E, G, H, R> F<A, F<B, F<C, F<D, F<E, F<G, F<H, R>>>>>>> curry(
+                F7<A, B, C, D, E, G, H, R> f) {
+            return f.curry();
+        }
+
+        /**
+         * Convert an curried function to its uncurried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <G>       the function's sixth argument type
+         * @param <H>       the function's seventh argument type
+         * @param <R>       the function's return type
+         * @return          the uncurried function
+         */
+        static <A, B, C, D, E, G, H, R> F7<A, B, C, D, E, G, H, R> uncurry(
+                F<A, F<B, F<C, F<D, F<E, F<G, F<H, R>>>>>>> f) {
+            return (a, b, c, d, e, g, h) -> f.apply(a).apply(b).apply(c).apply(d).apply(e).apply(g).apply(h);
+        }
+
+        /**
+         * Apply this function.
+         * @param a         the function's first argument
+         * @param b         the function's second argument
+         * @param c         the function's third argument
+         * @param d         the function's fourth argument
+         * @param e         the function's fifth argument
+         * @param g         the function's sixth argument
+         * @param h         the function's seventh argument
+         * @return          the result of applying this function
+         */
+        R apply(A a, B b, C c, D d, E e, G g, H h);
+
+        /**
+         * Partially apply this function to one value.
+         * @param a         the first value
+         * @return          the partially applied function
+         */
+        default F6<B, C, D, E, G, H, R> partial(A a) {
+            return (b, c, d, e, g, h) -> apply(a, b, c, d, e, g, h);
+        }
+
+        /**
+         * Partially apply this function to two value.
+         * @param a         the first value
+         * @param b         the second value
+         * @return          the partially applied function
+         */
+        default F5<C, D, E, G, H, R> partial(A a, B b) {
+            return (c, d, e, g, h) -> apply(a, b, c, d, e, g, h);
+        }
+
+        /**
+         * Partially apply this function to three values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @return          the partially applied function
+         */
+        default F4<D, E, G, H, R> partial(A a, B b, C c) {
+            return (d, e, g, h) -> apply(a, b, c, d, e, g, h);
+        }
+
+        /**
+         * Partially apply this function to four values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @return          the partially applied function
+         */
+        default F3<E, G, H, R> partial(A a, B b, C c, D d) {
+            return (e, g, h) -> apply(a, b, c, d, e, g, h);
+        }
+
+        /**
+         * Partially apply this function to five values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @param e         the fifth value
+         * @return          the partially applied function
+         */
+        default F2<G, H, R> partial(A a, B b, C c, D d, E e) {
+            return (g, h) -> apply(a, b, c, d, e, g, h);
+        }
+
+        /**
+         * Partially apply this function to six values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @param e         the fifth value
+         * @param g         the sixth value
+         * @return          the partially applied function
+         */
+        default F<H, R> partial(A a, B b, C c, D d, E e, G g) {
+            return h -> apply(a, b, c, d, e, g, h);
+        }
+
+        /**
+         * Convert this function to its curried equivalent.
+         * @return          the curried equivalent of this function
+         */
+        default F<A, F<B, F<C, F<D, F<E, F<G, F<H, R>>>>>>> curry() {
+            return a -> b -> c -> d -> e -> g -> h -> apply(a, b, c, d, e, g, h);
+        }
+    }
+
+    /**
+     * Function of arity 8.
+     * @param <A>       the function's first argument type
+     * @param <B>       the function's second argument type
+     * @param <C>       the function's third argument type
+     * @param <D>       the function's fourth argument type
+     * @param <E>       the function's fifth argument type
+     * @param <G>       the function's sixth argument type
+     * @param <H>       the function's seventh argument type
+     * @param <I>       the function's eighth argument type
+     * @param <R>       the function's return type
+     */
+    @FunctionalInterface
+    public interface F8<A, B, C, D, E, G, H, I, R> {
+        /**
+         * Static constructor.
+         * @param f         the function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <G>       the function's sixth argument type
+         * @param <H>       the function's seventh argument type
+         * @param <I>       the function's eighth argument type
+         * @param <R>       the function's return type
+         * @return          the function
+         */
+        static <A, B, C, D, E, G, H, I, R> F8<A, B, C, D, E, G, H, I, R> of(F8<A, B, C, D, E, G, H, I, R> f) {
+            return f;
+        }
+
+        /**
+         * Convert an uncurried function to its curried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <G>       the function's sixth argument type
+         * @param <H>       the function's seventh argument type
+         * @param <I>       the function's eighth argument type
+         * @param <R>       the function's return type
+         * @return          the curried function
+         */
+        static <A, B, C, D, E, G, H, I, R> F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R>>>>>>>> curry(
+                F8<A, B, C, D, E, G, H, I, R> f) {
+            return f.curry();
+        }
+
+        /**
+         * Convert an curried function to its uncurried equivalent.
+         * @param f         the uncurried function
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <C>       the function's third argument type
+         * @param <D>       the function's fourth argument type
+         * @param <E>       the function's fifth argument type
+         * @param <G>       the function's sixth argument type
+         * @param <H>       the function's seventh argument type
+         * @param <I>       the function's eighth argument type
+         * @param <R>       the function's return type
+         * @return          the uncurried function
+         */
+        static <A, B, C, D, E, G, H, I, R> F8<A, B, C, D, E, G, H, I, R> uncurry(
+                F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R>>>>>>>> f) {
+            return (a, b, c, d, e, g, h, i) ->
+                    f.apply(a).apply(b).apply(c).apply(d).apply(e).apply(g).apply(h).apply(i);
+        }
+
+        /**
+         * Apply this function.
+         * @param a         the function's first argument
+         * @param b         the function's second argument
+         * @param c         the function's third argument
+         * @param d         the function's fourth argument
+         * @param e         the function's fifth argument
+         * @param g         the function's sixth argument
+         * @param h         the function's seventh argument
+         * @param i         the function's eighth argument
+         * @return          the result of applying this function
+         */
+        R apply(A a, B b, C c, D d, E e, G g, H h, I i);
+
+        /**
+         * Partially apply this function to one value.
+         * @param a         the first value
+         * @return          the partially applied function
+         */
+        default F7<B, C, D, E, G, H, I, R> partial(A a) {
+            return (b, c, d, e, g, h, i) -> apply(a, b, c, d, e, g, h, i);
+        }
+
+        /**
+         * Partially apply this function to two value.
+         * @param a         the first value
+         * @param b         the second value
+         * @return          the partially applied function
+         */
+        default F6<C, D, E, G, H, I, R> partial(A a, B b) {
+            return (c, d, e, g, h, i) -> apply(a, b, c, d, e, g, h, i);
+        }
+
+        /**
+         * Partially apply this function to three values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @return          the partially applied function
+         */
+        default F5<D, E, G, H, I, R> partial(A a, B b, C c) {
+            return (d, e, g, h, i) -> apply(a, b, c, d, e, g, h, i);
+        }
+
+        /**
+         * Partially apply this function to four values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @return          the partially applied function
+         */
+        default F4<E, G, H, I, R> partial(A a, B b, C c, D d) {
+            return (e, g, h, i) -> apply(a, b, c, d, e, g, h, i);
+        }
+
+        /**
+         * Partially apply this function to five values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @param e         the fifth value
+         * @return          the partially applied function
+         */
+        default F3<G, H, I, R> partial(A a, B b, C c, D d, E e) {
+            return (g, h, i) -> apply(a, b, c, d, e, g, h, i);
+        }
+
+        /**
+         * Partially apply this function to six values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @param e         the fifth value
+         * @param g         the sixth value
+         * @return          the partially applied function
+         */
+        default F2<H, I, R> partial(A a, B b, C c, D d, E e, G g) {
+            return (h, i) -> apply(a, b, c, d, e, g, h, i);
+        }
+
+        /**
+         * Partially apply this function to seven values.
+         * @param a         the first value
+         * @param b         the second value
+         * @param c         the third value
+         * @param d         the fourth value
+         * @param e         the fifth value
+         * @param g         the sixth value
+         * @param h         the seventh value
+         * @return          the partially applied function
+         */
+        default F<I, R> partial(A a, B b, C c, D d, E e, G g, H h) {
+            return i -> apply(a, b, c, d, e, g, h, i);
+        }
+
+        /**
+         * Convert this function to its curried equivalent.
+         * @return          the curried equivalent of this function
+         */
+        default F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R>>>>>>>> curry() {
+            return a -> b -> c -> d -> e -> g -> h -> i -> apply(a, b, c, d, e, g, h, i);
+        }
+    }
+
+    /**
      * Unary operator function.
      * @param <T>       the operand type
      */
