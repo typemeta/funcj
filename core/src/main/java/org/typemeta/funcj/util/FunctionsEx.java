@@ -34,7 +34,7 @@ public abstract class FunctionsEx {
         /**
          * Apply this function
          * @return          the result of applying this function
-         * @throws Exception
+         * @throws Exception the exception
          */
         R apply() throws Exception;
     }
@@ -95,7 +95,7 @@ public abstract class FunctionsEx {
          * Apply this function
          * @param a         the function argument
          * @return          the result of applying this function
-         * @throws Exception
+         * @throws Exception the exception
          */
         R apply(A a) throws Exception;
 
@@ -224,7 +224,7 @@ public abstract class FunctionsEx {
          * @param a         the function's first argument
          * @param b         the function's second argument
          * @return          the result of applying this function
-         * @throws Exception
+         * @throws Exception the exception
          */
         R apply(A a, B b) throws Exception;
 
@@ -308,7 +308,7 @@ public abstract class FunctionsEx {
          * @param b         the function's second argument
          * @param c         the function's third argument
          * @return          the result of applying this function
-         * @throws Exception
+         * @throws Exception the exception
          */
         R apply(A a, B b, C c) throws Exception;
 
@@ -399,7 +399,7 @@ public abstract class FunctionsEx {
          * @param c         the function's third argument
          * @param d         the function's fourth argument
          * @return          the result of applying this function
-         * @throws Exception
+         * @throws Exception the exception
          */
         R apply(A a, B b, C c, D d) throws Exception;
 
@@ -506,7 +506,7 @@ public abstract class FunctionsEx {
          * @param d         the function's fourth argument
          * @param e         the function's fifth argument
          * @return          the result of applying this function
-         * @throws Exception
+         * @throws Exception the exception
          */
         R apply(A a, B b, C c, D d, E e) throws Exception;
 
@@ -630,7 +630,7 @@ public abstract class FunctionsEx {
          * @param e         the function's fifth argument
          * @param g         the function's sixth argument
          * @return          the result of applying this function
-         * @throws Exception
+         * @throws Exception the exception
          */
         R apply(A a, B b, C c, D d, E e, G g) throws Exception;
 
@@ -774,7 +774,7 @@ public abstract class FunctionsEx {
          * @param g         the function's sixth argument
          * @param h         the function's seventh argument
          * @return          the result of applying this function
-         * @throws Exception
+         * @throws Exception the exception
          */
         R apply(A a, B b, C c, D d, E e, G g, H h) throws Exception;
 
@@ -938,7 +938,7 @@ public abstract class FunctionsEx {
          * @param h         the function's seventh argument
          * @param i         the function's eighth argument
          * @return          the result of applying this function
-         * @throws Exception
+         * @throws Exception the exception
          */
         R apply(A a, B b, C c, D d, E e, G g, H h, I i) throws Exception;
 

@@ -142,6 +142,7 @@ public abstract class Functors {
      * Map a function over an {@link OptionalDouble}.
      * @param f         the function to apply to the value within the {@code OptionalDouble}
      * @param od        the optional value
+     * @param <R>       the return type of the function
      * @return          an {@code Optional} that contains the result of applying the function
      */
     public static <R> Optional<R> map(DoubleFunction<R> f, OptionalDouble od) {
