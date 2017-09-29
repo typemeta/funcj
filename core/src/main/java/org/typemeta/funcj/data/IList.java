@@ -105,7 +105,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @return      a {@code String}
      */
     public static String listToString(IList<Character> l) {
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder(l.size());
         for (; !l.isEmpty(); l = l.tail()) {
             sb.append(l.head());
         }

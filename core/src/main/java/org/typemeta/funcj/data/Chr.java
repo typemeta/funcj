@@ -23,6 +23,10 @@ public final class Chr implements Comparable<Chr> {
         return c < N ? chrs[c] : new Chr(c);
     }
 
+    public static boolean isAlphabetic(Chr c) {
+        return Character.isAlphabetic(c.charValue());
+    }
+
     public static boolean isLetterOrDigit(Chr c) {
         return isLetterOrDigit(c.charValue());
     }

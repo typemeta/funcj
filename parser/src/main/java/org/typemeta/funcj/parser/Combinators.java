@@ -28,6 +28,22 @@ public abstract class Combinators {
     }
 
     /**
+     * A parser that always fails.
+     * @param msg       the failure message
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
+     * @return          a parser that always fails.
+     */
+    public static <I, A> Parser<I, A> fail(String msg) {
+        return new ParserImpl<I, A>(LTRUE, SymSet::empty) {
+            @Override
+            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+                return failure(msg, in);
+            }
+        };
+    }
+
+    /**
      * A parser that succeeds if the end of the input has been reached.
      * @param <I>       the input stream symbol type
      * @return          a parser that succeeds iff we are at the end of the input.

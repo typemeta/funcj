@@ -1,6 +1,7 @@
 package org.typemeta.funcj.data;
 
 import org.typemeta.funcj.util.Functions.F;
+import org.typemeta.funcj.util.Functions.F2;
 
 import java.util.Objects;
 
@@ -36,6 +37,10 @@ final public class Tuple2<A, B> {
 
     public <T> Tuple2<A, T> with2(T t) {
         return Tuple2.of(_1, t);
+    }
+
+    public <T> T apply(F2<? super A, ? super B, ? extends T> f) {
+        return f.apply(_1, _2);
     }
 
     public <T> Tuple2<T, B> map1(F<? super A, ? extends T> f) {

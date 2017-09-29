@@ -37,6 +37,10 @@ abstract class Utils {
         return Result.failure(in, parser.firstSet().apply());
     }
 
+    static <I, A> Result<I, A> failure(String msg, Input<I> in) {
+        return Result.failureMessage(in, msg);
+    }
+
     static <I, A> Result<I, A> failureEof(Parser<I, A> parser, Input<I> in) {
         return Result.failureEof(in, parser.firstSet().apply());
     }
