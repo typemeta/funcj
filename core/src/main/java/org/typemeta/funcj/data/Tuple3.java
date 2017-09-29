@@ -5,10 +5,10 @@ import org.typemeta.funcj.util.Functions;
 import java.util.Objects;
 
 /**
- * A 3-tuple of values
- * @param <A> 1st value type
- * @param <B> 2nd value type
- * @param <C> 3rd value type
+ * A 3-tuple of values.
+ * @param <A>       first value type
+ * @param <B>       second value type
+ * @param <C>       third value type
  */
 final public class Tuple3<A, B, C> {
     public static <A, B, C> Tuple3<A, B, C> of(A _1, B _2, C _3) {
@@ -47,6 +47,10 @@ final public class Tuple3<A, B, C> {
 
     public <T> Tuple3<A, B, T> with3(T t) {
         return Tuple3.of(_1, _2, t);
+    }
+
+    public <T> T apply(Functions.F3<? super A, ? super B, ? super C, ? extends T> f) {
+        return f.apply(_1, _2, _3);
     }
 
     public <T> Tuple3<T, B, C> map1(Functions.F<? super A, ? extends T> f) {

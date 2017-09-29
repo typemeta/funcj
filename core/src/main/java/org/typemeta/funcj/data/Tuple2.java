@@ -6,9 +6,9 @@ import org.typemeta.funcj.util.Functions.F2;
 import java.util.Objects;
 
 /**
- * A 2-tuple of values
- * @param <A> 1st value type
- * @param <B> 2nd value type
+ * A 2-tuple of values.
+ * @param <A>       first value type
+ * @param <B>       second value type
  */
 final public class Tuple2<A, B> {
     public static <A, B> Tuple2<A, B> of(A _1, B _2) {
