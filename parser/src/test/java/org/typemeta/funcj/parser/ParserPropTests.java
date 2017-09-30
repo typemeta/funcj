@@ -4,7 +4,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Assume;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.data.Chr;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
 

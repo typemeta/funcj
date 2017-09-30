@@ -6,12 +6,11 @@ import org.typemeta.funcj.tuples.Tuple2;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static org.junit.Assert.*;
+import static java.util.stream.Collectors.*;
+import static org.junit.Assert.assertEquals;
 
 public class LazyTest {
     private static class InternalTestException extends RuntimeException {}

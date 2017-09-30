@@ -1,7 +1,6 @@
 package org.typemeta.funcj.functions;
 
-import org.typemeta.funcj.tuples.Tuple2;
-import org.typemeta.funcj.tuples.Tuple3;
+import org.typemeta.funcj.tuples.*;
 
 /**
  * Interfaces for composable functions which throw a specific exception type.

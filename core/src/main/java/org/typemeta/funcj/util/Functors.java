@@ -1,16 +1,15 @@
 package org.typemeta.funcj.util;
 
-import org.typemeta.funcj.tuples.Tuple2;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.StreamSupport;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 /**
  * Utility functions for mapping functions over Functor types, such as Collections.
