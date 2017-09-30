@@ -1,7 +1,7 @@
 package org.typemeta.funcj.parser.expr;
 
 import org.typemeta.funcj.data.Chr;
-import org.typemeta.funcj.util.Functions;
+import org.typemeta.funcj.functions.Functions;
 
 /**
  * A model for simple mathematical expressions.

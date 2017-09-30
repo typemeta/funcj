@@ -1,6 +1,6 @@
 package org.typemeta.funcj.util;
 
-import org.typemeta.funcj.util.Functions.F;
+import org.typemeta.funcj.functions.Functions.F;
 
 import java.util.Optional;
 

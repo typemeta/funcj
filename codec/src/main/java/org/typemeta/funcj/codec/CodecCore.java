@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.util.Functions;
+import org.typemeta.funcj.functions.Functions;
 
 /**
  * Interface for classes which implement an encoding into a specific target type {code E}.

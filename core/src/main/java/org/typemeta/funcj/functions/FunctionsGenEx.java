@@ -1,23 +1,28 @@
-package org.typemeta.funcj.util;
+package org.typemeta.funcj.functions;
+
+import org.typemeta.funcj.tuples.Tuple2;
+import org.typemeta.funcj.tuples.Tuple3;
 
 /**
- * Interfaces for composable functions which throw.
+ * Interfaces for composable functions which throw a specific exception type.
  */
-public abstract class FunctionsEx {
+public abstract class FunctionsGenEx {
 
     /**
      * Function of arity 0.
      * @param <R>       the function return type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface F0<R> {
+    public interface F0<R, X extends Exception> {
         /**
          * Static constructor.
          * @param f         the function
          * @param <R>       the function return type
+         * @param <X>       the exception type
          * @return          the function
          */
-        static <R> F0<R> of(F0<R> f) {
+        static <R, X extends Exception> F0<R, X> of(F0<R, X> f) {
             return f;
         }
 
@@ -25,18 +30,19 @@ public abstract class FunctionsEx {
          * Return a zero-argument constant function that always returns the same value.
          * @param r         the value the function always returns
          * @param <R>       the value type
+         * @param <X>       the exception type
          * @return          a zero-argument constant function that always returns the same value
          */
-        static <R> F0<R> konst(R r) {
+        static <R, X extends Exception> F0<R, X> konst(R r) {
             return () -> r;
         }
 
         /**
          * Apply this function
          * @return          the result of applying this function
-         * @throws Exception the exception
+         * @throws X        the exception
          */
-        R apply() throws Exception;
+        R apply() throws X;
     }
 
     /**
@@ -45,38 +51,20 @@ public abstract class FunctionsEx {
      * where pure = {@code konst} and bind = {@code flatMap}.
      * @param <A>       the function argument type
      * @param <R>       the function return type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface F<A, R> {
+    public interface F<A, R, X extends Exception> {
         /**
          * Static constructor.
          * @param f         the function
          * @param <A>       the function argument type
          * @param <R>       the function return type
+         * @param <X>       the exception type
          * @return          the function
          */
-        static <A, R> F<A, R> of(F<A, R> f) {
+        static <A, R, X extends Exception> F<A, R, X> of(F<A, R, X> f) {
             return f;
-        }
-
-        /**
-         * The identity function, that simply returns its argument.
-         * @param <A>       input and output type of function
-         * @return          the identity function
-         */
-        static <A> F<A, A> id() {
-            return x -> x;
-        }
-
-        /**
-         * The constant function, that always returns the same value, regardless of its argument
-         * @param r         the value the constant function will return
-         * @param <A>       the input type of the function
-         * @param <R>       the type of the constant value {@code r}
-         * @return          the constant function
-         */
-        static <A, R> F<A, R> konst(R r) {
-            return a -> r;
         }
 
         /**
@@ -85,9 +73,10 @@ public abstract class FunctionsEx {
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the flipped function
          */
-        static <A, B, R> F<B, F<A, R>> flip(F<A, F<B, R>> f) {
+        static <A, B, R, X extends Exception> F<B, F<A, R, X>, X> flip(F<A, F<B, R, X>, X> f) {
             return b -> a -> f.apply(a).apply(b);
         }
 
@@ -95,9 +84,9 @@ public abstract class FunctionsEx {
          * Apply this function
          * @param a         the function argument
          * @return          the result of applying this function
-         * @throws Exception the exception
+         * @throws X        the exception
          */
-        R apply(A a) throws Exception;
+        R apply(A a) throws X;
 
         /**
          * Compose this function with another,
@@ -107,7 +96,7 @@ public abstract class FunctionsEx {
          * @param <T>       the argument type to {@code f}
          * @return          a function that first applies {@code f} and then applies this function to the result.
          */
-        default <T> F<T, R> compose(F<? super T, ? extends A> f) {
+        default <T> F<T, R, X> compose(F<? super T, ? extends A, X> f) {
             return t -> this.apply(f.apply(t));
         }
 
@@ -119,7 +108,7 @@ public abstract class FunctionsEx {
          * @param <T>       the argument type to {@code f}
          * @return          a function that first applies this function and then applies {@code f} to the result.
          */
-        default <T> F<A, T> andThen(F<? super R, ? extends T> f) {
+        default <T> F<A, T, X> andThen(F<? super R, ? extends T, X> f) {
             return a -> f.apply(this.apply(a));
         }
 
@@ -130,7 +119,7 @@ public abstract class FunctionsEx {
          * @param <T>       the argument type to {@code f}
          * @return          a function that first applies {@code f} and then applies this function to the result.
          */
-        default <T> F<A, T> map(F<R, T> f) {
+        default <T> F<A, T, X> map(F<R, T, X> f) {
             return f.compose(this);
         }
 
@@ -140,7 +129,7 @@ public abstract class FunctionsEx {
          * @param <B>       the return type of the function returned by {code f}
          * @return          the composed function
          */
-        default <B> F<A, B> app(F<A, F<R, B>> f) {
+        default <B> F<A, B, X> app(F<A, F<R, B, X>, X> f) {
             return a -> f.apply(a).apply(apply(a));
         }
 
@@ -150,7 +139,7 @@ public abstract class FunctionsEx {
          * @param <B>       the return type of the function returned by {code f}
          * @return          the composed function
          */
-        default <B> F<A, B> flatMap(F<R, F<A, B>> f) {
+        default <B> F<A, B, X> flatMap(F<R, F<A, B, X>, X> f) {
             return a -> f.apply(apply(a)).apply(a);
         }
     }
@@ -160,18 +149,20 @@ public abstract class FunctionsEx {
      * @param <A>       the function's first argument type
      * @param <B>       the function's second argument type
      * @param <R>       the function return type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface F2<A, B, R> {
+    public interface F2<A, B, R, X extends Exception> {
         /**
          * Static constructor.
          * @param f         the function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <R>       the function return type
+         * @param <X>       the exception type
          * @return          the function
          */
-        static <A, B, R> F2<A, B, R> of(F2<A, B, R> f) {
+        static <A, B, R, X extends Exception> F2<A, B, R, X> of(F2<A, B, R, X> f) {
             return f;
         }
 
@@ -181,9 +172,10 @@ public abstract class FunctionsEx {
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <R>       the function return type
+         * @param <X>       the exception type
          * @return          the curried function
          */
-        static <A, B, R> F<A, F<B, R>> curry(F2<A, B, R> f) {
+        static <A, B, R, X extends Exception> F<A, F<B, R, X>, X> curry(F2<A, B, R, X> f) {
             return f.curry();
         }
 
@@ -193,9 +185,10 @@ public abstract class FunctionsEx {
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <R>       the function return type
+         * @param <X>       the exception type
          * @return          the uncurried function
          */
-        static <A, B, R> F2<A, B, R> uncurry(F<A, F<B, R>> f) {
+        static <A, B, R, X extends Exception> F2<A, B, R, X> uncurry(F<A, F<B, R, X>, X> f) {
             return (a, b) -> f.apply(a).apply(b);
         }
 
@@ -203,9 +196,10 @@ public abstract class FunctionsEx {
          * A function that always returns its first argument.
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
+         * @param <X>       the exception type
          * @return          a function that always returns its first argument.
          */
-        static <A, B> F2<A, B, A> first() {
+        static <A, B, X extends Exception> F2<A, B, A, X> first() {
             return (a, b) -> a;
         }
 
@@ -213,9 +207,10 @@ public abstract class FunctionsEx {
          * A function that always returns its second argument.
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
+         * @param <X>       the exception type
          * @return          a function that always returns its second argument.
          */
-        static <A, B> F2<A, B, B> second() {
+        static <A, B, X extends Exception> F2<A, B, B, X> second() {
             return (a, b) -> b;
         }
 
@@ -224,16 +219,26 @@ public abstract class FunctionsEx {
          * @param a         the function's first argument
          * @param b         the function's second argument
          * @return          the result of applying this function
-         * @throws Exception the exception
+         * @throws X        the exception
          */
-        R apply(A a, B b) throws Exception;
+        R apply(A a, B b) throws X;
+
+        /**
+         * Apply this function to the values withing the supplied {@code Tuple2}
+         * @param t2        the {@code Tuple2}
+         * @return          the result of applying this function
+         * @throws X        the exception
+         */
+        default R apply(Tuple2<A, B> t2) throws X {
+            return apply(t2._1, t2._2);
+        }
 
         /**
          * Partially apply this function.
          * @param a         the value to partially apply this function to
          * @return          the partially applied function
          */
-        default F<B, R> partial(A a) {
+        default F<B, R, X> partial(A a) {
             return b -> apply(a, b);
         }
 
@@ -241,7 +246,7 @@ public abstract class FunctionsEx {
          * Convert this function to its curried equivalent.
          * @return          the curried equivalent of this function
          */
-        default F<A, F<B, R>> curry() {
+        default F<A, F<B, R, X>, X> curry() {
             return a -> b -> apply(a, b);
         }
 
@@ -249,7 +254,7 @@ public abstract class FunctionsEx {
          * Flip this function by reversing the order of its arguments.
          * @return          the flipped function
          */
-        default F2<B, A, R> flip() {
+        default F2<B, A, R, X> flip() {
             return (b, a) -> apply(a, b);
         }
     }
@@ -260,9 +265,10 @@ public abstract class FunctionsEx {
      * @param <B>       the function's second argument type
      * @param <C>       the function's third argument type
      * @param <R>       the function's return type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface F3<A, B, C, R> {
+    public interface F3<A, B, C, R, X extends Exception> {
         /**
          * Static constructor.
          * @param f         the function
@@ -270,9 +276,10 @@ public abstract class FunctionsEx {
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the function
          */
-        static <A, B, C, R> F3<A, B, C, R> of(F3<A, B, C, R> f) {
+        static <A, B, C, R, X extends Exception> F3<A, B, C, R, X> of(F3<A, B, C, R, X> f) {
             return f;
         }
 
@@ -283,9 +290,10 @@ public abstract class FunctionsEx {
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the curried function
          */
-        static <A, B, C, R> F<A, F<B, F<C, R>>> curry(F3<A, B, C, R> f) {
+        static <A, B, C, R, X extends Exception> F<A, F<B, F<C, R, X>, X>, X> curry(F3<A, B, C, R, X> f) {
             return f.curry();
         }
 
@@ -296,9 +304,10 @@ public abstract class FunctionsEx {
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the uncurried function
          */
-        static <A, B, C, R> F3<A, B, C, R> uncurry(F<A, F<B, F<C, R>>> f) {
+        static <A, B, C, R, X extends Exception> F3<A, B, C, R, X> uncurry(F<A, F<B, F<C, R, X>, X>, X> f) {
             return (a, b, c) -> f.apply(a).apply(b).apply(c);
         }
 
@@ -308,16 +317,26 @@ public abstract class FunctionsEx {
          * @param b         the function's second argument
          * @param c         the function's third argument
          * @return          the result of applying this function
-         * @throws Exception the exception
+         * @throws X        the exception
          */
-        R apply(A a, B b, C c) throws Exception;
+        R apply(A a, B b, C c) throws X;
+
+        /**
+         * Apply this function to the values withing the supplied {@code Tuple3}
+         * @param t3        the {@code Tuple3}
+         * @return          the result of applying this function
+         * @throws X        the exception
+         */
+        default R apply(Tuple3<A, B, C> t3) throws Exception {
+            return apply(t3._1, t3._2, t3._3);
+        }
 
         /**
          * Partially apply this function to one value.
          * @param a         the value
          * @return          the partially applied function
          */
-        default F2<B, C, R> partial(A a) {
+        default F2<B, C, R, X> partial(A a) {
             return (b, c) -> apply(a, b, c);
         }
 
@@ -327,7 +346,7 @@ public abstract class FunctionsEx {
          * @param b         the second value
          * @return          the partially applied function
          */
-        default F<C, R> partial(A a, B b) {
+        default F<C, R, X> partial(A a, B b) {
             return c -> apply(a, b, c);
         }
 
@@ -335,7 +354,7 @@ public abstract class FunctionsEx {
          * Convert this function to its curried equivalent.
          * @return          the curried equivalent of this function
          */
-        default F<A, F<B, F<C, R>>> curry() {
+        default F<A, F<B, F<C, R, X>, X>, X> curry() {
             return a -> b -> c -> apply(a, b, c);
         }
     }
@@ -347,9 +366,10 @@ public abstract class FunctionsEx {
      * @param <C>       the function's third argument type
      * @param <D>       the function's fourth argument type
      * @param <R>       the function's return type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface F4<A, B, C, D, R> {
+    public interface F4<A, B, C, D, R, X extends Exception> {
         /**
          * Static constructor.
          * @param f         the function
@@ -358,9 +378,10 @@ public abstract class FunctionsEx {
          * @param <C>       the function's third argument type
          * @param <D>       the function's fourth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the function
          */
-        static <A, B, C, D, R> F4<A, B, C, D, R> of(F4<A, B, C, D, R> f) {
+        static <A, B, C, D, R, X extends Exception> F4<A, B, C, D, R, X> of(F4<A, B, C, D, R, X> f) {
             return f;
         }
 
@@ -372,9 +393,10 @@ public abstract class FunctionsEx {
          * @param <C>       the function's third argument type
          * @param <D>       the function's fourth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the curried function
          */
-        static <A, B, C, D, R> F<A, F<B, F<C, F<D, R>>>> curry(F4<A, B, C, D, R> f) {
+        static <A, B, C, D, R, X extends Exception> F<A, F<B, F<C, F<D, R, X>, X>, X>, X> curry(F4<A, B, C, D, R, X> f) {
             return f.curry();
         }
 
@@ -386,9 +408,10 @@ public abstract class FunctionsEx {
          * @param <C>       the function's third argument type
          * @param <D>       the function's fourth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the uncurried function
          */
-        static <A, B, C, D, R> F4<A, B, C, D, R> uncurry(F<A, F<B, F<C, F<D, R>>>> f) {
+        static <A, B, C, D, R, X extends Exception> F4<A, B, C, D, R, X> uncurry(F<A, F<B, F<C, F<D, R, X>, X>, X>, X> f) {
             return (a, b, c, d) -> f.apply(a).apply(b).apply(c).apply(d);
         }
 
@@ -399,16 +422,16 @@ public abstract class FunctionsEx {
          * @param c         the function's third argument
          * @param d         the function's fourth argument
          * @return          the result of applying this function
-         * @throws Exception the exception
+         * @throws X        the exception
          */
-        R apply(A a, B b, C c, D d) throws Exception;
+        R apply(A a, B b, C c, D d) throws X;
 
         /**
          * Partially apply this function to one value.
          * @param a         the first value
          * @return          the partially applied function
          */
-        default F3<B, C, D, R> partial(A a) {
+        default F3<B, C, D, R, X> partial(A a) {
             return (b, c, d) -> apply(a, b, c, d);
         }
 
@@ -418,7 +441,7 @@ public abstract class FunctionsEx {
          * @param b         the second value
          * @return          the partially applied function
          */
-        default F2<C, D, R> partial(A a, B b) {
+        default F2<C, D, R, X> partial(A a, B b) {
             return (c, d) -> apply(a, b, c, d);
         }
 
@@ -429,7 +452,7 @@ public abstract class FunctionsEx {
          * @param c         the third value
          * @return          the partially applied function
          */
-        default F<D, R> partial(A a, B b, C c) {
+        default F<D, R, X> partial(A a, B b, C c) {
             return d -> apply(a, b, c, d);
         }
 
@@ -437,7 +460,7 @@ public abstract class FunctionsEx {
          * Convert this function to its curried equivalent.
          * @return          the curried equivalent of this function
          */
-        default F<A, F<B, F<C, F<D, R>>>> curry() {
+        default F<A, F<B, F<C, F<D, R, X>, X>, X>, X> curry() {
             return a -> b -> c -> d -> apply(a, b, c, d);
         }
     }
@@ -450,9 +473,10 @@ public abstract class FunctionsEx {
      * @param <D>       the function's fourth argument type
      * @param <E>       the function's fifth argument type
      * @param <R>       the function's return type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface F5<A, B, C, D, E, R> {
+    public interface F5<A, B, C, D, E, R, X extends Exception> {
         /**
          * Static constructor.
          * @param f         the function
@@ -462,9 +486,11 @@ public abstract class FunctionsEx {
          * @param <D>       the function's fourth argument type
          * @param <E>       the function's fifth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the function
          */
-        static <A, B, C, D, E, R> F5<A, B, C, D, E, R> of(F5<A, B, C, D, E, R> f) {
+        static <A, B, C, D, E, R, X extends Exception> F5<A, B, C, D, E, R, X> of(
+                F5<A, B, C, D, E, R, X> f) {
             return f;
         }
 
@@ -477,9 +503,11 @@ public abstract class FunctionsEx {
          * @param <D>       the function's fourth argument type
          * @param <E>       the function's fifth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the curried function
          */
-        static <A, B, C, D, E, R> F<A, F<B, F<C, F<D, F<E, R>>>>> curry(F5<A, B, C, D, E, R> f) {
+        static <A, B, C, D, E, R, X extends Exception> F<A, F<B, F<C, F<D, F<E, R, X>, X>, X>, X>, X> curry(
+                F5<A, B, C, D, E, R, X> f) {
             return f.curry();
         }
 
@@ -492,9 +520,11 @@ public abstract class FunctionsEx {
          * @param <D>       the function's fourth argument type
          * @param <E>       the function's fifth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the uncurried function
          */
-        static <A, B, C, D, E, R> F5<A, B, C, D, E, R> uncurry(F<A, F<B, F<C, F<D, F<E, R>>>>> f) {
+        static <A, B, C, D, E, R, X extends Exception> F5<A, B, C, D, E, R, X> uncurry(
+                F<A, F<B, F<C, F<D, F<E, R, X>, X>, X>, X>, X> f) {
             return (a, b, c, d, e) -> f.apply(a).apply(b).apply(c).apply(d).apply(e);
         }
 
@@ -506,16 +536,16 @@ public abstract class FunctionsEx {
          * @param d         the function's fourth argument
          * @param e         the function's fifth argument
          * @return          the result of applying this function
-         * @throws Exception the exception
+         * @throws X         exception
          */
-        R apply(A a, B b, C c, D d, E e) throws Exception;
+        R apply(A a, B b, C c, D d, E e) throws X;
 
         /**
          * Partially apply this function to one value.
          * @param a         the first value
          * @return          the partially applied function
          */
-        default F4<B, C, D, E, R> partial(A a) {
+        default F4<B, C, D, E, R, X> partial(A a) {
             return (b, c, d, e) -> apply(a, b, c, d, e);
         }
 
@@ -525,7 +555,7 @@ public abstract class FunctionsEx {
          * @param b         the second value
          * @return          the partially applied function
          */
-        default F3<C, D, E, R> partial(A a, B b) {
+        default F3<C, D, E, R, X> partial(A a, B b) {
             return (c, d, e) -> apply(a, b, c, d, e);
         }
 
@@ -536,7 +566,7 @@ public abstract class FunctionsEx {
          * @param c         the third value
          * @return          the partially applied function
          */
-        default F2<D, E, R> partial(A a, B b, C c) {
+        default F2<D, E, R, X> partial(A a, B b, C c) {
             return (d, e) -> apply(a, b, c, d, e);
         }
 
@@ -548,7 +578,7 @@ public abstract class FunctionsEx {
          * @param d         the fourth value
          * @return          the partially applied function
          */
-        default F<E, R> partial(A a, B b, C c, D d) {
+        default F<E, R, X> partial(A a, B b, C c, D d) {
             return e -> apply(a, b, c, d, e);
         }
 
@@ -556,7 +586,7 @@ public abstract class FunctionsEx {
          * Convert this function to its curried equivalent.
          * @return          the curried equivalent of this function
          */
-        default F<A, F<B, F<C, F<D, F<E, R>>>>> curry() {
+        default F<A, F<B, F<C, F<D, F<E, R, X>, X>, X>, X>, X> curry() {
             return a -> b -> c -> d -> e -> apply(a, b, c, d, e);
         }
     }
@@ -570,9 +600,10 @@ public abstract class FunctionsEx {
      * @param <E>       the function's fifth argument type
      * @param <G>       the function's sixth argument type
      * @param <R>       the function's return type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface F6<A, B, C, D, E, G, R> {
+    public interface F6<A, B, C, D, E, G, R, X extends Exception> {
         /**
          * Static constructor.
          * @param f         the function
@@ -583,9 +614,11 @@ public abstract class FunctionsEx {
          * @param <E>       the function's fifth argument type
          * @param <G>       the function's sixth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the function
          */
-        static <A, B, C, D, E, G, R> F6<A, B, C, D, E, G, R> of(F6<A, B, C, D, E, G, R> f) {
+        static <A, B, C, D, E, G, R, X extends Exception> F6<A, B, C, D, E, G, R, X> of(
+                F6<A, B, C, D, E, G, R, X> f) {
             return f;
         }
 
@@ -599,9 +632,11 @@ public abstract class FunctionsEx {
          * @param <E>       the function's fifth argument type
          * @param <G>       the function's sixth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the curried function
          */
-        static <A, B, C, D, E, G, R> F<A, F<B, F<C, F<D, F<E, F<G, R>>>>>> curry(F6<A, B, C, D, E, G, R> f) {
+        static <A, B, C, D, E, G, R, X extends Exception> F<A, F<B, F<C, F<D, F<E, F<G, R, X>, X>, X>, X>, X>, X> curry(
+                F6<A, B, C, D, E, G, R, X> f) {
             return f.curry();
         }
 
@@ -615,9 +650,11 @@ public abstract class FunctionsEx {
          * @param <E>       the function's fifth argument type
          * @param <G>       the function's sixth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the uncurried function
          */
-        static <A, B, C, D, E, G, R> F6<A, B, C, D, E, G, R> uncurry(F<A, F<B, F<C, F<D, F<E, F<G, R>>>>>> f) {
+        static <A, B, C, D, E, G, R, X extends Exception> F6<A, B, C, D, E, G, R, X> uncurry(
+                F<A, F<B, F<C, F<D, F<E, F<G, R, X>, X>, X>, X>, X>, X> f) {
             return (a, b, c, d, e, g) -> f.apply(a).apply(b).apply(c).apply(d).apply(e).apply(g);
         }
 
@@ -630,16 +667,16 @@ public abstract class FunctionsEx {
          * @param e         the function's fifth argument
          * @param g         the function's sixth argument
          * @return          the result of applying this function
-         * @throws Exception the exception
+         * @throws X         exception
          */
-        R apply(A a, B b, C c, D d, E e, G g) throws Exception;
+        R apply(A a, B b, C c, D d, E e, G g) throws X;
 
         /**
          * Partially apply this function to one value.
          * @param a         the first value
          * @return          the partially applied function
          */
-        default F5<B, C, D, E, G, R> partial(A a) {
+        default F5<B, C, D, E, G, R, X> partial(A a) {
             return (b, c, d, e, g) -> apply(a, b, c, d, e, g);
         }
 
@@ -649,7 +686,7 @@ public abstract class FunctionsEx {
          * @param b         the second value
          * @return          the partially applied function
          */
-        default F4<C, D, E, G, R> partial(A a, B b) {
+        default F4<C, D, E, G, R, X> partial(A a, B b) {
             return (c, d, e, g) -> apply(a, b, c, d, e, g);
         }
 
@@ -660,7 +697,7 @@ public abstract class FunctionsEx {
          * @param c         the third value
          * @return          the partially applied function
          */
-        default F3<D, E, G, R> partial(A a, B b, C c) {
+        default F3<D, E, G, R, X> partial(A a, B b, C c) {
             return (d, e, g) -> apply(a, b, c, d, e, g);
         }
 
@@ -672,7 +709,7 @@ public abstract class FunctionsEx {
          * @param d         the fourth value
          * @return          the partially applied function
          */
-        default F2<E, G, R> partial(A a, B b, C c, D d) {
+        default F2<E, G, R, X> partial(A a, B b, C c, D d) {
             return (e, g) -> apply(a, b, c, d, e, g);
         }
 
@@ -685,7 +722,7 @@ public abstract class FunctionsEx {
          * @param e         the fifth value
          * @return          the partially applied function
          */
-        default F<G, R> partial(A a, B b, C c, D d, E e) {
+        default F<G, R, X> partial(A a, B b, C c, D d, E e) {
             return g -> apply(a, b, c, d, e, g);
         }
 
@@ -693,7 +730,7 @@ public abstract class FunctionsEx {
          * Convert this function to its curried equivalent.
          * @return          the curried equivalent of this function
          */
-        default F<A, F<B, F<C, F<D, F<E, F<G, R>>>>>> curry() {
+        default F<A, F<B, F<C, F<D, F<E, F<G, R, X>, X>, X>, X>, X>, X> curry() {
             return a -> b -> c -> d -> e -> g -> apply(a, b, c, d, e, g);
         }
     }
@@ -708,9 +745,10 @@ public abstract class FunctionsEx {
      * @param <G>       the function's sixth argument type
      * @param <H>       the function's seventh argument type
      * @param <R>       the function's return type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface F7<A, B, C, D, E, G, H, R> {
+    public interface F7<A, B, C, D, E, G, H, R, X extends Exception> {
         /**
          * Static constructor.
          * @param f         the function
@@ -722,9 +760,11 @@ public abstract class FunctionsEx {
          * @param <G>       the function's sixth argument type
          * @param <H>       the function's seventh argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the function
          */
-        static <A, B, C, D, E, G, H, R> F7<A, B, C, D, E, G, H, R> of(F7<A, B, C, D, E, G, H, R> f) {
+        static <A, B, C, D, E, G, H, R, X extends Exception> F7<A, B, C, D, E, G, H, R, X> of(
+                F7<A, B, C, D, E, G, H, R, X> f) {
             return f;
         }
 
@@ -739,10 +779,11 @@ public abstract class FunctionsEx {
          * @param <G>       the function's sixth argument type
          * @param <H>       the function's seventh argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the curried function
          */
-        static <A, B, C, D, E, G, H, R> F<A, F<B, F<C, F<D, F<E, F<G, F<H, R>>>>>>> curry(
-                F7<A, B, C, D, E, G, H, R> f) {
+        static <A, B, C, D, E, G, H, R, X extends Exception> F<A, F<B, F<C, F<D, F<E, F<G, F<H, R, X>, X>, X>, X>, X>, X>, X> curry(
+                F7<A, B, C, D, E, G, H, R, X> f) {
             return f.curry();
         }
 
@@ -757,10 +798,11 @@ public abstract class FunctionsEx {
          * @param <G>       the function's sixth argument type
          * @param <H>       the function's seventh argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the uncurried function
          */
-        static <A, B, C, D, E, G, H, R> F7<A, B, C, D, E, G, H, R> uncurry(
-                F<A, F<B, F<C, F<D, F<E, F<G, F<H, R>>>>>>> f) {
+        static <A, B, C, D, E, G, H, R, X extends Exception> F7<A, B, C, D, E, G, H, R, X> uncurry(
+                F<A, F<B, F<C, F<D, F<E, F<G, F<H, R, X>, X>, X>, X>, X>, X>, X> f) {
             return (a, b, c, d, e, g, h) -> f.apply(a).apply(b).apply(c).apply(d).apply(e).apply(g).apply(h);
         }
 
@@ -774,16 +816,16 @@ public abstract class FunctionsEx {
          * @param g         the function's sixth argument
          * @param h         the function's seventh argument
          * @return          the result of applying this function
-         * @throws Exception the exception
+         * @throws X         exception
          */
-        R apply(A a, B b, C c, D d, E e, G g, H h) throws Exception;
+        R apply(A a, B b, C c, D d, E e, G g, H h) throws X;
 
         /**
          * Partially apply this function to one value.
          * @param a         the first value
          * @return          the partially applied function
          */
-        default F6<B, C, D, E, G, H, R> partial(A a) {
+        default F6<B, C, D, E, G, H, R, X> partial(A a) {
             return (b, c, d, e, g, h) -> apply(a, b, c, d, e, g, h);
         }
 
@@ -793,7 +835,7 @@ public abstract class FunctionsEx {
          * @param b         the second value
          * @return          the partially applied function
          */
-        default F5<C, D, E, G, H, R> partial(A a, B b) {
+        default F5<C, D, E, G, H, R, X> partial(A a, B b) {
             return (c, d, e, g, h) -> apply(a, b, c, d, e, g, h);
         }
 
@@ -804,7 +846,7 @@ public abstract class FunctionsEx {
          * @param c         the third value
          * @return          the partially applied function
          */
-        default F4<D, E, G, H, R> partial(A a, B b, C c) {
+        default F4<D, E, G, H, R, X> partial(A a, B b, C c) {
             return (d, e, g, h) -> apply(a, b, c, d, e, g, h);
         }
 
@@ -816,7 +858,7 @@ public abstract class FunctionsEx {
          * @param d         the fourth value
          * @return          the partially applied function
          */
-        default F3<E, G, H, R> partial(A a, B b, C c, D d) {
+        default F3<E, G, H, R, X> partial(A a, B b, C c, D d) {
             return (e, g, h) -> apply(a, b, c, d, e, g, h);
         }
 
@@ -829,7 +871,7 @@ public abstract class FunctionsEx {
          * @param e         the fifth value
          * @return          the partially applied function
          */
-        default F2<G, H, R> partial(A a, B b, C c, D d, E e) {
+        default F2<G, H, R, X> partial(A a, B b, C c, D d, E e) {
             return (g, h) -> apply(a, b, c, d, e, g, h);
         }
 
@@ -843,7 +885,7 @@ public abstract class FunctionsEx {
          * @param g         the sixth value
          * @return          the partially applied function
          */
-        default F<H, R> partial(A a, B b, C c, D d, E e, G g) {
+        default F<H, R, X> partial(A a, B b, C c, D d, E e, G g) {
             return h -> apply(a, b, c, d, e, g, h);
         }
 
@@ -851,7 +893,7 @@ public abstract class FunctionsEx {
          * Convert this function to its curried equivalent.
          * @return          the curried equivalent of this function
          */
-        default F<A, F<B, F<C, F<D, F<E, F<G, F<H, R>>>>>>> curry() {
+        default F<A, F<B, F<C, F<D, F<E, F<G, F<H, R, X>, X>, X>, X>, X>, X>, X> curry() {
             return a -> b -> c -> d -> e -> g -> h -> apply(a, b, c, d, e, g, h);
         }
     }
@@ -867,9 +909,10 @@ public abstract class FunctionsEx {
      * @param <H>       the function's seventh argument type
      * @param <I>       the function's eighth argument type
      * @param <R>       the function's return type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface F8<A, B, C, D, E, G, H, I, R> {
+    public interface F8<A, B, C, D, E, G, H, I, R, X extends Exception> {
         /**
          * Static constructor.
          * @param f         the function
@@ -882,9 +925,11 @@ public abstract class FunctionsEx {
          * @param <H>       the function's seventh argument type
          * @param <I>       the function's eighth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the function
          */
-        static <A, B, C, D, E, G, H, I, R> F8<A, B, C, D, E, G, H, I, R> of(F8<A, B, C, D, E, G, H, I, R> f) {
+        static <A, B, C, D, E, G, H, I, R, X extends Exception> F8<A, B, C, D, E, G, H, I, R, X> of(
+                F8<A, B, C, D, E, G, H, I, R, X> f) {
             return f;
         }
 
@@ -900,10 +945,11 @@ public abstract class FunctionsEx {
          * @param <H>       the function's seventh argument type
          * @param <I>       the function's eighth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the curried function
          */
-        static <A, B, C, D, E, G, H, I, R> F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R>>>>>>>> curry(
-                F8<A, B, C, D, E, G, H, I, R> f) {
+        static <A, B, C, D, E, G, H, I, R, X extends Exception> F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R, X>, X>, X>, X>, X>, X>, X>, X> curry(
+                F8<A, B, C, D, E, G, H, I, R, X> f) {
             return f.curry();
         }
 
@@ -919,10 +965,11 @@ public abstract class FunctionsEx {
          * @param <H>       the function's seventh argument type
          * @param <I>       the function's eighth argument type
          * @param <R>       the function's return type
+         * @param <X>       the exception type
          * @return          the uncurried function
          */
-        static <A, B, C, D, E, G, H, I, R> F8<A, B, C, D, E, G, H, I, R> uncurry(
-                F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R>>>>>>>> f) {
+        static <A, B, C, D, E, G, H, I, R, X extends Exception> F8<A, B, C, D, E, G, H, I, R, X> uncurry(
+                F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R, X>, X>, X>, X>, X>, X>, X>, X> f) {
             return (a, b, c, d, e, g, h, i) ->
                     f.apply(a).apply(b).apply(c).apply(d).apply(e).apply(g).apply(h).apply(i);
         }
@@ -938,16 +985,16 @@ public abstract class FunctionsEx {
          * @param h         the function's seventh argument
          * @param i         the function's eighth argument
          * @return          the result of applying this function
-         * @throws Exception the exception
+         * @throws X         exception
          */
-        R apply(A a, B b, C c, D d, E e, G g, H h, I i) throws Exception;
+        R apply(A a, B b, C c, D d, E e, G g, H h, I i) throws X;
 
         /**
          * Partially apply this function to one value.
          * @param a         the first value
          * @return          the partially applied function
          */
-        default F7<B, C, D, E, G, H, I, R> partial(A a) {
+        default F7<B, C, D, E, G, H, I, R, X> partial(A a) {
             return (b, c, d, e, g, h, i) -> apply(a, b, c, d, e, g, h, i);
         }
 
@@ -957,7 +1004,7 @@ public abstract class FunctionsEx {
          * @param b         the second value
          * @return          the partially applied function
          */
-        default F6<C, D, E, G, H, I, R> partial(A a, B b) {
+        default F6<C, D, E, G, H, I, R, X> partial(A a, B b) {
             return (c, d, e, g, h, i) -> apply(a, b, c, d, e, g, h, i);
         }
 
@@ -968,7 +1015,7 @@ public abstract class FunctionsEx {
          * @param c         the third value
          * @return          the partially applied function
          */
-        default F5<D, E, G, H, I, R> partial(A a, B b, C c) {
+        default F5<D, E, G, H, I, R, X> partial(A a, B b, C c) {
             return (d, e, g, h, i) -> apply(a, b, c, d, e, g, h, i);
         }
 
@@ -980,7 +1027,7 @@ public abstract class FunctionsEx {
          * @param d         the fourth value
          * @return          the partially applied function
          */
-        default F4<E, G, H, I, R> partial(A a, B b, C c, D d) {
+        default F4<E, G, H, I, R, X> partial(A a, B b, C c, D d) {
             return (e, g, h, i) -> apply(a, b, c, d, e, g, h, i);
         }
 
@@ -993,7 +1040,7 @@ public abstract class FunctionsEx {
          * @param e         the fifth value
          * @return          the partially applied function
          */
-        default F3<G, H, I, R> partial(A a, B b, C c, D d, E e) {
+        default F3<G, H, I, R, X> partial(A a, B b, C c, D d, E e) {
             return (g, h, i) -> apply(a, b, c, d, e, g, h, i);
         }
 
@@ -1007,7 +1054,7 @@ public abstract class FunctionsEx {
          * @param g         the sixth value
          * @return          the partially applied function
          */
-        default F2<H, I, R> partial(A a, B b, C c, D d, E e, G g) {
+        default F2<H, I, R, X> partial(A a, B b, C c, D d, E e, G g) {
             return (h, i) -> apply(a, b, c, d, e, g, h, i);
         }
 
@@ -1022,7 +1069,7 @@ public abstract class FunctionsEx {
          * @param h         the seventh value
          * @return          the partially applied function
          */
-        default F<I, R> partial(A a, B b, C c, D d, E e, G g, H h) {
+        default F<I, R, X> partial(A a, B b, C c, D d, E e, G g, H h) {
             return i -> apply(a, b, c, d, e, g, h, i);
         }
 
@@ -1030,7 +1077,7 @@ public abstract class FunctionsEx {
          * Convert this function to its curried equivalent.
          * @return          the curried equivalent of this function
          */
-        default F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R>>>>>>>> curry() {
+        default F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R, X>, X>, X>, X>, X>, X>, X>, X> curry() {
             return a -> b -> c -> d -> e -> g -> h -> i -> apply(a, b, c, d, e, g, h, i);
         }
     }
@@ -1038,10 +1085,18 @@ public abstract class FunctionsEx {
     /**
      * Unary operator function.
      * @param <T>       the operand type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface Op<T> extends F<T, T> {
-        static <T> Op<T> of(Op<T> op) {
+    public interface Op<T, X extends Exception> extends F<T, T, X> {
+        /**
+         * Static constructor
+         * @param op        the operator function
+         * @param <T>       the operand type
+         * @param <X>       the exception type
+         * @return          the operator function
+         */
+        static <T, X extends Exception> Op<T, X> of(Op<T, X> op) {
             return op;
         }
     }
@@ -1049,16 +1104,18 @@ public abstract class FunctionsEx {
     /**
      * Binary operator function.
      * @param <T>       the operand type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface Op2<T> extends F2<T, T, T> {
+    public interface Op2<T, X extends Exception> extends F2<T, T, T, X> {
         /**
          * Static constructor
          * @param op        the operator function
          * @param <T>       the operand type
+         * @param <X>       the exception type
          * @return          the operator function
          */
-        static <T> Op2<T> of(Op2<T> op) {
+        static <T, X extends Exception> Op2<T, X> of(Op2<T, X> op) {
             return op;
         }
 
@@ -1066,7 +1123,7 @@ public abstract class FunctionsEx {
          * Flip this function by reversing the order of its arguments.
          * @return          the flipped function
          */
-        default Op2<T> flip() {
+        default Op2<T, X> flip() {
             return (b, a) -> apply(a, b);
         }
     }
@@ -1074,16 +1131,18 @@ public abstract class FunctionsEx {
     /**
      * Predicate function
      * @param <T>       the operand type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
-    public interface Predicate<T> extends F<T, Boolean> {
+    public interface Predicate<T, X extends Exception> extends F<T, Boolean, X> {
         /**
          * Static constructor
          * @param pr        the predicate function
          * @param <T>       the operand type
+         * @param <X>       the exception type
          * @return          the predicate function
          */
-        static <T> Predicate<T> of(Predicate<T> pr) {
+        static <T, X extends Exception> Predicate<T, X> of(Predicate<T, X> pr) {
             return pr;
         }
     }

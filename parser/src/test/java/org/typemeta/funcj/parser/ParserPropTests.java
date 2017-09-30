@@ -5,7 +5,8 @@ import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Assume;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.data.*;
-import org.typemeta.funcj.util.Functions.F;
+import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.typemeta.funcj.parser.Parser.ap;

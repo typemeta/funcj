@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.util.Functions.*;
+import org.typemeta.funcj.functions.Functions.*;
 
 import java.lang.reflect.Modifier;
 import java.util.*;

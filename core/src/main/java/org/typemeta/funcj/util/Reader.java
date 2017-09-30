@@ -1,6 +1,7 @@
 package org.typemeta.funcj.util;
 
 import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.functions.Functions;
 
 /**
  * The {@code Reader} class adds utility methods for using the function monad {@link Functions.F}

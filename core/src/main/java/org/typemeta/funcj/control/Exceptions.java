@@ -1,6 +1,6 @@
 package org.typemeta.funcj.control;
 
-import org.typemeta.funcj.util.Functions.F;
+import org.typemeta.funcj.functions.Functions.F;
 
 /**
  * Utility functions relating to exceptions.

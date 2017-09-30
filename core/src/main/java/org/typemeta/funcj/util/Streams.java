@@ -1,6 +1,6 @@
 package org.typemeta.funcj.util;
 
-import org.typemeta.funcj.data.Tuple2;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import java.util.Map;
 import java.util.stream.Stream;

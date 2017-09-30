@@ -1,8 +1,9 @@
 package org.typemeta.funcj.control;
 
 import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.functions.FunctionsEx;
 import org.typemeta.funcj.util.*;
-import org.typemeta.funcj.util.Functions.*;
+import org.typemeta.funcj.functions.Functions.*;
 
 import java.util.*;
 import java.util.function.Consumer;

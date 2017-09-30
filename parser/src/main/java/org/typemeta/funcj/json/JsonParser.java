@@ -2,6 +2,7 @@ package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.parser.*;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import java.io.Reader;
 import java.util.*;

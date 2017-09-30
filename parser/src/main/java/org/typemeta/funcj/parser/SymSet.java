@@ -1,7 +1,7 @@
 package org.typemeta.funcj.parser;
 
 import org.typemeta.funcj.data.Unit;
-import org.typemeta.funcj.util.Functions;
+import org.typemeta.funcj.functions.Functions;
 
 import java.util.*;
 

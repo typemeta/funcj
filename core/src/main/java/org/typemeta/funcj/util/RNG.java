@@ -1,7 +1,7 @@
 package org.typemeta.funcj.util;
 
 import org.typemeta.funcj.control.State;
-import org.typemeta.funcj.data.Tuple2;
+import org.typemeta.funcj.tuples.Tuple2;
 
 /**
  * Pseudo-random number generator, using the {@link State} monad.

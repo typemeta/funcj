@@ -1,6 +1,6 @@
 package org.typemeta.funcj.control;
 
-import org.typemeta.funcj.util.Functions.F0;
+import org.typemeta.funcj.functions.Functions.F0;
 
 public interface Trampoline<T> {
 

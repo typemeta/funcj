@@ -1,7 +1,8 @@
 package org.typemeta.funcj.util;
 
-import org.typemeta.funcj.data.Tuple2;
-import org.typemeta.funcj.util.Functions.F;
+import org.typemeta.funcj.tuples.Tuple2;
+import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.functions.Functions.F;
 
 import java.lang.reflect.Array;
 import java.util.*;

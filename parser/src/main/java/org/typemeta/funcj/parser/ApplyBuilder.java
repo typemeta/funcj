@@ -1,7 +1,7 @@
 package org.typemeta.funcj.parser;
 
-import org.typemeta.funcj.util.Functions;
-import org.typemeta.funcj.util.Functions.F;
+import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.functions.Functions.F;
 
 /**
  * {@code ApplyBuilder} combines parsers via successive calls to {@code and} and {@code andL}.

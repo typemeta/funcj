@@ -2,7 +2,7 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.json.*;
 import org.typemeta.funcj.codec.xml.*;
-import org.typemeta.funcj.util.Functions.F;
+import org.typemeta.funcj.functions.Functions.F;
 
 import java.time.*;
 

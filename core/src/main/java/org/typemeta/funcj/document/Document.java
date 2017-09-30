@@ -1,7 +1,7 @@
 package org.typemeta.funcj.document;
 
 import org.typemeta.funcj.data.IList;
-import org.typemeta.funcj.util.Functions;
+import org.typemeta.funcj.functions.Functions;
 
 import java.io.Writer;
 

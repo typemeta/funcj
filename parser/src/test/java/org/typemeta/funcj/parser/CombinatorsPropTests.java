@@ -4,7 +4,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.data.*;
-import org.typemeta.funcj.util.Functions.Predicate;
+import org.typemeta.funcj.functions.Functions.Predicate;
 
 @RunWith(JUnitQuickcheck.class)
 public class CombinatorsPropTests {

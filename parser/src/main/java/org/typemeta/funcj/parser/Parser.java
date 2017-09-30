@@ -1,7 +1,7 @@
 package org.typemeta.funcj.parser;
 
 import org.typemeta.funcj.data.Lazy;
-import org.typemeta.funcj.util.Functions.*;
+import org.typemeta.funcj.functions.Functions.*;
 
 import static org.typemeta.funcj.parser.Parser.pure;
 import static org.typemeta.funcj.parser.Utils.*;

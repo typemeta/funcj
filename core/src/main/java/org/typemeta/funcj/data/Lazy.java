@@ -1,6 +1,6 @@
 package org.typemeta.funcj.data;
 
-import org.typemeta.funcj.util.Functions;
+import org.typemeta.funcj.functions.Functions;
 
 import java.util.Objects;
 

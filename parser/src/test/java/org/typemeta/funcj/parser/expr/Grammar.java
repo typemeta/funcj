@@ -2,7 +2,7 @@ package org.typemeta.funcj.parser.expr;
 
 import org.typemeta.funcj.data.Chr;
 import org.typemeta.funcj.parser.*;
-import org.typemeta.funcj.util.Functions.Op2;
+import org.typemeta.funcj.functions.Functions.Op2;
 
 import static org.typemeta.funcj.parser.Combinators.chainl1;
 import static org.typemeta.funcj.parser.Text.*;

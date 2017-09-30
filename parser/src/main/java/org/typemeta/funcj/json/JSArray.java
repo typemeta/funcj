@@ -1,6 +1,7 @@
 package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.document.*;
+import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.*;
 
 import java.util.*;

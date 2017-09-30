@@ -1,6 +1,6 @@
 package org.typemeta.funcj.json;
 
-import org.typemeta.funcj.util.Functions;
+import org.typemeta.funcj.functions.Functions;
 
 public abstract class AbstractJSValue implements JSValue {
 

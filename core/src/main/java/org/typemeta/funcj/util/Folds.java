@@ -1,5 +1,7 @@
 package org.typemeta.funcj.util;
 
+import org.typemeta.funcj.functions.Functions;
+
 import java.util.*;
 
 /**

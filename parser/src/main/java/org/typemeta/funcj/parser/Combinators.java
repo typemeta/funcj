@@ -1,7 +1,8 @@
 package org.typemeta.funcj.parser;
 
 import org.typemeta.funcj.data.*;
-import org.typemeta.funcj.util.Functions;
+import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.tuples.*;
 
 import java.util.Optional;
 
@@ -151,7 +152,7 @@ public abstract class Combinators {
     }
 
     /**
-     * A parser which applies {@code p} zero or more times until it fails,
+     * A parser which repeatedly applies {@code p} until it fails,
      * and then returns an {@link IList} of the results.
      * Note, if {@code p} fails on the first attempt then this parser succeeds,
      * with an empty list of results.

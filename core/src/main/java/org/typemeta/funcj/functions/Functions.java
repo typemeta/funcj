@@ -1,4 +1,6 @@
-package org.typemeta.funcj.util;
+package org.typemeta.funcj.functions;
+
+import org.typemeta.funcj.tuples.*;
 
 /**
  * Interfaces for composable functions.
@@ -226,6 +228,15 @@ public abstract class Functions {
         R apply(A a, B b);
 
         /**
+         * Apply this function to the values withing the supplied {@code Tuple2}
+         * @param t2        the {@code Tuple2}
+         * @return          the result of applying this function
+         */
+        default R apply(Tuple2<A, B> t2) {
+            return apply(t2._1, t2._2);
+        }
+
+        /**
          * Partially apply this function.
          * @param a         the value to partially apply this function to
          * @return          the partially applied function
@@ -307,6 +318,15 @@ public abstract class Functions {
          * @return          the result of applying this function
          */
         R apply(A a, B b, C c);
+
+        /**
+         * Apply this function to the values withing the supplied {@code Tuple3}
+         * @param t3        the {@code Tuple3}
+         * @return          the result of applying this function
+         */
+        default R apply(Tuple3<A, B, C> t3) {
+            return apply(t3._1, t3._2, t3._3);
+        }
 
         /**
          * Partially apply this function to one value.
@@ -1032,6 +1052,12 @@ public abstract class Functions {
      */
     @FunctionalInterface
     public interface Op<T> extends F<T, T> {
+        /**
+         * Static constructor
+         * @param op        the operator function
+         * @param <T>       the operand type
+         * @return          the operator function
+         */
         static <T> Op<T> of(Op<T> op) {
             return op;
         }

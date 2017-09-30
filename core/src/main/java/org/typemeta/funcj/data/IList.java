@@ -1,6 +1,6 @@
 package org.typemeta.funcj.data;
 
-import org.typemeta.funcj.util.Functions.*;
+import org.typemeta.funcj.functions.Functions.*;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -9,18 +9,18 @@ import java.util.stream.*;
 /**
  * Simple recursive, immutable linked list.
  * <p>
- * Each {code IList} is either {code Empty} or it is {@code NonEmpty},
+ * Each {code IList} is either {@link Empty} or it is {@link NonEmpty},
  * in which case it has a head element value and a tail.
  * The tail is itself an {@code IList}.
  * Null elements are not allowed.
- * @param <T> element type
+ * @param <T>       the element type
  */
 public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct an empty list.
-     * @param <T>   element type
-     * @return      empty list
+     * @param <T>       the element type
+     * @return          an empty list
      */
     public static <T> IList<T> nil() {
         return (IList<T>)Empty.EMPTY;
@@ -28,8 +28,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct an empty list.
-     * @param <T>   element type
-     * @return      empty list
+     * @param <T>       the element type
+     * @return          an empty list
      */
     public static <T> IList<T> of() {
         return nil();
@@ -37,9 +37,9 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list with one element.
-     * @param elem  element
-     * @param <T>   element type
-     * @return      the new list with one element
+     * @param elem      element
+     * @param <T>       element type
+     * @return          the new list with one element
      */
     public static <T> NonEmpty<T> of(T elem) {
         return IList.<T>nil().add(elem);
@@ -47,10 +47,10 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list with one or more elements.
-     * @param elem  first element
-     * @param elems remaining elements
-     * @param <T>   element type
-     * @return      the new list with one or more element
+     * @param elem      the first element
+     * @param elems     the remaining elements
+     * @param <T>       the element type
+     * @return          the new list with one or more element
      */
     public static <T> NonEmpty<T> of(T elem, T... elems) {
         return ofArray(elems).add(elem);
@@ -58,9 +58,9 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list from an {@link java.lang.Iterable} collection of elements.
-     * @param elems iterable collection of elements
-     * @param <T>   element type
-     * @return      the new list with multiple elements
+     * @param elems     the iterable collection of elements
+     * @param <T>       the element type
+     * @return          the new list with multiple elements
      */
     public static <T> IList<T> ofIterable(Iterable<T> elems) {
         IList<T> r = nil();
@@ -72,9 +72,9 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Construct a list from an array.
-     * @param elems array of elements
-     * @param <T>   element type
-     * @return      the new list with multiple elements
+     * @param elems     the array of elements
+     * @param <T>       the element type
+     * @return          the new list with multiple elements
      */
     public static <T> IList<T> ofArray(T[] elems) {
         IList<T> r = nil();
@@ -86,10 +86,10 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Concatenate two lists to form a new list
-     * @param l1    first list
-     * @param l2    second list
-     * @param <T>   element type
-     * @return      the new concatenated list
+     * @param l1        the first list
+     * @param l2        the second list
+     * @param <T>       the element type
+     * @return          the new concatenated list
      */
     public static <T> IList<T> concat(IList<? extends T> l1, IList<? extends T>  l2) {
         IList<T> r = (IList<T>)l2;
@@ -101,8 +101,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Convert a list of {@link java.lang.Character}s into a {@link java.lang.String}.
-     * @param l     list of {@code Character}s
-     * @return      a {@code String}
+     * @param l         the list of {@code Character}s
+     * @return          a {@code String}
      */
     public static String listToString(IList<Character> l) {
         final StringBuilder sb = new StringBuilder(l.size());
@@ -114,8 +114,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Convert a {@link java.lang.String} into a list of {@link java.lang.Character}s.
-     * @param       s {@code String}
-     * @return      a list of {@code Character}s
+     * @param s         the {@code String}
+     * @return          a list of {@code Character}s
      */
     public static IList<Character> stringToList(String s) {
         IList<Character> r = nil();
@@ -127,8 +127,8 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a new list by adding an element to the head of this list.
-     * @param head  element to add onto head of this list
-     * @return      the new list
+     * @param head      the element to add onto head of this list
+     * @return          the new list
      */
     public NonEmpty<T> add(T head) {
         return new NonEmpty<T>(head, this);
@@ -136,9 +136,9 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a new list by adding multiple elements to the head of this list.
-     * @param l     list to be added to the head of this list
-     * @param <S>   list element type
-     * @return      the new list
+     * @param l         the list to be added to the head of this list
+     * @param <S>       the list element type
+     * @return          the new list
      */
     public <S extends T> IList<T> addAll(IList<S> l) {
         IList<T> r = this;
@@ -150,50 +150,50 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Return true if this list is empty otherwise false
-     * @return      true if this list is empty otherwise false
+     * @return          true if this list is empty otherwise false
      */
     public abstract boolean isEmpty();
 
     /**
      * Returns Optional.empty() if this list is empty,
      * otherwise it returns an {@link java.util.Optional} which wraps the non-empty list.
-     * @return      Optional.empty() if this list is empty, otherwise an {@code Optional} which wraps the
+     * @return          the Optional.empty() if this list is empty, otherwise an {@code Optional} which wraps the
      * non-empty list.
      */
     public abstract Optional<NonEmpty<T>> nonEmptyOpt();
 
     /**
      * Return the head element of this list.
-     * @return      the head of this list.
-     * @throws      UnsupportedOperationException if the list is empty.
+     * @return          the head of this list.
+     * @throws UnsupportedOperationException if the list is empty.
      */
     public abstract T head();
 
     /**
      * Return the tail of this list.
-     * @return      the tail of this list.
-     * @throws      UnsupportedOperationException if the list is empty.
+     * @return          the tail of this list.
+     * @throws UnsupportedOperationException if the list is empty.
      */
     public abstract IList<T> tail();
 
     /**
      * Returns the element at the specified position in this list.
-     * @param index the position of the element to return
-     * @return      the element of this list at the specified position.
-     * @throws      IndexOutOfBoundsException if the index is out of bounds.
+     * @param index     the position of the element to return
+     * @return          the element of this list at the specified position.
+     * @throws IndexOutOfBoundsException if the index is out of bounds.
      */
     public abstract T get(int index);
 
     /**
      * Append the contents of this list to a {@link java.lang.StringBuilder}.
      * @param sb the StringBuilder to be appended to
-     * @return the StringBuilder
+     * @return          the StringBuilder
      */
     public abstract StringBuilder append(StringBuilder sb);
 
     /**
      * List equality.
-     * @return      true if this list and rhs are equal in terms of their size and elements.
+     * @return          true if this list and rhs are equal in terms of their size and elements.
      */
     @Override
     public boolean equals(Object rhs) {
@@ -205,96 +205,96 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Type-safe list equality.
-     * @param rhs   list to be cpmpared
-     * @return      true if this list and rhs are equal in terms of their elements.
+     * @param rhs       the list to be cpmpared
+     * @return          true if this list and rhs are equal in terms of their elements.
      */
     public abstract boolean equals(IList<T> rhs);
 
     /**
      * Apply one of two functions depending on whether this list is empty or not.
-     * @param nonEmptyF     function to be applied if the list is non-empty
-     * @param emptyF        function to be applied if the list is empty
-     * @param <S>           return type of both functions
-     * @return              the result of applying the appropriate function.
+     * @param nonEmptyF the function to be applied if the list is non-empty
+     * @param emptyF    the function to be applied if the list is empty
+     * @param <S>       return type of both functions
+     * @return          the result of applying the appropriate function.
      */
     public abstract <S> S match(F<NonEmpty<T>, S> nonEmptyF, F<Empty<T>, S> emptyF);
 
     /**
      * Create a new list by appending an element to the end of this list.
-     * @param l     list to be appended to the end of this list
-     * @return      the new list
+     * @param l         the list to be appended to the end of this list
+     * @return          the new list
      */
     public abstract IList<T> appendAll(IList<T> l);
 
     /**
-     * @return      the length of this list.
+     * @return          the length of this list.
      */
     public abstract int size();
 
     /**
-     * @return      this list in reverse.
+     * @return          this list in reverse.
      */
     public abstract IList<T> reverse();
 
     /**
      * Apply the function {code f} to each element in this list,
      * and store the results in a new list.
-     * @param f     function to be applied to each element
-     * @param <U>   function return type
-     * @return      the new list
+     * @param f         the function to be applied to each element
+     * @param <U>       the function return type
+     * @return          the new list
      */
     public abstract <U> IList<U> map(F<? super T, ? extends U> f);
 
     /**
      * Apply a function that returns an {@code IList} to each element
      * in this list and concatenate the results into a single list.
-     * @param f     function to be applied
-     * @param <U>   element type for the list returned by the function
-     * @return      the new list
+     * @param f         the function to be applied
+     * @param <U>       the element type for the list returned by the function
+     * @return          the new list
      */
     public abstract <U> IList<U> flatMap(F<? super T, IList<? extends U>> f);
 
     /**
      * Right-fold a function over this list.
-     * @param f     function to be folded
-     * @param z     initial value for the fold (typically the identity value of {@code f})
-     * @param <U>   fold result type
-     * @return      the folded result
+     * @param f         the function to be folded
+     * @param z         the initial value for the fold (typically the identity value of {@code f})
+     * @param <U>       the fold result type
+     * @return          the folded result
      */
     public abstract <U> U foldRight(F2<T, U, U> f, U z);
 
     /**
      * Left-fold a function over this list.
-     * @param f     function to be folded
-     * @param z     initial value for the fold (typically the identity value of {@code f})
-     * @param <U>   fold result type
-     * @return      the folded result
+     * @param f         the function to be folded
+     * @param z         the initial value for the fold (typically the identity value of {@code f})
+     * @param <U>       the fold result type
+     * @return          the folded result
      */
     public abstract <U> U foldLeft(F2<U, T, U> f, U z);
 
     /**
      * Right-fold a function over this non-empty list.
-     * @param f     function to be folded
-     * @return      the folded result
+     * @param f         the function to be folded
+     * @return          the folded result
      */
     public abstract T foldRight1(Op2<T> f);
 
     /**
      * Left-fold a function over this non-empty list.
-     * @param f     function to be folded
-     * @return      the folded result
+     * @param f         the function to be folded
+     * @return          the folded result
      */
     public abstract T foldLeft1(Op2<T> f);
 
     /**
      * Create a {@link java.util.Spliterator}.
-     * @return      the spliterator
+     * @return          the spliterator
      */
     public abstract Spliterator<T> spliterator();
 
     /**
      * Create a {@link java.util.stream.Stream} onto this list.
-     * @return      the new stream
+     * @return          the new stream
      */
     public Stream<T> stream() {
         return StreamSupport.stream(spliterator(), false);
@@ -302,7 +302,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create a parallel {@link java.util.stream.Stream} onto this list.
-     * @return      the new stream
+     * @return          the new stream
      */
     public Stream<T> parallelStream() {
         return StreamSupport.stream(spliterator(), true);
@@ -310,16 +310,20 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Create an {@link java.util.Iterator} over this list.
-     * @return      the iterator
+     * @return          the iterator
      */
     public abstract Iterator<T> iterator();
 
     /**
      * Convert to a Java List implementation, albeit an immutable one.
-     * @return      the Java List.
+     * @return          the Java List.
      */
     public abstract List<T> toList();
 
+    /**
+     * An empty list node.
+     * @param <T>    the element type
+     */
     public static final class Empty<T> extends IList<T> {
         static final Empty EMPTY = new Empty();
 
@@ -468,6 +472,10 @@ public abstract class IList<T> implements Iterable<T> {
         }
     }
 
+    /**
+     * A non-empty list node.
+     * @param <T>       the element type
+     */
     public static final class NonEmpty<T> extends IList<T> {
 
         private final T head;

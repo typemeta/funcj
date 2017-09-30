@@ -1,7 +1,8 @@
 package org.typemeta.funcj.control;
 
 import org.typemeta.funcj.data.*;
-import org.typemeta.funcj.util.Functions.F;
+import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import static org.typemeta.funcj.data.Unit.UNIT;
 

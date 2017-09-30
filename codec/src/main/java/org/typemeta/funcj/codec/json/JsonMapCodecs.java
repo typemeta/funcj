@@ -3,7 +3,7 @@ package org.typemeta.funcj.codec.json;
 import org.typemeta.funcj.codec.Codec;
 import org.typemeta.funcj.control.Exceptions;
 import org.typemeta.funcj.json.*;
-import org.typemeta.funcj.util.Functions;
+import org.typemeta.funcj.functions.Functions;
 
 import java.util.*;
 import java.util.function.Consumer;
