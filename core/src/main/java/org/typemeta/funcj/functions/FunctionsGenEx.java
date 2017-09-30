@@ -228,7 +228,7 @@ public abstract class FunctionsGenEx {
          * @return          the result of applying this function
          * @throws X        the exception
          */
-        default R apply(Tuple2<A, B> t2) throws X {
+        default R apply2(Tuple2<A, B> t2) throws X {
             return apply(t2._1, t2._2);
         }
 
@@ -326,7 +326,7 @@ public abstract class FunctionsGenEx {
          * @return          the result of applying this function
          * @throws X        the exception
          */
-        default R apply(Tuple3<A, B, C> t3) throws Exception {
+        default R apply2(Tuple3<A, B, C> t3) throws Exception {
             return apply(t3._1, t3._2, t3._3);
         }
 

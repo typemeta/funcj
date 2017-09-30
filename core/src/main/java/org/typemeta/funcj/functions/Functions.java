@@ -232,7 +232,7 @@ public abstract class Functions {
          * @param t2        the {@code Tuple2}
          * @return          the result of applying this function
          */
-        default R apply(Tuple2<A, B> t2) {
+        default R apply2(Tuple2<A, B> t2) {
             return apply(t2._1, t2._2);
         }
 
@@ -324,7 +324,7 @@ public abstract class Functions {
          * @param t3        the {@code Tuple3}
          * @return          the result of applying this function
          */
-        default R apply(Tuple3<A, B, C> t3) {
+        default R apply2(Tuple3<A, B, C> t3) {
             return apply(t3._1, t3._2, t3._3);
         }
 

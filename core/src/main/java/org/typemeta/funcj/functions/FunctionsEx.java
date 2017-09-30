@@ -236,7 +236,7 @@ public abstract class FunctionsEx {
          * @return          the result of applying this function
          * @throws Exception the exception
          */
-        default R apply(Tuple2<A, B> t2) throws Exception {
+        default R apply2(Tuple2<A, B> t2) throws Exception {
             return apply(t2._1, t2._2);
         }
 
@@ -330,7 +330,7 @@ public abstract class FunctionsEx {
          * @return          the result of applying this function
          * @throws Exception the exception
          */
-        default R apply(Tuple3<A, B, C> t3) throws Exception {
+        default R apply2(Tuple3<A, B, C> t3) throws Exception {
             return apply(t3._1, t3._2, t3._3);
         }
 
