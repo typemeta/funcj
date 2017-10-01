@@ -385,7 +385,10 @@ public interface Try<T> {
 
         @Override
         public <U> Try<U> apply(Try<F<T, U>> tf) {
-            return cast();
+            return tf.match(
+                    fail -> fail.cast(),
+                    succ -> this.cast()
+            );
         }
 
         @Override
