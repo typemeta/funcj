@@ -2,6 +2,8 @@ package org.typemeta.funcj.functions;
 
 import org.typemeta.funcj.tuples.*;
 
+import java.util.Objects;
+
 /**
  * Interfaces for composable functions which throw a specific exception type.
  */
@@ -166,19 +168,6 @@ public abstract class FunctionsGenEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <R>       the function return type
-         * @param <X>       the exception type
-         * @return          the curried function
-         */
-        static <A, B, R, X extends Exception> F<A, F<B, R, X>, X> curry(F2<A, B, R, X> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
          * @param f         the curried function
          * @param <A>       the function's first argument type
@@ -223,16 +212,6 @@ public abstract class FunctionsGenEx {
         R apply(A a, B b) throws X;
 
         /**
-         * Apply this function to the values withing the supplied {@code Tuple2}
-         * @param t2        the {@code Tuple2}
-         * @return          the result of applying this function
-         * @throws X        the exception
-         */
-        default R apply2(Tuple2<A, B> t2) throws X {
-            return apply(t2._1, t2._2);
-        }
-
-        /**
          * Partially apply this function.
          * @param a         the value to partially apply this function to
          * @return          the partially applied function
@@ -255,6 +234,15 @@ public abstract class FunctionsGenEx {
          */
         default F2<B, A, R, X> flip() {
             return (b, a) -> apply(a, b);
+        }
+
+        /**
+         * Convert this function to one that operates on a {@link Tuple2}.
+         * @return          a function that operates on a {@link Tuple2}
+         * @throws X        the exception
+         */
+        default F<Tuple2<A, B>, R, X> tupled() throws X {
+            return t2 -> apply(t2._1, t2._2);
         }
     }
 
@@ -283,22 +271,8 @@ public abstract class FunctionsGenEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <R>       the function's return type
-         * @param <X>       the exception type
-         * @return          the curried function
-         */
-        static <A, B, C, R, X extends Exception> F<A, F<B, F<C, R, X>, X>, X> curry(F3<A, B, C, R, X> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -319,16 +293,6 @@ public abstract class FunctionsGenEx {
          * @throws X        the exception
          */
         R apply(A a, B b, C c) throws X;
-
-        /**
-         * Apply this function to the values withing the supplied {@code Tuple3}
-         * @param t3        the {@code Tuple3}
-         * @return          the result of applying this function
-         * @throws X        the exception
-         */
-        default R apply2(Tuple3<A, B, C> t3) throws Exception {
-            return apply(t3._1, t3._2, t3._3);
-        }
 
         /**
          * Partially apply this function to one value.
@@ -355,6 +319,15 @@ public abstract class FunctionsGenEx {
          */
         default F<A, F<B, F<C, R, X>, X>, X> curry() {
             return a -> b -> c -> apply(a, b, c);
+        }
+
+        /**
+         * Convert this function to one that operates on a {@link Tuple3}.
+         * @return          a function that operates on a {@link Tuple3}
+         * @throws X the exception
+         */
+        default F<Tuple3<A, B, C>, R, X> tupled() throws X {
+            return t3 -> apply(t3._1, t3._2, t3._3);
         }
     }
 
@@ -385,23 +358,8 @@ public abstract class FunctionsGenEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <R>       the function's return type
-         * @param <X>       the exception type
-         * @return          the curried function
-         */
-        static <A, B, C, D, R, X extends Exception> F<A, F<B, F<C, F<D, R, X>, X>, X>, X> curry(F4<A, B, C, D, R, X> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -494,25 +452,8 @@ public abstract class FunctionsGenEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <E>       the function's fifth argument type
-         * @param <R>       the function's return type
-         * @param <X>       the exception type
-         * @return          the curried function
-         */
-        static <A, B, C, D, E, R, X extends Exception> F<A, F<B, F<C, F<D, F<E, R, X>, X>, X>, X>, X> curry(
-                F5<A, B, C, D, E, R, X> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -622,26 +563,8 @@ public abstract class FunctionsGenEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <E>       the function's fifth argument type
-         * @param <G>       the function's sixth argument type
-         * @param <R>       the function's return type
-         * @param <X>       the exception type
-         * @return          the curried function
-         */
-        static <A, B, C, D, E, G, R, X extends Exception> F<A, F<B, F<C, F<D, F<E, F<G, R, X>, X>, X>, X>, X>, X> curry(
-                F6<A, B, C, D, E, G, R, X> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -768,27 +691,8 @@ public abstract class FunctionsGenEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <E>       the function's fifth argument type
-         * @param <G>       the function's sixth argument type
-         * @param <H>       the function's seventh argument type
-         * @param <R>       the function's return type
-         * @param <X>       the exception type
-         * @return          the curried function
-         */
-        static <A, B, C, D, E, G, H, R, X extends Exception> F<A, F<B, F<C, F<D, F<E, F<G, F<H, R, X>, X>, X>, X>, X>, X>, X> curry(
-                F7<A, B, C, D, E, G, H, R, X> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -933,28 +837,8 @@ public abstract class FunctionsGenEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <E>       the function's fifth argument type
-         * @param <G>       the function's sixth argument type
-         * @param <H>       the function's seventh argument type
-         * @param <I>       the function's eighth argument type
-         * @param <R>       the function's return type
-         * @param <X>       the exception type
-         * @return          the curried function
-         */
-        static <A, B, C, D, E, G, H, I, R, X extends Exception> F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R, X>, X>, X>, X>, X>, X>, X>, X> curry(
-                F8<A, B, C, D, E, G, H, I, R, X> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -1138,11 +1022,59 @@ public abstract class FunctionsGenEx {
          * Static constructor
          * @param pr        the predicate function
          * @param <T>       the operand type
-         * @param <X>       the exception type
          * @return          the predicate function
          */
         static <T, X extends Exception> Predicate<T, X> of(Predicate<T, X> pr) {
             return pr;
+        }
+
+        /**
+         * Return a {@code Predicate} that checks if a value is null
+         * @param <T>       the operand type
+         * @return          a {@code Predicate} that checks if a value is null
+         */
+        static <T, X extends Exception> Predicate<T, X> isNull() {
+            return Objects::isNull;
+        }
+
+        /**
+         * Return a {@code Predicate} that checks if a value is equal to the supplied value
+         * @param lhs       the value to compare against
+         * @param <T>       the operand type
+         * @return          a {@code Predicate} that checks if a value is equal to the supplied value
+         */
+        static <T, X extends Exception> Predicate<T, X> isEqual(Object lhs) {
+            return (lhs == null)
+                    ? isNull()
+                    : lhs::equals;
+        }
+
+        /**
+         * Invert this {@code Predicate}
+         * @return          a {@code Predicate} that logically inverts this {@code Predicate}
+         */
+        default Predicate<T, X> negate() {
+            return t -> !apply(t);
+        }
+
+        /**
+         * Compose this {@code Predicate} with another by logically and'ing them.
+         * @param rhs       other {@code Predicate}
+         * @return          a {@code Predicate} that returns true iff both {@code Predicate}s return true
+         */
+        default Predicate<T, X> and(Predicate<? super T, X> rhs) {
+            Objects.requireNonNull(rhs);
+            return t -> apply(t) && rhs.apply(t);
+        }
+
+        /**
+         * Compose this {@code Predicate} with another by logically or'ing them.
+         * @param rhs       other {@code Predicate}
+         * @return          a {@code Predicate} that returns true if either {@code Predicate}s return true
+         */
+        default Predicate<T, X> or(Predicate<? super T, X> rhs) {
+            Objects.requireNonNull(rhs);
+            return t -> apply(t) ||  rhs.apply(t);
         }
     }
 }

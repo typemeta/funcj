@@ -2,6 +2,8 @@ package org.typemeta.funcj.functions;
 
 import org.typemeta.funcj.tuples.*;
 
+import java.util.Objects;
+
 /**
  * Interfaces for composable functions which throw.
  */
@@ -178,18 +180,6 @@ public abstract class FunctionsEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <R>       the function return type
-         * @return          the curried function
-         */
-        static <A, B, R> F<A, F<B, R>> curry(F2<A, B, R> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
          * @param f         the curried function
          * @param <A>       the function's first argument type
@@ -231,16 +221,6 @@ public abstract class FunctionsEx {
         R apply(A a, B b) throws Exception;
 
         /**
-         * Apply this function to the values withing the supplied {@code Tuple2}
-         * @param t2        the {@code Tuple2}
-         * @return          the result of applying this function
-         * @throws Exception the exception
-         */
-        default R apply2(Tuple2<A, B> t2) throws Exception {
-            return apply(t2._1, t2._2);
-        }
-
-        /**
          * Partially apply this function.
          * @param a         the value to partially apply this function to
          * @return          the partially applied function
@@ -263,6 +243,15 @@ public abstract class FunctionsEx {
          */
         default F2<B, A, R> flip() {
             return (b, a) -> apply(a, b);
+        }
+
+        /**
+         * Convert this function to one that operates on a {@link Tuple2}.
+         * @return          a function that operates on a {@link Tuple2}
+         * @throws Exception the exception
+         */
+        default F<Tuple2<A, B>, R> tupled() throws Exception {
+            return t2 -> apply(t2._1, t2._2);
         }
     }
 
@@ -289,21 +278,8 @@ public abstract class FunctionsEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <R>       the function's return type
-         * @return          the curried function
-         */
-        static <A, B, C, R> F<A, F<B, F<C, R>>> curry(F3<A, B, C, R> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -323,16 +299,6 @@ public abstract class FunctionsEx {
          * @throws Exception the exception
          */
         R apply(A a, B b, C c) throws Exception;
-
-        /**
-         * Apply this function to the values withing the supplied {@code Tuple3}
-         * @param t3        the {@code Tuple3}
-         * @return          the result of applying this function
-         * @throws Exception the exception
-         */
-        default R apply2(Tuple3<A, B, C> t3) throws Exception {
-            return apply(t3._1, t3._2, t3._3);
-        }
 
         /**
          * Partially apply this function to one value.
@@ -359,6 +325,15 @@ public abstract class FunctionsEx {
          */
         default F<A, F<B, F<C, R>>> curry() {
             return a -> b -> c -> apply(a, b, c);
+        }
+
+        /**
+         * Convert this function to one that operates on a {@link Tuple3}.
+         * @return          a function that operates on a {@link Tuple3}
+         * @throws Exception the exception
+         */
+        default F<Tuple3<A, B, C>, R> tupled() throws Exception {
+            return t3 -> apply(t3._1, t3._2, t3._3);
         }
     }
 
@@ -387,22 +362,8 @@ public abstract class FunctionsEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <R>       the function's return type
-         * @return          the curried function
-         */
-        static <A, B, C, D, R> F<A, F<B, F<C, F<D, R>>>> curry(F4<A, B, C, D, R> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -491,23 +452,8 @@ public abstract class FunctionsEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <E>       the function's fifth argument type
-         * @param <R>       the function's return type
-         * @return          the curried function
-         */
-        static <A, B, C, D, E, R> F<A, F<B, F<C, F<D, F<E, R>>>>> curry(F5<A, B, C, D, E, R> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -612,24 +558,8 @@ public abstract class FunctionsEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <E>       the function's fifth argument type
-         * @param <G>       the function's sixth argument type
-         * @param <R>       the function's return type
-         * @return          the curried function
-         */
-        static <A, B, C, D, E, G, R> F<A, F<B, F<C, F<D, F<E, F<G, R>>>>>> curry(F6<A, B, C, D, E, G, R> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -751,26 +681,8 @@ public abstract class FunctionsEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <E>       the function's fifth argument type
-         * @param <G>       the function's sixth argument type
-         * @param <H>       the function's seventh argument type
-         * @param <R>       the function's return type
-         * @return          the curried function
-         */
-        static <A, B, C, D, E, G, H, R> F<A, F<B, F<C, F<D, F<E, F<G, F<H, R>>>>>>> curry(
-                F7<A, B, C, D, E, G, H, R> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -911,27 +823,8 @@ public abstract class FunctionsEx {
         }
 
         /**
-         * Convert an uncurried function to its curried equivalent.
-         * @param f         the uncurried function
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <C>       the function's third argument type
-         * @param <D>       the function's fourth argument type
-         * @param <E>       the function's fifth argument type
-         * @param <G>       the function's sixth argument type
-         * @param <H>       the function's seventh argument type
-         * @param <I>       the function's eighth argument type
-         * @param <R>       the function's return type
-         * @return          the curried function
-         */
-        static <A, B, C, D, E, G, H, I, R> F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<I, R>>>>>>>> curry(
-                F8<A, B, C, D, E, G, H, I, R> f) {
-            return f.curry();
-        }
-
-        /**
          * Convert an curried function to its uncurried equivalent.
-         * @param f         the uncurried function
+         * @param f         the curried function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
@@ -1113,6 +1006,55 @@ public abstract class FunctionsEx {
          */
         static <T> Predicate<T> of(Predicate<T> pr) {
             return pr;
+        }
+
+        /**
+         * Return a {@code Predicate} that checks if a value is null
+         * @param <T>       the operand type
+         * @return          a {@code Predicate} that checks if a value is null
+         */
+        static <T> Predicate<T> isNull() {
+            return Objects::isNull;
+        }
+
+        /**
+         * Return a {@code Predicate} that checks if a value is equal to the supplied value
+         * @param lhs       the value to compare against
+         * @param <T>       the operand type
+         * @return          a {@code Predicate} that checks if a value is equal to the supplied value
+         */
+        static <T> Predicate<T> isEqual(Object lhs) {
+            return (lhs == null)
+                    ? isNull()
+                    : lhs::equals;
+        }
+
+        /**
+         * Invert this {@code Predicate}
+         * @return          a {@code Predicate} that logically inverts this {@code Predicate}
+         */
+        default Predicate<T> negate() {
+            return t -> !apply(t);
+        }
+
+        /**
+         * Compose this {@code Predicate} with another by logically and'ing them.
+         * @param rhs       other {@code Predicate}
+         * @return          a {@code Predicate} that returns true iff both {@code Predicate}s return true
+         */
+        default Predicate<T> and(Predicate<? super T> rhs) {
+            Objects.requireNonNull(rhs);
+            return t -> apply(t) && rhs.apply(t);
+        }
+
+        /**
+         * Compose this {@code Predicate} with another by logically or'ing them.
+         * @param rhs       other {@code Predicate}
+         * @return          a {@code Predicate} that returns true if either {@code Predicate}s return true
+         */
+        default Predicate<T> or(Predicate<? super T> rhs) {
+            Objects.requireNonNull(rhs);
+            return t -> apply(t) ||  rhs.apply(t);
         }
     }
 }
