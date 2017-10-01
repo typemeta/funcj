@@ -134,7 +134,10 @@ public interface State<S, A> {
      * @return          the new {@code State}
      */
     default <B> State<S, B> map(F<? super A, ? extends B> f) {
-        return st -> runState(st).map2(f::apply);
+        return st -> {
+            final Tuple2<S, A> t2 = runState(st);
+            return t2.map2(f);
+        };
     }
 
     /**
