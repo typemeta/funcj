@@ -20,26 +20,42 @@ public class TrampolineTest {
     }
 
     private static int factorial(final int n) {
-        return factorial(n, 1).compute();
+        return factT(n).runT();
     }
 
-    private static Trampoline<Integer> factorial(final int n, final int sum) {
-        if (n == 1) {
-            return Trampoline.done(sum);
+    public static Trampoline<Integer> fib(int n) {
+        if (n <= 1) {
+            return Trampoline.done(n);
         } else {
-            return Trampoline.more(() -> factorial(n - 1, sum * n));
+            return Trampoline.more(() -> fib(n-1)).flatMap(x ->
+                    Trampoline.more(() -> fib(n-2)).flatMap(y ->
+                            Trampoline.done(x + y)
+                    )
+            );
+        }
+    }
+
+    private static Trampoline<Integer> factT(final int n) {
+        if (n <= 1) {
+            return Trampoline.done(1);
+        } else {
+            return Trampoline.more(() -> factT(n - 1)).flatMap(x ->
+                    Trampoline.done(n*x)
+            );
         }
     }
 
     private static int count(final int n) {
-        return count(n, 1).compute();
+        return countT(n).runT();
     }
 
-    private static Trampoline<Integer> count(final int n, final int sum) {
-        if (n == 1) {
-            return Trampoline.done(sum);
+    private static Trampoline<Integer> countT(final int n) {
+        if (n == 0) {
+            return Trampoline.done(0);
         } else {
-            return Trampoline.more(() -> count(n - 1, sum + 1));
+            return Trampoline.more(() -> countT(n - 1)).flatMap(x ->
+                    Trampoline.done(x+1)
+            );
         }
     }
 }

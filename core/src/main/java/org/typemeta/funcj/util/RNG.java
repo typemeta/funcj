@@ -1,10 +1,13 @@
 package org.typemeta.funcj.util;
 
-import org.typemeta.funcj.control.State;
+import org.typemeta.funcj.control.StateT;
 import org.typemeta.funcj.tuples.Tuple2;
 
+import static org.typemeta.funcj.control.Trampoline.done;
+import static org.typemeta.funcj.control.Trampoline.more;
+
 /**
- * Pseudo-random number generator, using the {@link State} monad.
+ * Pseudo-random number generator, using the {@link StateT} monad.
  */
 public interface RNG {
 
@@ -12,12 +15,12 @@ public interface RNG {
         return new RNGUtils.XorShiftRNG(seed);
     }
 
-    static State<RNG, Double> nextDbl() {
-        return RNG::nextDouble0To1;
+    static StateT<RNG, Double> nextDbl() {
+        return st -> more(() -> done(st.nextDouble0To1()));
     }
 
-    static State<RNG, Long> nextLng() {
-        return RNG::nextLong;
+    static StateT<RNG, Long> nextLng() {
+        return st -> more(() -> done(st.nextLong()));
     }
 
     /**

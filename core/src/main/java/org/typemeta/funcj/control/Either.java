@@ -264,7 +264,10 @@ public interface Either<E, S> {
 
         @Override
         public <C> Either<E, C> apply(Either<E, F<S, C>> ef) {
-            return cast();
+            return ef.match(
+                    left -> left.cast(),
+                    right -> this.cast()
+            );
         }
 
         @Override
