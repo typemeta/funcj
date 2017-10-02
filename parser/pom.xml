@@ -12,7 +12,7 @@
     </parent>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>A set of functional data structures and algorithms.</description>
+    <description>A parser combinator framework.</description>
     <url>https://github.com/jon-hanson/funcj/parser</url>
 
     <packaging>jar</packaging>

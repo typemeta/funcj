@@ -12,7 +12,7 @@
     </parent>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>A set of functional data structures and algorithms.</description>
+    <description>A encoder/decoder framework.</description>
     <url>https://github.com/jon-hanson/funcj/codec</url>
 
     <packaging>jar</packaging>

@@ -6,7 +6,9 @@
     <version>0.7-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>A set of functional data structures and algorithms.</description>
+    <description>
+        A collection Java libraries and frameworks inspired by functional programming.
+    </description>
     <url>https://github.com/${project.groupId}/${project.artifactId}</url>
 
     <packaging>pom</packaging>
