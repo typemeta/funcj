@@ -14,4 +14,4 @@ At present the project consists of three sub-libraries:
 
 # Javadocs
 
-[The latest 0.7-SNAPSHOT](https://typemeta.github.io/funcj/javadocs/)
+[The latest 0.7-SNAPSHOT Javadocs](https://typemeta.github.io/funcj/javadocs/)
