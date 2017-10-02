@@ -5,7 +5,7 @@ import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import static org.typemeta.funcj.control.Trampoline.done;
-import static org.typemeta.funcj.control.Trampoline.more;
+import static org.typemeta.funcj.control.Trampoline.defer;
 import static org.typemeta.funcj.data.Unit.UNIT;
 
 /**
@@ -32,7 +32,7 @@ public interface StateT<S, A> {
      * @return          the new {@code State} instance
      */
     static <S, A> StateT<S, A> pure(A a) {
-        return st -> more(() -> done(Tuple2.of(st, a)));
+        return st -> defer(() -> done(Tuple2.of(st, a)));
     }
 
     /**
@@ -55,7 +55,7 @@ public interface StateT<S, A> {
      * @return          the new {@code State} instance
      */
     static <S> StateT<S, Unit> put(S st) {
-        return u -> more(() -> done(Tuple2.of(st, UNIT)));
+        return u -> defer(() -> done(Tuple2.of(st, UNIT)));
     }
 
     /**
@@ -64,7 +64,7 @@ public interface StateT<S, A> {
      * @return          the new {@code State} instance
      */
     static <S> StateT<S, S> get() {
-        return s -> more(() -> done(Tuple2.of(s, s)));
+        return s -> defer(() -> done(Tuple2.of(s, s)));
     }
 
     /**
@@ -170,9 +170,9 @@ public interface StateT<S, A> {
      */
     default <B> StateT<S, B> flatMap(F<A, StateT<S, B>> f) {
         return st ->
-                more(() -> runState(st)
+                defer(() -> runState(st)
                         .flatMap(t2 ->
-                                more(() -> f.apply(t2._2).runState(t2._1)))
+                                defer(() -> f.apply(t2._2).runState(t2._1)))
                 );
     }
 

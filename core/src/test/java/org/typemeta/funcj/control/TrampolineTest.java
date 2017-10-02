@@ -27,8 +27,8 @@ public class TrampolineTest {
         if (n <= 1) {
             return Trampoline.done(n);
         } else {
-            return Trampoline.more(() -> fib(n-1)).flatMap(x ->
-                    Trampoline.more(() -> fib(n-2)).flatMap(y ->
+            return Trampoline.defer(() -> fib(n-1)).flatMap(x ->
+                    Trampoline.defer(() -> fib(n-2)).flatMap(y ->
                             Trampoline.done(x + y)
                     )
             );
@@ -39,7 +39,7 @@ public class TrampolineTest {
         if (n <= 1) {
             return Trampoline.done(1);
         } else {
-            return Trampoline.more(() -> factT(n - 1)).flatMap(x ->
+            return Trampoline.defer(() -> factT(n - 1)).flatMap(x ->
                     Trampoline.done(n*x)
             );
         }
@@ -53,7 +53,7 @@ public class TrampolineTest {
         if (n == 0) {
             return Trampoline.done(0);
         } else {
-            return Trampoline.more(() -> countT(n - 1)).flatMap(x ->
+            return Trampoline.defer(() -> countT(n - 1)).flatMap(x ->
                     Trampoline.done(x+1)
             );
         }

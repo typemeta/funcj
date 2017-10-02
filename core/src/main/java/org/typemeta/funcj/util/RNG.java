@@ -4,7 +4,7 @@ import org.typemeta.funcj.control.StateT;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import static org.typemeta.funcj.control.Trampoline.done;
-import static org.typemeta.funcj.control.Trampoline.more;
+import static org.typemeta.funcj.control.Trampoline.defer;
 
 /**
  * Pseudo-random number generator, using the {@link StateT} monad.
@@ -16,11 +16,11 @@ public interface RNG {
     }
 
     static StateT<RNG, Double> nextDbl() {
-        return st -> more(() -> done(st.nextDouble0To1()));
+        return st -> defer(() -> done(st.nextDouble0To1()));
     }
 
     static StateT<RNG, Long> nextLng() {
-        return st -> more(() -> done(st.nextLong()));
+        return st -> defer(() -> done(st.nextLong()));
     }
 
     /**
