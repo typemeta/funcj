@@ -9,7 +9,7 @@
     <description>
         A collection Java libraries and frameworks inspired by functional programming.
     </description>
-    <url>https://github.com/${project.groupId}/${project.artifactId}</url>
+    <url>https://github.com/typemeta/funcj</url>
 
     <packaging>pom</packaging>
 

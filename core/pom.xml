@@ -13,7 +13,7 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A set of functional data structures and algorithms.</description>
-    <url>https://github.com/jon-hanson/funcj/core</url>
+    <url>https://github.com/typemeta/funcj/core</url>
 
     <packaging>jar</packaging>
 

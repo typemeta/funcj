@@ -13,7 +13,7 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A parser combinator framework.</description>
-    <url>https://github.com/jon-hanson/funcj/parser</url>
+    <url>https://github.com/typemeta/funcj/parser</url>
 
     <packaging>jar</packaging>
 
