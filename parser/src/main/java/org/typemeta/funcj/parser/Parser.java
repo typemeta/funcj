@@ -140,9 +140,9 @@ public interface Parser<I, A> {
                     final Input<I> next = succ.next();
                     if (!pa.acceptsEmpty().apply()) {
                         if (next.isEof()) {
-                            return failureEof(this, next);
+                            return failureEof(pa, next);
                         } else if (!pa.firstSet().apply().matches(next.get())) {
-                            return failure(this, next);
+                            return failure(pa, next);
                         }
                     }
 

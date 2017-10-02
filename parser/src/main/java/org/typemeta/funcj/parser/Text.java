@@ -89,7 +89,7 @@ public abstract class Text {
                         for (int i = 0; i < s.length(); ++i) {
                             if (in.isEof()) {
                                 return Utils.failureEof(this, in);
-                            } else if(!in.get().equals(s.charAt(i))) {
+                            } else if (!in.get().equals(s.charAt(i))) {
                                 return Utils.failure(this, in);
                             } else {
                                 in = in.next();

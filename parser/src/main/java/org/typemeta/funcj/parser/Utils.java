@@ -33,7 +33,7 @@ abstract class Utils {
         return acceptsEmpty ? fs1.union(fs2) : fs1;
     }
 
-    static <I, A> Result<I, A> failure(Parser<I, A> parser, Input<I> in) {
+    static <I, A> Result<I, A> failure(Parser<I, ?> parser, Input<I> in) {
         return Result.failure(in, parser.firstSet().apply());
     }
 
@@ -41,7 +41,7 @@ abstract class Utils {
         return Result.failureMessage(in, msg);
     }
 
-    static <I, A> Result<I, A> failureEof(Parser<I, A> parser, Input<I> in) {
+    static <I, A> Result<I, A> failureEof(Parser<I, ?> parser, Input<I> in) {
         return Result.failureEof(in, parser.firstSet().apply());
     }
 }
