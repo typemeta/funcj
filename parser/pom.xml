@@ -3,17 +3,17 @@
 
     <groupId>org.typemeta</groupId>
     <artifactId>funcj-parser</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.6.2-SNAPSHOT</version>
 
     <parent>
         <groupId>org.typemeta</groupId>
         <artifactId>funcj</artifactId>
-        <version>0.7-SNAPSHOT</version>
+        <version>0.6.2-SNAPSHOT</version>
     </parent>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>A set of functional data structures and algorithms.</description>
-    <url>https://github.com/jon-hanson/funcj/parser</url>
+    <description>A parser combinator framework.</description>
+    <url>https://github.com/typemeta/funcj/parser</url>
 
     <packaging>jar</packaging>
 

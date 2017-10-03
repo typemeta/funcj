@@ -3,11 +3,13 @@
 
     <groupId>org.typemeta</groupId>
     <artifactId>funcj</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.6.2-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>A set of functional data structures and algorithms.</description>
-    <url>https://github.com/${project.groupId}/${project.artifactId}</url>
+    <description>
+        A collection Java libraries and frameworks inspired by functional programming.
+    </description>
+    <url>https://github.com/typemeta/funcj</url>
 
     <packaging>pom</packaging>
 

@@ -15,7 +15,7 @@ import static org.typemeta.funcj.data.Unit.UNIT;
  * and produces a new state and a result of type {@code A}.
  * The state processor is represented by the {@link StateT#runState(Object)} SAM.
  * <p>
- * Note, this {@code State} type uses the {@link Trampoline} to
+ * Note, this {@code State} type uses the {@link Trampoline} monad to
  * translate a recursive evaluation model into an iterative one,
  * thereby avoiding the issue of {@link StackOverflowError}s.
  * @param <S>       the state type

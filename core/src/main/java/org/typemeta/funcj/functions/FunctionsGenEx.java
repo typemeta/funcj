@@ -1022,6 +1022,7 @@ public abstract class FunctionsGenEx {
          * Static constructor
          * @param pr        the predicate function
          * @param <T>       the operand type
+         * @param <X>       the exception type
          * @return          the predicate function
          */
         static <T, X extends Exception> Predicate<T, X> of(Predicate<T, X> pr) {
@@ -1031,6 +1032,7 @@ public abstract class FunctionsGenEx {
         /**
          * Return a {@code Predicate} that checks if a value is null
          * @param <T>       the operand type
+         * @param <X>       the exception type
          * @return          a {@code Predicate} that checks if a value is null
          */
         static <T, X extends Exception> Predicate<T, X> isNull() {
@@ -1041,6 +1043,7 @@ public abstract class FunctionsGenEx {
          * Return a {@code Predicate} that checks if a value is equal to the supplied value
          * @param lhs       the value to compare against
          * @param <T>       the operand type
+         * @param <X>       the exception type
          * @return          a {@code Predicate} that checks if a value is equal to the supplied value
          */
         static <T, X extends Exception> Predicate<T, X> isEqual(Object lhs) {

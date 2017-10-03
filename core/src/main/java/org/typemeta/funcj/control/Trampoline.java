@@ -11,15 +11,15 @@ import org.typemeta.funcj.functions.Functions.*;
  * <p>
  * Based on the <a href="http://blog.higher-order.com/assets/trampolines.pdf">Stackless Scala With Free Monads</a>
  * paper by Runar Bjarnason.
- * @param <T>           the value type yielded by the {@code Trampoline}
+ * @param <T>       the value type yielded by the {@code Trampoline}
  */
 public interface Trampoline<T> {
 
     /**
      * Construct a {@link Pure} value.
-     * @param result        the value to be wrapped into the {@code Done} value
-     * @param <A>           the value type
-     * @return              the new {@code Done} value
+     * @param result    the value to be wrapped into the {@code Done} value
+     * @param <A>       the value type
+     * @return          the new {@code Done} value
      */
     static <A> Pure<A> done(A result) {
         return new Pure<A>(result);
@@ -27,9 +27,9 @@ public interface Trampoline<T> {
 
     /**
      * Construct a {@link Suspend} value.
-     * @param next          a continuation that yields the next {@link Trampoline} in the computation.
-     * @param <A>           the value type
-     * @return              the new {@code More} value
+     * @param next      a continuation that yields the next {@link Trampoline} in the computation.
+     * @param <A>       the value type
+     * @return          the new {@code More} value
      */
     static <A> Suspend<A> defer(F0<Trampoline<A>> next) {
         return new Suspend<A>(next);
@@ -37,11 +37,11 @@ public interface Trampoline<T> {
 
     /**
      * Construct a {@link FlatMapped} value.
-     * @param sub           the {@link Trampoline} value to be bound into the {@code FlatMap}
-     * @param f             the function that, when invoked, yields the next {@code Trampoline} value
-     * @param <A>           the value type of the {@code Trampoline} value
-     * @param <B>           the value type of the {@code Trampoline} value return by {@code f}
-     * @return              the new {@code FlatMap} value
+     * @param sub       the {@link Trampoline} value to be bound into the {@code FlatMap}
+     * @param f         the function that, when invoked, yields the next {@code Trampoline} value
+     * @param <A>       the value type of the {@code Trampoline} value
+     * @param <B>       the value type of the {@code Trampoline} value return by {@code f}
+     * @return          the new {@code FlatMap} value
      */
     static <A, B> FlatMapped<A, B> flatMapOf(Trampoline<A> sub, F<A, Trampoline<B>> f) {
         return new FlatMapped<A, B>(sub) {
@@ -54,7 +54,7 @@ public interface Trampoline<T> {
 
     /**
      * Represents the end of a computation, in the form of the resultant value.
-     * @param <T>           the value type
+     * @param <T>       the value type
      */
     final class Pure<T> implements Trampoline<T> {
         /**
@@ -74,7 +74,7 @@ public interface Trampoline<T> {
 
     /**
      * Represents a continuation, indicating that further steps are required in the computation.
-     * @param <T>           the value type
+     * @param <T>       the value type
      */
     final class Suspend<T> implements Trampoline<T> {
         /**
@@ -94,8 +94,8 @@ public interface Trampoline<T> {
 
     /**
      * Represents a deferred flatMap operation, namely a value and a function to be applied to the value.
-     * @param <S>           the flatMap value input type
-     * @param <T>           the flatMap value output type
+     * @param <S>       the flatMap value input type
+     * @param <T>       the flatMap value output type
      */
     abstract class FlatMapped<S, T> implements Trampoline<T> {
         /**
@@ -109,8 +109,8 @@ public interface Trampoline<T> {
 
         /**
          * The function to be applied to the flatMap value.
-         * @param s             the argument to the flatMap operation
-         * @return              the result of the flatMap operation
+         * @param s         the argument to the flatMap operation
+         * @return          the result of the flatMap operation
          */
         abstract Trampoline<T> k(S s);
 
@@ -127,9 +127,9 @@ public interface Trampoline<T> {
 
     /**
      * Map a function over this value.
-     * @param f             the function to be mapped
-     * @param <U>           the return type of the function
-     * @return              a {@code Trampoline} that wraps the result of applying the function
+     * @param f         the function to be mapped
+     * @param <U>       the return type of the function
+     * @return          a {@code Trampoline} that wraps the result of applying the function
      */
     default <U> Trampoline<U> map(F<T, U> f) {
         return flatMap(x -> defer(() -> done(f.apply(x))));
@@ -137,9 +137,9 @@ public interface Trampoline<T> {
 
     /**
      * FlatMap a function over this value.
-     * @param f             the function to be flatMapped
-     * @param <U>           the value type of the {@code Trampoline} returned by the function
-     * @return              a {@code Trampoline} representing the deferred result of a flatMap
+     * @param f         the function to be flatMapped
+     * @param <U>       the value type of the {@code Trampoline} returned by the function
+     * @return          a {@code Trampoline} representing the deferred result of a flatMap
      */
     default <U> Trampoline<U> flatMap(F<T, Trampoline<U>> f) {
         return flatMapOf(this, f);
@@ -147,11 +147,10 @@ public interface Trampoline<T> {
 
     /**
      * Resume the computation until it yields the next value.
-     * @return              either an {@link Either.Left} of a further computation,
-     *                      or an {@link Either.Right} of a final result.
+     * @return          either an {@link Either.Left} of a further computation,
+     *                  or an {@link Either.Right} of a final result.
      */
     default Either<F0<Trampoline<T>>, T> resume() {
-        // The following loop is effectively an iterative rendition of a tail-recursive call.
         Trampoline<T> next = this;
         while (true) {
             if (next instanceof Trampoline.Pure) {
@@ -178,10 +177,9 @@ public interface Trampoline<T> {
 
     /**
      * Run the computation until it yields a final result.
-     * @return              the final result of the computation
+     * @return          the final result of the computation
      */
     default T runT() {
-        // The following loop is effectively an iterative rendition of a tail-recursive call.
         Trampoline<T> next = this;
         while (true) {
             final Either<F0<Trampoline<T>>, T> result = next.resume();
