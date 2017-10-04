@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * {code Input} represents a position in a stream of input symbols,
- * that {link Parser}s operate on.
+ * that {@link Parser}s operate on.
  * @param <I> input stream symbol type
  */
 public interface Input<I> {
