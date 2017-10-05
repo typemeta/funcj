@@ -273,20 +273,6 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract <U> U foldLeft(F2<U, T, U> f, U z);
 
     /**
-     * Right-fold a function over this non-empty list.
-     * @param f         the function to be folded
-     * @return          the folded result
-     */
-    public abstract T foldRight1(Op2<T> f);
-
-    /**
-     * Left-fold a function over this non-empty list.
-     * @param f         the function to be folded
-     * @return          the folded result
-     */
-    public abstract T foldLeft1(Op2<T> f);
-
-    /**
      * Create a {@link java.util.Spliterator}.
      * @return          the spliterator
      */
@@ -413,16 +399,6 @@ public abstract class IList<T> implements Iterable<T> {
         @Override
         public <U> U foldLeft(F2<U, T, U> f, U z) {
             return z;
-        }
-
-        @Override
-        public T foldRight1(Op2<T> f) {
-            throw new UnsupportedOperationException("Cannot call foldRight1(f) on an empty list");
-        }
-
-        @Override
-        public T foldLeft1(Op2<T> f) {
-            throw new UnsupportedOperationException("Cannot call foldLeft1(f) on an empty list");
         }
 
         @Override
@@ -629,12 +605,20 @@ public abstract class IList<T> implements Iterable<T> {
             return r;
         }
 
-        @Override
+        /**
+         * Right-fold a function over this non-empty list.
+         * @param f         the function to be folded
+         * @return          the folded result
+         */
         public T foldRight1(Op2<T> f) {
             return reverse().foldLeft1(f.flip());
         }
 
-        @Override
+        /**
+         * Left-fold a function over this non-empty list.
+         * @param f         the function to be folded
+         * @return          the folded result
+         */
         public T foldLeft1(Op2<T> f) {
             T r = head;
             for (IList<T> n = tail; !n.isEmpty(); n = n.tail()) {

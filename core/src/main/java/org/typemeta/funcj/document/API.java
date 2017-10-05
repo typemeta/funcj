@@ -107,10 +107,9 @@ public abstract class API {
      */
     public static Document.Concat lines(IList.NonEmpty<Document> docs) {
         final IList<Document> docs2 =
-                docs.tail()
-                        .foldRight(
-                                (d, acc) -> acc.add(lbreak).add(d),
-                                IList.of(docs.head()));
+                docs.foldRight(
+                        (doc, acc) -> acc.add(lbreak).add(doc),
+                        IList.nil());
         return concat(docs2);
     }
 
@@ -159,9 +158,10 @@ public abstract class API {
             Document sep,
             Document close,
             IList<Document> docs) {
-        final Document elems = docs.isEmpty() ?
-                empty :
-                docs.foldRight1((d, acc) -> concat(d, sep, lbreak, acc));
+        final Document elems = docs
+                .nonEmptyOpt()
+                .map(nel -> nel.foldRight1((d, acc) -> concat(d, sep, lbreak, acc)))
+                .orElse(empty);
         return enclose(open, elems, close);
     }
 

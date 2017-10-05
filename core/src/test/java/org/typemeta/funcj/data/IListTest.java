@@ -2,6 +2,8 @@ package org.typemeta.funcj.data;
 
 import org.junit.*;
 
+import static org.junit.Assert.assertEquals;
+
 public class IListTest {
 
     final IList<Integer> empty = IList.of();
@@ -9,8 +11,8 @@ public class IListTest {
 
     @Test
     public void testEquals() {
-        Assert.assertEquals("equals for an empty list", IList.of(), empty);
-        Assert.assertEquals("[equals for a non-empty list", IList.of().add(4).add(3).add(2).add(1), l);
+        assertEquals("equals for an empty list", IList.of(), empty);
+        assertEquals("[equals for a non-empty list", IList.of().add(4).add(3).add(2).add(1), l);
     }
 
     @Test
@@ -21,32 +23,34 @@ public class IListTest {
 
     @Test
     public void testLength() {
-        Assert.assertEquals("size for an empty list", 0, empty.size());
-        Assert.assertEquals("[1,2,3,4].size for a non-empty list", 4, l.size());
+        assertEquals("size for an empty list", 0, empty.size());
+        assertEquals("[1,2,3,4].size for a non-empty list", 4, l.size());
     }
 
     @Test
     public void testToString() {
-        Assert.assertEquals("toString for an empty list", "[]", empty.toString());
-        Assert.assertEquals("toString for a non-empty list", "[1,2,3,4]", l.toString());
+        assertEquals("toString for an empty list", "[]", empty.toString());
+        assertEquals("toString for a non-empty list", "[1,2,3,4]", l.toString());
     }
 
     @Test
     public void testFoldl() {
-        Assert.assertEquals("foldLeft for an empty list", 0, empty.foldLeft((x, y) -> x - y, 0).intValue());
-        Assert.assertEquals("foldLeft for a non-empty list", (((10-1)-2)-3)-4, l.foldLeft((x, y) -> x - y, 10).intValue());
+        assertEquals("Reversal on lists", l.reverse(), l.foldLeft(IList::add, IList.nil()));
+        assertEquals("foldLeft for an empty list", 0, empty.foldLeft((x, y) -> x - y, 0).intValue());
+        assertEquals("foldLeft for a non-empty list", (((10-1)-2)-3)-4, l.foldLeft((x, y) -> x - y, 10).intValue());
     }
 
     @Test
     public void testFoldr() {
-        Assert.assertEquals("foldRight for an empty list", 0, empty.foldRight((x, y) -> x - y, 0).intValue());
-        Assert.assertEquals("foldRight for a non-empty list", 1-(2-(3-(4-10))), l.foldRight((x, y) -> x - y, 10).intValue());
+        assertEquals("Identity function on lists", l, l.foldRight((i, acc) -> acc.add(i), IList.nil()));
+        assertEquals("foldRight for an empty list", 0, empty.foldRight((x, y) -> x - y, 0).intValue());
+        assertEquals("foldRight for a non-empty list", 1-(2-(3-(4-10))), l.foldRight((x, y) -> x - y, 10).intValue());
     }
 
     @Test
     public void testMap() {
-        Assert.assertEquals("map for an empty list", IList.of(), empty.map(x -> null));
-        Assert.assertEquals("map for a non-empty list", IList.of(-1, -2, -3, -4), l.map(i -> -i));
+        assertEquals("map for an empty list", IList.of(), empty.map(x -> null));
+        assertEquals("map for a non-empty list", IList.of(-1, -2, -3, -4), l.map(i -> -i));
     }
 
     @Test

@@ -300,7 +300,7 @@ public abstract class Combinators {
      */
     public static <I, A>
     Parser<I, A> choice(Parser<I, A>... ps) {
-        return choice(IList.ofArray(ps));
+        return choice((IList.NonEmpty<Parser<I, A>>) IList.ofArray(ps));
     }
 
     /**
@@ -312,7 +312,7 @@ public abstract class Combinators {
      * @return          a parser that attempts one or more parsers in turn
      */
     public static <I, A>
-    Parser<I, A> choice(IList<Parser<I, A>> ps) {
+    Parser<I, A> choice(IList.NonEmpty<Parser<I, A>> ps) {
         return ps.foldLeft1(Parser::or);
     }
 
