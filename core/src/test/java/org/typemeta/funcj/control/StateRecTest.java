@@ -2,14 +2,16 @@ package org.typemeta.funcj.control;
 
 import org.junit.*;
 
-public class StateTTest {
+import static org.typemeta.funcj.control.StateRec.*;
+
+public class StateRecTest {
     @Test
     public void testState() {
         final String r =
-            StateT.put("efgh")
-                .flatMap(u -> StateT.get())
-                .flatMap(s -> StateT.put(s + "1234"))
-                .flatMap(u -> StateT.get())
+            put("efgh")
+                .flatMap(u -> get())
+                .flatMap(s -> put(s + "1234"))
+                .flatMap(u -> get())
                 .eval("abcd");
 
         Assert.assertEquals("efgh1234", r);
@@ -18,9 +20,9 @@ public class StateTTest {
     @Test
     public void testState2() {
         final String r =
-            StateT.<String>get()
-                .flatMap(s -> StateT.put(s + "1234"))
-                .flatMap(u -> StateT.get())
+            StateRec.<String>get()
+                .flatMap(s -> put(s + "1234"))
+                .flatMap(u -> get())
                 .eval("abcd");
         Assert.assertEquals("abcd1234", r);
     }

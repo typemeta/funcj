@@ -4,8 +4,6 @@ import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
 
-import static org.typemeta.funcj.control.Trampoline.done;
-import static org.typemeta.funcj.control.Trampoline.defer;
 import static org.typemeta.funcj.data.Unit.UNIT;
 
 /**
@@ -13,16 +11,16 @@ import static org.typemeta.funcj.data.Unit.UNIT;
  * <p>
  * Each {@code State} instance is a state processor that takes a state of type {@code S},
  * and produces a new state and a result of type {@code A}.
- * The state processor is represented by the {@link StateT#runState(Object)} SAM.
+ * The state processor is represented by the {@link StateRec#runState(Object)} SAM.
  * <p>
- * Note, this {@code State} type uses the {@link Trampoline} monad to
- * translate a recursive evaluation model into an iterative one,
- * thereby avoiding the issue of {@link StackOverflowError}s.
+ * Note, this {@code State} type uses recursion and will blow the stack
+ * for heavily chained computations.
+ * If this is na issue then use {@link State}, which avoids recursion.
  * @param <S>       the state type
  * @param <A>       the result type
  */
 @FunctionalInterface
-public interface StateT<S, A> {
+public interface StateRec<S, A> {
 
     /**
      * A construct a {@code State} instance which leaves the input state unchanged and sets the result to a.
@@ -31,8 +29,8 @@ public interface StateT<S, A> {
      * @param <A>       the result type
      * @return          the new {@code State} instance
      */
-    static <S, A> StateT<S, A> pure(A a) {
-        return st -> defer(() -> done(Tuple2.of(st, a)));
+    static <S, A> StateRec<S, A> pure(A a) {
+        return st -> Tuple2.of(st, a);
     }
 
     /**
@@ -44,7 +42,7 @@ public interface StateT<S, A> {
      * @param <B>       the function return type
      * @return          a new {@code State} instance which contains the result of applying the function
      */
-    static <S, A, B> StateT<S, B> ap(StateT<S, F<A, B>> sf, StateT<S, A> sa) {
+    static <S, A, B> StateRec<S, B> ap(StateRec<S, F<A, B>> sf, StateRec<S, A> sa) {
         return sa.apply(sf);
     }
 
@@ -54,8 +52,8 @@ public interface StateT<S, A> {
      * @param <S>       the state type
      * @return          the new {@code State} instance
      */
-    static <S> StateT<S, Unit> put(S st) {
-        return u -> defer(() -> done(Tuple2.of(st, UNIT)));
+    static <S> StateRec<S, Unit> put(S st) {
+        return u -> Tuple2.of(st, UNIT);
     }
 
     /**
@@ -63,8 +61,8 @@ public interface StateT<S, A> {
      * @param <S>       the state type
      * @return          the new {@code State} instance
      */
-    static <S> StateT<S, S> get() {
-        return s -> defer(() -> done(Tuple2.of(s, s)));
+    static <S> StateRec<S, S> get() {
+        return s -> Tuple2.of(s, s);
     }
 
     /**
@@ -74,8 +72,8 @@ public interface StateT<S, A> {
      * @param <S>       the state type
      * @return          the new {@code State} instance
      */
-    static <S> StateT<S, Unit> modify(F<S, S> f) {
-        return StateT.<S>get().flatMap(x ->
+    static <S> StateRec<S, Unit> modify(F<S, S> f) {
+        return StateRec.<S>get().flatMap(x ->
             put(f.apply(x))
         );
     }
@@ -88,8 +86,8 @@ public interface StateT<S, A> {
      * @param <A>       the result type
      * @return          the new {@code State} instance
      */
-    static <S, A> StateT<S, A> gets(F<S, A> f) {
-        return StateT.<S>get().map(f);
+    static <S, A> StateRec<S, A> gets(F<S, A> f) {
+        return StateRec.<S>get().map(f);
     }
 
     /**
@@ -101,7 +99,7 @@ public interface StateT<S, A> {
      * @param <B>       the state result type
      * @return          a {@code State} which wraps an {@link IList} of values
      */
-    static <S, A, B> StateT<S, IList<B>> traverse(IList<A> lt, F<A, StateT<S, B>> f) {
+    static <S, A, B> StateRec<S, IList<B>> traverse(IList<A> lt, F<A, StateRec<S, B>> f) {
         return lt.foldRight(
             (a, slb) -> f.apply(a).apply(slb.map(l -> l::add)),
             pure(IList.nil())
@@ -115,7 +113,7 @@ public interface StateT<S, A> {
      * @param <A>       the state result type
      * @return          a {@code State} which wraps an {@link IList} of values
      */
-    static <S, A> StateT<S, IList<A>> sequence(IList<? extends StateT<S, A>> lsa) {
+    static <S, A> StateRec<S, IList<A>> sequence(IList<? extends StateRec<S, A>> lsa) {
         return lsa.foldRight(
             (sa, sla) -> sa.apply(sla.map(l -> l::add)),
             pure(IList.nil())
@@ -131,7 +129,7 @@ public interface StateT<S, A> {
      * @param state     the input state.
      * @return          the new state and a result
      */
-    Trampoline<Tuple2<S, A>> runState(S state);
+    Tuple2<S, A> runState(S state);
 
     /**
      * Map a function over the state processor.
@@ -139,8 +137,11 @@ public interface StateT<S, A> {
      * @param <B>       the return type of the function
      * @return          the new {@code State}
      */
-    default <B> StateT<S, B> map(F<? super A, ? extends B> f) {
-        return st -> runState(st).map(t2 -> t2.map2(f));
+    default <B> StateRec<S, B> map(F<? super A, ? extends B> f) {
+        return st -> {
+            final Tuple2<S, A> t2 = runState(st);
+            return t2.map2(f);
+        };
     }
 
     /**
@@ -151,11 +152,11 @@ public interface StateT<S, A> {
      * @param <B>       the {@code State} that wraps a value
      * @return          a {@code State} that wraps the result of applying the function to the value
      */
-    default <B> StateT<S, B> apply(StateT<S, F<A, B>> sf) {
-        return sf.flatMap(f ->
-                this.flatMap(a ->
-                        pure(f.apply(a)))
-        );
+    default <B> StateRec<S, B> apply(StateRec<S, F<A, B>> sf) {
+        return st -> {
+            final Tuple2<S, F<A, B>> t2F = sf.runState(st);
+            return this.runState(t2F._1).map2(t2F._2);
+        };
     }
 
     /**
@@ -168,12 +169,11 @@ public interface StateT<S, A> {
      * @param <B>       result value type
      * @return          a {@code State}
      */
-    default <B> StateT<S, B> flatMap(F<A, StateT<S, B>> f) {
-        return st ->
-                defer(() -> runState(st)
-                        .flatMap(t2 ->
-                                defer(() -> f.apply(t2._2).runState(t2._1)))
-                );
+    default <B> StateRec<S, B> flatMap(F<A, StateRec<S, B>> f) {
+        return st -> {
+            final Tuple2<S, A> t2 = runState(st);
+            return f.apply(t2._2).runState(t2._1);
+        };
     }
 
     /**
@@ -182,7 +182,7 @@ public interface StateT<S, A> {
      * @return          the state value yielded by running this state processor
      */
     default S exec(S s) {
-        return runState(s).runT()._1;
+        return runState(s)._1;
     }
 
     /**
@@ -191,7 +191,7 @@ public interface StateT<S, A> {
      * @return          the state result yielded by running this state processor
      */
     default A eval(S s) {
-        return runState(s).runT()._2;
+        return runState(s)._2;
     }
 }
 

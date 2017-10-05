@@ -2,8 +2,7 @@ package org.typemeta.funcj.control;
 
 import org.junit.*;
 
-import static org.typemeta.funcj.control.Trampoline.defer;
-import static org.typemeta.funcj.control.Trampoline.done;
+import static org.typemeta.funcj.control.Trampoline.*;
 
 public class TrampolineTest {
     @Test

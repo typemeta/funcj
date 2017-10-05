@@ -1,14 +1,14 @@
 package org.typemeta.funcj.util;
 
 import org.junit.*;
-import org.typemeta.funcj.control.StateT;
+import org.typemeta.funcj.control.State;
 import org.typemeta.funcj.data.IList;
 
 public class RNGTest {
 
     private static final int N = 1000;
 
-    private static StateT<RNG, String> randomStr() {
+    private static State<RNG, String> randomStr() {
         return
             RNG.nextDbl().flatMap(d ->
                 RNG.nextLng().map(l ->
@@ -25,9 +25,9 @@ public class RNGTest {
 
     @Test
     public void testSequence() {
-        final IList<StateT<RNG, Double>> rngs = generate(RNG.nextDbl(), N);
+        final IList<State<RNG, Double>> rngs = generate(RNG.nextDbl(), N);
 
-        final IList<Double> result = StateT.sequence(rngs).eval(RNG.xorShiftRNG(0));
+        final IList<Double> result = State.sequence(rngs).eval(RNG.xorShiftRNG(0));
         Assert.assertEquals("Number of generated random doubles", N, result.size());
 
         result.forEach(d -> {
