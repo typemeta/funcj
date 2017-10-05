@@ -1,5 +1,7 @@
 ![Func::j](https://github.com/typemeta/funcj/blob/master/resources/funcj.png)
 
+[![Build Status](https://travis-ci.org/typemeta/funcj.svg?branch=master)](https://travis-ci.org/typemeta/funcj)
+
 A collection of functional-oriented data structures, algorithms and libraries, for Java.
 
 # Introduction
