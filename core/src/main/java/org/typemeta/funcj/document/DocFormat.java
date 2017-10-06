@@ -9,30 +9,41 @@ import java.io.*;
  * Format a {@code Document} into a {@code String}.
  */
 public class DocFormat {
+    private static final int DEFAULT_INDENT_SIZE = 4;
+
+    private static final String indentStr = "                                                                ";
+
+    private static final int indentStrLen = indentStr.length();
+
     public static String format(int width, Document doc) {
-        final StringWriter wtr = new StringWriter();
-        format(wtr, width, doc);
-        return wtr.toString();
+        return format(width, DEFAULT_INDENT_SIZE, doc);
     }
 
     public static void format(Writer wtr, int width, Document doc) {
-        new DocFormat(wtr, width).format(doc);
+        format(wtr, DEFAULT_INDENT_SIZE, width, doc);
+    }
+
+    public static String format(int width, int indent, Document doc) {
+        final StringWriter wtr = new StringWriter();
+        format(wtr, indent, width, doc);
+        return wtr.toString();
+    }
+
+    public static void format(Writer wtr, int indent, int width, Document doc) {
+        new DocFormat(wtr, indent, width).format(doc);
         Exceptions.wrap(wtr::flush);
     }
 
-    private static final String indent = "                                                                ";
-    private static final int indentLen = indent.length();
-
     private static String indentStr(int depth) {
-        if (depth < indentLen) {
-            return indent.substring(0, depth);
+        if (depth < indentStrLen) {
+            return indentStr.substring(0, depth);
         } else {
             final StringBuilder sb = new StringBuilder();
-            while(depth > indentLen) {
-                sb.append(indent);
-                depth -= indentLen;
+            while(depth > indentStrLen) {
+                sb.append(indentStr);
+                depth -= indentStrLen;
             }
-            return sb.append(indent.substring(0, depth)).toString();
+            return sb.append(indentStr.substring(0, depth)).toString();
         }
     }
 
@@ -64,14 +75,16 @@ public class DocFormat {
     private final StringBuilder line = new StringBuilder();
     private final Writer wtr;
     private final int width;
+    private final int indSize;
 
-    public DocFormat(Writer wtr, int width) {
+    public DocFormat(Writer wtr, int indSize, int width) {
         this.wtr = wtr;
         this.width = width;
+        this.indSize = indSize;
     }
 
     private void format(Document doc) {
-        format(0, IList.of(FmtState.of(0, false, API.group(doc))));
+        format(0, IList.of(FmtState.of(0, false, doc)));
         flush();
     }
 
@@ -103,7 +116,7 @@ public class DocFormat {
         return this;
     }
 
-    private static boolean fits(int w, IList<FmtState> states) {
+    private boolean fits(int w, IList<FmtState> states) {
         while(!states.isEmpty()) {
             if (w < 0) {
                 return false;
@@ -124,7 +137,7 @@ public class DocFormat {
                     states = states.add(FmtState.of(hd.rw, false, group.doc));
                 } else if (hd.doc instanceof Document.Nest) {
                     final Document.Nest nest = (Document.Nest) hd.doc;
-                    states = states.add(FmtState.of(hd.rw + nest.indent, hd.flag, nest.doc));
+                    states = states.add(FmtState.of(hd.rw + nest.indent * indSize, hd.flag, nest.doc));
                 } else if (hd.doc instanceof Document.Concat) {
                     final Document.Concat concat = (Document.Concat) hd.doc;
                     final IList<FmtState> states2 = concat.children.map(c -> FmtState.of(hd.rw, hd.flag, c));
@@ -159,7 +172,7 @@ public class DocFormat {
                 states = states.add(FmtState.of(hd.rw, !fitsFlat, group.doc));
             } else if (hd.doc instanceof Document.Nest) {
                 final Document.Nest nest = (Document.Nest) hd.doc;
-                states = states.add(FmtState.of(hd.rw + nest.indent, hd.flag, nest.doc));
+                states = states.add(FmtState.of(hd.rw + nest.indent * indSize, hd.flag, nest.doc));
             } else if (hd.doc instanceof Document.Concat) {
                 final Document.Concat concat = (Document.Concat) hd.doc;
                 final IList<FmtState> states2 = concat.children.map(c -> FmtState.of(hd.rw, hd.flag, c));

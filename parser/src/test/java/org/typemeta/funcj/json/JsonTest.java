@@ -56,7 +56,7 @@ public class JsonTest {
             JsonParser.parser.run(
                 Input.of(FileUtils.openFile("/example.json").get()));
         final JSValue node = result.getOrThrow();
-        final String json2 = node.toJson(100);
+        final String json2 = node.toString(100);
 
         //System.out.println(node.toString());
         assertEquals("Round-tripped JSON", json, json2);

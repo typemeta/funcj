@@ -20,7 +20,7 @@ public class JsonCodecTest extends TestBase {
         final T val2 = codec.decode(clazz, node);
 
         if (printData || !val.equals(val2)) {
-            java.lang.System.out.println(node.toJson(40));
+            java.lang.System.out.println(node.toString(40));
         }
 
         Assert.assertEquals(val, val2);

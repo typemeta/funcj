@@ -94,7 +94,7 @@ final JsonCodecCore codec = Codecs.jsonCodec();
 
 // Serialise to JSON.
 final JSValue json = codec.encode(person);
-System.out.println(json.toJson(40));
+System.out.println(json.toString(40));
 
 // Deserialise back to Java.
 final Person person2 = codec.decode(Person.class, json);

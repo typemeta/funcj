@@ -3,9 +3,17 @@ package org.typemeta.funcj.json;
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions.F;
 
+/**
+ * Common interface for types represent JSON values.
+ */
 public interface JSValue {
 
-    default String toJson(int width)  {
+    /**
+     * Pretty-print this value as a JSON string, with indentation
+     * @param width
+     * @return
+     */
+    default String toString(int width)  {
         return DocFormat.format(width, toDocument());
     }
 

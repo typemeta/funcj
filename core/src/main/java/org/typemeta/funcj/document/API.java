@@ -6,7 +6,6 @@ import org.typemeta.funcj.util.Folds;
 import java.util.List;
 
 public abstract class API {
-    private static final int INDENT = 4;
 
     /**
      * An empty document.
@@ -162,7 +161,7 @@ public abstract class API {
                 .nonEmptyOpt()
                 .map(nel -> nel.foldRight1((d, acc) -> concat(d, sep, lbreak, acc)))
                 .orElse(empty);
-        return enclose(open, elems, close);
+        return enclose(open, close, elems);
     }
 
     /**
@@ -197,7 +196,7 @@ public abstract class API {
         return group(
                 concat(
                         open,
-                        nest(INDENT, concat(lbreak, doc)),
+                        nest(1, concat(lbreak, doc)),
                         lbreak,
                         close
                 )

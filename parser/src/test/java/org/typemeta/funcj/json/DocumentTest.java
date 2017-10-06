@@ -40,8 +40,8 @@ public class DocumentTest {
     }
 
     private static void checkJsonNode(JSValue node, int lines, int width) {
-        final String text = node.toJson(width);
-        //System.out.println(text);
+        final String text = node.toString(width);
+        System.out.println(text);
         checkSize(text, lines, width);
     }
 
