@@ -5,21 +5,22 @@ import org.junit.Test;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
+import static org.typemeta.funcj.json.JSAPI.*;
 
 public class DocumentTest {
 
     private static final JSValue testNode =
-            JSObject.of(
-                    JSObject.field("numbers", JSArray.of(JSNumber.of(1.2), JSNumber.of(3.4), JSNumber.of(4.5))),
-                    JSObject.field("strings", JSArray.of(JSString.of("abcd"), JSString.of("efgh"), JSString.of("ijkl"))),
-                    JSObject.field("objects", JSArray.of(
-                            JSObject.of(
-                                    JSObject.field("a", JSNumber.of(1)),
-                                    JSObject.field("b", JSNumber.of(2))
+            obj(
+                    field("numbers", arr(num(1.2), num(3.4), num(4.5))),
+                    field("strings", arr(str("abcd"), str("efgh"), str("ijkl"))),
+                    field("objects", arr(
+                            obj(
+                                    field("a", num(1)),
+                                    field("b", num(2))
                             ),
-                            JSObject.of(
-                                    JSObject.field("c", JSNumber.of(3)),
-                                    JSObject.field("d", JSNumber.of(4))
+                            obj(
+                                    field("c", num(3)),
+                                    field("d", num(4))
                             )
                     ))
             );

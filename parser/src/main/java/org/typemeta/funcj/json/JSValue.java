@@ -9,15 +9,20 @@ import org.typemeta.funcj.functions.Functions.F;
 public interface JSValue {
 
     /**
-     * Pretty-print this value as a JSON string, with indentation
-     * @param width
-     * @return
+     * Pretty-print this value as a JSON string.
+     * @param width     maximum line length
+     * @return          string representation of formatted JSON
      */
     default String toString(int width)  {
         return DocFormat.format(width, toDocument());
     }
 
-    StringBuilder toString(StringBuilder sb);
+    /**
+     * Write this value into the supplied {@code StringBuilder}.
+     * @param sb        the {@code StringBuilder}
+     * @return          the {@code StringBuilder}
+     */
+    /* private */ StringBuilder toString(StringBuilder sb);
 
     <T> T match(
         F<JSNull, T> nl,

@@ -5,10 +5,6 @@ import org.typemeta.funcj.functions.Functions;
 
 public final class JSString extends AbstractJSValue {
 
-    public static JSString of(String value) {
-        return new JSString(value);
-    }
-
     protected final String value;
 
     protected JSString(String value) {

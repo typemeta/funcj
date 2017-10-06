@@ -7,6 +7,8 @@ import org.typemeta.funcj.tuples.Tuple2;
 import java.io.Reader;
 import java.util.*;
 
+import static org.typemeta.funcj.json.JSAPI.field;
+import static org.typemeta.funcj.json.JSAPI.nul;
 import static org.typemeta.funcj.parser.Text.*;
 
 /**
@@ -21,19 +23,19 @@ public class JsonParser {
 
     private static List<JSObject.Field> toMap(Iterable<Tuple2<String, JSValue>> iter) {
         final List<JSObject.Field> fields = new ArrayList<>();
-        iter.forEach(t2 -> fields.add(JSObject.field(t2._1, t2._2)));
+        iter.forEach(t2 -> fields.add(field(t2._1, t2._2)));
         return fields;
     }
 
     static {
-        final Parser<Chr, JSValue> jnull = tok(string("null")).andR(Parser.pure(JSNull.of()));
+        final Parser<Chr, JSValue> jnull = tok(string("null")).andR(Parser.pure(JSAPI.nul()));
 
         final Parser<Chr, Boolean> jtrue = tok(string("true")).andR(Parser.pure(Boolean.TRUE));
         final Parser<Chr, Boolean> jfalse = tok(string("false")).andR(Parser.pure(Boolean.FALSE));
 
-        final Parser<Chr, JSValue> jbool = tok(jtrue.or(jfalse)).map(JSBool::of);
+        final Parser<Chr, JSValue> jbool = tok(jtrue.or(jfalse)).map(JSAPI::bool);
 
-        final Parser<Chr, JSValue> jnumber = tok(dble).map(JSNumber::of);
+        final Parser<Chr, JSValue> jnumber = tok(dble).map(JSAPI::num);
 
         final Parser<Chr, Byte> hexDigit =
             Combinators.choice(
@@ -99,7 +101,7 @@ public class JsonParser {
             ));
 
         final Parser<Chr, JSValue> jtext =
-            jstring.map(JSString::of);
+            jstring.map(JSAPI::str);
 
         final Ref<Chr, JSValue> jvalue = Parser.ref();
 
@@ -111,7 +113,7 @@ public class JsonParser {
                     jvalue,
                     tok(chr(','))
                 )
-            ).map(IList::toList).map(JSArray::of);
+            ).map(IList::toList).map(JSAPI::arr);
 
         final Parser<Chr, Tuple2<String, JSValue>> jfield =
             jstring
@@ -126,7 +128,7 @@ public class JsonParser {
                 Combinators.sepBy(
                     jfield,
                     tok(chr(','))
-                ).map(JsonParser::toMap).map(JSObject::of)
+                ).map(JsonParser::toMap).map(JSAPI::obj)
             );
 
         jvalue.set(

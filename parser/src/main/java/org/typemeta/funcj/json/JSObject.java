@@ -53,38 +53,6 @@ public final class JSObject extends AbstractJSValue
         }
     }
 
-    public static Field field(String name, JSValue node) {
-        return new Field(name, node);
-    }
-
-    public static JSObject of(Field... fields) {
-        final LinkedHashMap<String, Field> fieldMap =
-                Arrays.stream(fields)
-                        .collect(toMap(
-                                Field::getName,
-                                Function.identity(),
-                                Utils::duplicateKeyError,
-                                LinkedHashMap::new
-                        ));
-        return of(fieldMap);
-    }
-
-    public static JSObject of(Iterable<Field> iter) {
-        final LinkedHashMap<String, Field> fieldMap =
-                StreamSupport.stream(iter.spliterator(), false)
-                        .collect(toMap(
-                                Field::getName,
-                                Function.identity(),
-                                Utils::duplicateKeyError,
-                                LinkedHashMap::new
-                        ));
-        return of(fieldMap);
-    }
-
-    public static JSObject of(LinkedHashMap<String, Field> values) {
-        return new JSObject(values);
-    }
-
     private final LinkedHashMap<String, Field> fields;
 
     protected JSObject(LinkedHashMap<String, Field> fields) {

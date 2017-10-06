@@ -32,12 +32,12 @@ public abstract class JsonMapCodecs {
             final String valueFieldName = core.valueFieldName();
 
             final List<JSValue> nodes = map.entrySet().stream()
-                    .map(en -> JSObject.of(
-                            JSObject.field(keyFieldName, keyCodec.encode(en.getKey(), enc)),
-                            JSObject.field(valueFieldName, valueCodec.encode(en.getValue(), enc))
+                    .map(en -> JSAPI.obj(
+                            JSAPI.field(keyFieldName, keyCodec.encode(en.getKey(), enc)),
+                            JSAPI.field(valueFieldName, valueCodec.encode(en.getValue(), enc))
                     )).collect(toList());
 
-            return JSArray.of(nodes);
+            return JSAPI.arr(nodes);
         }
 
         @Override
@@ -79,10 +79,10 @@ public abstract class JsonMapCodecs {
 
             map.forEach((k, v) -> {
                 final JSValue value = valueCodec.encode(v, enc);
-                fields.add(JSObject.field(k, value));
+                fields.add(JSAPI.field(k, value));
             });
 
-            return JSObject.of(fields);
+            return JSAPI.obj(fields);
         }
 
         @Override

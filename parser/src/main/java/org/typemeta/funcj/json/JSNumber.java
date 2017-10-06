@@ -7,10 +7,6 @@ import java.util.Objects;
 
 public final class JSNumber extends AbstractJSValue {
 
-    public static JSNumber of(double value) {
-        return new JSNumber(value);
-    }
-
     private final double value;
 
     protected JSNumber(double value) {

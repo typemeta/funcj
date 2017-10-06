@@ -33,7 +33,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public JSValue encode(Object val, JSValue enc) {
-            return JSNull.of();
+            return JSAPI.nul();
         }
 
         @Override
@@ -69,7 +69,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public JSValue encodePrim(boolean val) {
-            return JSBool.of(val);
+            return JSAPI.bool(val);
         }
 
         @Override
@@ -91,7 +91,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
             for (boolean val : vals) {
                 nodes.add(booleanCodec().encode(val, enc));
             }
-            return JSArray.of(nodes);
+            return JSAPI.arr(nodes);
         }
 
         @Override
@@ -115,7 +115,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public JSValue encodePrim(byte val) {
-            return JSNumber.of(val);
+            return JSAPI.num(val);
         }
 
         @Override
@@ -137,7 +137,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
             for (byte val : vals) {
                 nodes.add(byteCodec().encode(val, enc));
             }
-            return JSArray.of(nodes);
+            return JSAPI.arr(nodes);
         }
 
         @Override
@@ -161,7 +161,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public JSValue encodePrim(char val) {
-            return JSString.of(String.valueOf(val));
+            return JSAPI.str(String.valueOf(val));
         }
 
         @Override
@@ -189,7 +189,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
             for (char val : vals) {
                 nodes.add(charCodec().encode(val, enc));
             }
-            return JSArray.of(nodes);
+            return JSAPI.arr(nodes);
         }
 
         @Override
@@ -213,7 +213,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public JSValue encodePrim(short val) {
-            return JSNumber.of(val);
+            return JSAPI.num(val);
         }
 
         @Override
@@ -235,7 +235,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
             for (short val : vals) {
                 nodes.add(shortCodec().encode(val, enc));
             }
-            return JSArray.of(nodes);
+            return JSAPI.arr(nodes);
         }
 
         @Override
@@ -259,7 +259,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public JSValue encodePrim(int val) {
-            return JSNumber.of(val);
+            return JSAPI.num(val);
         }
 
         @Override
@@ -281,7 +281,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
             for (int val : vals) {
                 nodes.add(intCodec().encode(val, enc));
             }
-            return JSArray.of(nodes);
+            return JSAPI.arr(nodes);
         }
 
         @Override
@@ -305,7 +305,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public JSValue encodePrim(long val) {
-            return JSNumber.of(val);
+            return JSAPI.num(val);
         }
 
         @Override
@@ -327,7 +327,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
             for (long val : vals) {
                 nodes.add(longCodec().encode(val, enc));
             }
-            return JSArray.of(nodes);
+            return JSAPI.arr(nodes);
         }
 
         @Override
@@ -351,7 +351,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public JSValue encodePrim(float val) {
-            return JSNumber.of(val);
+            return JSAPI.num(val);
         }
 
         @Override
@@ -373,7 +373,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
             for (float val : vals) {
                 nodes.add(floatCodec().encode(val, enc));
             }
-            return JSArray.of(nodes);
+            return JSAPI.arr(nodes);
         }
 
         @Override
@@ -397,7 +397,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public JSValue encodePrim(double val) {
-            return JSNumber.of(val);
+            return JSAPI.num(val);
         }
 
         @Override
@@ -419,7 +419,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
             for (double val : vals) {
                 nodes.add(doubleCodec().encode(val, enc));
             }
-            return JSArray.of(nodes);
+            return JSAPI.arr(nodes);
         }
 
         @Override
@@ -442,7 +442,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
     protected final Codec<String, JSValue> stringCodec = new Codec<String, JSValue>() {
         @Override
         public JSValue encode(String val, JSValue enc) {
-            return JSString.of(val);
+            return JSAPI.str(val);
         }
 
         @Override
@@ -461,7 +461,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
         return new Codec<EM, JSValue>() {
             @Override
             public JSValue encode(EM val, JSValue enc) {
-                return JSString.of(val.name());
+                return JSAPI.str(val.name());
             }
 
             @Override
@@ -491,7 +491,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
                 for (T val : vals) {
                     nodes.add(elemCodec.encode(val, enc));
                 }
-                return JSArray.of(nodes);
+                return JSAPI.arr(nodes);
             }
 
             @Override
@@ -521,7 +521,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
                 for (T val : vals) {
                     nodes.add(elemCodec.encode(val, enc));
                 }
-                return JSArray.of(nodes);
+                return JSAPI.arr(nodes);
             }
 
             @Override
@@ -547,11 +547,11 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
                 if (dynType.equals(stcType)) {
                     return JsonCodecCoreImpl.this.getNullUnsafeCodec(stcType).encode(val, enc);
                 } else {
-                    return JSObject.of(
-                            JSObject.field(
+                    return JSAPI.obj(
+                            JSAPI.field(
                                     typeFieldName(),
-                                    JSString.of(classToName(dynType))),
-                            JSObject.field(
+                                    JSAPI.str(classToName(dynType))),
+                            JSAPI.field(
                                     valueFieldName(),
                                     encode2(JsonCodecCoreImpl.this.getNullUnsafeCodec(dynType), val, enc))
                     );
@@ -597,9 +597,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
                 if (dynType.equals(stcType)) {
                     return codec.encode(val, enc);
                 } else {
-                    return JSObject.of(
-                            JSObject.field(typeFieldName(), JSString.of(classToName(dynType))),
-                            JSObject.field(valueFieldName(), codec.encode(val, enc))
+                    return JSAPI.obj(
+                            JSAPI.field(typeFieldName(), JSAPI.str(classToName(dynType))),
+                            JSAPI.field(valueFieldName(), codec.encode(val, enc))
                     );
                 }
             }
@@ -635,10 +635,10 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
             public JSValue encode(T val, JSValue enc) {
                 final List<JSObject.Field> fields =
                         Functors.map(
-                                field -> JSObject.field(field.name(), field.encodeField(val, enc)),
+                                field -> JSAPI.field(field.name(), field.encodeField(val, enc)),
                                 objMeta
                         );
-                return JSObject.of(fields);
+                return JSAPI.obj(fields);
             }
 
             @Override
