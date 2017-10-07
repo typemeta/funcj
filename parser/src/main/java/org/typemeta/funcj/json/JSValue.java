@@ -18,7 +18,7 @@ public interface JSValue {
     }
 
     /**
-     * Select the supplied functions that corresponds to the type of JSValue this value is,
+     * Select the one supplied function that corresponds to the type of this value,
      * and return the result of applying the function to this value.
      * @param nl        the function to be applied to a {@link JSNull} value
      * @param bl        the function to be applied to a {@link JSBool} value
