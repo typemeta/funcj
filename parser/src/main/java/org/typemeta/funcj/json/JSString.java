@@ -3,6 +3,9 @@ package org.typemeta.funcj.json;
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
 
+/**
+ * Models a JSON string.
+ */
 public final class JSString extends AbstractJSValue {
 
     protected final String value;

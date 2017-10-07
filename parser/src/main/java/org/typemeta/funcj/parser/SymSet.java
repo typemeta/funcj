@@ -16,7 +16,7 @@ import static org.typemeta.funcj.parser.SymSetUtils.typeError;
  * {@code SymSet} has to support these directly else every symbol that satisfies the predicate,
  * would have to be enumerated.
  * Consequently, a SymSet is expressed as the composition of symbols, predicates and set operations.
- * @param <I>   input stream symbol type
+ * @param <I>           the input stream symbol type
  */
 public interface SymSet<I> {
     enum Type {

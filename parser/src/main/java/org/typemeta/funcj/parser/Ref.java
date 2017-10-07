@@ -5,17 +5,19 @@ import org.typemeta.funcj.data.*;
 import java.util.Objects;
 
 /**
- * A reference to a parser.
+ * A reference to a {@link Parser}.
  * <p>
- * A reference to a {link Parser}. At creation the reference The reference is eventually
- * Typically used to allow parsers with circular
+ * At creation the reference is typically uninitialised.
+ * Any of the {@code Parser} methods will throw if invoked on an uninitialised {@code Ref}.
+ * It is subsequently initialised (via the {@link Ref#set(Parser)} method) with a {@code Parser}
+ * {@code Ref} is typically used to allow parsers for grammars with circular
  * dependencies to be constructed.
- * @param <I> input stream symbol type
- * @param <A> parser result type
+ * @param <I>       input stream symbol type
+ * @param <A>       parser result type
  */
 public class Ref<I, A> implements Parser<I, A> {
 
-    private enum Null implements Parser<Unit, Unit> {
+    private enum Uninitialised implements Parser<Unit, Unit> {
         INSTANCE {
             @Override
             public Lazy<Boolean> acceptsEmpty() {
@@ -44,11 +46,16 @@ public class Ref<I, A> implements Parser<I, A> {
     }
 
     Ref() {
-        this.impl = Null.of();
+        this.impl = Uninitialised.of();
     }
 
+    /**
+     * Initialise this reference
+     * @param impl      the parser
+     * @return          this parser
+     */
     public Parser<I, A> set(Parser<I, A> impl) {
-        if (this.impl != Null.INSTANCE) {
+        if (this.impl != Uninitialised.INSTANCE) {
             throw new IllegalStateException("Ref is already initialised");
         } else {
             this.impl = Objects.requireNonNull(impl);

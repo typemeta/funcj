@@ -8,8 +8,9 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-import static java.util.stream.Collectors.toMap;
-
+/**
+ * Models a JSON object.
+ */
 public final class JSObject extends AbstractJSValue
         implements Iterable<JSObject.Field> {
 

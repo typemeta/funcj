@@ -5,6 +5,9 @@ import org.typemeta.funcj.functions.Functions;
 
 import java.util.Objects;
 
+/**
+ * Models a JSON number value.
+ */
 public final class JSNumber extends AbstractJSValue {
 
     private final Object value;

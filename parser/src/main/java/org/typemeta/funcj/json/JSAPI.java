@@ -9,7 +9,7 @@ import static java.util.stream.Collectors.toMap;
 public class JSAPI {
 
     public static JSNull nul() {
-        return JSNull.INSTANCE;
+        return JSNull.NULL;
     }
 
     public static JSBool bool(boolean value) {

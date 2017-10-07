@@ -7,8 +7,8 @@ import java.util.function.Consumer;
 
 /**
  * A parse result is either a {@code Success} or a {@code Failure}.
- * @param <I> input stream symbol type
- * @param <A> parser result type
+ * @param <I>       the input stream symbol type
+ * @param <A>       the parser result type
  */
 public interface Result<I, A> {
     static <I, A> Result<I, A> success(A result, Input<I> next) {
@@ -41,8 +41,8 @@ public interface Result<I, A> {
      * The result of a successful parse.
      * Consists of the parsed value, and a reference to the point in the input symbol stream
      * immediately after the parsed input.
-     * @param <I> input stream symbol type
-     * @param <A> parser result type
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
      */
     class Success<I, A> implements Result<I, A> {
         private final A value;

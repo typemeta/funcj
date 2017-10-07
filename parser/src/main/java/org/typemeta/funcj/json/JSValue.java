@@ -4,7 +4,7 @@ import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions.F;
 
 /**
- * Common interface for classes represent JSON values.
+ * Common interface for classes that represent JSON values.
  */
 public interface JSValue {
 

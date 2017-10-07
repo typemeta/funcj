@@ -3,8 +3,11 @@ package org.typemeta.funcj.json;
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
 
+/**
+ * Models a JSON null value.
+ */
 public enum JSNull implements JSValue {
-    INSTANCE;
+    NULL;
 
     @Override
     public String toString() {

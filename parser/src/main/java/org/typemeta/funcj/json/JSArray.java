@@ -8,6 +8,9 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+/**
+ * Models a JSON array.
+ */
 public final class JSArray extends AbstractJSValue
         implements Iterable<JSValue> {
 

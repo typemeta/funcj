@@ -9,13 +9,13 @@ import java.util.Objects;
 /**
  * {code Input} represents a position in a stream of input symbols,
  * that {@link Parser}s operate on.
- * @param <I> input stream symbol type
+ * @param <I>       the input stream symbol type
  */
 public interface Input<I> {
     /**
      * Construct an {@code Input} from a {@code char} array.
-     * @param data input data
-     * @return input stream
+     * @param data      the input data
+     * @return          the input stream
      */
     static Input<Chr> of(char[] data) {
         return new StringInput(data);
@@ -23,8 +23,8 @@ public interface Input<I> {
 
     /**
      * Construct an {@code Input} from a {link java.lang.String}.
-     * @param s input data
-     * @return input stream
+     * @param s         the input data
+     * @return          the input stream
      */
     static Input<Chr> of(String s) {
         return new StringInput(s.toCharArray());
@@ -32,8 +32,8 @@ public interface Input<I> {
 
     /**
      * Construct an {@code Input} from a {link java.io.Reader}.
-     * @param rdr input data
-     * @return input stream
+     * @param rdr       the input data
+     * @return          the input stream
      */
     static Input<Chr> of(Reader rdr) {
         return new ReaderInput(rdr);
@@ -41,28 +41,28 @@ public interface Input<I> {
 
     /**
      * Returns true if and only if this input is at the end of the input stream.
-     * @return true if this input is at the end of the input stream
+     * @return          true if this input is at the end of the input stream
      */
     boolean isEof();
 
     /**
      * Returns the symbol from the stream indicated by this input.
      * Will throw if {@code isEof} is true.
-     * @return next symbol
+     * @return          the next symbol
      */
     I get();
 
     /**
      * Get the next position in the input stream.
      * Will throw if {@code isEof} is true.
-     * @return the next position in the input stream
+     * @return          the next position in the input stream
      */
     Input<I> next();
 
     /**
      * Return a implementation-specific representation of the
      * current position (e.g. an Integer).
-     * @return current position
+     * @return          the current position
      */
     Object position();
 }

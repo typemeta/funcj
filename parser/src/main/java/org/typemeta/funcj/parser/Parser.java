@@ -9,8 +9,8 @@ import static org.typemeta.funcj.parser.Utils.*;
 /**
  * A parser is essentially a function from an input stream to a parse {@link Result}.
  * The {@code Parser} type along with the {@code pure} and {@code ap} functions constitute an applicative functor.
- * @param <I> input stream symbol type
- * @param <A> parser result type
+ * @param <I>       the input stream symbol type
+ * @param <A>       the parser result type
  */
 public interface Parser<I, A> {
 
@@ -30,21 +30,21 @@ public interface Parser<I, A> {
 
     /**
      * The First Set for this parser.
-     * @return          lazy symbol set
+     * @return          a lazy symbol set
      */
     Lazy<SymSet<I>> firstSet();
 
     /**
      * Apply this parser to the input stream.
-     * @param in        input stream
-     * @param follow    dynamic follow set
+     * @param in        the input stream
+     * @param follow    the dynamic follow set
      * @return          the parse result
      */
     Result<I, A> parse(Input<I> in, SymSet<I> follow);
 
     /**
      * Apply this parser to the input stream.
-     * @param in        input stream
+     * @param in        the input stream
      * @return          the parser result
      */
     default Result<I, A> parse(Input<I> in) {
@@ -53,7 +53,7 @@ public interface Parser<I, A> {
 
     /**
      * Apply this parser to the input stream. Fail if eof isn't reached.
-     * @param in        input stream
+     * @param in        the input stream
      * @return          the parser result
      */
     default Result<I, A> run(Input<I> in) {
@@ -215,7 +215,7 @@ public interface Parser<I, A> {
      * Combine this parser with another to form a builder which accumulates the parse results.
      * @param pb        the second parser
      * @param <B>       the result type of second parser
-     * @return an {@link ApplyBuilder} which accumulates the parse results.
+     * @return          an {@link ApplyBuilder} which accumulates the parse results.
      */
     default <B> ApplyBuilder._2<I, A, B> and(Parser<I, B> pb) {
         return new ApplyBuilder._2<I, A, B>(this, pb);

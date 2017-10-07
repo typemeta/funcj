@@ -3,6 +3,9 @@ package org.typemeta.funcj.json;
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
 
+/**
+ * Models JSON true and false values.
+ */
 public enum JSBool implements JSValue {
     TRUE(true),
     FALSE(false);
