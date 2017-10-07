@@ -8,13 +8,22 @@ abstract class Utils {
         throw new IllegalStateException("Duplicate keys - " + u + " & " + v);
     }
 
-    static String format(double d) {
-        final long ld = (long)d;
-        if (d == ld) {
-            return String.format("%d", ld);
-        } else {
-            return String.format("%s", d);
+    static String formatAsNumber(Object obj) {
+        if (obj instanceof Double) {
+            final double d = (Double) obj;
+            final long l = (long)d;
+            if (d == l) {
+                return String.format("%d", l);
+            }
+        } else if (obj instanceof Float) {
+            final float f = (Float) obj;
+            final long l = (long)f;
+            if (f == l) {
+                return String.format("%d", l);
+            }
         }
+
+        return obj.toString();
     }
 
     static String format(String s) {

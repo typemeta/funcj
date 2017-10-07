@@ -120,7 +120,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public byte decodePrim(JSValue enc) {
-            return (byte) enc.asNumber().getValue();
+            return enc.asNumber().toByte();
         }
     };
 
@@ -218,7 +218,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public short decodePrim(JSValue enc) {
-            return (short) enc.asNumber().getValue();
+            return enc.asNumber().toShort();
         }
     };
 
@@ -264,7 +264,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public int decodePrim(JSValue enc) {
-            return (int) enc.asNumber().getValue();
+            return enc.asNumber().toInt();
         }
     };
 
@@ -310,7 +310,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public long decodePrim(JSValue enc) {
-            return (long) enc.asNumber().getValue();
+            return enc.asNumber().toLong();
         }
     };
 
@@ -356,7 +356,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public float decodePrim(JSValue enc) {
-            return (float) enc.asNumber().getValue();
+            return enc.asNumber().toFloat();
         }
     };
 
@@ -402,7 +402,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public double decodePrim(JSValue enc) {
-            return enc.asNumber().getValue();
+            return enc.asNumber().oDouble();
         }
     };
 
@@ -627,10 +627,8 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
     @Override
     public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, JSValue> createObjectCodec(
-            ObjectMeta<T, JSValue, RA> objMeta
-    ) {
+            ObjectMeta<T, JSValue, RA> objMeta) {
         return new Codec<T, JSValue>() {
-
             @Override
             public JSValue encode(T val, JSValue enc) {
                 final List<JSObject.Field> fields =

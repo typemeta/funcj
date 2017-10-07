@@ -24,7 +24,31 @@ public class JSAPI {
         return new JSArray(values);
     }
 
+    public static JSNumber num(byte value) {
+        return new JSNumber(value);
+    }
+
+    public static JSNumber num(short value) {
+        return new JSNumber(value);
+    }
+
+    public static JSNumber num(int value) {
+        return new JSNumber(value);
+    }
+
+    public static JSNumber num(long value) {
+        return new JSNumber(value);
+    }
+
+    public static JSNumber num(float value) {
+        return new JSNumber(value);
+    }
+
     public static JSNumber num(double value) {
+        return new JSNumber(value);
+    }
+
+    public static JSNumber num(String value) {
         return new JSNumber(value);
     }
 

@@ -390,7 +390,8 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         return createObjectCodec(fieldCodecs);
     }
 
-    public static abstract class ObjectMeta<T, E, RA extends ObjectMeta.ResultAccumlator<T>> implements Iterable<ObjectMeta.Field<T, E, RA>> {
+    public static abstract class ObjectMeta<T, E, RA extends ObjectMeta.ResultAccumlator<T>>
+            implements Iterable<ObjectMeta.Field<T, E, RA>> {
         public interface ResultAccumlator<T> {
             T construct();
         }
@@ -408,7 +409,6 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         }
 
         public abstract int size();
-
     }
 
     public <T> Codec<T, E> createObjectCodec(Map<String, FieldCodec<E>> fieldCodecs) {

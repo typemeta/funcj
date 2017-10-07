@@ -15,7 +15,7 @@ import static org.typemeta.funcj.data.Unit.UNIT;
  * <p>
  * Note, this {@code State} type uses recursion and will blow the stack
  * for heavily chained computations.
- * If this is na issue then use {@link State}, which avoids recursion.
+ * If this is an issue then use {@link State}, which avoids recursion.
  * @param <S>       the state type
  * @param <A>       the result type
  */

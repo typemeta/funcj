@@ -2,6 +2,9 @@ package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.functions.Functions;
 
+/**
+ * Base class for classes represent JSON values.
+ */
 public abstract class AbstractJSValue implements JSValue {
 
     public abstract StringBuilder toString(StringBuilder sb);
