@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toList;
  * Base class for classes which implement an encoding into a specific target type.
  * @param <E> the encoded type
  */
+@SuppressWarnings("unchecked")
 public abstract class BaseCodecCore<E> implements CodecCore<E> {
 
     /**

@@ -401,6 +401,7 @@ public interface Try<T> {
             return Optional.empty();
         }
 
+        @SuppressWarnings("unchecked")
         private <U> Try<U> cast() {
             return (Try<U>) this;
         }

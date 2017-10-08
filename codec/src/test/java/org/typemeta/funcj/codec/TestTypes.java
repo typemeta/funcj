@@ -819,6 +819,7 @@ public abstract class TestTypes {
 
 abstract class TestDataUtils {
 
+    @SafeVarargs
     static <T> ArrayList<T> arrayList(T... vals) {
         final ArrayList<T> l = new ArrayList<T>(vals.length);
         l.addAll(Arrays.asList(vals));
@@ -839,6 +840,7 @@ abstract class TestDataUtils {
         return m;
     }
 
+    @SafeVarargs
     static <T> TreeSet<T> treeSet(T... vals) {
         final TreeSet<T> l = new TreeSet<T>();
         l.addAll(Arrays.asList(vals));

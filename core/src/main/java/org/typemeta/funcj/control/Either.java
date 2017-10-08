@@ -275,6 +275,7 @@ public interface Either<E, S> {
             return cast();
         }
 
+        @SuppressWarnings("unchecked")
         private <C> Either<E, C> cast() {
             return (Either<E, C>) this;
         }

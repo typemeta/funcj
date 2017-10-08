@@ -188,6 +188,7 @@ public abstract class Functors {
      * @param <B>       the element type of the output array
      * @return          the output array
      */
+    @SuppressWarnings("unchecked")
     public static <A, B> B[] map(F<A, B> f, A[] from, B[] to) {
         final int l = from.length;
         if (to.length != l) {

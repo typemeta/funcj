@@ -7,6 +7,7 @@ import org.typemeta.funcj.json.JSValue;
  * Interface for classes which implement an encoding into JSON,
  * via the {@link JSValue} representation for JSON values.
  */
+@SuppressWarnings("unchecked")
 public interface JsonCodecCore extends CodecCore<JSValue> {
 
     /**

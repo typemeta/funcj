@@ -60,6 +60,7 @@ public interface Validation<E, T> {
      * @param <X>       the exception type
      * @return          the {@code Validation} value which wraps the function result
      */
+    @SuppressWarnings("unchecked")
     static <E, T, X extends Exception>
     Validation<E, T> of(FunctionsGenEx.F0<T, X> f, F<X, E> error) {
         try {
@@ -353,6 +354,7 @@ public interface Validation<E, T> {
             return Optional.empty();
         }
 
+        @SuppressWarnings("unchecked")
         public <U> Failure<E, U> cast() {
             return (Failure<E, U>) this;
         }

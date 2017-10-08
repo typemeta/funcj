@@ -150,6 +150,7 @@ public interface Trampoline<T> {
      * @return          either an {@link Either.Left} of a further computation,
      *                  or an {@link Either.Right} of a final result.
      */
+    @SuppressWarnings("unchecked")
     default Either<F0<Trampoline<T>>, T> resume() {
         Trampoline<T> next = this;
         while (true) {

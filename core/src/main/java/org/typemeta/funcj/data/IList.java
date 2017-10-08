@@ -22,6 +22,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @param <T>       the element type
      * @return          an empty list
      */
+    @SuppressWarnings("unchecked")
     public static <T> IList<T> nil() {
         return (IList<T>)Empty.EMPTY;
     }
@@ -52,6 +53,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @param <T>       the element type
      * @return          the new list with one or more element
      */
+    @SafeVarargs
     public static <T> NonEmpty<T> of(T elem, T... elems) {
         return ofArray(elems).add(elem);
     }
@@ -92,6 +94,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @return          the new concatenated list
      */
     public static <T> IList<T> concat(IList<? extends T> l1, IList<? extends T>  l2) {
+        @SuppressWarnings("unchecked")
         IList<T> r = (IList<T>)l2;
         for (T elem : l1.reverse()) {
             r = r.add(elem);
@@ -195,6 +198,7 @@ public abstract class IList<T> implements Iterable<T> {
      * List equality.
      * @return          true if this list and rhs are equal in terms of their size and elements.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object rhs) {
         return this == rhs ||
@@ -378,17 +382,17 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public IList<T> reverse() {
-            return EMPTY;
+            return nil();
         }
 
         @Override
         public <U> IList<U> map(F<? super T, ? extends U> f) {
-            return EMPTY;
+            return nil();
         }
 
         @Override
         public <U> IList<U> flatMap(F<? super T, IList<? extends U>> f) {
-            return EMPTY;
+            return nil();
         }
 
         @Override

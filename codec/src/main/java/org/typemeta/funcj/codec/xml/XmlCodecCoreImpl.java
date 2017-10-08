@@ -8,6 +8,7 @@ import org.w3c.dom.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodecCore {
 
     public XmlCodecCoreImpl() {

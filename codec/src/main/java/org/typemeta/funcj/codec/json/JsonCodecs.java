@@ -5,6 +5,7 @@ import org.typemeta.funcj.json.*;
 
 import java.util.Optional;
 
+@SuppressWarnings("unchecked")
 public class JsonCodecs {
     public static JsonCodecCoreImpl registerAll(JsonCodecCoreImpl core) {
         core.registerCodec(Optional.class, new JsonCodecs.OptionalCodec(core));

@@ -8,6 +8,7 @@ import org.typemeta.funcj.util.*;
 import java.lang.reflect.Array;
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCodecCore {
 
     public JsonCodecCoreImpl() {
@@ -466,7 +467,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
             @Override
             public EM decode(Class<EM> dynType, JSValue enc) {
-                Class<EM> type = dynType != null ? dynType : (Class<EM>)enumType;
+                final Class<EM> type = dynType != null ? dynType : (Class<EM>)enumType;
                 return EM.valueOf(type, enc.asString().getValue());
             }
         };

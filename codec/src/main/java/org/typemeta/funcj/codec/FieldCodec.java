@@ -10,6 +10,7 @@ import java.util.Objects;
  * to an encoded type {@code E}, and vice-versa.
  * @param <E> encoded type
  */
+@SuppressWarnings("unchecked")
 public interface FieldCodec<E> {
 
     abstract class Impl<E> implements FieldCodec<E> {

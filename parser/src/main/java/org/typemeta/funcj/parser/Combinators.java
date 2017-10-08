@@ -298,6 +298,7 @@ public abstract class Combinators {
      * @param <A>       the parser result type
      * @return          a parser that attempts one or more parsers in turn
      */
+    @SafeVarargs
     public static <I, A>
     Parser<I, A> choice(Parser<I, A>... ps) {
         return choice((IList.NonEmpty<Parser<I, A>>) IList.ofArray(ps));

@@ -12,6 +12,7 @@ import java.util.*;
  * @param <T> raw type to be encoded/decoded
  * @param <E> encoded type
  */
+@SuppressWarnings("unchecked")
 public class ObjectCodecBuilder<T, E> {
     public static class FieldCodec<T, E> {
         protected final F2<T, E, E> encoder;

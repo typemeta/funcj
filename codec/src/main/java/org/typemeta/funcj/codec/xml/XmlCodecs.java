@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 
 import java.util.Optional;
 
+@SuppressWarnings("unchecked")
 public class XmlCodecs {
     public static XmlCodecCoreImpl registerAll(XmlCodecCoreImpl core) {
         core.registerCodec(Optional.class, new XmlCodecs.OptionalCodec(core));

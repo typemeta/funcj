@@ -32,6 +32,7 @@ public class ClassType<T> {
      * @param value     the object to cast
      * @return          an {@code Optional} that wraps the cast value
      */
+    @SuppressWarnings("unchecked")
     public Optional<T> cast(Object value) {
         if (clazz.isInstance(value)) {
             return Optional.of((T)value);
@@ -51,6 +52,7 @@ public class ClassType<T> {
      * @param <R>       the return type of both functions
      * @return          the result of appllying either function
      */
+    @SuppressWarnings("unchecked")
     public <S, R> R match(S value, F<T, R> success, F<S, R> fail) {
         if (clazz.isInstance(value)) {
             return success.apply((T)value);
