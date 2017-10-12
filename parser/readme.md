@@ -1,3 +1,5 @@
+![Func::j](https://github.com/typemeta/funcj/blob/master/resources/funcj.png)
+
 # Introduction
 
 **funcj.parser** is a Java parser combinator framework for constructing [LL(1) parsers](http://en.wikipedia.org/wiki/LL_parser).
