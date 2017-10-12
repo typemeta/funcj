@@ -1,3 +1,5 @@
+![Func::j](https://github.com/typemeta/funcj/blob/master/resources/funcj.png)
+
 # Introduction
 
 **funcj.codec** is a Java framework for round-tripping Java data via a structured data format such as JSON and XML.
