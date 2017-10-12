@@ -1,4 +1,4 @@
-![Func::j](https://github.com/typemeta/funcj/blob/master/resources/funcj.png)
+![funcj.parser](https://github.com/typemeta/funcj/blob/master/parser/resources/funcj-parser.png)
 
 # Introduction
 
