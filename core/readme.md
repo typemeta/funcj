@@ -1,3 +1,5 @@
+![Func::j](https://github.com/typemeta/funcj/blob/master/resources/funcj.png)
+
 # Introduction
 
 **funcj.core** is a set of data structures and algorithms.
