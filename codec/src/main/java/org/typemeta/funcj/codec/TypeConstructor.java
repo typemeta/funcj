@@ -7,16 +7,16 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * Interface for constructing an uninitialised value of type {@code T}.
- * @param <T> type of value to be constructed
+ * @param <T>       type of value to be constructed
  */
 @SuppressWarnings("unchecked")
 public interface TypeConstructor<T> {
     /**
      * Create a {@code TypeConstructor} for the specified class.
      * @param clazz type descriptor which conveys the type argument
-     * @param <T> the type we want a {@code TypeConstructor} for
-     * @return a {@code TypeConstructor}
-     * @throws InstantiationException if type has no constructors
+     * @param <T>       the type we want a {@code TypeConstructor} for
+     * @return          a {@code TypeConstructor}
+     * @throws          InstantiationException if type has no constructors
      */
     static <T> TypeConstructor<T> createTypeConstructor(Class<T> clazz)
             throws InstantiationException {
@@ -58,8 +58,8 @@ public interface TypeConstructor<T> {
 
     /**
      * Construct a value of type {@code T}.
-     * @return newly constructed value
-     * @throws ReflectiveOperationException typically thrown by {@link java.lang.reflect.Constructor#newInstance(Object[])}
+     * @return          newly constructed value
+     * @throws          ReflectiveOperationException typically thrown by {@link java.lang.reflect.Constructor#newInstance(Object[])}
      */
     T construct() throws ReflectiveOperationException;
 }

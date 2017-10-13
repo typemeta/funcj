@@ -41,7 +41,7 @@ public abstract class FunctionsGenEx {
         /**
          * Apply this function
          * @return          the result of applying this function
-         * @throws X        the exception
+         * @throws          X the exception
          */
         R apply() throws X;
     }
@@ -85,7 +85,7 @@ public abstract class FunctionsGenEx {
          * Apply this function
          * @param a         the function argument
          * @return          the result of applying this function
-         * @throws X        the exception
+         * @throws          X the exception
          */
         R apply(A a) throws X;
 
@@ -207,7 +207,7 @@ public abstract class FunctionsGenEx {
          * @param a         the function's first argument
          * @param b         the function's second argument
          * @return          the result of applying this function
-         * @throws X        the exception
+         * @throws          X the exception
          */
         R apply(A a, B b) throws X;
 
@@ -239,7 +239,7 @@ public abstract class FunctionsGenEx {
         /**
          * Convert this function to one that operates on a {@link Tuple2}.
          * @return          a function that operates on a {@link Tuple2}
-         * @throws X        the exception
+         * @throws          X the exception
          */
         default F<Tuple2<A, B>, R, X> tupled() throws X {
             return t2 -> apply(t2._1, t2._2);
@@ -290,7 +290,7 @@ public abstract class FunctionsGenEx {
          * @param b         the function's second argument
          * @param c         the function's third argument
          * @return          the result of applying this function
-         * @throws X        the exception
+         * @throws          X the exception
          */
         R apply(A a, B b, C c) throws X;
 
@@ -324,7 +324,7 @@ public abstract class FunctionsGenEx {
         /**
          * Convert this function to one that operates on a {@link Tuple3}.
          * @return          a function that operates on a {@link Tuple3}
-         * @throws X the exception
+         * @throws          X the exception
          */
         default F<Tuple3<A, B, C>, R, X> tupled() throws X {
             return t3 -> apply(t3._1, t3._2, t3._3);
@@ -379,7 +379,7 @@ public abstract class FunctionsGenEx {
          * @param c         the function's third argument
          * @param d         the function's fourth argument
          * @return          the result of applying this function
-         * @throws X        the exception
+         * @throws          X the exception
          */
         R apply(A a, B b, C c, D d) throws X;
 
@@ -589,7 +589,7 @@ public abstract class FunctionsGenEx {
          * @param e         the function's fifth argument
          * @param g         the function's sixth argument
          * @return          the result of applying this function
-         * @throws X         exception
+         * @throws          X the exception
          */
         R apply(A a, B b, C c, D d, E e, G g) throws X;
 
@@ -719,7 +719,7 @@ public abstract class FunctionsGenEx {
          * @param g         the function's sixth argument
          * @param h         the function's seventh argument
          * @return          the result of applying this function
-         * @throws X         exception
+         * @throws          X the exception
          */
         R apply(A a, B b, C c, D d, E e, G g, H h) throws X;
 
@@ -868,7 +868,7 @@ public abstract class FunctionsGenEx {
          * @param h         the function's seventh argument
          * @param i         the function's eighth argument
          * @return          the result of applying this function
-         * @throws X         exception
+         * @throws          X the exception
          */
         R apply(A a, B b, C c, D d, E e, G g, H h, I i) throws X;
 

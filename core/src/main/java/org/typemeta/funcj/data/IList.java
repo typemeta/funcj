@@ -168,14 +168,14 @@ public abstract class IList<T> implements Iterable<T> {
     /**
      * Return the head element of this list.
      * @return          the head of this list.
-     * @throws UnsupportedOperationException if the list is empty.
+     * @throws          UnsupportedOperationException if the list is empty.
      */
     public abstract T head();
 
     /**
      * Return the tail of this list.
      * @return          the tail of this list.
-     * @throws UnsupportedOperationException if the list is empty.
+     * @throws          UnsupportedOperationException if the list is empty.
      */
     public abstract IList<T> tail();
 
@@ -183,7 +183,7 @@ public abstract class IList<T> implements Iterable<T> {
      * Returns the element at the specified position in this list.
      * @param index     the position of the element to return
      * @return          the element of this list at the specified position.
-     * @throws IndexOutOfBoundsException if the index is out of bounds.
+     * @throws          IndexOutOfBoundsException if the index is out of bounds.
      */
     public abstract T get(int index);
 

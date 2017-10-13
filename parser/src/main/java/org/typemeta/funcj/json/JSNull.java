@@ -26,13 +26,13 @@ public enum JSNull implements JSValue {
 
     @Override
     public <T> T match(
-            Functions.F<JSNull, T> nl,
-            Functions.F<JSBool, T> bl,
-            Functions.F<JSNumber, T> nm,
-            Functions.F<JSString, T> st,
-            Functions.F<JSArray, T> ar,
-            Functions.F<JSObject, T> ob) {
-        return nl.apply(this);
+            Functions.F<JSNull, T> fNull,
+            Functions.F<JSBool, T> fBool,
+            Functions.F<JSNumber, T> fNum,
+            Functions.F<JSString, T> fStr,
+            Functions.F<JSArray, T> fArr,
+            Functions.F<JSObject, T> fObj) {
+        return fNull.apply(this);
     }
 
     @Override

@@ -20,7 +20,7 @@ final public class Tuple3<A, B, C> {
      * @param <B>       the second value type
      * @param <C>       the third value type
      * @return          the new {@code Tuple3}
-     * @throws NullPointerException if any of the tuple values is null
+     * @throws          NullPointerException if any of the tuple values is null
      */
     public static <A, B, C> Tuple3<A, B, C> of(A a, B b, C c) {
         return new Tuple3<>(a, b, c);
@@ -73,7 +73,7 @@ final public class Tuple3<A, B, C> {
      * @param a         the first value
      * @param b         the second value
      * @param c         the third value
-     * @throws NullPointerException if any of the tuple values is null
+     * @throws          NullPointerException if any of the tuple values is null
      */
     public Tuple3(A a, B b, C c) {
         _1 = Objects.requireNonNull(a);

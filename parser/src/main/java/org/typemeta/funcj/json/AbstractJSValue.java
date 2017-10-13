@@ -10,12 +10,12 @@ public abstract class AbstractJSValue implements JSValue {
     public abstract StringBuilder toString(StringBuilder sb);
 
     public abstract <T> T match(
-            Functions.F<JSNull, T> nl,
-            Functions.F<JSBool, T> bl,
-            Functions.F<JSNumber, T> nm,
-            Functions.F<JSString, T> st,
-            Functions.F<JSArray, T> ar,
-            Functions.F<JSObject, T> ob
+            Functions.F<JSNull, T> fNull,
+            Functions.F<JSBool, T> fBool,
+            Functions.F<JSNumber, T> fNum,
+            Functions.F<JSString, T> fStr,
+            Functions.F<JSArray, T> fArr,
+            Functions.F<JSObject, T> fObj
     );
 
     public boolean isNull() {

@@ -20,22 +20,22 @@ public interface JSValue {
     /**
      * Select the one supplied function that corresponds to the type of this value,
      * and return the result of applying the function to this value.
-     * @param nl        the function to be applied to a {@link JSNull} value
-     * @param bl        the function to be applied to a {@link JSBool} value
-     * @param nm        the function to be applied to a {@link JSNumber} value
-     * @param st        the function to be applied to a {@link JSString} value
-     * @param ar        the function to be applied to a {@link JSArray} value
-     * @param ob        the function to be applied to a {@link JSObject} value
+     * @param fNull     the function to be applied to a {@link JSNull} value
+     * @param fBool     the function to be applied to a {@link JSBool} value
+     * @param fNum      the function to be applied to a {@link JSNumber} value
+     * @param fStr      the function to be applied to a {@link JSString} value
+     * @param fArr      the function to be applied to a {@link JSArray} value
+     * @param fObj      the function to be applied to a {@link JSObject} value
      * @param <T>       the return type of the functions
      * @return          the result of applying the appropriate function to this value
      */
     <T> T match(
-        F<JSNull, T> nl,
-        F<JSBool, T> bl,
-        F<JSNumber, T> nm,
-        F<JSString, T> st,
-        F<JSArray, T> ar,
-        F<JSObject, T> ob
+        F<JSNull, T> fNull,
+        F<JSBool, T> fBool,
+        F<JSNumber, T> fNum,
+        F<JSString, T> fStr,
+        F<JSArray, T> fArr,
+        F<JSObject, T> fObj
     );
 
     /**
