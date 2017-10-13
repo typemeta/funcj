@@ -5,44 +5,49 @@ import org.typemeta.funcj.functions.Functions;
 import java.util.*;
 
 /**
- * A 4-tuple of values.
+ * A 5-tuple of values.
  * @param <A>       the first value type
  * @param <B>       the second value type
  * @param <C>       the third value type
  * @param <D>       the fourth value type
+ * @param <E>       the fifth value type
  */
-final public class Tuple4<A, B, C, D> {
+final public class Tuple5<A, B, C, D, E> {
     /**
-     * Create a new {@code Tuple4} comprised of the supplied values
+     * Create a new {@code Tuple5} comprised of the supplied values
      * @param a         the first value
      * @param b         the second value
      * @param c         the third value
      * @param d         the fourth value
+     * @param e         the fifth value
      * @param <A>       the first value type
      * @param <B>       the second value type
      * @param <C>       the third value type
      * @param <D>       the fourth value type
-     * @return          the new {@code Tuple4}
+     * @param <E>       the fifth value type
+     * @return          the new {@code Tuple5}
      * @throws NullPointerException if any of the tuple values is null
      */
-    public static <A, B, C, D> Tuple4<A, B, C, D> of(A a, B b, C c, D d) {
-        return new Tuple4<>(a, b, c, d);
+    public static <A, B, C, D, E> Tuple5<A, B, C, D, E> of(A a, B b, C c, D d, E e) {
+        return new Tuple5<>(a, b, c, d, e);
     }
 
     /**
-     * Return a {@link Comparator} which can be used for {@code Tuple4},
+     * Return a {@link Comparator} which can be used for {@code Tuple5},
      * when both type parameters implement {@link Comparable}.
      * @param <A>       the first value type
      * @param <B>       the second value type
      * @param <C>       the third value type
      * @param <D>       the fourth value type
-     * @return          a {@link Comparator} which can be used for {@code Tuple4} values
+     * @param <E>       the fifth value type
+     * @return          a {@link Comparator} which can be used for {@code Tuple5} values
      */
     public static <
             A extends Comparable<A>,
             B extends Comparable<B>,
             C extends Comparable<C>,
-            D extends Comparable<D>> Comparator<Tuple4<A, B, C, D>> comparator() {
+            D extends Comparable<D>,
+            E extends Comparable<E>> Comparator<Tuple5<A, B, C, D, E>> comparator() {
         return (lhs, rhs) -> {
             final int cmp1 = lhs._1.compareTo(rhs._1);
             if (cmp1 != 0) {
@@ -56,7 +61,12 @@ final public class Tuple4<A, B, C, D> {
                     if (cmp3 != 0) {
                         return cmp3;
                     } else {
-                        return lhs._4.compareTo(rhs._4);
+                        final int cmp4 = lhs._4.compareTo(rhs._4);
+                        if (cmp4 != 0) {
+                            return cmp4;
+                        } else {
+                            return lhs._5.compareTo(rhs._5);
+                        }
                     }
                 }
             }
@@ -84,18 +94,25 @@ final public class Tuple4<A, B, C, D> {
     public final D _4;
 
     /**
-     * Create a new {@code Tuple4} comprised of the supplied values
+     * The fifth value type
+     */
+    public final E _5;
+
+    /**
+     * Create a new {@code Tuple5} comprised of the supplied values
      * @param a         the first value
      * @param b         the second value
      * @param c         the third value
      * @param d         the fourth value
+     * @param e         the fifth value
      * @throws NullPointerException if any of the tuple values is null
      */
-    public Tuple4(A a, B b, C c, D d) {
+    public Tuple5(A a, B b, C c, D d, E e) {
         _1 = Objects.requireNonNull(a);
         _2 = Objects.requireNonNull(b);
         _3 = Objects.requireNonNull(c);
         _4 = Objects.requireNonNull(d);
+        _5 = Objects.requireNonNull(e);
     }
 
     /**
@@ -131,111 +148,142 @@ final public class Tuple4<A, B, C, D> {
     }
 
     /**
-     * Return a new {@code Tuple4} which is a copy of this one,
+     * Return the fifth value.
+     * @return          the fifth value
+     */
+    public E get5() {
+        return _5;
+    }
+
+    /**
+     * Return a new {@code Tuple5} which is a copy of this one,
      * but with the first value replaced with the supplied argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
-     * @return          the new {@code Tuple4}
+     * @return          the new {@code Tuple5}
      */
-    public <T> Tuple4<T, B, C, D> with1(T t) {
-        return Tuple4.of(t, _2, _3, _4);
+    public <T> Tuple5<T, B, C, D, E> with1(T t) {
+        return Tuple5.of(t, _2, _3, _4, _5);
     }
 
     /**
-     * Return a new {@code Tuple4} which is a copy of this one,
+     * Return a new {@code Tuple5} which is a copy of this one,
      * but with the second value replaced with the supplied argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
-     * @return          the new {@code Tuple4}
+     * @return          the new {@code Tuple5}
      */
-    public <T> Tuple4<A, T, C, D> with2(T t) {
-        return Tuple4.of(_1, t, _3, _4);
+    public <T> Tuple5<A, T, C, D, E> with2(T t) {
+        return Tuple5.of(_1, t, _3, _4, _5);
     }
 
     /**
-     * Return a new {@code Tuple4} which is a copy of this one,
+     * Return a new {@code Tuple5} which is a copy of this one,
      * but with the third value replaced with the supplied argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
-     * @return          the new {@code Tuple4}
+     * @return          the new {@code Tuple5}
      */
-    public <T> Tuple4<A, B, T, D> with3(T t) {
-        return Tuple4.of(_1, _2, t, _4);
+    public <T> Tuple5<A, B, T, D, E> with3(T t) {
+        return Tuple5.of(_1, _2, t, _4, _5);
     }
 
     /**
-     * Return a new {@code Tuple4} which is a copy of this one,
+     * Return a new {@code Tuple5} which is a copy of this one,
      * but with the fourth value replaced with the supplied argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
-     * @return          the new {@code Tuple4}
+     * @return          the new {@code Tuple5}
      */
-    public <T> Tuple4<A, B, C, T> with4(T t) {
-        return Tuple4.of(_1, _2, _3, t);
+    public <T> Tuple5<A, B, C, T, E> with4(T t) {
+        return Tuple5.of(_1, _2, _3, t, _5);
     }
 
     /**
-     * Apply a 4-ary function to the values within this {@code Tuple4},
+     * Return a new {@code Tuple5} which is a copy of this one,
+     * but with the fifth value replaced with the supplied argument {@code t}
+     * @param t         the replacement value
+     * @param <T>       the replacement value type
+     * @return          the new {@code Tuple5}
+     */
+    public <T> Tuple5<A, B, C, D, T> with5(T t) {
+        return Tuple5.of(_1, _2, _3, _4, t);
+    }
+
+    /**
+     * Apply a 5-ary function to the values within this {@code Tuple5},
      * and return the result.
      * @param f         the function
      * @param <T>       the function return type
      * @return          the result of applying the function
      */
-    public <T> T apply(Functions.F4<? super A, ? super B, ? super C, ? super D, ? extends T> f) {
-        return f.apply(_1, _2, _3, _4);
+    public <T> T apply(Functions.F5<? super A, ? super B, ? super C, ? super D, ? super E, ? extends T> f) {
+        return f.apply(_1, _2, _3, _4, _5);
     }
 
     /**
-     * Create a new {@code Tuple4} which is a copy of this one,
+     * Create a new {@code Tuple5} which is a copy of this one,
      * but with the first value replaced with the result of applying the supplied function
      * to the first value.
      * @param f         the function
      * @param <T>       the function return type
-     * @return          the new {@code Tuple4}
+     * @return          the new {@code Tuple5}
      */
-    public <T> Tuple4<T, B, C, D> map1(Functions.F<? super A, ? extends T> f) {
-        return of(f.apply(_1), _2, _3, _4);
+    public <T> Tuple5<T, B, C, D, E> map1(Functions.F<? super A, ? extends T> f) {
+        return of(f.apply(_1), _2, _3, _4, _5);
     }
 
     /**
-     * Create a new {@code Tuple4} which is a copy of this one,
+     * Create a new {@code Tuple5} which is a copy of this one,
      * but with the second value replaced with the result of applying the supplied function
      * to the second value.
      * @param f         the function
      * @param <T>       the function return type
-     * @return          the new {@code Tuple4}
+     * @return          the new {@code Tuple5}
      */
-    public <T> Tuple4<A, T, C, D> map2(Functions.F<? super B, ? extends T> f) {
-        return of(_1, f.apply(_2), _3, _4);
+    public <T> Tuple5<A, T, C, D, E> map2(Functions.F<? super B, ? extends T> f) {
+        return of(_1, f.apply(_2), _3, _4, _5);
     }
 
     /**
-     * Create a new {@code Tuple4} which is a copy of this one,
+     * Create a new {@code Tuple5} which is a copy of this one,
      * but with the third value replaced with the result of applying the supplied function
      * to the third value.
      * @param f         the function
      * @param <T>       the function return type
-     * @return          the new {@code Tuple4}
+     * @return          the new {@code Tuple5}
      */
-    public <T> Tuple4<A, B, T, D> map3(Functions.F<? super C, ? extends T> f) {
-        return of(_1, _2, f.apply(_3), _4);
+    public <T> Tuple5<A, B, T, D, E> map3(Functions.F<? super C, ? extends T> f) {
+        return of(_1, _2, f.apply(_3), _4, _5);
     }
 
     /**
-     * Create a new {@code Tuple4} which is a copy of this one,
+     * Create a new {@code Tuple5} which is a copy of this one,
      * but with the fourth value replaced with the result of applying the supplied function
      * to the third value.
      * @param f         the function
      * @param <T>       the function return type
-     * @return          the new {@code Tuple4}
+     * @return          the new {@code Tuple5}
      */
-    public <T> Tuple4<A, B, C, T> map4(Functions.F<? super D, ? extends T> f) {
-        return of(_1, _2, _3, f.apply(_4));
+    public <T> Tuple5<A, B, C, T, E> map4(Functions.F<? super D, ? extends T> f) {
+        return of(_1, _2, _3, f.apply(_4), _5);
+    }
+
+    /**
+     * Create a new {@code Tuple5} which is a copy of this one,
+     * but with the fifth value replaced with the result of applying the supplied function
+     * to the third value.
+     * @param f         the function
+     * @param <T>       the function return type
+     * @return          the new {@code Tuple5}
+     */
+    public <T> Tuple5<A, B, C, D, T> map5(Functions.F<? super E, ? extends T> f) {
+        return of(_1, _2, _3, _4, f.apply(_5));
     }
 
     @Override
     public String toString() {
-        return "(" + _1 + ',' + _2 + ',' + _3 + ',' + _4 +  ')';
+        return "(" + _1 + ',' + _2 + ',' + _3 + ',' + _4 + ',' + _5 +  ')';
     }
 
     @Override
@@ -243,12 +291,13 @@ final public class Tuple4<A, B, C, D> {
         if (this == rhs) return true;
         if (rhs == null || getClass() != rhs.getClass()) return false;
 
-        Tuple4<?, ?, ?, ?> rhsT = (Tuple4<?, ?, ?, ?>) rhs;
+        Tuple5<?, ?, ?, ?, ?> rhsT = (Tuple5<?, ?, ?, ?, ?>) rhs;
 
         return _1.equals(rhsT._1) &&
             _2.equals(rhsT._2) &&
             _3.equals(rhsT._3) &&
-            _4.equals(rhsT._4);
+            _4.equals(rhsT._4) &&
+            _5.equals(rhsT._5);
     }
 
     @Override
@@ -257,6 +306,7 @@ final public class Tuple4<A, B, C, D> {
         result = 31 * result + _2.hashCode();
         result = 31 * result + _3.hashCode();
         result = 31 * result + _4.hashCode();
+        result = 31 * result + _5.hashCode();
         return result;
     }
 }

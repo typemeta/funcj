@@ -6,9 +6,9 @@ import java.util.*;
 
 /**
  * A 3-tuple of values.
- * @param <A>       first value type
- * @param <B>       second value type
- * @param <C>       third value type
+ * @param <A>       the first value type
+ * @param <B>       the second value type
+ * @param <C>       the third value type
  */
 final public class Tuple3<A, B, C> {
     /**
@@ -23,7 +23,7 @@ final public class Tuple3<A, B, C> {
      * @throws NullPointerException if any of the tuple values is null
      */
     public static <A, B, C> Tuple3<A, B, C> of(A a, B b, C c) {
-        return new Tuple3<A, B, C>(a, b, c);
+        return new Tuple3<>(a, b, c);
     }
 
     /**
@@ -143,7 +143,7 @@ final public class Tuple3<A, B, C> {
      * and return the result.
      * @param f         the function
      * @param <T>       the function return type
-     * @return          the result of applying the function.
+     * @return          the result of applying the function
      */
     public <T> T apply(Functions.F3<? super A, ? super B, ? super C, ? extends T> f) {
         return f.apply(_1, _2, _3);

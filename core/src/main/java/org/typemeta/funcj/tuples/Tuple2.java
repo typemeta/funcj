@@ -20,7 +20,7 @@ final public class Tuple2<A, B> {
      * @throws NullPointerException if any of the tuple values is null
      */
     public static <A, B> Tuple2<A, B> of(A a, B b) {
-        return new Tuple2<A, B>(a, b);
+        return new Tuple2<>(a, b);
     }
 
     /**
@@ -106,7 +106,7 @@ final public class Tuple2<A, B> {
      * and return the result.
      * @param f         the function
      * @param <T>       the function return type
-     * @return          the result of applying the function.
+     * @return          the result of applying the function
      */
     public <T> T apply(F2<? super A, ? super B, ? extends T> f) {
         return f.apply(_1, _2);
