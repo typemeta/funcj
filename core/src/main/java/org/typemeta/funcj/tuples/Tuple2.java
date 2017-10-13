@@ -6,6 +6,8 @@ import java.util.*;
 
 /**
  * A 2-tuple of values.
+ * <p>
+ * Null values are not allowed.
  * @param <A>       the first value type
  * @param <B>       the second value type
  */
@@ -17,7 +19,7 @@ final public class Tuple2<A, B> {
      * @param <A>       the first value type
      * @param <B>       the second value type
      * @return          the new {@code Tuple2}
-     * @throws          NullPointerException if any of the tuple values is null
+     * @throws          NullPointerException if any of the tuple values are null
      */
     public static <A, B> Tuple2<A, B> of(A a, B b) {
         return new Tuple2<>(a, b);

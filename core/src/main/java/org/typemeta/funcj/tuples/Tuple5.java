@@ -6,6 +6,8 @@ import java.util.*;
 
 /**
  * A 5-tuple of values.
+ * <p>
+ * Null values are not allowed.
  * @param <A>       the first value type
  * @param <B>       the second value type
  * @param <C>       the third value type
@@ -26,7 +28,7 @@ final public class Tuple5<A, B, C, D, E> {
      * @param <D>       the fourth value type
      * @param <E>       the fifth value type
      * @return          the new {@code Tuple5}
-     * @throws          NullPointerException if any of the tuple values is null
+     * @throws          NullPointerException if any of the tuple values are null
      */
     public static <A, B, C, D, E> Tuple5<A, B, C, D, E> of(A a, B b, C c, D d, E e) {
         return new Tuple5<>(a, b, c, d, e);

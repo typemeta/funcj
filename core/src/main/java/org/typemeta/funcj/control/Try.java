@@ -17,6 +17,8 @@ import java.util.function.Consumer;
  * <p>
  * Try is biased towards the {@code Try.Success<T>}, meaning that map, apply and flatMap operate on the
  * {@code Success} value and bypass the {@code Failure} value.
+ * <p>
+ * Null values are not allowed.
  * @param <T>       the successful result type
  */
 public interface Try<T> {
@@ -26,6 +28,7 @@ public interface Try<T> {
      * @param value     the successful result to be wrapped
      * @param <T>       the successful result type
      * @return          a {@code Success} value
+     * @throws          NullPointerException if {@code value} is null
      */
     static <T> Try<T> success(T value) {
         return new Success<T>(value);
@@ -36,6 +39,7 @@ public interface Try<T> {
      * @param error     the error result
      * @param <T>       the successful result type
      * @return          a {@code Failure} value
+     * @throws          NullPointerException if {@code error} is null
      */
     static <T> Try<T> failure(Exception error) {
         return new Failure<T>(error);

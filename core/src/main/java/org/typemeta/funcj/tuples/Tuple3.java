@@ -6,6 +6,8 @@ import java.util.*;
 
 /**
  * A 3-tuple of values.
+ * <p>
+ * Null values are not allowed.
  * @param <A>       the first value type
  * @param <B>       the second value type
  * @param <C>       the third value type
@@ -20,7 +22,7 @@ final public class Tuple3<A, B, C> {
      * @param <B>       the second value type
      * @param <C>       the third value type
      * @return          the new {@code Tuple3}
-     * @throws          NullPointerException if any of the tuple values is null
+     * @throws          NullPointerException if any of the tuple values are null
      */
     public static <A, B, C> Tuple3<A, B, C> of(A a, B b, C c) {
         return new Tuple3<>(a, b, c);

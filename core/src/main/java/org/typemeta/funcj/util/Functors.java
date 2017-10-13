@@ -217,7 +217,7 @@ public abstract class Functors {
      * @return          the new {@code Map}
      */
     public static <K, V, W> Map<K, W> map(Functions.F2<K, V, W> f, Map<K, V> m) {
-        return Streams.of(m)
+        return Streams.tupleStream(m)
                 .map(t2 -> Tuple2.of(t2._1, t2.apply(f)))
                 .collect(toMap(Tuple2::get1, Tuple2::get2));
     }

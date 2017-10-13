@@ -17,6 +17,8 @@ import java.util.function.Consumer;
  * <p>
  * Either has right-bias, meaning that map, apply and flatMap operate on the
  * {@code Right} value and bypass the {@code Left} value.
+ * <p>
+ * Null values are not allowed.
  * @param <E>       the left-hand type (possibly an error type)
  * @param <S>       the right-hand type (possibly a success type)
  */
@@ -27,6 +29,7 @@ public interface Either<E, S> {
      * @param <E>       the left-hand type
      * @param <S>       the right-hand type
      * @return          a {@code Left} value
+     * @throws          NullPointerException if {@code value} is null
      */
     static <E, S> Either<E, S> left(E value) {
         return new Left<E, S>(value);
@@ -38,6 +41,7 @@ public interface Either<E, S> {
      * @param <E>       the left-hand type
      * @param <S>       the right-hand type
      * @return          a {@code Right} value
+     * @throws          NullPointerException if {@code value} is null
      */
     static <E, S> Either<E, S> right(S value) {
         return new Right<E, S>(value);

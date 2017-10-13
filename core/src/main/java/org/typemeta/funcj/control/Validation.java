@@ -14,6 +14,8 @@ import java.util.function.Consumer;
  * A {@code Validation<T>} value is either
  * the sub-type {@code Validation.Failure<T>} which wraps an list of errors, or
  * the sub-type {@code Validation.Success<T>} which wraps a value of type T.
+ * <p>
+ * Null values are not allowed.
  * @param <E>       the error type
  * @param <T>       the successful result type
  */
@@ -24,6 +26,7 @@ public interface Validation<E, T> {
      * @param <E>       the error type
      * @param <T>       the successful result type
      * @return          a success value
+     * @throws          NullPointerException if {@code result} is null
      */
     static <E, T> Validation<E, T> success(T result) {
         return new Success<E, T>(result);
@@ -35,6 +38,7 @@ public interface Validation<E, T> {
      * @param <E>       the error type
      * @param <T>       the successful result type
      * @return          a failure value
+     * @throws          NullPointerException if {@code errors} is null
      */
     static <E, T> Validation<E, T> failure(IList<E> errors) {
         return new Failure<E, T>(errors);
@@ -46,6 +50,7 @@ public interface Validation<E, T> {
      * @param <E>       the error type
      * @param <T>       the successful result type
      * @return          a failure value
+     * @throws          NullPointerException if {@code error} is null
      */
     static <E, T> Validation<E, T> failure(E error) {
         return new Failure<E, T>(IList.of(error));

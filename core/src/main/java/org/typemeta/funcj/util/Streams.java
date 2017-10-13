@@ -16,7 +16,7 @@ public abstract class Streams {
      * @param <V>       the map value type
      * @return          a stream of {@code Tuple2}s
      */
-    public static <K, V> Stream<Tuple2<K, V>> of(Map<K, V> m) {
+    public static <K, V> Stream<Tuple2<K, V>> tupleStream(Map<K, V> m) {
         return m.entrySet().stream().map(en -> Tuple2.of(en.getKey(), en.getValue()));
     }
 }
