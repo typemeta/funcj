@@ -27,10 +27,12 @@ public interface SymSet<I> {
         UNION
     }
 
+    @SuppressWarnings("unchecked")
     static <I> SymSet<I> empty() {
         return (SymSet<I>) Empty.INSTANCE;
     }
 
+    @SuppressWarnings("unchecked")
     static <I> SymSet<I> all() {
         return (SymSet<I>) All.INSTANCE;
     }

@@ -2,21 +2,59 @@ package org.typemeta.funcj.tuples;
 
 import org.typemeta.funcj.functions.Functions.*;
 
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A 2-tuple of values.
- * @param <A>       first value type
- * @param <B>       second value type
+ * @param <A>       the first value type
+ * @param <B>       the second value type
  */
 final public class Tuple2<A, B> {
-    public static <A, B> Tuple2<A, B> of(A _1, B _2) {
-        return new Tuple2<A, B>(_1, _2);
+    /**
+     * Static constructor
+     * @param a         the first value
+     * @param b         the second value
+     * @param <A>       the first value type
+     * @param <B>       the second value type
+     * @return          the new {@code Tuple2}
+     */
+    public static <A, B> Tuple2<A, B> of(A a, B b) {
+        return new Tuple2<A, B>(a, b);
     }
 
+    /**
+     * Return a {@link Comparator} which can be used for {@code Tuple2},
+     * when both type parameters implement {@link Comparable}.
+     * @param <A>       the first value type
+     * @param <B>       the second value type
+     * @return          a {@link Comparator} which can be used for {@code Tuple2} values
+     */
+    public static <A extends Comparable<A>, B extends Comparable<B>> Comparator<Tuple2<A, B>> comparator() {
+        return (lhs, rhs) -> {
+            final int cmp1 = lhs._1.compareTo(rhs._1);
+            if (cmp1 != 0) {
+                return cmp1;
+            } else {
+                return lhs._2.compareTo(rhs._2);
+            }
+        };
+    }
+
+    /**
+     * The first value type
+     */
     public final A _1;
+
+    /**
+     * The second value type
+     */
     public final B _2;
 
+    /**
+     * Constructor.
+     * @param a         the first value
+     * @param b         the second value
+     */
     public Tuple2(A a, B b) {
         _1 = Objects.requireNonNull(a);
         _2 = Objects.requireNonNull(b);

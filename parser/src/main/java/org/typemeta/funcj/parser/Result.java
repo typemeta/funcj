@@ -143,6 +143,7 @@ public interface Result<I, A> {
             return Objects.hash(input);
         }
 
+        @SuppressWarnings("unchecked")
         public <T> Failure<I, T> cast() {
             return (Failure<I, T>) this;
         }
@@ -208,6 +209,7 @@ public interface Result<I, A> {
             return Objects.hash(super.hashCode(), expected);
         }
 
+        @SuppressWarnings("unchecked")
         public <T> Failure<I, T> cast() {
             return (Failure<I, T>) this;
         }
@@ -280,6 +282,7 @@ public interface Result<I, A> {
             return Objects.hash(super.hashCode(), error);
         }
 
+        @SuppressWarnings("unchecked")
         public <T> Failure<I, T> cast() {
             return (Failure<I, T>) this;
         }

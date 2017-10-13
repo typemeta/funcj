@@ -17,7 +17,7 @@ import java.util.Objects;
  */
 public class Ref<I, A> implements Parser<I, A> {
 
-    private enum Uninitialised implements Parser<Unit, Unit> {
+    private enum Uninitialised implements Parser<Object, Object> {
         INSTANCE {
             @Override
             public Lazy<Boolean> acceptsEmpty() {
@@ -25,15 +25,16 @@ public class Ref<I, A> implements Parser<I, A> {
             }
 
             @Override
-            public Lazy<SymSet<Unit>> firstSet() {
+            public Lazy<SymSet<Object>> firstSet() {
                 throw new RuntimeException("Uninitialised lazy Parser reference");
             }
 
-            public Result<Unit, Unit> parse(Input<Unit> in, SymSet<Unit> follow) {
+            public Result<Object, Object> parse(Input<Object> in, SymSet<Object> follow) {
                 throw new RuntimeException("Uninitialised lazy Parser reference");
             }
         };
 
+        @SuppressWarnings("unchecked")
         static <I, A> Parser<I, A> of() {
             return (Parser<I, A>) INSTANCE;
         }
