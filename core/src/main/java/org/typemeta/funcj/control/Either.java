@@ -335,6 +335,7 @@ public interface Either<E, S> {
             return right.apply(this);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public <T> Either<T, S> mapLeft(F<? super E, ? extends T> f) {
             return (Either<T, S>) this;
