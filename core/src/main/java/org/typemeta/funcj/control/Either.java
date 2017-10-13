@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  * <p>
  * A value of {@code Either<A, B>} is either
  * the sub-type {@code Either.Left<A, B>} which wraps a value of type A, or
- * the sub-type {@code Either.Right<A, B>} which wraps a value of type A.
+ * the sub-type {@code Either.Right<A, B>} which wraps a value of type B.
  * <p>
  * Either has right-bias, meaning that map, apply and flatMap operate on the
  * {@code Right} value and bypass the {@code Left} value.
