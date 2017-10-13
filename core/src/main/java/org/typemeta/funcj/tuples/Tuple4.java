@@ -13,7 +13,7 @@ import java.util.*;
  */
 final public class Tuple4<A, B, C, D> {
     /**
-     * Static constructor
+     * Create a new {@code Tuple4} comprised of the supplied values
      * @param a         the first value
      * @param b         the second value
      * @param c         the third value
@@ -23,6 +23,7 @@ final public class Tuple4<A, B, C, D> {
      * @param <C>       the third value type
      * @param <D>       the fourth value type
      * @return          the new {@code Tuple4}
+     * @throws NullPointerException if any of the tuple values is null
      */
     public static <A, B, C, D> Tuple4<A, B, C, D> of(A a, B b, C c, D d) {
         return new Tuple4<A, B, C, D>(a, b, c, d);
@@ -83,11 +84,12 @@ final public class Tuple4<A, B, C, D> {
     public final D _4;
 
     /**
-     * Constructor.
+     * Create a new {@code Tuple4} comprised of the supplied values
      * @param a         the first value
      * @param b         the second value
      * @param c         the third value
      * @param d         the fourth value
+     * @throws NullPointerException if any of the tuple values is null
      */
     public Tuple4(A a, B b, C c, D d) {
         _1 = Objects.requireNonNull(a);
@@ -129,33 +131,33 @@ final public class Tuple4<A, B, C, D> {
     }
 
     /**
-     * Return a new {@code Tuple3} which is a copy of this one,
+     * Return a new {@code Tuple4} which is a copy of this one,
      * but with the first value replaced with the supplied argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
-     * @return          the new {@code Tuple3}
+     * @return          the new {@code Tuple4}
      */
     public <T> Tuple4<T, B, C, D> with1(T t) {
         return Tuple4.of(t, _2, _3, _4);
     }
 
     /**
-     * Return a new {@code Tuple3} which is a copy of this one,
+     * Return a new {@code Tuple4} which is a copy of this one,
      * but with the second value replaced with the supplied argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
-     * @return          the new {@code Tuple3}
+     * @return          the new {@code Tuple4}
      */
     public <T> Tuple4<A, T, C, D> with2(T t) {
         return Tuple4.of(_1, t, _3, _4);
     }
 
     /**
-     * Return a new {@code Tuple3} which is a copy of this one,
+     * Return a new {@code Tuple4} which is a copy of this one,
      * but with the third value replaced with the supplied argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
-     * @return          the new {@code Tuple3}
+     * @return          the new {@code Tuple4}
      */
     public <T> Tuple4<A, B, T, D> with3(T t) {
         return Tuple4.of(_1, _2, t, _4);

@@ -11,12 +11,13 @@ import java.util.*;
  */
 final public class Tuple2<A, B> {
     /**
-     * Static constructor
+     * Create a new {@code Tuple2} comprised of the supplied values.
      * @param a         the first value
      * @param b         the second value
      * @param <A>       the first value type
      * @param <B>       the second value type
      * @return          the new {@code Tuple2}
+     * @throws NullPointerException if any of the tuple values is null
      */
     public static <A, B> Tuple2<A, B> of(A a, B b) {
         return new Tuple2<A, B>(a, b);
@@ -51,9 +52,10 @@ final public class Tuple2<A, B> {
     public final B _2;
 
     /**
-     * Constructor.
+     * Create a new {@code Tuple2} comprised of the supplied values.
      * @param a         the first value
      * @param b         the second value
+     * @throws NullPointerException if any of the tuple values is null
      */
     public Tuple2(A a, B b) {
         _1 = Objects.requireNonNull(a);
