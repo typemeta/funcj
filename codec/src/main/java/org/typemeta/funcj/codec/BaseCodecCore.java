@@ -24,7 +24,6 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
      * the primary populator of the registry is this {@code CodecCore} implementation.
      * As and when new classes are encountered, they are inspected via Reflection,
      * and a {@code Codec} is constructed and registered.
-     * To support thread-safe use of this class, this field is a {@code ConcurrentHashMap}.
      */
     protected final ConcurrentMap<String, Codec<?, E>> codecRegistry = new ConcurrentHashMap<>();
 
@@ -34,7 +33,6 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
      * the primary populator of the registry is this {@code CodecCore} implementation.
      * As and when new classes are encountered, they are inspected via Reflection,
      * and a {@code TypeConstructor} is constructed and registered.
-     * To support thread-safe use of this class, this field is a {@code ConcurrentHashMap}.
      */
     protected final ConcurrentMap<String, TypeConstructor<?>> typeCtorRegistry = new ConcurrentHashMap<>();
 
@@ -53,7 +51,9 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
 
     @Override
     public <T> void registerCodec(String name, Codec<T, E> codec) {
-        codecRegistry.put(name, codec);
+        synchronized (codecRegistry) {
+            codecRegistry.put(name, codec);
+        }
     }
 
     @Override
@@ -239,10 +239,46 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         return makeNullSafeCodec(getNullUnsafeCodec(type));
     }
 
+    /**
+     * Lookup a {@code Codec} for a name, and, if one doesn't exist,
+     * then use the {@code codecSupp} to create a new one.
+     * <p>
+     * This is slightly tricky as it needs to be re-entrant in case the
+     * type in question is recursive.
+     * I.e. {@code codecSupp}, when invoked, may call this method again for the same type.
+     * @param name      the type name
+     * @param codecSupp a supplier of the {@code Codec} value
+     * @param <T>       the raw type to be encoded/decoded
+     * @return          the {@code Codec} for the specified name
+     */
+    protected <T> Codec<T, E> getCodec(String name, Functions.F0<Codec<T, E>> codecSupp) {
+        // First attempt, without locking.
+        if (codecRegistry.containsKey(name)) {
+            return (Codec<T, E>)codecRegistry.get(name);
+        } else {
+            final CodecRef<T, E> codecRef;
+            // Lock and try again.
+            synchronized(codecRegistry) {
+                if (codecRegistry.containsKey(name)) {
+                    return (Codec<T, E>) codecRegistry.get(name);
+                } else {
+                    // Ok, it's definitely not there, so add a CodecRef.
+                    codecRef = new CodecRef<T, E>();
+                    codecRegistry.put(name, codecRef);
+                }
+            }
+
+            // Initialise the CodecRef, and overwrite the registry entry with the real Codec.
+            codecRegistry.put(name, codecRef.setIfUninitialised(codecSupp));
+
+            return (Codec<T, E>)codecRegistry.get(name);
+        }
+    }
+
     public <T> Codec<T, E> getNullUnsafeCodec(Class<T> type) {
         final Class<T> type2 = remapType(type);
         final String name = classToName(type2);
-        return (Codec<T, E>) codecRegistry.computeIfAbsent(name, n -> getNullUnsafeCodecImplDyn(type2));
+        return getCodec(name, () -> getNullUnsafeCodecImplDyn(type2));
     }
 
     public <T> Codec<T, E> getNullUnsafeCodecImplDyn(Class<T> dynType) {
@@ -259,7 +295,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         if (codec == null) {
             if (Modifier.isFinal(stcType.getModifiers())) {
                 final String name = classToName(stcType);
-                return (Codec<T, E>) codecRegistry.computeIfAbsent(name, n -> createObjectCodec(stcType));
+                return getCodec(name, () -> createObjectCodec(stcType));
             } else {
                 return dynamicCodec(stcType);
             }

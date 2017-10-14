@@ -728,7 +728,7 @@ public abstract class TestTypes {
         }
     }
 
-    public static class Recursive {
+    public static final class Recursive {
         private final Recursive next;
         private final int id;
 

@@ -19,20 +19,25 @@ public class Ref<I, A> implements Parser<I, A> {
 
     private enum Uninitialised implements Parser<Object, Object> {
         INSTANCE {
+
             @Override
             public Lazy<Boolean> acceptsEmpty() {
-                throw new RuntimeException("Uninitialised lazy Parser reference");
+                throw error();
             }
 
             @Override
             public Lazy<SymSet<Object>> firstSet() {
-                throw new RuntimeException("Uninitialised lazy Parser reference");
+                throw error();
             }
 
             public Result<Object, Object> parse(Input<Object> in, SymSet<Object> follow) {
-                throw new RuntimeException("Uninitialised lazy Parser reference");
+                throw error();
             }
         };
+
+        private static RuntimeException error() {
+            return new RuntimeException("Uninitialised lazy Parser reference");
+        }
 
         @SuppressWarnings("unchecked")
         static <I, A> Parser<I, A> of() {
