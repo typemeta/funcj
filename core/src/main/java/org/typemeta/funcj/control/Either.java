@@ -7,6 +7,7 @@ import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Tagged union type over two types.
@@ -62,6 +63,8 @@ public interface Either<E, S> {
 
     /**
      * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(ls.map(f))</pre>.
      * @param ls        the list of values
      * @param f         the function to be applied to each value in the list
      * @param <E>       the left-hand, error type of the {@code Either} returned by the function
@@ -77,27 +80,10 @@ public interface Either<E, S> {
     }
 
     /**
-     * Standard applicative traversal.
-     * @param ls        the list of values
-     * @param f         the function to be applied to each value in the list
-     * @param <E>       the left-hand, error type of the {@code Either} returned by the function
-     * @param <S>       the type of list elements
-     * @param <T>       the right-hand, success type of the {@code Either} returned by the function
-     * @return          a {@code Either} which wraps an {@link IList} of values
-     */
-    static <E, S, T> Either<E, List<T>> traverse(List<S> ls, F<S, Either<E, T>> f) {
-        return Folds.foldRight(
-                (s, elt) -> f.apply(s).apply(elt.map(lt -> t -> {lt.add(t); return lt;})),
-                right(new ArrayList<>()),
-                ls
-        );
-    }
-
-    /**
      * Standard applicative sequencing.
      * @param les       the list of {@code Try} values
      * @param <E>       the left-hand, error type
-     * @param <S>       the right-hand, success type
+     * @param <S>       the right-hand, success type of the {@code Either}s in the list
      * @return          a {@code Try} which wraps an {@link IList} of values
      */
     static <E, S> Either<E, IList<S>> sequence(IList<Either<E, S>> les) {
@@ -108,18 +94,20 @@ public interface Either<E, S> {
     }
 
     /**
-     * Standard applicative sequencing.
-     * @param les       the list of {@code Try} values
-     * @param <E>       the left-hand, error type
-     * @param <S>       the right-hand, success type
-     * @return          a {@code Try} which wraps an {@link IList} of values
+     * Variation of {@link Either#sequence(IList)} for {@link Stream}.
+     * @param set       the stream of {@code Either} values
+     * @param <E>       the error type
+     * @param <T>       the right-hand, success type of the {@code Either}s in the stream
+     * @return          a {@code Either} which wraps an {@link Stream} of values
      */
-    static <E, S> Either<E, List<S>> sequence(List<Either<E, S>> les) {
-        return Folds.foldRight(
-                (es, els) -> es.apply(els.map(ls -> s -> {ls.add(s); return ls;})),
-                right(new ArrayList<>()),
-                les
-        );
+    static <E, T> Either<E, Stream<T>> sequence(Stream<Either<E, T>> set) {
+        final Iterator<Either<E, T>> iter = set.iterator();
+        Either<E, IList<T>> elt = right(IList.nil());
+        while (iter.hasNext()) {
+            final Either<E, T> et = iter.next();
+            elt = et.apply(elt.map(lt -> lt::add));
+        }
+        return elt.map(IList::stream);
     }
 
     /**

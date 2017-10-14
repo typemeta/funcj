@@ -4,6 +4,9 @@ import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
 
+import java.util.Iterator;
+import java.util.stream.Stream;
+
 import static org.typemeta.funcj.control.Trampoline.*;
 import static org.typemeta.funcj.data.Unit.UNIT;
 
@@ -93,6 +96,8 @@ public interface State<S, A> {
 
     /**
      * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
      * @param lt        list of values
      * @param f         function to be applied to each value in the list
      * @param <S>       the state type
@@ -109,9 +114,12 @@ public interface State<S, A> {
 
     /**
      * Standard applicative sequencing.
+     * <p>
+     * Translate a {@link IList} of {@code State} into a {@code State} of an {@code IList},
+     * by composing each consecutive {@code State} using the {@link State#apply(State)} method.
      * @param lsa       the list of {@code State} values
      * @param <S>       the state type
-     * @param <A>       the state result type
+     * @param <A>       the result type of the {@code State}s in the list
      * @return          a {@code State} which wraps an {@link IList} of values
      */
     static <S, A> State<S, IList<A>> sequence(IList<? extends State<S, A>> lsa) {
@@ -119,6 +127,23 @@ public interface State<S, A> {
             (sa, sla) -> sa.apply(sla.map(l -> l::add)),
             pure(IList.nil())
         );
+    }
+
+    /**
+     * Variation of {@link State#sequence(IList)} for {@link Stream}.
+     * @param sst       the stream of {@code State} values
+     * @param <S>       the state type
+     * @param <T>       the result type of the {@code State}s in the stream
+     * @return          a {@code State} which wraps an {@link Stream} of values
+     */
+    static <S, T> State<S, Stream<T>> sequence(Stream<State<S, T>> sst) {
+        final Iterator<State<S, T>> iter = sst.iterator();
+        State<S, IList<T>> slt = pure(IList.nil());
+        while (iter.hasNext()) {
+            final State<S, T> st = iter.next();
+            slt = st.apply(slt.map(lt -> lt::add));
+        }
+        return slt.map(IList::stream);
     }
 
     /**

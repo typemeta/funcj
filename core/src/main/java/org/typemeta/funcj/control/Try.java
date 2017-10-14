@@ -7,6 +7,7 @@ import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Union type of a successful result and an exception.
@@ -73,6 +74,8 @@ public interface Try<T> {
 
     /**
      * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
      * @param lt        the list of values
      * @param f         the function to be applied to each value in the list
      * @param <T>       the type of list elements
@@ -87,25 +90,12 @@ public interface Try<T> {
     }
 
     /**
-     * Standard applicative traversal.
-     * @param lt        the list of values
-     * @param f         the function to be applied to each value in the list
-     * @param <T>       the type of list elements
-     * @param <U>       the type wrapped by the {@code Try} returned by the function
-     * @return          a {@code Try} which wraps an {@link IList} of values
-     */
-    static <T, U> Try<List<U>> traverse(List<T> lt, F<T, Try<U>> f) {
-        return Folds.foldRight(
-                (t, tlt) -> f.apply(t).apply(tlt.map(lu -> u -> {lu.add(u); return lu;})),
-                success(new ArrayList<>()),
-                lt
-        );
-    }
-
-    /**
      * Standard applicative sequencing.
+     * <p>
+     * Translate a {@link IList} of {@code Try} into a {@code Try} of an {@code IList},
+     * by composing each consecutive {@code Try} using the {@link Try#apply(Try)} method.
      * @param ltt       the list of {@code Try} values
-     * @param <T>       the type of list elements
+     * @param <T>       the value type of the {@code Try}s in the list
      * @return          a {@code Try} which wraps an {@link IList} of values
      */
     static <T> Try<IList<T>> sequence(IList<Try<T>> ltt) {
@@ -113,6 +103,22 @@ public interface Try<T> {
             (tt, tlt) -> tt.apply(tlt.map(lt -> lt::add)),
             success(IList.nil())
         );
+    }
+
+    /**
+     * Variation of {@link Try#sequence(IList)} for {@link Stream}.
+     * @param stt       the stream of {@code Try} values
+     * @param <T>       the value type of the {@code Try}s in the stream
+     * @return          a {@code Try} which wraps an {@link Stream} of values
+     */
+    static <T> Try<Stream<T>> sequence(Stream<Try<T>> stt) {
+        final Iterator<Try<T>> iter = stt.iterator();
+        Try<IList<T>> tlt = success(IList.nil());
+        while (iter.hasNext()) {
+            final Try<T> tt = iter.next();
+            tlt = tt.apply(tlt.map(lt -> lt::add));
+        }
+        return tlt.map(IList::stream);
     }
 
     /**

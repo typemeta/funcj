@@ -7,6 +7,7 @@ import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Union type of a successfult result and a list of errors.
@@ -90,6 +91,8 @@ public interface Validation<E, T> {
 
     /**
      * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
      * @param lt        the list of values
      * @param f         the function to be applied to each value in the list
      * @param <E>       the error type
@@ -105,27 +108,13 @@ public interface Validation<E, T> {
     }
 
     /**
-     * Standard applicative traversal.
-     * @param lt        the list of values
-     * @param f         the function to be applied to each value in the list
-     * @param <E>       the error type
-     * @param <T>       the type of list elements
-     * @param <U>       the type wrapped by the {@code Try} returned by the function
-     * @return          a {@code Validation} which wraps an {@link IList} of values
-     */
-    static <E, T, U> Validation<E, List<U>> traverse(List<T> lt, F<T, Validation<E, U>> f) {
-        return Folds.foldRight(
-                (t, vlu) -> f.apply(t).apply(vlu.map(lu -> u -> {lu.add(u); return lu;})),
-                success(new ArrayList<>()),
-                lt
-        );
-    }
-
-    /**
      * Standard applicative sequencing.
+     * <p>
+     * Translate a {@link IList} of {@code Validation} into a {@code Validation} of an {@code IList},
+     * by composing each consecutive {@code Validation} using the {@link Validation#apply(Validation)} method.
      * @param lvt       the list of {@code Validation} values
      * @param <E>       the error type
-     * @param <T>       the type of list elements
+     * @param <T>       the value type of the {@code Validation}s in the list
      * @return          a {@code Validation} which wraps an {@link IList} of values
      */
     static <E, T> Validation<E, IList<T>> sequence(IList<Validation<E, T>> lvt) {
@@ -136,18 +125,20 @@ public interface Validation<E, T> {
     }
 
     /**
-     * Standard applicative sequencing.
-     * @param lvt       the list of {@code Validation} values
+     * Variation of {@link Validation#sequence(IList)} for {@link Stream}.
+     * @param svt       the stream of {@code Validation} values
      * @param <E>       the error type
-     * @param <T>       the type of list elements
-     * @return          a {@code Validation} which wraps an {@link IList} of values
+     * @param <T>       the value type of the {@code Validation}s in the stream
+     * @return          a {@code Validation} which wraps an {@link Stream} of values
      */
-    static <E, T> Validation<E, List<T>> sequence(List<Validation<E, T>> lvt) {
-        return Folds.foldRight(
-                (vt, vlt) -> vt.apply(vlt.map(lu -> u -> {lu.add(u); return lu;})),
-                success(new ArrayList<>()),
-                lvt
-        );
+    static <E, T> Validation<E, Stream<T>> sequence(Stream<Validation<E, T>> svt) {
+        final Iterator<Validation<E, T>> iter = svt.iterator();
+        Validation<E, IList<T>> vlt = success(IList.nil());
+        while (iter.hasNext()) {
+            final Validation<E, T> vt = iter.next();
+            vlt = vt.apply(vlt.map(lt -> lt::add));
+        }
+        return vlt.map(IList::stream);
     }
 
     /**
