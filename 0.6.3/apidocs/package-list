@@ -1,0 +1,12 @@
+org.typemeta.funcj.codec
+org.typemeta.funcj.codec.json
+org.typemeta.funcj.codec.utils
+org.typemeta.funcj.codec.xml
+org.typemeta.funcj.control
+org.typemeta.funcj.data
+org.typemeta.funcj.document
+org.typemeta.funcj.functions
+org.typemeta.funcj.json
+org.typemeta.funcj.parser
+org.typemeta.funcj.tuples
+org.typemeta.funcj.util
