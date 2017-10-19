@@ -147,6 +147,56 @@ public interface State<S, A> {
     }
 
     /**
+     * Kleisli models composable operations that return a {@code State}.
+     * @param <S>       the state type
+     * @param <A>       the input type
+     * @param <B>       the value type of the returned @{code State} type
+     */
+    @FunctionalInterface
+    interface Kleisli<S, A, B> {
+        /**
+         * Construct a {@code Kleisli} value from a function.
+         * @param f         the function
+         * @param <S>       the state type
+         * @param <T>       the input type
+         * @param <U>       the value type of the returned @{code State} value
+         * @return          the new {@code Kleisli}
+         */
+        static <S, T, U> Kleisli<S, T, U> of(F<T, State<S, U>> f) {
+            return f::apply;
+        }
+
+        /**
+         * Run this {@code Kleisli} operation
+         * @param a         the input value
+         * @return          the result of the operation
+         */
+        State<S, B> run(A a);
+
+        /**
+         * Compose this {@code Kleisli} with another by applying this one first,
+         * then the other.
+         * @param kUV       the {@code Kleisli} to be applied after this one
+         * @param <V>       the second {@code Kleisli}'s return type
+         * @return          the composed {@code Kleisli}
+         */
+        default <V> Kleisli<S, A, V> andThen(Kleisli<S, B, V> kUV) {
+            return a -> run(a).flatMap(kUV::run);
+        }
+
+        /**
+         * Compose this {@code Kleisli} with another by applying the other one first,
+         * and then this one.
+         * @param kST       the {@code Kleisli} to be applied after this one
+         * @param <C>       the first {@code Kleisli}'s input type
+         * @return          the composed {@code Kleisli}
+         */
+        default <C> Kleisli<S, C, B> compose(Kleisli<S, C, A> kST) {
+            return s -> kST.run(s).flatMap(this::run);
+        }
+    }
+
+    /**
      * The state processor.
      * <p>
      * This the SAM that implementations implement, typically via a lambda,

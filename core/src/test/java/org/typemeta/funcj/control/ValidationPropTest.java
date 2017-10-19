@@ -3,6 +3,8 @@ package org.typemeta.funcj.control;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.runner.RunWith;
+import org.typemeta.funcj.control.Validation.Kleisli;
+import org.typemeta.funcj.data.Unit;
 
 import static org.junit.Assert.*;
 
@@ -58,5 +60,36 @@ public class ValidationPropTest {
         assertEquals(failure(cs), Validation.success(c).flatMap(d -> failure(cs)));
         assertEquals(failure(cs), failure(cs).flatMap(d -> Validation.success(e)));
         assertEquals(failure(cs), failure(cs).flatMap(d -> failure("error")));
+    }
+
+    static class Utils {
+        private static Validation<Unit, Integer> parse(String s) {
+            try {
+                return Validation.success(Integer.parseInt(s));
+            } catch (NumberFormatException ex) {
+                return Validation.failure(Unit.UNIT);
+            }
+        }
+
+        private static Validation<Unit, Double> sqrt(int d) {
+            final double x = Math.sqrt(d);
+            if (Double.isNaN(x)) {
+                return Validation.failure(Unit.UNIT);
+            } else {
+                return Validation.success(x);
+            }
+        }
+    }
+
+    @Property
+    public void kleisli(int i) {
+        final String s = Integer.toString(i);
+        final Kleisli<Unit, String, Double> tk = Kleisli.of(Utils::parse).andThen(Utils::sqrt);
+        final Validation<Unit, Double> td = tk.run(s);
+        final Validation<Unit, Double> expected =
+                (i >= 0) ?
+                        Validation.success(Math.sqrt(i)) :
+                        Validation.failure(Unit.UNIT);
+        assertEquals(expected, td);
     }
 }

@@ -4,6 +4,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
+import org.typemeta.funcj.control.Try.Kleisli;
 
 import static org.junit.Assert.*;
 
@@ -59,5 +60,31 @@ public class TryPropTest {
         Assert.assertEquals(failure(cs), Try.success(c).flatMap(d -> failure(cs)));
         Assert.assertEquals(failure(cs), failure(cs).flatMap(d -> Try.success(e)));
         Assert.assertEquals(failure(cs), failure(cs).flatMap(d -> failure("error")));
+    }
+
+    static class Utils {
+        private static Try<Integer> parse(String s) {
+            return Try.of(() -> Integer.parseInt(s));
+        }
+
+        private static Try<Double> sqrt(int d) {
+            final double x = Math.sqrt(d);
+            if (Double.isNaN(x)) {
+                return Try.failure(new RuntimeException("NaN"));
+            } else {
+                return Try.success(x);
+            }
+        }
+    }
+
+    @Property
+    public void kleisli(int i) {
+        final String s = Integer.toString(i);
+        final Kleisli<String, Double> tk = Kleisli.of(Utils::parse).andThen(Utils::sqrt);
+        final Try<Double> td = tk.run(s);
+        final Try<Double> expected = (i >= 0) ?
+            Try.success(Math.sqrt(i)) :
+            Try.failure(new RuntimeException("NaN"));
+        assertEquals(expected, td);
     }
 }

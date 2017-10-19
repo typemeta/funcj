@@ -3,6 +3,8 @@ package org.typemeta.funcj.control;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.runner.RunWith;
+import org.typemeta.funcj.control.Either.Kleisli;
+import org.typemeta.funcj.data.Unit;
 
 import static org.junit.Assert.*;
 
@@ -60,5 +62,35 @@ public class EitherPropTest {
         assertEquals(Either.left(cs), Either.right(c).flatMap(d -> Either.left(cs)));
         assertEquals(Either.left(cs), Either.left(cs).flatMap(d -> Either.right(e)));
         assertEquals(Either.left(cs), Either.left(cs).flatMap(d -> Either.left("error")));
+    }
+
+    static class Utils {
+        private static Either<Unit, Integer> parse(String s) {
+            try {
+                return Either.right(Integer.parseInt(s));
+            } catch (NumberFormatException ex) {
+                return Either.left(Unit.UNIT);
+            }
+        }
+
+        private static Either<Unit, Double> sqrt(int d) {
+            final double x = Math.sqrt(d);
+            if (Double.isNaN(x)) {
+                return Either.left(Unit.UNIT);
+            } else {
+                return Either.right(x);
+            }
+        }
+    }
+
+    @Property
+    public void kleisli(int i) {
+        final String s = Integer.toString(i);
+        final Kleisli<Unit, String, Double> tk = Kleisli.of(Utils::parse).andThen(Utils::sqrt);
+        final Either<Unit, Double> td = tk.run(s);
+        final Either<Unit, Double> expected = (i >= 0) ?
+                Either.right(Math.sqrt(i)) :
+                Either.left(Unit.UNIT);
+        assertEquals(expected, td);
     }
 }

@@ -3,7 +3,6 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.functions.FunctionsEx;
-import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -122,20 +121,6 @@ public interface Try<T> {
     }
 
     /**
-     * Standard applicative sequencing.
-     * @param ltt       the list of {@code Try} values
-     * @param <T>       the type of list elements
-     * @return          a {@code Try} which wraps an {@link IList} of values
-     */
-    static <T> Try<List<T>> sequence(List<Try<T>> ltt) {
-        return Folds.foldRight(
-                (tt, tlt) -> tt.apply(tlt.map(lt -> t -> {lt.add(t); return lt;})),
-                success(new ArrayList<>()),
-                ltt
-        );
-    }
-
-    /**
      * Indicates if this is a {code Success} value.
      * @return          true if this value is a {code Success} value
      */
@@ -233,6 +218,54 @@ public interface Try<T> {
      */
     default <U> ApplyBuilder._2<T, U> and(Try<U> tb) {
         return new ApplyBuilder._2<T, U>(this, tb);
+    }
+
+    /**
+     * Kleisli models composable operations that return a {@code Try}.
+     * @param <T>       the input type
+     * @param <U>       the value type of the returned {@code Try} type
+     */
+    @FunctionalInterface
+    interface Kleisli<T, U> {
+        /**
+         * Construct a {@code Kleisli} value from a function.
+         * @param f         the function
+         * @param <T>       the input type
+         * @param <U>       the value type of the returned {@code Try} value
+         * @return          the new {@code Kleisli}
+         */
+        static <T, U> Kleisli<T, U> of(F<T, Try<U>> f) {
+            return f::apply;
+        }
+
+        /**
+         * Run this {@code Kleisli} operation
+         * @param t         the input value
+         * @return          the result of the operation
+         */
+        Try<U> run(T t);
+
+        /**
+         * Compose this {@code Kleisli} with another by applying this one first,
+         * then the other.
+         * @param kUV       the {@code Kleisli} to be applied after this one
+         * @param <V>       the second {@code Kleisli}'s return type
+         * @return          the composed {@code Kleisli}
+         */
+        default <V> Kleisli<T, V> andThen(Kleisli<U, V> kUV) {
+            return t -> run(t).flatMap(kUV::run);
+        }
+
+        /**
+         * Compose this {@code Kleisli} with another by applying the other one first,
+         * and then this one.
+         * @param kST       the {@code Kleisli} to be applied after this one
+         * @param <S>       the first {@code Kleisli}'s input type
+         * @return          the composed {@code Kleisli}
+         */
+        default <S> Kleisli<S, U> compose(Kleisli<S, T> kST) {
+            return s -> kST.run(s).flatMap(this::run);
+        }
     }
 
     /**

@@ -6,7 +6,7 @@ import org.typemeta.funcj.data.IList;
 
 public class RNGTest {
 
-    private static final int N = 1000;
+    private static final int N = 10000;
 
     private static State<RNG, String> randomStr() {
         return
@@ -37,8 +37,8 @@ public class RNGTest {
         final double m = result.foldLeft((x, y) -> x + y, 0.0) / N;
         final double sd = Math.sqrt(result.map(x -> (x-m)*(x-m)).foldLeft(Double::sum, 0.0) / N);
 
-        Assert.assertEquals("Mean", 0.5, m, 0.05);
-        Assert.assertEquals("Standard deviation", 1.0/Math.sqrt(12.0), sd, 0.05);
+        Assert.assertEquals("Mean", 0.5, m, 0.01);
+        Assert.assertEquals("Standard deviation", 1.0/Math.sqrt(12.0), sd, 0.01);
     }
 
     private static <T> IList<T> generate(T value, int n) {

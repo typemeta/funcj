@@ -3,7 +3,6 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -52,8 +51,8 @@ public interface Either<E, S> {
      * Applicative function application.
      * @param ef        the function wrapped in a {@code Either}
      * @param eb        the function argument wrapped in a {@code Either}
-     * @param <E>       the left-hand, error type
-     * @param <S>       the right-hand, success type
+     * @param <E>       the left-hand type
+     * @param <S>       the right-hand type
      * @param <T>       the function return type
      * @return          the result of applying the function to the argument, wrapped in a {@code Either}
      */
@@ -67,9 +66,9 @@ public interface Either<E, S> {
      * Equivalent to <pre>sequence(ls.map(f))</pre>.
      * @param ls        the list of values
      * @param f         the function to be applied to each value in the list
-     * @param <E>       the left-hand, error type of the {@code Either} returned by the function
+     * @param <E>       the left-hand type of the {@code Either} returned by the function
      * @param <S>       the type of list elements
-     * @param <T>       the right-hand, success type of the {@code Either} returned by the function
+     * @param <T>       the right-hand type of the {@code Either} returned by the function
      * @return          a {@code Either} which wraps an {@link IList} of values
      */
     static <E, S, T> Either<E, IList<T>> traverse(IList<S> ls, F<S, Either<E, T>> f) {
@@ -82,8 +81,8 @@ public interface Either<E, S> {
     /**
      * Standard applicative sequencing.
      * @param les       the list of {@code Try} values
-     * @param <E>       the left-hand, error type
-     * @param <S>       the right-hand, success type of the {@code Either}s in the list
+     * @param <E>       the left-hand type
+     * @param <S>       the right-hand type of the {@code Either}s in the list
      * @return          a {@code Try} which wraps an {@link IList} of values
      */
     static <E, S> Either<E, IList<S>> sequence(IList<Either<E, S>> les) {
@@ -96,8 +95,8 @@ public interface Either<E, S> {
     /**
      * Variation of {@link Either#sequence(IList)} for {@link Stream}.
      * @param set       the stream of {@code Either} values
-     * @param <E>       the error type
-     * @param <T>       the right-hand, success type of the {@code Either}s in the stream
+     * @param <E>       the left-hand type
+     * @param <T>       the right-hand type of the {@code Either}s in the stream
      * @return          a {@code Either} which wraps an {@link Stream} of values
      */
     static <E, T> Either<E, Stream<T>> sequence(Stream<Either<E, T>> set) {
@@ -108,6 +107,56 @@ public interface Either<E, S> {
             elt = et.apply(elt.map(lt -> lt::add));
         }
         return elt.map(IList::stream);
+    }
+
+    /**
+     * Kleisli models composable operations that return a {@code Either}.
+     * @param <E>       the left-hand type
+     * @param <T>       the input type
+     * @param <U>       the value type of the returned {@code Either} type
+     */
+    @FunctionalInterface
+    interface Kleisli<E, T, U> {
+        /**
+         * Construct a {@code Kleisli} value from a function.
+         * @param f         the function
+         * @param <E>       the left-hand type
+         * @param <T>       the input type
+         * @param <U>       the value type of the returned {@code Either} value
+         * @return          the new {@code Kleisli}
+         */
+        static <E, T, U> Kleisli<E, T, U> of(F<T, Either<E, U>> f) {
+            return f::apply;
+        }
+
+        /**
+         * Run this {@code Kleisli} operation
+         * @param t         the input value
+         * @return          the result of the operation
+         */
+        Either<E, U> run(T t);
+
+        /**
+         * Compose this {@code Kleisli} with another by applying this one first,
+         * then the other.
+         * @param kUV       the {@code Kleisli} to be applied after this one
+         * @param <V>       the second {@code Kleisli}'s return type
+         * @return          the composed {@code Kleisli}
+         */
+        default <V> Kleisli<E, T, V> andThen(Kleisli<E, U, V> kUV) {
+            return t -> run(t).flatMap(kUV::run);
+        }
+
+        /**
+         * Compose this {@code Kleisli} with another by applying the other one first,
+         * and then this one.
+         * @param kST       the {@code Kleisli} to be applied after this one
+         * @param <S>       the first {@code Kleisli}'s input type
+         * @return          the composed {@code Kleisli}
+         */
+        default <S> Kleisli<E, S, U> compose(Kleisli<E, S, T> kST) {
+            return s -> kST.run(s).flatMap(this::run);
+        }
     }
 
     /**
