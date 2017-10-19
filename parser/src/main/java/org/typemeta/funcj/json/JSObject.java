@@ -5,8 +5,8 @@ import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Models a JSON object.

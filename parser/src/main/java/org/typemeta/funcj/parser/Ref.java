@@ -1,6 +1,6 @@
 package org.typemeta.funcj.parser;
 
-import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.data.Lazy;
 
 import java.util.Objects;
 

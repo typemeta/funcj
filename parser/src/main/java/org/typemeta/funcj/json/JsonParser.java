@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.util.*;
 
 import static org.typemeta.funcj.json.JSAPI.field;
-import static org.typemeta.funcj.json.JSAPI.nul;
 import static org.typemeta.funcj.parser.Text.*;
 
 /**
