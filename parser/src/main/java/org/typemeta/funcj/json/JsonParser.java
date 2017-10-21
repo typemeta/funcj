@@ -8,6 +8,8 @@ import java.io.Reader;
 import java.util.*;
 
 import static org.typemeta.funcj.json.JSAPI.field;
+import static org.typemeta.funcj.parser.Combinators.*;
+import static org.typemeta.funcj.parser.Parser.pure;
 import static org.typemeta.funcj.parser.Text.*;
 
 /**
@@ -17,7 +19,7 @@ import static org.typemeta.funcj.parser.Text.*;
  */
 public class JsonParser {
     private static <T> Parser<Chr, T> tok(Parser<Chr, T> p) {
-        return p.andL(Combinators.skipMany(ws));
+        return p.andL(skipMany(ws));
     }
 
     private static List<JSObject.Field> toMap(Iterable<Tuple2<String, JSValue>> iter) {
@@ -27,39 +29,39 @@ public class JsonParser {
     }
 
     static {
-        final Parser<Chr, JSValue> jnull = tok(string("null")).andR(Parser.pure(JSAPI.nul()));
+        final Parser<Chr, JSValue> jnull = tok(string("null")).andR(pure(JSAPI.nul()));
 
-        final Parser<Chr, Boolean> jtrue = tok(string("true")).andR(Parser.pure(Boolean.TRUE));
-        final Parser<Chr, Boolean> jfalse = tok(string("false")).andR(Parser.pure(Boolean.FALSE));
+        final Parser<Chr, Boolean> jtrue = tok(string("true")).andR(pure(Boolean.TRUE));
+        final Parser<Chr, Boolean> jfalse = tok(string("false")).andR(pure(Boolean.FALSE));
 
         final Parser<Chr, JSValue> jbool = tok(jtrue.or(jfalse)).map(JSAPI::bool);
 
         final Parser<Chr, JSValue> jnumber = tok(dble).map(JSAPI::num);
 
         final Parser<Chr, Byte> hexDigit =
-            Combinators.choice(
-                Combinators.value(Chr.valueOf('0'), (byte)0),
-                Combinators.value(Chr.valueOf('1'), (byte)1),
-                Combinators.value(Chr.valueOf('2'), (byte)2),
-                Combinators.value(Chr.valueOf('3'), (byte)3),
-                Combinators.value(Chr.valueOf('4'), (byte)4),
-                Combinators.value(Chr.valueOf('5'), (byte)5),
-                Combinators.value(Chr.valueOf('6'), (byte)6),
-                Combinators.value(Chr.valueOf('7'), (byte)7),
-                Combinators.value(Chr.valueOf('8'), (byte)8),
-                Combinators.value(Chr.valueOf('9'), (byte)9),
-                Combinators.value(Chr.valueOf('a'), (byte)10),
-                Combinators.value(Chr.valueOf('A'), (byte)10),
-                Combinators.value(Chr.valueOf('b'), (byte)11),
-                Combinators.value(Chr.valueOf('B'), (byte)11),
-                Combinators.value(Chr.valueOf('c'), (byte)12),
-                Combinators.value(Chr.valueOf('C'), (byte)12),
-                Combinators.value(Chr.valueOf('d'), (byte)13),
-                Combinators.value(Chr.valueOf('D'), (byte)13),
-                Combinators.value(Chr.valueOf('e'), (byte)14),
-                Combinators.value(Chr.valueOf('E'), (byte)14),
-                Combinators.value(Chr.valueOf('f'), (byte)15),
-                Combinators.value(Chr.valueOf('F'), (byte)15)
+            choice(
+                value(Chr.valueOf('0'), (byte)0),
+                value(Chr.valueOf('1'), (byte)1),
+                value(Chr.valueOf('2'), (byte)2),
+                value(Chr.valueOf('3'), (byte)3),
+                value(Chr.valueOf('4'), (byte)4),
+                value(Chr.valueOf('5'), (byte)5),
+                value(Chr.valueOf('6'), (byte)6),
+                value(Chr.valueOf('7'), (byte)7),
+                value(Chr.valueOf('8'), (byte)8),
+                value(Chr.valueOf('9'), (byte)9),
+                value(Chr.valueOf('a'), (byte)10),
+                value(Chr.valueOf('A'), (byte)10),
+                value(Chr.valueOf('b'), (byte)11),
+                value(Chr.valueOf('B'), (byte)11),
+                value(Chr.valueOf('c'), (byte)12),
+                value(Chr.valueOf('C'), (byte)12),
+                value(Chr.valueOf('d'), (byte)13),
+                value(Chr.valueOf('D'), (byte)13),
+                value(Chr.valueOf('e'), (byte)14),
+                value(Chr.valueOf('E'), (byte)14),
+                value(Chr.valueOf('f'), (byte)15),
+                value(Chr.valueOf('F'), (byte)15)
             );
 
         final Parser<Chr, Chr> uni =
@@ -75,15 +77,15 @@ public class JsonParser {
         final Parser<Chr, Chr> dqChr = chr('"');
 
         final Parser<Chr, Chr> esc =
-            Combinators.choice(
+            choice(
                 dqChr,
                 bsChr,
                 chr('/'),
-                Combinators.value(Chr.valueOf('b'), Chr.valueOf('\b')),
-                Combinators.value(Chr.valueOf('f'), Chr.valueOf('\f')),
-                Combinators.value(Chr.valueOf('n'), Chr.valueOf('\n')),
-                Combinators.value(Chr.valueOf('r'), Chr.valueOf('\r')),
-                Combinators.value(Chr.valueOf('t'), Chr.valueOf('\t')),
+                value(Chr.valueOf('b'), Chr.valueOf('\b')),
+                value(Chr.valueOf('f'), Chr.valueOf('\f')),
+                value(Chr.valueOf('n'), Chr.valueOf('\n')),
+                value(Chr.valueOf('r'), Chr.valueOf('\r')),
+                value(Chr.valueOf('t'), Chr.valueOf('\t')),
                 uChr.andR(uni)
             );
 
@@ -93,10 +95,10 @@ public class JsonParser {
             );
 
         final Parser<Chr, String> jstring =
-            tok(Combinators.between(
+            tok(between(
                 dqChr,
                 dqChr,
-                Combinators.many(stringChar).map(Chr::listToString)
+                many(stringChar).map(Chr::listToString)
             ));
 
         final Parser<Chr, JSValue> jtext =
@@ -105,7 +107,7 @@ public class JsonParser {
         final Ref<Chr, JSValue> jvalue = Parser.ref();
 
         final Parser<Chr, JSValue> jarray =
-            Combinators.between(
+            between(
                 tok(chr('[')),
                 tok(chr(']')),
                 Combinators.sepBy(
@@ -121,7 +123,7 @@ public class JsonParser {
                 .map(Tuple2::new);
 
         final Parser<Chr, JSValue> jobject =
-            Combinators.between(
+            between(
                 tok(chr('{')),
                 tok(chr('}')),
                 Combinators.sepBy(
@@ -131,7 +133,7 @@ public class JsonParser {
             );
 
         jvalue.set(
-            Combinators.choice(
+            choice(
                 jnull,
                 jbool,
                 jnumber,
@@ -141,7 +143,7 @@ public class JsonParser {
             )
         );
 
-        parser = Combinators.skipMany(ws).andR(tok(jvalue));
+        parser = skipMany(ws).andR(tok(jvalue));
     }
 
     /**
