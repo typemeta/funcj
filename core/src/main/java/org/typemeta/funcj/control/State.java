@@ -18,7 +18,7 @@ import static org.typemeta.funcj.data.Unit.UNIT;
  * The state processor is represented by the {@link State#runState(Object)} SAM.
  * <p>
  * Note, this {@code State} type uses the {@link Trampoline} monad to
- * translate a recursive evaluation model into an iterative one,
+ * replace a recursive evaluation model into an iterative one,
  * thereby avoiding the issue of {@link StackOverflowError}s.
  * @param <S>       the state type
  * @param <A>       the result type
@@ -147,7 +147,7 @@ public interface State<S, A> {
     }
 
     /**
-     * Kleisli models composable operations that return a {@code State}.
+     * {@code Kleisli} models composable operations that return a {@code State}.
      * @param <S>       the state type
      * @param <A>       the input type
      * @param <B>       the value type of the returned @{code State} type

@@ -110,7 +110,7 @@ public interface Either<E, S> {
     }
 
     /**
-     * Kleisli models composable operations that return a {@code Either}.
+     * {@code Kleisli} models composable operations that return an {@code Either}.
      * @param <E>       the left-hand type
      * @param <T>       the input type
      * @param <U>       the value type of the returned {@code Either} type
