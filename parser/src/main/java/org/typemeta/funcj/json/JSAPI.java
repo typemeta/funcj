@@ -1,5 +1,7 @@
 package org.typemeta.funcj.json;
 
+import org.typemeta.funcj.data.IList;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
@@ -22,6 +24,10 @@ public class JSAPI {
 
     public static JSArray arr(List<JSValue> values) {
         return new JSArray(values);
+    }
+
+    public static JSArray arr(IList<JSValue> values) {
+        return new JSArray(values.toList());
     }
 
     public static JSNumber num(byte value) {

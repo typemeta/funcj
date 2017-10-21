@@ -22,12 +22,6 @@ public class JsonParser {
         return p.andL(skipMany(ws));
     }
 
-    private static List<JSObject.Field> toMap(Iterable<Tuple2<String, JSValue>> iter) {
-        final List<JSObject.Field> fields = new ArrayList<>();
-        iter.forEach(t2 -> fields.add(field(t2._1, t2._2)));
-        return fields;
-    }
-
     static {
         final Parser<Chr, JSValue> jnull = tok(string("null")).andR(pure(JSAPI.nul()));
 
@@ -110,11 +104,11 @@ public class JsonParser {
             between(
                 tok(chr('[')),
                 tok(chr(']')),
-                Combinators.sepBy(
+                sepBy(
                     jvalue,
                     tok(chr(','))
                 )
-            ).map(IList::toList).map(JSAPI::arr);
+            ).map(JSAPI::arr);
 
         final Parser<Chr, Tuple2<String, JSValue>> jfield =
             jstring
@@ -126,11 +120,12 @@ public class JsonParser {
             between(
                 tok(chr('{')),
                 tok(chr('}')),
-                Combinators.sepBy(
+                sepBy(
                     jfield,
                     tok(chr(','))
-                ).map(JsonParser::toMap).map(JSAPI::obj)
-            );
+                )
+            ).map(lt2 -> lt2.map(t2 -> t2.apply(JSAPI::field)))
+                    .map(JSAPI::obj);
 
         jvalue.set(
             choice(
