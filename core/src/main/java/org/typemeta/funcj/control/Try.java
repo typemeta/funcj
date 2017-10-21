@@ -379,6 +379,12 @@ public interface Try<T> {
             } else {
                 final Failure<?> rhs = (Failure<?>) obj;
 
+                if (error.equals(rhs.error)) {
+                    return true;
+                } else if (!error.getClass().equals(rhs.error.getClass())) {
+                    return false;
+                }
+
                 // In general the equals() method for Exception classes isn't implemented,
                 // which means we get object equality. This is rarely useful so here
                 // we instead compare the string representations.
