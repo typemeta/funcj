@@ -16,7 +16,7 @@ public interface Codec<T, E> {
      */
     interface NullCodec<E> extends Codec<Object, E> {
         /**
-         * Check whether and encoded value represents a null value.
+         * Check whether an encoded value represents a null value.
          * @param enc       encoded value
          * @return          true if encoded value represents a null value
          */
