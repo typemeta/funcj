@@ -9,7 +9,7 @@ import org.typemeta.funcj.data.Unit;
 import static org.junit.Assert.*;
 
 @RunWith(JUnitQuickcheck.class)
-public class EitherPropTest {
+public class EitherTest {
 
     @Property
     public void isRight(char c) {

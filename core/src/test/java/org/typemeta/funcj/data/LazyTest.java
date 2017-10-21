@@ -1,6 +1,9 @@
 package org.typemeta.funcj.data;
 
+import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.*;
+import org.junit.runner.RunWith;
 import org.typemeta.funcj.control.Exceptions;
 import org.typemeta.funcj.tuples.Tuple2;
 
@@ -12,6 +15,7 @@ import java.util.stream.IntStream;
 import static java.util.stream.Collectors.*;
 import static org.junit.Assert.assertEquals;
 
+@RunWith(JUnitQuickcheck.class)
 public class LazyTest {
     private static class InternalTestException extends RuntimeException {}
 
@@ -31,11 +35,10 @@ public class LazyTest {
         }
     }
 
-    @Test
-    public void testGet() {
-        final String VALUE = "s9rjIOmyuo3r0-";
-        final Lazy<String> l = Lazy.ofTS(() -> VALUE);
-        assertEquals(VALUE, l.apply());
+    @Property
+    public void testGet(String s) {
+        final Lazy<String> l = Lazy.ofTS(() -> s);
+        assertEquals(s, l.apply());
     }
 
     @Test
@@ -55,11 +58,10 @@ public class LazyTest {
         assertEquals(l.apply(), l.apply());
     }
 
-    @Test
-    public void testTSGet() {
-        final String VALUE = "s9rjIOmyuo3r0-";
-        final Lazy<String> l = Lazy.of(() -> VALUE);
-        assertEquals(VALUE, l.apply());
+    @Property
+    public void testTSGet(String s) {
+        final Lazy<String> l = Lazy.of(() -> s);
+        assertEquals(s, l.apply());
     }
 
     @Test
@@ -93,7 +95,7 @@ public class LazyTest {
 
         final Map<Integer, Lazy<Integer>> lm =
             IntStream.range(0, N_VALUES)
-                .mapToObj(Integer::new)
+                .boxed()
                 .collect(toMap(
                     i -> i,
                     i -> delayedLazy(true, i, rng.nextInt(DELAY))
@@ -101,7 +103,7 @@ public class LazyTest {
 
         final List<Callable<Tuple2<Integer, Integer>>> lct2 =
             IntStream.range(0, N_THREADS)
-                .mapToObj(Integer::new)
+                .boxed()
                 .flatMap(i -> IntStream.range(1, N_VALUES)
                     .mapToObj(j -> callable(() -> Tuple2.of(j, lm.get(j).apply())))
                 ).collect(toList());

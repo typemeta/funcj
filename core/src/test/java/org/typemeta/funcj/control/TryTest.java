@@ -9,7 +9,7 @@ import org.typemeta.funcj.control.Try.Kleisli;
 import static org.junit.Assert.*;
 
 @RunWith(JUnitQuickcheck.class)
-public class TryPropTest {
+public class TryTest {
 
     private static <T> Try<T> failure(String msg) {
         return Try.failure(new RuntimeException(msg));
