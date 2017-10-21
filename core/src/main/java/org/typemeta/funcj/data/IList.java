@@ -578,21 +578,21 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public <U> IList<U> map(F<? super T, ? extends U> f) {
+        public <U> NonEmpty<U> map(F<? super T, ? extends U> f) {
             IList<U> r = nil();
             for (IList<T> n = this; !n.isEmpty(); n = n.tail()) {
                 r = r.add(f.apply(n.head()));
             }
-            return r.reverse();
+            return (NonEmpty<U>) r.reverse();
         }
 
         @Override
-        public <U> IList<U> flatMap(F<? super T, IList<? extends U>> f) {
+        public <U> NonEmpty<U> flatMap(F<? super T, IList<? extends U>> f) {
             final IList<U> r = nil();
             for (IList<T> n = this; !n.isEmpty(); n = n.tail()) {
                 r.addAll(f.apply(n.head()));
             }
-            return r;
+            return (NonEmpty<U>) r;
         }
 
         @Override

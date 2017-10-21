@@ -307,6 +307,9 @@ public abstract class Combinators {
     /**
      * A parser that attempts one or more parsers in turn and returns the result
      * of the first that succeeds, or else fails.
+     * <p>
+     * The combinator is implemented as a ParserImpl, using iteration,
+     * for performance reasons, however it is equivalent to {@code return ps.foldLeft1(Parser::or)}.
      * @param ps        the list of parsers
      * @param <I>       the input stream symbol type
      * @param <A>       the parser result type
@@ -314,7 +317,37 @@ public abstract class Combinators {
      */
     public static <I, A>
     Parser<I, A> choice(IList.NonEmpty<Parser<I, A>> ps) {
-        return ps.foldLeft1(Parser::or);
+        return new ParserImpl<I, A>(
+                ps.map(Parser::acceptsEmpty).foldLeft1(Utils::or),
+                ps.map(Parser::firstSet).foldLeft1(Utils::union)
+        ) {
+            @Override
+            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+                if (in.isEof()) {
+                    for (Parser<I, A> p : ps) {
+                        if (p.acceptsEmpty().apply()) {
+                            return p.parse(in, follow);
+                        }
+                    }
+                    return failureEof(this, in);
+                } else {
+                    final I next = in.get();
+                    for (Parser<I, A> p : ps) {
+                        if (p.firstSet().apply().matches(next)) {
+                            return p.parse(in, follow);
+                        }
+                    }
+                    if (follow.matches(next)) {
+                        for (Parser<I, A> p : ps) {
+                            if (p.acceptsEmpty().apply()) {
+                                return p.parse(in, follow);
+                            }
+                        }
+                    }
+                    return failure(this, in);
+                }
+            }
+        };
     }
 
     /**

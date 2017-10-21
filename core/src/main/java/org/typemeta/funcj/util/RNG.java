@@ -14,20 +14,33 @@ import static org.typemeta.funcj.control.Trampoline.*;
  */
 public interface RNG {
 
+    /**
+     * Return a {@code RNG} based on the XorShift algorithm.
+     * @see <a href="https://en.wikipedia.org/wiki/Xorshift">https://en.wikipedia.org/wiki/Xorshift</a>
+     * @param seed      the initial seed for the RNG
+     * @return          the {@code RNG}
+     */
     static RNG xorShiftRNG(long seed) {
         return new RNGUtils.XorShiftRNG(seed);
     }
 
+    /**
+     * @return          a state processor which will generate the next random double
+     */
     static State<RNG, Double> nextDbl() {
         return st -> defer(() -> done(st.generateDouble0To1()));
     }
 
+    /**
+     * @return          a state processor which will generate the next random long
+     */
     static State<RNG, Long> nextLng() {
         return st -> defer(() -> done(st.generateLong()));
     }
 
     /**
-     * @return a random double value in the range 0 to 1 inclusive.
+     * Return a pair containing the next RNG state and the next random double.
+     * @return          a pair containing a random double value in the range 0 to 1 inclusive
      */
     default Tuple2<RNG, Double> generateDouble0To1() {
         final Tuple2<RNG, Long> rngLng = generateLong();
@@ -36,7 +49,8 @@ public interface RNG {
     }
 
     /**
-     * @return a random long value.
+     * Return a pair containing the next RNG state and the next random long.
+     * @return          a pair containing a random long value
      */
     default Tuple2<RNG, Long> generateLong() {
         final Tuple2<RNG, Double> rngDbl = generateDouble0To1();

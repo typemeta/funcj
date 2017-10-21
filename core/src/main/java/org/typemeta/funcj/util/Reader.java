@@ -19,12 +19,12 @@ public abstract class Reader {
      * Standard applicative traversal.
      * <p>
      * Equivalent to <pre>sequence(lt.map(f))</pre>.
-     * @param la            the list of values
-     * @param ffb           the function to be applied to each value in the list
-     * @param <T>           the input type of the applicative function
-     * @param <A>           the type of list elements
-     * @param <B>           the return type of the {@code F} returned by the function
-     * @return              an {@code F} which wraps an {@link IList} of values
+     * @param la        the list of values
+     * @param ffb       the function to be applied to each value in the list
+     * @param <T>       the input type of the applicative function
+     * @param <A>       the type of list elements
+     * @param <B>       the return type of the {@code F} returned by the function
+     * @return          an {@code F} which wraps an {@link IList} of values
      */
     static <T, A, B> Functions.F<T, IList<B>> traverse(IList<A> la, Functions.F<A, Functions.F<T, B>> ffb) {
         return la.foldRight(
@@ -38,9 +38,9 @@ public abstract class Reader {
      * <p>
      * Translate a {@link IList} of {@code F}s into a {@code F} of an {@code IList},
      * by composing each consecutive {@code F}s using the {@link Functions.F#app(Functions.F)} method.
-     * @param lfu           the list of {@code F} values
-     * @param <T>           the input type of the applicative function
-     * @param <U>           the return type of the {@code F}s in the list
+     * @param lfu       the list of {@code F} values
+     * @param <T>       the input type of the applicative function
+     * @param <U>       the return type of the {@code F}s in the list
      * @return
      */
     static <T, U> Functions.F<T, IList<U>> sequence(IList<? extends Functions.F<T, U>> lfu) {

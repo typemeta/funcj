@@ -108,8 +108,8 @@ public final class Chr implements Comparable<Chr> {
 
     /**
      * Convert a list of {@code Chr}s into a {@code String}.
-     * @param l     the list of {@code Chr}s
-     * @return      the {@code String}
+     * @param l         the list of {@code Chr}s
+     * @return          the {@code String}
      */
     public static String listToString(IList<Chr> l) {
         final StringBuilder sb = new StringBuilder();
@@ -121,8 +121,8 @@ public final class Chr implements Comparable<Chr> {
 
     /**
      * Convert a {@code String} into a list of {@code Chr}s.
-     * @param s     the {@code String}
-     * @return      the list of {@code Chr}s
+     * @param s         the {@code String}
+     * @return          the list of {@code Chr}s
      */
     public static IList<Chr> stringToList(String s) {
         IList<Chr> r = IList.nil();

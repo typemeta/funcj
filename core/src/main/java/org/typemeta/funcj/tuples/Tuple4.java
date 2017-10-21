@@ -226,7 +226,7 @@ final public class Tuple4<A, B, C, D> {
     /**
      * Create a new {@code Tuple4} which is a copy of this one,
      * but with the fourth value replaced with the result of applying the supplied function
-     * to the third value.
+     * to the fourth value.
      * @param f         the function
      * @param <T>       the function return type
      * @return          the new {@code Tuple4}
