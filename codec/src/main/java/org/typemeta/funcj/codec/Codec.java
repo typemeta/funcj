@@ -280,7 +280,7 @@ public interface Codec<T, E> {
     }
 
     /**
-     * Encode a value of type {@code T} into and encoded value of type {@code E}.
+     * Encode a value of type {@code T} into nd encoded value of type {@code E}.
      * @param val       the unencoded value
      * @param enc       the encoded parent value
      * @return          the encoded value
