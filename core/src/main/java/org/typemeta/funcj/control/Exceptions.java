@@ -15,7 +15,7 @@ public abstract class Exceptions {
     /**
      * Wrap a function which throws a checked exception
      * into one that that throws a {@link java.lang.RuntimeException}.
-     * @param thrower function that may throw
+     * @param thrower   function that may throw
      */
     public static void wrap(Throws0 thrower) {
         try {
@@ -28,8 +28,8 @@ public abstract class Exceptions {
     /**
      * Wrap a function which throws a checked exception
      * into one that that throws an unchecked exception.
-     * @param thrower function that may throw
-     * @param trans function to translate thrown exception into another, unchecked, exception
+     * @param thrower   function that may throw
+     * @param trans     function to translate thrown exception into another, unchecked, exception
      */
     public static void wrap(Throws0 thrower, F<? super Exception, ? extends RuntimeException> trans) {
         try {
@@ -47,9 +47,9 @@ public abstract class Exceptions {
     /**
      * Wrap a function which throws a checked exception
      * into one that that throws a {@link java.lang.RuntimeException}.
-     * @param thrower function that may throw
-     * @param <R> return type of function
-     * @return result of function if it doesn't throw
+     * @param thrower   function that may throw
+     * @param <R>       return type of function
+     * @return          result of function if it doesn't throw
      */
     public static <R> R wrap(Throws1<R> thrower) {
         try {
@@ -62,10 +62,10 @@ public abstract class Exceptions {
     /**
      * Wrap a function which throws a checked exception
      * into one that that throws an unchecked exception.
-     * @param thrower function that may throw
-     * @param trans function to translate thrown exception into another, unchecked, exception.
-     * @param <R> return type of function
-     * @return result of function if it doesn't throw
+     * @param thrower   function that may throw
+     * @param trans     function to translate thrown exception into another, unchecked, exception.
+     * @param <R>       return type of function
+     * @return          result of function if it doesn't throw
      */
     public static <R>
     R wrap(Throws1<R> thrower, F<? super Exception, ? extends RuntimeException> trans) {
@@ -84,10 +84,10 @@ public abstract class Exceptions {
     /**
      * Wrap a function which throws a checked exception
      * into one that that throws an unchecked exception.
-     * @param thrower function that may throw
-     * @param <T> input type of the function
-     * @param <R> return type of function
-     * @return a function which throws an unchecked exception
+     * @param thrower   function that may throw
+     * @param <T>       input type of the function
+     * @param <R>       return type of function
+     * @return          a function which throws an unchecked exception
      */
     public static <T, R>
     F<T, R> wrap(Throws2<T, R> thrower) {
@@ -103,11 +103,11 @@ public abstract class Exceptions {
     /**
      * Wrap a function which throws a checked exception
      * into one that that throws an unchecked exception.
-     * @param thrower function that may throw
-     * @param trans function to translate thrown exception into another, unchecked, exception.
-     * @param <T> input type of the function
-     * @param <R> return type of function
-     * @return a function which throws an unchecked exception
+     * @param thrower   function that may throw
+     * @param trans     function to translate thrown exception into another, unchecked, exception.
+     * @param <T>       input type of the function
+     * @param <R>       return type of function
+     * @return          a function which throws an unchecked exception
      */
     public static <T, R>
     F<T, R> wrap(Throws2<T, R> thrower, F<? super Exception, ? extends RuntimeException> trans) {
@@ -122,7 +122,7 @@ public abstract class Exceptions {
 
     /**
      * Used to mark incomplete pieces of code.
-     * @return an exception
+     * @return          an exception
      */
     public static RuntimeException TODO() {
         return new RuntimeException("TODO");

@@ -57,7 +57,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalInt}.
+     * Map a function over an {@link OptionalInt}, to yield a generic {@link Optional}.
      * @param f         the function to apply to the value within the {@code OptionalInt}
      * @param oi        the optional value
      * @param <R>       the return type of the function
@@ -68,7 +68,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalInt}.
+     * Map a function over an {@link OptionalInt}, to yield a {@link OptionalInt}.
      * @param f         the function to apply to the value within the {@code OptionalInt}
      * @param oi        the optional value
      * @return          an {@code OptionalInt} that contains the result of applying the function
@@ -78,7 +78,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalInt}.
+     * Map a function over an {@link OptionalInt}, to yield a {@link OptionalLong}.
      * @param f         the function to apply to the value within the {@code OptionalInt}
      * @param oi        the optional value
      * @return          an {@code OptionalLong} that contains the result of applying the function
@@ -88,7 +88,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalInt}.
+     * Map a function over an {@link OptionalInt}, to yield a {@link OptionalDouble}.
      * @param f         the function to apply to the value within the {@code OptionalInt}
      * @param oi        the optional value
      * @return          an {@code OptionalDouble} that contains the result of applying the function
@@ -98,7 +98,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalLong}.
+     * Map a function over an {@link OptionalLong}, to yield a generic {@link Optional}.
      * @param f         the function to apply to the value within the {@code OptionalLong}
      * @param oi        the optional value
      * @param <R>       the return type of the function
@@ -109,7 +109,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalLong}.
+     * Map a function over an {@link OptionalLong}, to yield a {@link OptionalInt}.
      * @param f         the function to apply to the value within the {@code OptionalLong}
      * @param ol        the optional value
      * @return          an {@code OptionalInt} that contains the result of applying the function
@@ -119,7 +119,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalLong}.
+     * Map a function over an {@link OptionalLong}, to yield a {@link OptionalLong}.
      * @param f         the function to apply to the value within the {@code OptionalLong}
      * @param ol        the optional value
      * @return          an {@code OptionalLong} that contains the result of applying the function
@@ -129,7 +129,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalLong}.
+     * Map a function over an {@link OptionalLong}, to yield a {@link OptionalDouble}.
      * @param f         the function to apply to the value within the {@code OptionalLong}
      * @param ol        the optional value
      * @return          an {@code OptionalDouble} that contains the result of applying the function
@@ -139,7 +139,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalDouble}.
+     * Map a function over an {@link OptionalDouble}, to yield a generic {@link Optional}.
      * @param f         the function to apply to the value within the {@code OptionalDouble}
      * @param od        the optional value
      * @param <R>       the return type of the function
@@ -150,7 +150,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalDouble}.
+     * Map a function over an {@link OptionalDouble}, to yield a {@link OptionalInt}.
      * @param f         the function to apply to the value within the {@code OptionalDouble}
      * @param od        the optional value
      * @return          an {@code OptionalInt} that contains the result of applying the function
@@ -160,7 +160,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalDouble}.
+     * Map a function over an {@link OptionalDouble}, to yield a {@link OptionalLong}.
      * @param f         the function to apply to the value within the {@code OptionalDouble}
      * @param od        the optional value
      * @return          an {@code OptionalLong} that contains the result of applying the function
@@ -170,7 +170,7 @@ public abstract class Functors {
     }
 
     /**
-     * Map a function over an {@link OptionalDouble}.
+     * Map a function over an {@link OptionalDouble}, to yield a {@link OptionalDouble}.
      * @param f         the function to apply to the value within the {@code OptionalDouble}
      * @param od        the optional value
      * @return          an {@code OptionalDouble} that contains the result of applying the function
