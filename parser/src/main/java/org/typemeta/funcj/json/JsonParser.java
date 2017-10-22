@@ -108,11 +108,11 @@ public class JsonParser {
                 )
             ).map(JSAPI::arr);
 
-        final Parser<Chr, Tuple2<String, JSValue>> jfield =
+        final Parser<Chr, JSObject.Field> jfield =
             jstring
                 .andL(tok(chr(':')))
                 .and(jvalue)
-                .map(Tuple2::new);
+                .map(JSAPI::field);
 
         final Parser<Chr, JSValue> jobject =
             between(
@@ -122,8 +122,7 @@ public class JsonParser {
                     jfield,
                     tok(chr(','))
                 )
-            ).map(lt2 -> lt2.map(t2 -> t2.apply(JSAPI::field)))
-                    .map(JSAPI::obj);
+            ).map(JSAPI::obj);
 
         jvalue.set(
             choice(
