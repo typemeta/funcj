@@ -140,7 +140,6 @@ public interface Validation<E, T> {
         return vlt.map(IList::stream);
     }
 
-
     /**
      * Kleisli models composable operations that return a {@code Validation}.
      * @param <E>       the error type

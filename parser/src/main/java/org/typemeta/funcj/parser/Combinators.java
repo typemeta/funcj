@@ -136,25 +136,9 @@ public abstract class Combinators {
     }
 
     /**
-     * Combine three parsers to form a parser which applies all parsers,
-     * and if they are successful then returns {@link Tuple3} of the results.
-     * @param pa        the first parser
-     * @param pb        the second parser
-     * @param pc        the third parser
-     * @param <I>       input stream symbol type
-     * @param <A>       the result type of first parser
-     * @param <B>       the result type of second parser
-     * @param <C>       the result type of third parser
-     * @return          a parser that applies two parsers consecutively and returns the pair of values
-     */
-    public static <I, A, B, C> Parser<I, Tuple3<A, B, C>> product(Parser<I, A> pa, Parser<I, B> pb, Parser<I, C> pc) {
-        return pa.and(pb).and(pc).map(Tuple3::of);
-    }
-
-    /**
      * A parser which repeatedly applies {@code p} until it fails,
      * and then returns an {@link IList} of the results.
-     * Note, if {@code p} fails on the first attempt then this parser succeeds,
+     * If {@code p} fails on the first attempt then this parser succeeds,
      * with an empty list of results.
      * @param p         the parser to be applied repeatedly
      * @param <I>       the input stream symbol type
@@ -163,6 +147,8 @@ public abstract class Combinators {
      */
     public static <I, A>
     Parser<I, IList<A>> many(Parser<I, A> p) {
+        // We use an iterative implementation, in favour of a more concise recursive solution,
+        // for performance, and to avoid StackOverflowExceptions.
         return new ParserImpl<I, IList<A>>(LTRUE, p.firstSet()) {
             @Override
             public Result<I, IList<A>> parse(Input<I> in, SymSet<I> follow) {
@@ -215,7 +201,8 @@ public abstract class Combinators {
      */
     public static <I, A>
     Parser<I, Unit> skipMany(Parser<I, A> p) {
-        return many(p).map(u -> Unit.UNIT);
+        return many(p)
+                .map(u -> Unit.UNIT);
     }
 
     /**
@@ -232,7 +219,8 @@ public abstract class Combinators {
      */
     public static <I, A, SEP>
     Parser<I, IList<A>> sepBy(Parser<I, A> p, Parser<I, SEP> sep) {
-        return sepBy1(p, sep).or(Parser.pure(IList.nil()));
+        return sepBy1(p, sep)
+                .or(Parser.pure(IList.nil()));
     }
 
     /**
@@ -264,7 +252,8 @@ public abstract class Combinators {
      */
     public static <I, A>
     Parser<I, Optional<A>> optional(Parser<I, A> p) {
-        return p.map(Optional::of).or(Parser.pure(Optional.empty()));
+        return p.map(Optional::of)
+                .or(Parser.pure(Optional.empty()));
     }
 
     /**
@@ -307,9 +296,6 @@ public abstract class Combinators {
     /**
      * A parser that attempts one or more parsers in turn and returns the result
      * of the first that succeeds, or else fails.
-     * <p>
-     * The combinator is implemented as a ParserImpl, using iteration,
-     * for performance reasons, however it is equivalent to {@code return ps.foldLeft1(Parser::or)}.
      * @param ps        the list of parsers
      * @param <I>       the input stream symbol type
      * @param <A>       the parser result type
@@ -317,6 +303,8 @@ public abstract class Combinators {
      */
     public static <I, A>
     Parser<I, A> choice(IList.NonEmpty<Parser<I, A>> ps) {
+        // We use an iterative implementation for performance, and to avoid StackOverflowExceptions.
+        // The more concise recursive equivalent is ps.foldLeft1(Parser::or)
         return new ParserImpl<I, A>(
                 ps.map(Parser::acceptsEmpty).foldLeft1(Utils::or),
                 ps.map(Parser::firstSet).foldLeft1(Utils::union)
@@ -351,8 +339,7 @@ public abstract class Combinators {
     }
 
     /**
-     * A parser for an operand, followed by one or more operands
-     * that separated by operators.
+     * A parser for an operand, followed by one or more operands that are separated by operators.
      * This can, for example, be used to eliminate left recursion
      * which typically occurs in expression grammars.
      * @param p         the parser
@@ -363,7 +350,7 @@ public abstract class Combinators {
      */
     public static <I, A> Parser<I, A> chainl1(Parser<I, A> p, Parser<I, Functions.Op2<A>> op) {
         final Parser<I, IList<Functions.Op<A>>> plo =
-                Combinators.many(op.and(p)
+                many(op.and(p)
                         .map((f, y) -> x -> f.apply(x, y)));
         return p.and(plo)
                 .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
