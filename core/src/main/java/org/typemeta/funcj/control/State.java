@@ -199,7 +199,7 @@ public interface State<S, A> {
     /**
      * The state processor.
      * <p>
-     * This the SAM that implementations implement, typically via a lambda,
+     * State implementations mjust implement thus method, typically via a lambda,
      * {@code runState} is essentially a function that can be applied to a
      * state {@code S} to yield a new state and a result.
      * @param state     the input state.
