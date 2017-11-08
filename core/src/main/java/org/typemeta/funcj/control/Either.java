@@ -108,6 +108,36 @@ public interface Either<E, S> {
         }
         return elt.map(IList::stream);
     }
+    /**
+     * Repeatedly call the function {@code f} until it returns {@code Either.Right}.
+     * <p>
+     * Call the function {@code f} and if it returns a right value then return the wrapped value,
+     * otherwise extract the value and call {@code f} again.
+     * @param a         the starting value
+     * @param f         the function
+     * @param <E>       the left-hand type
+     * @param <A>       the starting value type
+     * @param <B>       the final value type
+     * @return          the final value
+     */
+    @SuppressWarnings("unchecked")
+    static <E, A, B> Either<E, B> tailRecM(A a, F<A, Either<E, Either<A, B>>> f) {
+        while (true) {
+            final Either<E, Either<A, B>> ee = f.apply(a);
+            if (ee instanceof Either.Left) {
+                return ((Either.Left)ee).cast();
+            } else {
+                final Either.Right<E, Either<A, B>> re = (Either.Right<E, Either<A, B>>)ee;
+                if (re.value instanceof Either.Left) {
+                    final Either.Left<A, B> left = (Either.Left<A, B>) re.value;
+                    a = left.value;
+                } else {
+                    final Either.Right<A, B> right = (Either.Right<A, B>) re.value;
+                    return Either.right(right.value);
+                }
+            }
+        }
+    }
 
     /**
      * {@code Kleisli} models composable operations that return an {@code Either}.

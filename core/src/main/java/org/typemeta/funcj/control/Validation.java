@@ -141,6 +141,37 @@ public interface Validation<E, T> {
     }
 
     /**
+     * Repeatedly call the function {@code f} until it returns {@code Either.Right}.
+     * <p>
+     * Call the function {@code f} and if it returns a right value then return the wrapped value,
+     * otherwise extract the value and call {@code f} again.
+     * @param a         the starting value
+     * @param f         the function
+     * @param <E>       the error type
+     * @param <A>       the starting value type
+     * @param <B>       the final value type
+     * @return          the final value
+     */
+    @SuppressWarnings("unchecked")
+    static <E, A, B> Validation<E, B> tailRecM(A a, F<A, Validation<E, Either<A, B>>> f) {
+        while (true) {
+            final Validation<E, Either<A, B>> ve = f.apply(a);
+            if (ve instanceof Validation.Failure) {
+                return ((Validation.Failure)ve).cast();
+            } else {
+                final Validation.Success<E, Either<A, B>> vse = (Validation.Success<E, Either<A, B>>)ve;
+                if (vse.value instanceof Either.Left) {
+                    final Either.Left<A, B> left = (Either.Left<A, B>) vse.value;
+                    a = left.value;
+                } else {
+                    final Either.Right<A, B> right = (Either.Right<A, B>) vse.value;
+                    return Validation.success(right.value);
+                }
+            }
+        }
+    }
+
+    /**
      * Kleisli models composable operations that return a {@code Validation}.
      * @param <E>       the error type
      * @param <T>       the input type

@@ -89,6 +89,18 @@ public interface StateR<S, A> {
      * @param <A>       the result type
      * @return          the new {@code State} instance
      */
+    static <S, A> StateR<S, A> inspect(F<S, A> f) {
+        return StateR.<S>get().map(f);
+    }
+
+    /**
+     * A state which leaves the state unchanged,
+     * and sets the result to the function f applied to the state.
+     * @param f         the function
+     * @param <S>       the state type
+     * @param <A>       the result type
+     * @return          the new {@code State} instance
+     */
     static <S, A> StateR<S, A> gets(F<S, A> f) {
         return StateR.<S>get().map(f);
     }
@@ -138,6 +150,37 @@ public interface StateR<S, A> {
             slt = st.apply(slt.map(lt -> lt::add));
         }
         return slt.map(IList::stream);
+    }
+
+    /**
+     * Repeatedly call the function {@code f} until it returns {@code Either.Right}.
+     * <p>
+     * Call the function {@code f} and if it returns a right value then return the wrapped value,
+     * otherwise extract the value and call {@code f} again.
+     * @param a         the starting value
+     * @param f         the function
+     * @param <S>       the state type
+     * @param <A>       the starting value type
+     * @param <B>       the final value type
+     * @return          the final value
+     */
+    static <S, A, B> StateR<S, B> tailRecM(A a, F<A, StateR<S, Either<A, B>>> f) {
+        return st -> {
+            A aa = a;
+            S s = st;
+            while (true) {
+                final Tuple2<S, Either<A, B>> t2e = f.apply(aa).runState(s);
+
+                if (t2e._2 instanceof Either.Left) {
+                    final Either.Left<A, B> left = (Either.Left<A, B>) t2e._2;
+                    aa = left.value;
+                    s = t2e._1;
+                } else {
+                    final Either.Right<A, B> right = (Either.Right<A, B>) t2e._2;
+                    return Tuple2.of(t2e._1, right.value);
+                }
+            }
+        };
     }
 
     /**

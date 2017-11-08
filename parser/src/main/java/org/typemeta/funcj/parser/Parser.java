@@ -31,6 +31,7 @@ public interface Parser<I, A> {
      * Construct a parser reference object from a parser.
      * @param <I>       the input stream symbol type
      * @param <A>       the parser result type
+     * @param p         the parser
      * @return          the initialised parser reference
      */
     static <I, A> Ref<I, A> ref(Parser<I, A> p) {

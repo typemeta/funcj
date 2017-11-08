@@ -90,7 +90,7 @@ public interface State<S, A> {
      * @param <A>       the result type
      * @return          the new {@code State} instance
      */
-    static <S, A> State<S, A> gets(F<S, A> f) {
+    static <S, A> State<S, A> inspect(F<S, A> f) {
         return State.<S>get().map(f);
     }
 
@@ -147,6 +147,33 @@ public interface State<S, A> {
     }
 
     /**
+     * Repeatedly call the function {@code f} until it returns {@code Either.Right}.
+     * <p>
+     * Call the function {@code f} and if it returns a right value then return the wrapped value,
+     * otherwise extract the value and call {@code f} again.
+     * @param a         the starting value
+     * @param f         the function
+     * @param <S>       the state type
+     * @param <A>       the starting value type
+     * @param <B>       the final value type
+     * @return          the final value
+     */
+    static <S, A, B> State<S, B> tailRecM(A a, F<A, State<S, Either<A, B>>> f) {
+        while (true) {
+            final State<S, Either<A, B>> s = f.apply(a);
+            return s.flatMap(e -> {
+                if (e instanceof Either.Left) {
+                    final Either.Left<A, B> left = (Either.Left<A, B>) e;
+                    return tailRecM(left.value, f);
+                } else {
+                    final Either.Right<A, B> right = (Either.Right<A, B>) e;
+                    return State.pure(right.value);
+                }
+            });
+        }
+    }
+
+    /**
      * {@code Kleisli} models composable operations that return a {@code State}.
      * @param <S>       the state type
      * @param <A>       the input type
@@ -199,7 +226,7 @@ public interface State<S, A> {
     /**
      * The state processor.
      * <p>
-     * State implementations mjust implement thus method, typically via a lambda,
+     * State implementations must implement thus method, typically via a lambda,
      * {@code runState} is essentially a function that can be applied to a
      * state {@code S} to yield a new state and a result.
      * @param state     the input state.

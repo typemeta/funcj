@@ -3,6 +3,7 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.functions.FunctionsEx;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -121,6 +122,84 @@ public interface Try<T> {
     }
 
     /**
+     * Repeatedly call the function {@code f} until it returns {@code Either.Right}.
+     * <p>
+     * Call the function {@code f} and if it returns a right value then return the wrapped value,
+     * otherwise extract the value and call {@code f} again.
+     * @param a         the starting value
+     * @param f         the function
+     * @param <A>       the starting value type
+     * @param <B>       the final value type
+     * @return          the final value
+     */
+    @SuppressWarnings("unchecked")
+    static <A, B> Try<B> tailRecM(A a, F<A, Try<Either<A, B>>> f) {
+        while (true) {
+            final Try<Either<A, B>> te = f.apply(a);
+            if (te instanceof Try.Failure) {
+                return ((Try.Failure)te).cast();
+            } else {
+                final Try.Success<Either<A, B>> tse = (Try.Success<Either<A, B>>)te;
+                if (tse.value instanceof Either.Left) {
+                    final Either.Left<A, B> left = (Either.Left<A, B>) tse.value;
+                    a = left.value;
+                } else {
+                    final Either.Right<A, B> right = (Either.Right<A, B>) tse.value;
+                    return Try.success(right.value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Kleisli models composable operations that return a {@code Try}.
+     * @param <T>       the input type
+     * @param <U>       the value type of the returned {@code Try} type
+     */
+    @FunctionalInterface
+    interface Kleisli<T, U> {
+        /**
+         * Construct a {@code Kleisli} value from a function.
+         * @param f         the function
+         * @param <T>       the input type
+         * @param <U>       the value type of the returned {@code Try} value
+         * @return          the new {@code Kleisli}
+         */
+        static <T, U> Kleisli<T, U> of(F<T, Try<U>> f) {
+            return f::apply;
+        }
+
+        /**
+         * Run this {@code Kleisli} operation
+         * @param t         the input value
+         * @return          the result of the operation
+         */
+        Try<U> run(T t);
+
+        /**
+         * Compose this {@code Kleisli} with another by applying this one first,
+         * then the other.
+         * @param kUV       the {@code Kleisli} to be applied after this one
+         * @param <V>       the second {@code Kleisli}'s return type
+         * @return          the composed {@code Kleisli}
+         */
+        default <V> Kleisli<T, V> andThen(Kleisli<U, V> kUV) {
+            return t -> run(t).flatMap(kUV::run);
+        }
+
+        /**
+         * Compose this {@code Kleisli} with another by applying the other one first,
+         * and then this one.
+         * @param kST       the {@code Kleisli} to be applied after this one
+         * @param <S>       the first {@code Kleisli}'s input type
+         * @return          the composed {@code Kleisli}
+         */
+        default <S> Kleisli<S, U> compose(Kleisli<S, T> kST) {
+            return s -> kST.run(s).flatMap(this::run);
+        }
+    }
+
+    /**
      * Indicates if this is a {code Success} value.
      * @return          true if this value is a {code Success} value
      */
@@ -218,54 +297,6 @@ public interface Try<T> {
      */
     default <U> ApplyBuilder._2<T, U> and(Try<U> tb) {
         return new ApplyBuilder._2<T, U>(this, tb);
-    }
-
-    /**
-     * Kleisli models composable operations that return a {@code Try}.
-     * @param <T>       the input type
-     * @param <U>       the value type of the returned {@code Try} type
-     */
-    @FunctionalInterface
-    interface Kleisli<T, U> {
-        /**
-         * Construct a {@code Kleisli} value from a function.
-         * @param f         the function
-         * @param <T>       the input type
-         * @param <U>       the value type of the returned {@code Try} value
-         * @return          the new {@code Kleisli}
-         */
-        static <T, U> Kleisli<T, U> of(F<T, Try<U>> f) {
-            return f::apply;
-        }
-
-        /**
-         * Run this {@code Kleisli} operation
-         * @param t         the input value
-         * @return          the result of the operation
-         */
-        Try<U> run(T t);
-
-        /**
-         * Compose this {@code Kleisli} with another by applying this one first,
-         * then the other.
-         * @param kUV       the {@code Kleisli} to be applied after this one
-         * @param <V>       the second {@code Kleisli}'s return type
-         * @return          the composed {@code Kleisli}
-         */
-        default <V> Kleisli<T, V> andThen(Kleisli<U, V> kUV) {
-            return t -> run(t).flatMap(kUV::run);
-        }
-
-        /**
-         * Compose this {@code Kleisli} with another by applying the other one first,
-         * and then this one.
-         * @param kST       the {@code Kleisli} to be applied after this one
-         * @param <S>       the first {@code Kleisli}'s input type
-         * @return          the composed {@code Kleisli}
-         */
-        default <S> Kleisli<S, U> compose(Kleisli<S, T> kST) {
-            return s -> kST.run(s).flatMap(this::run);
-        }
     }
 
     /**
