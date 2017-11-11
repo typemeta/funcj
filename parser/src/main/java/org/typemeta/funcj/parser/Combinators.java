@@ -2,7 +2,7 @@ package org.typemeta.funcj.parser;
 
 import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.tuples.*;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import java.util.Optional;
 

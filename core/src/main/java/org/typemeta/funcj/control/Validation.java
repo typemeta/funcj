@@ -2,10 +2,9 @@ package org.typemeta.funcj.control;
 
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
-import org.typemeta.funcj.functions.FunctionsGenEx;
+import org.typemeta.funcj.functions.*;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -235,11 +234,11 @@ public interface Validation<E, T> {
     Optional<T> asOptional();
 
     /**
-     * Push the result to a {@link java.util.function.Consumer}.
-     * @param failure   the consumer to be applied to {@code Failure} values
-     * @param success   the consumer to be applied to {@code Success} values
+     * Push the result to a {@link SideEffect.F}.
+     * @param failure   the side-effect to be applied to {@code Failure} values
+     * @param success   the side-effect to be applied to {@code Success} values
      */
-    void handle(Consumer<Failure<E, T>> failure, Consumer<Success<E, T>> success);
+    void handle(SideEffect.F<Failure<E, T>> failure, SideEffect.F<Success<E, T>> success);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
@@ -331,8 +330,8 @@ public interface Validation<E, T> {
         }
 
         @Override
-        public void handle(Consumer<Failure<E, T>> failure, Consumer<Success<E, T>> success) {
-            success.accept(this);
+        public void handle(SideEffect.F<Failure<E, T>> failure, SideEffect.F<Success<E, T>> success) {
+            success.apply(this);
         }
 
         @Override
@@ -401,8 +400,8 @@ public interface Validation<E, T> {
         }
 
         @Override
-        public void handle(Consumer<Failure<E, T>> failure, Consumer<Success<E, T>> success) {
-            failure.accept(this);
+        public void handle(SideEffect.F<Failure<E, T>> failure, SideEffect.F<Success<E, T>> success) {
+            failure.apply(this);
         }
 
         @Override

@@ -2,11 +2,9 @@ package org.typemeta.funcj.control;
 
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
-import org.typemeta.funcj.functions.FunctionsEx;
-import org.typemeta.funcj.tuples.Tuple2;
+import org.typemeta.funcj.functions.*;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -233,11 +231,11 @@ public interface Try<T> {
     T get();
 
     /**
-     * Push the result to a {@link java.util.function.Consumer}.
-     * @param failure   the consumer to be applied to {@code Failure} values
-     * @param success   the consumer to be applied to {@code Success} values
+     * Push the result to a {@link SideEffect.F}.
+     * @param failure   the side-effect to be applied to {@code Failure} values
+     * @param success   the side-effect to be applied to {@code Success} values
      */
-    void handle(Consumer<Failure<T>> failure, Consumer<Success<T>> success);
+    void handle(SideEffect.F<Failure<T>> failure, SideEffect.F<Success<T>> success);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
@@ -354,8 +352,8 @@ public interface Try<T> {
         }
 
         @Override
-        public void handle(Consumer<Failure<T>> failure, Consumer<Success<T>> success) {
-            success.accept(this);
+        public void handle(SideEffect.F<Failure<T>> failure, SideEffect.F<Success<T>> success) {
+            success.apply(this);
         }
 
         @Override
@@ -449,8 +447,8 @@ public interface Try<T> {
         }
 
         @Override
-        public void handle(Consumer<Failure<T>> failure, Consumer<Success<T>> success) {
-            failure.accept(this);
+        public void handle(SideEffect.F<Failure<T>> failure, SideEffect.F<Success<T>> success) {
+            failure.apply(this);
         }
 
         @Override

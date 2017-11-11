@@ -2,9 +2,9 @@ package org.typemeta.funcj.control;
 
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
+import org.typemeta.funcj.functions.SideEffect;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -223,11 +223,11 @@ public interface Option<T> {
     T get();
 
     /**
-     * Push the result to a {@link Consumer}.
-     * @param none   the consumer to be applied to {@code None} values
-     * @param some   the consumer to be applied to {@code Some} values
+     * Push the result to a {@link SideEffect.F}.
+     * @param none   the side-effect to be applied to {@code None} values
+     * @param some   the side-effect to be applied to {@code Some} values
      */
-    void handle(Consumer<None<T>> none, Consumer<Some<T>> some);
+    void handle(SideEffect.F0 none, SideEffect.F<Some<T>> some);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
@@ -236,7 +236,7 @@ public interface Option<T> {
      * @param <R>       the return type of functions
      * @return          the result of applying either function
      */
-    <R> R match(F<None<T>, ? extends R> none, F<Some<T>, ? extends R> some);
+    <R> R match(F0<? extends R> none, F<Some<T>, ? extends R> some);
 
     /**
      * Functor function application.
@@ -344,12 +344,12 @@ public interface Option<T> {
         }
 
         @Override
-        public void handle(Consumer<None<T>> none, Consumer<Some<T>> some) {
-            some.accept(this);
+        public void handle(SideEffect.F0 none, SideEffect.F<Some<T>> some) {
+            some.apply(this);
         }
 
         @Override
-        public <R> R match(F<None<T>, ? extends R> none, F<Some<T>, ? extends R> some) {
+        public <R> R match(F0<? extends R> none, F<Some<T>, ? extends R> some) {
             return some.apply(this);
         }
 
@@ -425,13 +425,13 @@ public interface Option<T> {
         }
 
         @Override
-        public void handle(Consumer<None<T>> none, Consumer<Some<T>> some) {
-            none.accept(this);
+        public void handle(SideEffect.F0 none, SideEffect.F<Some<T>> some) {
+            none.apply();
         }
 
         @Override
-        public <R> R match(F<None<T>, ? extends R> none, F<Some<T>, ? extends R> some) {
-            return none.apply(this);
+        public <R> R match(F0<? extends R> none, F<Some<T>, ? extends R> some) {
+            return none.apply();
         }
 
         @Override
@@ -441,10 +441,7 @@ public interface Option<T> {
 
         @Override
         public <U> Option<U> apply(Option<F<T, U>> tf) {
-            return tf.match(
-                    none -> none.cast(),
-                    some -> this.cast()
-            );
+            return this.cast();
         }
 
         @Override

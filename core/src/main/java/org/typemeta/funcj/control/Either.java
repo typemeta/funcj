@@ -1,11 +1,10 @@
 package org.typemeta.funcj.control;
 
 import org.typemeta.funcj.data.IList;
-import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.functions.Functions.F;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -203,11 +202,11 @@ public interface Either<E, S> {
     Optional<S> asOptional();
 
     /**
-     * Push the result to a {@link java.util.function.Consumer}.
-     * @param left      the consumer to be applied to {@code Left} values
-     * @param right     the consumer to be applied to {@code Right} values
+     * Push the result to a {@link SideEffect.F}.
+     * @param left      the side-effect to be applied to {@code Left} values
+     * @param right     the side-effect to be applied to {@code Right} values
      */
-    void handle(Consumer<Left<E, S>> left, Consumer<Right<E, S>> right);
+    void handle(SideEffect.F<Left<E, S>> left, SideEffect.F<Right<E, S>> right);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
@@ -314,8 +313,8 @@ public interface Either<E, S> {
         }
 
         @Override
-        public void handle(Consumer<Left<E, S>> left, Consumer<Right<E, S>> right) {
-            left.accept(this);
+        public void handle(SideEffect.F<Left<E, S>> left, SideEffect.F<Right<E, S>> right) {
+            left.apply(this);
         }
 
         @Override
@@ -397,8 +396,8 @@ public interface Either<E, S> {
         }
 
         @Override
-        public void handle(Consumer<Left<E, S>> left, Consumer<Right<E, S>> right) {
-            right.accept(this);
+        public void handle(SideEffect.F<Left<E, S>> left, SideEffect.F<Right<E, S>> right) {
+            right.apply(this);
         }
 
         @Override

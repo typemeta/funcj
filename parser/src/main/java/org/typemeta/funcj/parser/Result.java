@@ -1,9 +1,9 @@
 package org.typemeta.funcj.parser;
 
 import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.functions.SideEffect;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * A parse result is either a {@code Success} or a {@code Failure}.
@@ -33,7 +33,7 @@ public interface Result<I, A> {
 
     <B> Result<I, B> map(F<A, B> f);
 
-    void handle(Consumer<Success<I, A>> success, Consumer<Failure<I, A>> failure);
+    void handle(SideEffect.F<Success<I, A>> success, SideEffect.F<Failure<I, A>> failure);
 
     <B> B match(F<Success<I, A>, B> success, F<Failure<I, A>, B> failure);
 
@@ -99,8 +99,8 @@ public interface Result<I, A> {
         }
 
         @Override
-        public void handle(Consumer<Success<I, A>> success, Consumer<Failure<I, A>> failure) {
-            success.accept(this);
+        public void handle(SideEffect.F<Success<I, A>> success, SideEffect.F<Failure<I, A>> failure) {
+            success.apply(this);
         }
 
         @Override
@@ -159,8 +159,8 @@ public interface Result<I, A> {
         }
 
         @Override
-        public void handle(Consumer<Success<I, A>> success, Consumer<Failure<I, A>> failure) {
-            failure.accept(this);
+        public void handle(SideEffect.F<Success<I, A>> success, SideEffect.F<Failure<I, A>> failure) {
+            failure.apply(this);
         }
 
         @Override
@@ -232,8 +232,8 @@ public interface Result<I, A> {
         }
 
         @Override
-        public void handle(Consumer<Success<I, A>> success, Consumer<Failure<I, A>> failure) {
-            failure.accept(this);
+        public void handle(SideEffect.F<Success<I, A>> success, SideEffect.F<Failure<I, A>> failure) {
+            failure.apply(this);
         }
 
         @Override
@@ -305,8 +305,8 @@ public interface Result<I, A> {
         }
 
         @Override
-        public void handle(Consumer<Success<I, A>> success, Consumer<Failure<I, A>> failure) {
-            failure.accept(this);
+        public void handle(SideEffect.F<Success<I, A>> success, SideEffect.F<Failure<I, A>> failure) {
+            failure.apply(this);
         }
 
         @Override

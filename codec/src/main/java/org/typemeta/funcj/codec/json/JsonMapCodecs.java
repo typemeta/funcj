@@ -2,11 +2,10 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.Codec;
 import org.typemeta.funcj.control.Exceptions;
-import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.json.*;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
 
@@ -45,7 +44,7 @@ public abstract class JsonMapCodecs {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
-            final Functions.F<Map<K, V>, Consumer<JSValue>> decodeF = m -> elemNode -> {
+            final Functions.F<Map<K, V>, SideEffect.F<JSValue>> decodeF = m -> elemNode -> {
                 final JSObject elemObjNode = elemNode.asObject();
                 final K key = keyCodec.decode(elemObjNode.get(keyFieldName));
                 final V val = valueCodec.decode(elemObjNode.get(valueFieldName));
@@ -57,8 +56,8 @@ public abstract class JsonMapCodecs {
                     JsonCodecException::new);
 
             final JSArray objNode = enc.asArray();
-            final Consumer<JSValue> decode = decodeF.apply(map);
-            objNode.forEach(decode);
+            final SideEffect.F<JSValue> decode = decodeF.apply(map);
+            objNode.forEach(decode::apply);
 
             return map;
         }

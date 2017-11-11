@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.typemeta.funcj.data.Unit;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnitQuickcheck.class)
 public class ValidationTest {
