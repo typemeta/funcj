@@ -156,7 +156,7 @@ public class ParserTest {
         final String s = "" + c1 + c2;
         final char[] ca = s.toCharArray();
 
-        final Parser<Chr, String> parser = any(Chr.class).many().map(Chr::listToString);
+        final Parser<Chr, String> parser = any(Chr.class).many1().map(Chr::listToString);
 
         TestUtils.ParserCheck.parser(parser)
                 .withInput(Input.of(ca))
@@ -167,7 +167,7 @@ public class ParserTest {
     public void many1FailsOnNonEmptyInput() {
         final Input<Chr> input = Input.of("");
 
-        final Parser<Chr, String> parser = any(Chr.class).many().map(Chr::listToString);
+        final Parser<Chr, String> parser = any(Chr.class).many1().map(Chr::listToString);
 
         TestUtils.ParserCheck.parser(parser)
                 .withInput(input)
