@@ -1,11 +1,9 @@
 package org.typemeta.funcj.parser;
 
-import org.junit.Test;
 import org.typemeta.funcj.data.Chr;
 import org.typemeta.funcj.functions.Functions;
 
 import static org.junit.Assert.assertEquals;
-import static org.typemeta.funcj.parser.Combinators.choice;
 import static org.typemeta.funcj.parser.Text.*;
 
 public class ExprTest {

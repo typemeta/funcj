@@ -9,8 +9,7 @@ import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import static org.hamcrest.CoreMatchers.not;
-import static org.typemeta.funcj.parser.Combinators.any;
-import static org.typemeta.funcj.parser.Combinators.value;
+import static org.typemeta.funcj.parser.Combinators.*;
 import static org.typemeta.funcj.parser.Parser.ap;
 
 @RunWith(JUnitQuickcheck.class)
