@@ -9,6 +9,8 @@ import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import static org.hamcrest.CoreMatchers.not;
+import static org.typemeta.funcj.parser.Combinators.any;
+import static org.typemeta.funcj.parser.Combinators.value;
 import static org.typemeta.funcj.parser.Parser.ap;
 
 @RunWith(JUnitQuickcheck.class)
@@ -30,7 +32,7 @@ public class ParserPropTests {
         final Input<Chr> input = Input.of(String.valueOf(c1));
 
         final Parser<Chr, Chr> parser =
-                Combinators.value(Chr.valueOf(c1))
+                value(Chr.valueOf(c1))
                         .map(c -> Chr.valueOf(c.charValue() + 1));
 
         TestUtils.ParserCheck.parser(parser)
@@ -44,7 +46,7 @@ public class ParserPropTests {
 
         final F<Chr, Chr> f = (Chr c) -> Chr.valueOf(c.charValue() + 1);
 
-        final Parser<Chr, Chr> parser = ap(f, Combinators.any());
+        final Parser<Chr, Chr> parser = ap(f, any());
 
         TestUtils.ParserCheck.parser(parser)
                 .withInput(input)
@@ -62,7 +64,13 @@ public class ParserPropTests {
         final char[] ca12 = String.valueOf("" + c1 + c2).toCharArray();
         final char[] ca11 = String.valueOf("" + c1 + c1).toCharArray();
 
-        final Parser<Chr, Tuple2<Chr, Chr>> parser = ap(ap(a -> b -> Tuple2.of(a, b), Combinators.value(cc1)), Combinators.value(cc2));
+        final Parser<Chr, Tuple2<Chr, Chr>> parser =
+                ap(
+                        ap(
+                                a -> b -> Tuple2.of(a, b),
+                                value(cc1)),
+                        value(cc2)
+                );
 
         TestUtils.ParserCheck.parser(parser)
                 .withInput(Input.of(ca12))
@@ -86,7 +94,7 @@ public class ParserPropTests {
         final Chr cc1 = Chr.valueOf(c1);
         final Chr cc2 = Chr.valueOf(c2);
 
-        final Parser<Chr, Chr> parser = Combinators.value(cc1).or(Combinators.value(cc2));
+        final Parser<Chr, Chr> parser = value(cc1).or(value(cc2));
 
         TestUtils.ParserCheck.parser(parser)
                 .withInput(input1)
@@ -108,8 +116,8 @@ public class ParserPropTests {
         final Input<Chr> input = Input.of(data);
 
         final Parser<Chr, Tuple2<Chr, Chr>> parser =
-                Combinators.<Chr>any()
-                        .and(Combinators.any())
+                any(Chr.class)
+                        .and(any())
                         .map(Tuple2::of);
 
         final Input<Chr> expInp = Input.of(data).next().next();
@@ -117,5 +125,51 @@ public class ParserPropTests {
         TestUtils.ParserCheck.parser(parser)
                 .withInput(input)
                 .succeedsWithResult(Tuple2.of(Chr.valueOf(c1), Chr.valueOf(c2)), expInp);
+    }
+
+    @Property
+    public void manyMatchesMany(char c1, char c2) {
+        final String s = "" + c1 + c2;
+        final char[] ca = s.toCharArray();
+
+        final Parser<Chr, String> parser = any(Chr.class).many().map(Chr::listToString);
+
+        TestUtils.ParserCheck.parser(parser)
+                .withInput(Input.of(ca))
+                .succeedsWithResult(s, Input.of(ca).next().next());
+    }
+
+    @Property
+    public void manySuccedsOnNonEmptyInput() {
+        final Input<Chr> input = Input.of("");
+
+        final Parser<Chr, String> parser = any(Chr.class).many().map(Chr::listToString);
+
+        TestUtils.ParserCheck.parser(parser)
+                .withInput(input)
+                .succeedsWithResult("", input);
+    }
+
+    @Property
+    public void many1MatchesMany(char c1, char c2) {
+        final String s = "" + c1 + c2;
+        final char[] ca = s.toCharArray();
+
+        final Parser<Chr, String> parser = any(Chr.class).many().map(Chr::listToString);
+
+        TestUtils.ParserCheck.parser(parser)
+                .withInput(Input.of(ca))
+                .succeedsWithResult(s, Input.of(ca).next().next());
+    }
+
+    @Property
+    public void many1FailsOnNonEmptyInput() {
+        final Input<Chr> input = Input.of("");
+
+        final Parser<Chr, String> parser = any(Chr.class).many().map(Chr::listToString);
+
+        TestUtils.ParserCheck.parser(parser)
+                .withInput(input)
+                .fails();
     }
 }

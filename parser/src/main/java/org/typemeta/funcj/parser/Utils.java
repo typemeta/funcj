@@ -1,6 +1,8 @@
 package org.typemeta.funcj.parser;
 
-import org.typemeta.funcj.data.Lazy;
+import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.tuples.Tuple2;
 
 abstract class Utils {
 
@@ -43,5 +45,12 @@ abstract class Utils {
 
     static <I, A> Result<I, A> failureEof(Parser<I, ?> parser, Input<I> in) {
         return Result.failureEof(in, parser.firstSet().apply());
+    }
+
+    static <A> A reduce(A a, IList<Tuple2<Functions.Op2<A>, A>> lopA) {
+        return lopA.match(
+                nel -> nel.head()._1.apply(a, reduce(nel.head()._2, nel.tail())),
+                nil -> a
+        );
     }
 }

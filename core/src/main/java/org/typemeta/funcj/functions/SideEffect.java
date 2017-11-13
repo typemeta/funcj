@@ -63,6 +63,7 @@ public abstract class SideEffect {
          * @param f         the function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
+         * @return          the function
          */
         static <A, B> F2<A, B> of(F2<A, B> f) {
             return f;

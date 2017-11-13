@@ -4,7 +4,6 @@ import org.typemeta.funcj.data.Chr;
 import org.typemeta.funcj.functions.Functions.Op2;
 import org.typemeta.funcj.parser.*;
 
-import static org.typemeta.funcj.parser.Combinators.chainl1;
 import static org.typemeta.funcj.parser.Text.*;
 import static org.typemeta.funcj.parser.expr.Model.*;
 
@@ -71,18 +70,18 @@ public abstract class Grammar {
         final Parser<Chr, UnaryOp> sign = plus.or(minus);
 
         // signedExpr = sign expr
-//        final Parser<Chr, Expr> signedExpr =
-//            sign.and(expr).map(Model::unaryOpExpr);
+        final Parser<Chr, Expr> signedExpr =
+            sign.and(expr).map(Model::unaryOpExpr);
 
         // term = num | brackExpr | funcN | signedExpr
         final Parser<Chr, Expr> term =
-            num.or(brackExpr).or(funcN).or(var); //.or(signedExpr);
+            num.or(brackExpr).or(funcN).or(var).or(signedExpr);
 
         // prod = term chainl1 multDiv
-        final Parser<Chr, Expr> prod = chainl1(term, multDiv);
+        final Parser<Chr, Expr> prod = term.chainl1(multDiv);
 
         // expr = prod chainl1 addSub
-        parser = expr.set(chainl1(prod, addSub));
+        parser = expr.set(prod.chainl1(addSub));
     }
 
     public static final Parser<Chr, Expr> parser;

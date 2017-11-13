@@ -122,6 +122,16 @@ public abstract class Combinators {
     }
 
     /**
+     * A parser that succeeds on any input symbol, and returns that symbol.
+     * @param <I>       the input stream symbol type
+     * @param clazz     dummy p[aram for type inference of generic type {@code I}
+     * @return          a parser that succeeds on any input symbol
+     */
+    public static <I> Parser<I, I> any(Class<I> clazz) {
+        return any();
+    }
+
+    /**
      * Combine two parser to form a parser which applies both parsers,
      * and if they are both successful then returns a {@link Tuple2} of the results.
      * @param pa        the first parser
@@ -136,150 +146,6 @@ public abstract class Combinators {
     }
 
     /**
-     * A parser which repeatedly applies {@code p} until it fails,
-     * and then returns an {@link IList} of the results.
-     * If {@code p} fails on the first attempt then this parser succeeds,
-     * with an empty list of results.
-     * @param p         the parser to be applied repeatedly
-     * @param <I>       the input stream symbol type
-     * @param <A>       the parse result type
-     * @return          a parser which applies {@code p} zero or more times until it fails
-     */
-    public static <I, A>
-    Parser<I, IList<A>> many(Parser<I, A> p) {
-        // We use an iterative implementation, in favour of a more concise recursive solution,
-        // for performance, and to avoid StackOverflowExceptions.
-        return new ParserImpl<I, IList<A>>(LTRUE, p.firstSet()) {
-            @Override
-            public Result<I, IList<A>> parse(Input<I> in, SymSet<I> follow) {
-                IList<A> acc = IList.of();
-                final SymSet<I> follow2 = follow.union(p.firstSet().apply());
-                while (true) {
-                    if (!in.isEof()) {
-                        final I i = in.get();
-                        if (firstSet().apply().matches(i)) {
-                            final Result<I, A> r = p.parse(in, follow2);
-                            if (r.isSuccess()) {
-                                final Result.Success<I, A> succ = (Result.Success<I, A>) r;
-                                acc = acc.add(succ.value());
-                                in = succ.next();
-                                continue;
-                            } else {
-                                return ((Result.Failure<I, A>)r).cast();
-                            }
-                        }
-                    }
-                    return Result.success(acc.reverse(), in);
-                }
-            }
-        };
-    }
-
-    /**
-     * A parser which applies {@code p} one or more times until it fails,
-     * and then returns an {@link IList} of the results.
-     * Note, if {@code p} fails on the first attempt then this parser fails.
-     * @param p         the parser to be applied repeatedly
-     * @param <I>       the input stream symbol type
-     * @param <A>       the parser result type
-     * @return          a parser which applies {@code p} repeatedly until it fails
-     */
-    public static <I, A>
-    Parser<I, IList.NonEmpty<A>> many1(Parser<I, A> p) {
-        return p.and(many(p))
-            .map(a -> l -> l.add(a));
-    }
-
-    /**
-     * A parser which applies {@code p} zero or more times until it fails,
-     * and throws away the results.
-     * Note, if {@code p} fails on the first attempt then this parser succeeds.
-     * @param p         the parser to be applied repeatedly
-     * @param <I>       the input stream symbol type
-     * @param <A>       the parser result type
-     * @return          a parser which applies {@code p} repeatedly until it fails
-     */
-    public static <I, A>
-    Parser<I, Unit> skipMany(Parser<I, A> p) {
-        return many(p)
-                .map(u -> Unit.UNIT);
-    }
-
-    /**
-     * A parser which applies {@code p} zero or more times until it fails,
-     * alternating with calls to the {@code sep} parser.
-     * The results of the {@code p} parser are collected in a {@link IList}
-     * and returned by the parser.
-     * @param p         the symbol parser
-     * @param sep       the separator parser
-     * @param <I>       the input stream symbol type
-     * @param <A>       the parser result type
-     * @param <SEP>     the separator type
-     * @return          a parser which applies {@code p} zero or more times alternated with {@code sep}
-     */
-    public static <I, A, SEP>
-    Parser<I, IList<A>> sepBy(Parser<I, A> p, Parser<I, SEP> sep) {
-        return sepBy1(p, sep)
-                .or(Parser.pure(IList.nil()));
-    }
-
-    /**
-     * A parser which applies {@code p} one or more times until it fails,
-     * alternating with calls to the {@code sep} parser.
-     * The results of the {@code p} parser are collected in a {@link IList}
-     * and returned by the parser.
-     * @param p         the symbol parser
-     * @param sep       the separator parser
-     * @param <I>       the input stream symbol type
-     * @param <A>       the parser result type
-     * @param <SEP>     the separator type
-     * @return          a parser which applies {@code p} one or more times alternated with {@code sep}
-     */
-    public static <I, A, SEP>
-    Parser<I, IList<A>> sepBy1(Parser<I, A> p, Parser<I, SEP> sep) {
-        return p.and(many(sep.andR(p)))
-            .map(a -> l -> l.add(a));
-    }
-
-    /**
-     * A parser that applies the {@code p} parser, and, if it succeeds,
-     * returns the result wrapped in an {@link Optional},
-     * otherwise returns an empty {@code Optional}.
-     * @param p         the symbol parser
-     * @param <I>       the input stream symbol type
-     * @param <A>       the parser result type
-     * @return          an optional parser
-     */
-    public static <I, A>
-    Parser<I, Optional<A>> optional(Parser<I, A> p) {
-        return p.map(Optional::of)
-                .or(Parser.pure(Optional.empty()));
-    }
-
-    /**
-     * A parser for expressions with enclosing symbols.
-     * <p>
-     * A parser which applies the {@code open} parser, then the {@code p} parser,
-     * and then {@code close} parser.
-     * If all three succeed then the result of the {@code p} parser is returned.
-     * @param open      the open symbol parser
-     * @param close     the close symbol parser
-     * @param p         the enclosed symbol parser
-     * @param <I>       the input stream symbol type
-     * @param <A>       the enclosed parser result type
-     * @param <OPEN>    the open parser result type
-     * @param <CLOSE>   the close parser result type
-     * @return          a parser for expressions with enclosing symbols
-     */
-    public static <I, A, OPEN, CLOSE>
-    Parser<I, A> between(
-            Parser<I, OPEN> open,
-            Parser<I, CLOSE> close,
-            Parser<I, A> p) {
-        return open.andR(p).andL(close);
-    }
-
-    /**
      * A parser that attempts one or more parsers in turn and returns the result
      * of the first that succeeds, or else fails.
      * @param ps        the var-arg list of parsers
@@ -291,6 +157,101 @@ public abstract class Combinators {
     public static <I, A>
     Parser<I, A> choice(Parser<I, A>... ps) {
         return choice((IList.NonEmpty<Parser<I, A>>) IList.ofArray(ps));
+    }
+
+    /**
+     * A parser that attempts one or more parsers in turn and returns the result
+     * of the first that succeeds, or else fails.
+     * @param p1        the first parser
+     * @param p2        the second parser
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
+     * @return          a parser that attempts one or more parsers in turn
+     */
+    public static <I, A>
+    Parser<I, A> choice(Parser<I, ? extends A> p1, Parser<I, ? extends A> p2) {
+        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast()));
+    }
+
+    /**
+     * A parser that attempts one or more parsers in turn and returns the result
+     * of the first that succeeds, or else fails.
+     * @param p1        the first parser
+     * @param p2        the second parser
+     * @param p3        the third parser
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
+     * @return          a parser that attempts one or more parsers in turn
+     */
+    public static <I, A>
+    Parser<I, A> choice(Parser<I, ? extends A> p1, Parser<I, ? extends A> p2, Parser<I, ? extends A> p3) {
+        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast()));
+    }
+
+    /**
+     * A parser that attempts one or more parsers in turn and returns the result
+     * of the first that succeeds, or else fails.
+     * @param p1        the first parser
+     * @param p2        the second parser
+     * @param p3        the third parser
+     * @param p4        the fourth parser
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
+     * @return          a parser that attempts one or more parsers in turn
+     */
+    public static <I, A>
+    Parser<I, A> choice(
+            Parser<I, ? extends A> p1,
+            Parser<I, ? extends A> p2,
+            Parser<I, ? extends A> p3,
+            Parser<I, ? extends A> p4) {
+        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast()));
+    }
+
+    /**
+     * A parser that attempts one or more parsers in turn and returns the result
+     * of the first that succeeds, or else fails.
+     * @param p1        the first parser
+     * @param p2        the second parser
+     * @param p3        the third parser
+     * @param p4        the fourth parser
+     * @param p5        the fifth parser
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
+     * @return          a parser that attempts one or more parsers in turn
+     */
+    public static <I, A>
+    Parser<I, A> choice(
+            Parser<I, ? extends A> p1,
+            Parser<I, ? extends A> p2,
+            Parser<I, ? extends A> p3,
+            Parser<I, ? extends A> p4,
+            Parser<I, ? extends A> p5) {
+        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast()));
+    }
+
+    /**
+     * A parser that attempts one or more parsers in turn and returns the result
+     * of the first that succeeds, or else fails.
+     * @param p1        the first parser
+     * @param p2        the second parser
+     * @param p3        the third parser
+     * @param p4        the fourth parser
+     * @param p5        the fifth parser
+     * @param p6        the sixth parser
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
+     * @return          a parser that attempts one or more parsers in turn
+     */
+    public static <I, A>
+    Parser<I, A> choice(
+            Parser<I, ? extends A> p1,
+            Parser<I, ? extends A> p2,
+            Parser<I, ? extends A> p3,
+            Parser<I, ? extends A> p4,
+            Parser<I, ? extends A> p5,
+            Parser<I, ? extends A> p6) {
+        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast(), p6.cast()));
     }
 
     /**
@@ -338,21 +299,4 @@ public abstract class Combinators {
         };
     }
 
-    /**
-     * A parser for an operand, followed by one or more operands that are separated by operators.
-     * This can, for example, be used to eliminate left recursion
-     * which typically occurs in expression grammars.
-     * @param p         the parser
-     * @param op        the parser for the operator
-     * @param <I>       the input stream symbol type
-     * @param <A>       the parser result type
-     * @return          a parser for operator expressions
-     */
-    public static <I, A> Parser<I, A> chainl1(Parser<I, A> p, Parser<I, Functions.Op2<A>> op) {
-        final Parser<I, IList<Functions.Op<A>>> plo =
-                many(op.and(p)
-                        .map((f, y) -> x -> f.apply(x, y)));
-        return p.and(plo)
-                .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
-    }
 }

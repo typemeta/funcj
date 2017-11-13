@@ -1,9 +1,11 @@
 package org.typemeta.funcj.parser;
 
 import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.*;
+import org.typemeta.funcj.tuples.Tuple2;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.typemeta.funcj.parser.Parser.pure;
@@ -192,6 +194,11 @@ public interface Parser<I, A> {
      */
     Result<I, A> parse(Input<I> in, SymSet<I> follow);
 
+    @SuppressWarnings("unchecked")
+    default <B> Parser<I, B> cast() {
+        return (Parser<I, B>)this;
+    }
+
     /**
      * Apply this parser to the input stream.
      * @param in        the input stream
@@ -313,5 +320,176 @@ public interface Parser<I, A> {
      */
     default <B> Parser<I, B> andR(Parser<I, B> pb) {
         return this.and(pb).map(F2.second());
+    }
+
+    /**
+     * A parser which repeatedly applies this parser until it fails,
+     * and then returns an {@link IList} of the results.
+     * If this parser fails on the first attempt then the parser succeeds,
+     * with an empty list of results.
+     * @return          a parser which applies {@code p} zero or more times until it fails
+     */
+    default Parser<I, IList<A>> many() {
+        // We use an iterative implementation, in favour of a more concise recursive solution,
+        // for performance, and to avoid StackOverflowExceptions.
+        return new ParserImpl<I, IList<A>>(LTRUE, this.firstSet()) {
+            @Override
+            public Result<I, IList<A>> parse(Input<I> in, SymSet<I> follow) {
+                IList<A> acc = IList.of();
+                final SymSet<I> follow2 = follow.union(Parser.this.firstSet().apply());
+                while (true) {
+                    if (!in.isEof()) {
+                        final I i = in.get();
+                        if (firstSet().apply().matches(i)) {
+                            final Result<I, A> r = Parser.this.parse(in, follow2);
+                            if (r.isSuccess()) {
+                                final Result.Success<I, A> succ = (Result.Success<I, A>) r;
+                                acc = acc.add(succ.value());
+                                in = succ.next();
+                                continue;
+                            } else {
+                                return ((Result.Failure<I, A>)r).cast();
+                            }
+                        }
+                    }
+                    return Result.success(acc.reverse(), in);
+                }
+            }
+        };
+    }
+
+    /**
+     * A parser which applies this parser one or more times until it fails,
+     * and then returns an {@link IList} of the results.
+     * Note, if this parser fails on the first attempt then the parser fails.
+     * @return          a parser which applies this parser repeatedly until it fails
+     */
+    default Parser<I, IList.NonEmpty<A>> many1() {
+        return this.and(this.many())
+                .map(a -> l -> l.add(a));
+    }
+
+    /**
+     * A parser which applies this parser zero or more times until it fails,
+     * and throws away the results.
+     * Note, if this parser fails on the first attempt then the parser succeeds.
+     * @return          a parser which applies this parser repeatedly until it fails
+     */
+    default Parser<I, Unit> skipMany() {
+        return this.many()
+                .map(u -> Unit.UNIT);
+    }
+
+    /**
+     * A parser which applies this parser zero or more times until it fails,
+     * alternating with calls to the {@code sep} parser.
+     * The results of this parser are collected in a {@link IList}
+     * and returned by the parser.
+     * @param sep       the separator parser
+     * @param <SEP>     the separator type
+     * @return          a parser which applies this parser zero or more times alternated with {@code sep}
+     */
+    default <SEP> Parser<I, IList<A>> sepBy(Parser<I, SEP> sep) {
+        return this.sepBy1(sep)
+                .or(Parser.pure(IList.nil()));
+    }
+
+    /**
+     * A parser which applies this parser one or more times until it fails,
+     * alternating with calls to the {@code sep} parser.
+     * The results of this parser are collected in a {@link IList}
+     * and returned by the parser.
+     * @param sep       the separator parser
+     * @param <SEP>     the separator type
+     * @return          a parser which applies this parser one or more times alternated with {@code sep}
+     */
+    default <SEP> Parser<I, IList<A>> sepBy1(Parser<I, SEP> sep) {
+        return this.and(sep.andR(this).many())
+                .map(a -> l -> l.add(a));
+    }
+
+    /**
+     * A parser that applies this parser, and, if it succeeds,
+     * returns the result wrapped in an {@link Optional},
+     * otherwise returns an empty {@code Optional}.
+     * @return          an optional parser
+     */
+    default Parser<I, Optional<A>> optional() {
+        return this.map(Optional::of)
+                .or(Parser.pure(Optional.empty()));
+    }
+
+    /**
+     * A parser for expressions with enclosing symbols.
+     * <p>
+     * A parser which applies the {@code open} parser, then this parser,
+     * and then {@code close} parser.
+     * If all three succeed then the result of this parser is returned.
+     * @param open      the open symbol parser
+     * @param close     the close symbol parser
+     * @param <OPEN>    the open parser result type
+     * @param <CLOSE>   the close parser result type
+     * @return          a parser for expressions with enclosing symbols
+     */
+    default <OPEN, CLOSE>
+    Parser<I, A> between(
+            Parser<I, OPEN> open,
+            Parser<I, CLOSE> close) {
+        return open.andR(this).andL(close);
+    }
+
+    /**
+     * A parser for an operand, followed by zero or more operands that are separated by operators.
+     * The operators are right-associative.
+     * @param op        the parser for the operator
+     * @param a         the value to return if there are no operands
+     * @return          a parser for operator expressions
+     */
+
+    default Parser<I, A> chainr(Parser<I, Op2<A>> op, A a) {
+        return this.chainr1(op).or(pure(a));
+    }
+
+    /**
+     * A parser for an operand, followed by one or more operands that are separated by operators.
+     * The operators are right-associative.
+     * @param op        the parser for the operator
+     * @return          a parser for operator expressions
+     */
+    default Parser<I, A> chainr1(Parser<I, Op2<A>> op) {
+        return this.and(
+                op.and(this)
+                        .map(Tuple2::of)
+                        .many()
+        ).map(Utils::reduce);
+    }
+
+    /**
+     * A parser for an operand, followed by zero or more operands that are separated by operators.
+     * The operators are left-associative.
+     * This can, for example, be used to eliminate left recursion
+     * which typically occurs in expression grammars.
+     * @param op        the parser for the operator
+     * @param a         the value to return if there are no operands
+     * @return          a parser for operator expressions
+     */
+    default Parser<I, A> chainl(Parser<I, Op2<A>> op, A a) {
+        return this.chainl1(op).or(pure(a));
+    }
+
+    /**
+     * A parser for an operand, followed by one or more operands that are separated by operators.
+     * The operators are left-associative.
+     * This can, for example, be used to eliminate left recursion
+     * which typically occurs in expression grammars.
+     * @param op        the parser for the operator
+     * @return          a parser for operator expressions
+     */
+    default Parser<I, A> chainl1(Parser<I, Functions.Op2<A>> op) {
+        final Parser<I, Functions.Op<A>> plo =
+                op.and(this)
+                        .map((f, y) -> x -> f.apply(x, y));
+        return this.and(plo.many())
+                .map((a, lf) -> lf.foldLeft((acc, f) -> f.apply(acc), a));
     }
 }

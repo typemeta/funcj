@@ -65,7 +65,8 @@ public abstract class Text {
      * parser that parses an unsigned integer.
      */
     public static final Parser<Chr, Integer> uintr =
-            Combinators.many1(digit.map(Text::digitToInt))
+            digit.map(Text::digitToInt)
+                    .many1()
                     .map(l -> l.foldLeft1((acc, x) -> acc * 10 + x));
 
     /**
@@ -79,7 +80,8 @@ public abstract class Text {
      * parser that parses an unsigned long.
      */
     public static final Parser<Chr, Long> ulng =
-            Combinators.many1(digit.map(c -> (long)digitToInt(c)))
+            digit.map(c -> (long)digitToInt(c))
+                    .many1()
                     .map(l -> l.foldLeft1((acc, x) -> acc * 10 + x));
 
     /**
@@ -90,7 +92,8 @@ public abstract class Text {
                     .map((sign, i) -> sign ? i : -i);
 
     private static final Parser<Chr, Double> floating =
-            Combinators.many(digit.map(Text::digitToInt))
+            digit.map(Text::digitToInt)
+                    .many()
                     .map(l -> l.foldRight((d, acc) -> d + acc / 10.0, 0.0) / 10.0);
 
     private static final Parser<Chr, Integer> expnt =
@@ -101,8 +104,9 @@ public abstract class Text {
      * parser that parses a floating point number.
      */
     public static final Parser<Chr, Double> dble =
-            sign.and(ulng).and(Combinators.optional(chr('.').andR(floating)))
-                    .and(Combinators.optional(expnt))
+            sign.and(ulng)
+                    .and((chr('.').andR(floating)).optional())
+                    .and(expnt.optional())
                     .map((sn, i, f, exp) -> {
                         double r = i.doubleValue();
                         if (f.isPresent()) {

@@ -4,7 +4,7 @@ import org.typemeta.funcj.data.IList;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -69,28 +69,27 @@ public class JSAPI {
     public static JSObject obj(JSObject.Field... fields) {
         final LinkedHashMap<String, JSObject.Field> fieldMap =
                 Arrays.stream(fields)
-                        .collect(toMap(
-                                JSObject.Field::getName,
-                                Function.identity(),
-                                Utils::duplicateKeyError,
-                                LinkedHashMap::new
-                        ));
+                        .collect(toFieldMap());
         return obj(fieldMap);
     }
 
     public static JSObject obj(Iterable<JSObject.Field> iter) {
         final LinkedHashMap<String, JSObject.Field> fieldMap =
                 StreamSupport.stream(iter.spliterator(), false)
-                        .collect(toMap(
-                                JSObject.Field::getName,
-                                Function.identity(),
-                                Utils::duplicateKeyError,
-                                LinkedHashMap::new
-                        ));
+                        .collect(toFieldMap());
         return obj(fieldMap);
     }
 
     public static JSObject obj(LinkedHashMap<String, JSObject.Field> values) {
         return new JSObject(values);
+    }
+
+    private static Collector<JSObject.Field, ?, LinkedHashMap<String, JSObject.Field>> toFieldMap() {
+        return toMap(
+                JSObject.Field::getName,
+                Function.identity(),
+                Utils::duplicateKeyError,
+                LinkedHashMap::new
+        );
     }
 }
