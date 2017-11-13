@@ -154,7 +154,7 @@ public abstract class Combinators {
     @SafeVarargs
     public static <I, A>
     Parser<I, A> choice(Parser<I, A>... ps) {
-        return choice((IList.NonEmpty<Parser<I, A>>) IList.ofArray(ps));
+        return Parser.choice((IList.NonEmpty<Parser<I, A>>) IList.ofArray(ps));
     }
 
     /**
@@ -168,7 +168,7 @@ public abstract class Combinators {
      */
     public static <I, A>
     Parser<I, A> choice(Parser<I, ? extends A> p1, Parser<I, ? extends A> p2) {
-        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast()));
+        return Parser.choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast()));
     }
 
     /**
@@ -183,7 +183,7 @@ public abstract class Combinators {
      */
     public static <I, A>
     Parser<I, A> choice(Parser<I, ? extends A> p1, Parser<I, ? extends A> p2, Parser<I, ? extends A> p3) {
-        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast()));
+        return Parser.choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast()));
     }
 
     /**
@@ -203,7 +203,7 @@ public abstract class Combinators {
             Parser<I, ? extends A> p2,
             Parser<I, ? extends A> p3,
             Parser<I, ? extends A> p4) {
-        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast()));
+        return Parser.choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast()));
     }
 
     /**
@@ -225,7 +225,7 @@ public abstract class Combinators {
             Parser<I, ? extends A> p3,
             Parser<I, ? extends A> p4,
             Parser<I, ? extends A> p5) {
-        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast()));
+        return Parser.choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast()));
     }
 
     /**
@@ -249,52 +249,6 @@ public abstract class Combinators {
             Parser<I, ? extends A> p4,
             Parser<I, ? extends A> p5,
             Parser<I, ? extends A> p6) {
-        return choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast(), p6.cast()));
+        return Parser.choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast(), p6.cast()));
     }
-
-    /**
-     * A parser that attempts one or more parsers in turn and returns the result
-     * of the first that succeeds, or else fails.
-     * @param ps        the list of parsers
-     * @param <I>       the input stream symbol type
-     * @param <A>       the parser result type
-     * @return          a parser that attempts one or more parsers in turn
-     */
-    public static <I, A>
-    Parser<I, A> choice(IList.NonEmpty<Parser<I, A>> ps) {
-        // We use an iterative implementation for performance, and to avoid StackOverflowExceptions.
-        // The more concise recursive equivalent is ps.foldLeft1(Parser::or)
-        return new ParserImpl<I, A>(
-                ps.map(Parser::acceptsEmpty).foldLeft1(Utils::or),
-                ps.map(Parser::firstSet).foldLeft1(Utils::union)
-        ) {
-            @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
-                if (in.isEof()) {
-                    for (Parser<I, A> p : ps) {
-                        if (p.acceptsEmpty().apply()) {
-                            return p.parse(in, follow);
-                        }
-                    }
-                    return failureEof(this, in);
-                } else {
-                    final I next = in.get();
-                    for (Parser<I, A> p : ps) {
-                        if (p.firstSet().apply().matches(next)) {
-                            return p.parse(in, follow);
-                        }
-                    }
-                    if (follow.matches(next)) {
-                        for (Parser<I, A> p : ps) {
-                            if (p.acceptsEmpty().apply()) {
-                                return p.parse(in, follow);
-                            }
-                        }
-                    }
-                    return failure(this, in);
-                }
-            }
-        };
-    }
-
 }

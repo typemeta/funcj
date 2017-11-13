@@ -359,6 +359,51 @@ public interface Parser<I, A> {
     }
 
     /**
+     * A parser that attempts one or more parsers in turn and returns the result
+     * of the first that succeeds, or else fails.
+     * @param ps        the list of parsers
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
+     * @return          a parser that attempts one or more parsers in turn
+     */
+    static <I, A>
+    Parser<I, A> choice(IList.NonEmpty<Parser<I, A>> ps) {
+        // We use an iterative implementation for performance, and to avoid StackOverflowExceptions.
+        // The more concise recursive equivalent is ps.foldLeft1(Parser::or)
+        return new ParserImpl<I, A>(
+                ps.map(Parser::acceptsEmpty).foldLeft1(Utils::or),
+                ps.map(Parser::firstSet).foldLeft1(Utils::union)
+        ) {
+            @Override
+            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+                if (in.isEof()) {
+                    for (Parser<I, A> p : ps) {
+                        if (p.acceptsEmpty().apply()) {
+                            return p.parse(in, follow);
+                        }
+                    }
+                    return failureEof(this, in);
+                } else {
+                    final I next = in.get();
+                    for (Parser<I, A> p : ps) {
+                        if (p.firstSet().apply().matches(next)) {
+                            return p.parse(in, follow);
+                        }
+                    }
+                    if (follow.matches(next)) {
+                        for (Parser<I, A> p : ps) {
+                            if (p.acceptsEmpty().apply()) {
+                                return p.parse(in, follow);
+                            }
+                        }
+                    }
+                    return failure(this, in);
+                }
+            }
+        };
+    }
+
+    /**
      * A parser which applies this parser one or more times until it fails,
      * and then returns an {@link IList} of the results.
      * Note, if this parser fails on the first attempt then the parser fails.

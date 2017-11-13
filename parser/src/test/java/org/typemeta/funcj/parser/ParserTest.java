@@ -2,18 +2,20 @@ package org.typemeta.funcj.parser;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.junit.Assume;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.data.Chr;
-import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.typemeta.funcj.parser.Combinators.*;
 import static org.typemeta.funcj.parser.Parser.ap;
+import static org.typemeta.funcj.parser.Text.intr;
 
 @RunWith(JUnitQuickcheck.class)
-public class ParserPropTests {
+public class ParserTest {
 
     @Property
     public void pureConsumesNoInput(char c1) {
@@ -43,7 +45,7 @@ public class ParserPropTests {
     public void apAppliesF(char c1) {
         final Input<Chr> input = Input.of(String.valueOf(c1));
 
-        final F<Chr, Chr> f = (Chr c) -> Chr.valueOf(c.charValue() + 1);
+        final F<Chr, Chr> f = c -> Chr.valueOf(c.charValue() + 1);
 
         final Parser<Chr, Chr> parser = ap(f, any());
 
@@ -59,7 +61,7 @@ public class ParserPropTests {
         final Chr cc1 = Chr.valueOf(c1);
         final Chr cc2 = Chr.valueOf(c2);
 
-        // String.toCharArray returns a new array each time, so ensure we call it only once.
+        // String.toCharArray creates a new array each time, so ensure we call it only once.
         final char[] ca12 = String.valueOf("" + c1 + c2).toCharArray();
         final char[] ca11 = String.valueOf("" + c1 + c1).toCharArray();
 
@@ -67,8 +69,8 @@ public class ParserPropTests {
                 ap(
                         ap(
                                 a -> b -> Tuple2.of(a, b),
-                                value(cc1)),
-                        value(cc2)
+                                value(cc1)
+                        ), value(cc2)
                 );
 
         TestUtils.ParserCheck.parser(parser)
@@ -170,5 +172,51 @@ public class ParserPropTests {
         TestUtils.ParserCheck.parser(parser)
                 .withInput(input)
                 .fails();
+    }
+
+    private static void assertEvaluate(Parser<Chr, Integer> parser, String s, int expected) {
+        assertEquals(s, expected, parser.parse(Input.of(s)).getOrThrow().intValue());
+    }
+
+    private static final Parser<Chr, Op2<Integer>> subtr = value(Chr.valueOf('-'), Op2.of((x, y) -> x - y));
+
+    private static final int Z = 1000;
+
+    @Test
+    public void testChainl() {
+        final Parser<Chr, Integer> parser = intr.chainl(subtr, Z);
+
+        assertEvaluate(parser, "", Z);
+        assertEvaluate(parser, "1", 1);
+        assertEvaluate(parser, "1-2", -1);
+        assertEvaluate(parser, "1-2-3", (1-2)-3);
+    }
+
+    @Test
+    public void testChainr() {
+        final Parser<Chr, Integer> parser = intr.chainr(subtr, Z);
+
+        assertEvaluate(parser, "", Z);
+        assertEvaluate(parser, "1", 1);
+        assertEvaluate(parser, "1-2", -1);
+        assertEvaluate(parser, "1-2-3", 1-(2-3));
+    }
+
+    @Test
+    public void testChainl1() {
+        final Parser<Chr, Integer> parser = intr.chainl1(subtr);
+
+        assertEvaluate(parser, "1", 1);
+        assertEvaluate(parser, "1-2", -1);
+        assertEvaluate(parser, "1-2-3", (1-2)-3);
+    }
+
+    @Test
+    public void testChainr1() {
+        final Parser<Chr, Integer> parser = intr.chainr1(subtr);
+
+        assertEvaluate(parser, "1", 1);
+        assertEvaluate(parser, "1-2", -1);
+        assertEvaluate(parser, "1-2-3", 1-(2-3));
     }
 }

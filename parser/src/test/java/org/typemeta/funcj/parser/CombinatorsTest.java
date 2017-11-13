@@ -7,7 +7,7 @@ import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.functions.Functions.Predicate;
 
 @RunWith(JUnitQuickcheck.class)
-public class CombinatorsPropTests {
+public class CombinatorsTest {
 
     @Property
     public void failAlwaysFails(char c1) {
