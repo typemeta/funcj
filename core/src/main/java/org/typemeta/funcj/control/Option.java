@@ -184,6 +184,18 @@ public interface Option<T> {
         default <S> Kleisli<S, U> compose(Kleisli<S, T> kST) {
             return s -> kST.run(s).flatMap(this::run);
         }
+
+        /**
+         * Compose this {@code Kleisli} with a function,
+         * by applying this {@code Kleisli} first,
+         * and then mapping the function over the result.
+         * @param f         the function
+         * @param <V>       the function return type
+         * @return          the composed {@code Kleisli}
+         */
+        default <V> Kleisli<T, V> map(F<U, V> f) {
+            return t -> run(t).map(f);
+        }
     }
 
     /**

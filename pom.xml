@@ -17,6 +17,7 @@
         <module>core</module>
         <module>parser</module>
         <module>codec</module>
+        <module>query</module>
     </modules>
 
     <scm>

@@ -218,6 +218,18 @@ public interface Validation<E, T> {
         default <S> Kleisli<E, S, U> compose(Kleisli<E, S, T> kST) {
             return s -> kST.run(s).flatMap(this::run);
         }
+
+        /**
+         * Compose this {@code Kleisli} with a function,
+         * by applying this {@code Kleisli} first,
+         * and then mapping the function over the result.
+         * @param f         the function
+         * @param <V>       the function return type
+         * @return          the composed {@code Kleisli}
+         */
+        default <V> Kleisli<E, T, V> map(F<U, V> f) {
+            return t -> run(t).map(f);
+        }
     }
 
     /**

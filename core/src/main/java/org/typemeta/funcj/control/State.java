@@ -204,10 +204,10 @@ public interface State<S, A> {
          * Compose this {@code Kleisli} with another by applying this one first,
          * then the other.
          * @param kUV       the {@code Kleisli} to be applied after this one
-         * @param <V>       the second {@code Kleisli}'s return type
+         * @param <C>       the second {@code Kleisli}'s return type
          * @return          the composed {@code Kleisli}
          */
-        default <V> Kleisli<S, A, V> andThen(Kleisli<S, B, V> kUV) {
+        default <C> Kleisli<S, A, C> andThen(Kleisli<S, B, C> kUV) {
             return a -> run(a).flatMap(kUV::run);
         }
 
@@ -220,6 +220,18 @@ public interface State<S, A> {
          */
         default <C> Kleisli<S, C, B> compose(Kleisli<S, C, A> kST) {
             return s -> kST.run(s).flatMap(this::run);
+        }
+
+        /**
+         * Compose this {@code Kleisli} with a function,
+         * by applying this {@code Kleisli} first,
+         * and then mapping the function over the result.
+         * @param f         the function
+         * @param <C>       the function return type
+         * @return          the composed {@code Kleisli}
+         */
+        default <C> Kleisli<S, A, C> map(F<B, C> f) {
+            return t -> run(t).map(f);
         }
     }
 
