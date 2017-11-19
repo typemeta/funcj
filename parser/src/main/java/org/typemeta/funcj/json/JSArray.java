@@ -2,6 +2,7 @@ package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.json.algebra.JsonAlg;
 import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
@@ -11,8 +12,8 @@ import java.util.stream.Stream;
 /**
  * Models a JSON array.
  */
-public final class JSArray extends AbstractJSValue
-        implements Iterable<JSValue> {
+public final class JSArray
+        implements Iterable<JSValue>, JSValue {
 
     private final List<JSValue> values;
 
@@ -114,6 +115,11 @@ public final class JSArray extends AbstractJSValue
             Functions.F<JSArray, T> fArr,
             Functions.F<JSObject, T> fObj) {
         return fArr.apply(this);
+    }
+
+    @Override
+    public <T> T apply(JsonAlg<T> alg) {
+        return alg.arr(Functors.map(v -> v.apply(alg), values));
     }
 
     @Override

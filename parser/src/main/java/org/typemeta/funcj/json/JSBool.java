@@ -2,6 +2,7 @@ package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.json.algebra.JsonAlg;
 
 /**
  * Models JSON true and false values.
@@ -44,6 +45,11 @@ public enum JSBool implements JSValue {
             Functions.F<JSArray, T> fArr,
             Functions.F<JSObject, T> fObj) {
         return fBool.apply(this);
+    }
+
+    @Override
+    public <T> T apply(JsonAlg<T> alg) {
+        return alg.bool(value);
     }
 
     @Override

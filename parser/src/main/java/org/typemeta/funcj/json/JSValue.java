@@ -2,6 +2,7 @@ package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.json.algebra.JsonAlg;
 
 /**
  * Common interface for classes that represent JSON values.
@@ -38,77 +39,103 @@ public interface JSValue {
         F<JSObject, T> fObj
     );
 
+    <T> T apply(JsonAlg<T> alg);
+
     /**
      * @return          true if this value is a {@link JSNull}, otherwise false
      */
-    boolean isNull();
+    default boolean isNull() {
+        return false;
+    }
 
     /**
      * @return          true if this value is a {@link JSBool}, otherwise false
      */
-    boolean isBool();
+    default boolean isBool() {
+        return false;
+    }
 
     /**
      * @return          true if this value is a {@link JSNumber}, otherwise false
      */
-    boolean isNumber();
+    default boolean isNumber() {
+        return false;
+    }
 
     /**
      * @return          true if this value is a {@link JSString}, otherwise false
      */
-    boolean isString();
+    default boolean isString() {
+        return false;
+    }
 
     /**
      * @return          true if this value is a {@link JSArray}, otherwise false
      */
-    boolean isArray();
+    default boolean isArray() {
+        return false;
+    }
 
     /**
      * @return          true if this value is a {@link JSObject}, otherwise false
      */
-    boolean isObject();
+    default boolean isObject() {
+        return false;
+    }
 
     /**
      * If this value is a {@link JSNull} then downcast it, otherwise throw an exception.
      * @return          if this value is a {@code JSNull} then return it.
      * @throws          RuntimeException if this value is not a {@code JSNull}
      */
-    JSNull asNull();
+    default JSNull asNull() {
+        throw Utils.nullTypeError(getClass());
+    }
 
     /**
      * If this value is a {@link JSBool} then downcast it, otherwise throw an exception.
      * @return          if this value is a {@code JSBool} then return it.
      * @throws          RuntimeException if this value is not a {@code JSBool}
      */
-    JSBool asBool();
+    default JSBool asBool() {
+        throw Utils.boolTypeError(getClass());
+    }
 
     /**
      * If this value is a {@link JSNumber} then downcast it, otherwise throw an exception.
      * @return          if this value is a {@code JSNumber} then return it.
      * @throws          RuntimeException if this value is not a {@code JSNumber}
      */
-    JSNumber asNumber();
+    default JSNumber asNumber() {
+        throw Utils.numberTypeError(getClass());
+    }
 
     /**
      * If this value is a {@link JSString} then downcast it, otherwise throw an exception.
      * @return          if this value is a {@code JSString} then return it.
      * @throws          RuntimeException if this value is not a {@code JSString}
      */
-    JSString asString();
+    default JSString asString() {
+        throw Utils.stringTypeError(getClass());
+    }
 
     /**
      * If this value is a {@link JSArray} then downcast it, otherwise throw an exception.
      * @return          if this value is a {@code JSArray} then return it.
      * @throws          RuntimeException if this value is not a {@code JSArray}
      */
-    JSArray asArray();
+    default JSArray asArray() {
+        throw Utils.arrayTypeError(getClass());
+    }
 
     /**
      * If this value is a {@link JSObject} then downcast it, otherwise throw an exception.
      * @return          if this value is a {@code JSObject} then return it.
      * @throws          RuntimeException if this value is not a {@code JSObject}
      */
-    JSObject asObject();
+    default JSObject asObject() {
+        throw Utils.objectTypeError(getClass());
+    }
 
     /**
      * Write this value into the supplied {@code StringBuilder}.

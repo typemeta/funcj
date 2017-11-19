@@ -2,13 +2,14 @@ package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.json.algebra.JsonAlg;
 
 import java.util.Objects;
 
 /**
  * Models a JSON number value.
  */
-public final class JSNumber extends AbstractJSValue {
+public final class JSNumber implements JSValue {
 
     private final Object value;
 
@@ -60,7 +61,7 @@ public final class JSNumber extends AbstractJSValue {
         }
     }
 
-    public double oDouble() {
+    public double toDouble() {
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
         } else {
@@ -109,6 +110,11 @@ public final class JSNumber extends AbstractJSValue {
             Functions.F<JSArray, T> fArr,
             Functions.F<JSObject, T> fObj) {
         return fNum.apply(this);
+    }
+
+    @Override
+    public <T> T apply(JsonAlg<T> alg) {
+        return alg.num(toDouble());
     }
 
     @Override

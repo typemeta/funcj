@@ -403,7 +403,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JSValue> implements JsonCod
 
         @Override
         public double decodePrim(JSValue enc) {
-            return enc.asNumber().oDouble();
+            return enc.asNumber().toDouble();
         }
     };
 

@@ -2,6 +2,7 @@ package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.json.algebra.JsonAlg;
 
 /**
  * Models a JSON null value.
@@ -33,6 +34,11 @@ public enum JSNull implements JSValue {
             Functions.F<JSArray, T> fArr,
             Functions.F<JSObject, T> fObj) {
         return fNull.apply(this);
+    }
+
+    @Override
+    public <T> T apply(JsonAlg<T> alg) {
+        return alg.nul();
     }
 
     @Override

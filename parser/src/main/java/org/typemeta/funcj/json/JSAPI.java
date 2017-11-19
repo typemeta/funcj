@@ -80,7 +80,7 @@ public class JSAPI {
         return obj(fieldMap);
     }
 
-    public static JSObject obj(LinkedHashMap<String, JSObject.Field> values) {
+    public static JSObject obj(Map<String, JSObject.Field> values) {
         return new JSObject(values);
     }
 
@@ -88,8 +88,12 @@ public class JSAPI {
         return toMap(
                 JSObject.Field::getName,
                 Function.identity(),
-                Utils::duplicateKeyError,
+                JSAPI::duplicateKeyError,
                 LinkedHashMap::new
         );
+    }
+
+    private static <T> T duplicateKeyError(T u, T v) {
+        throw new IllegalStateException("Duplicate keys - " + u + " & " + v);
     }
 }

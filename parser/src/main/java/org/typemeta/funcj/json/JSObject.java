@@ -2,6 +2,7 @@ package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.json.algebra.JsonAlg;
 import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
@@ -11,8 +12,8 @@ import java.util.stream.Stream;
 /**
  * Models a JSON object.
  */
-public final class JSObject extends AbstractJSValue
-        implements Iterable<JSObject.Field> {
+public final class JSObject
+        implements Iterable<JSObject.Field>, JSValue {
 
     public static class Field {
         public final String name;
@@ -54,9 +55,9 @@ public final class JSObject extends AbstractJSValue
         }
     }
 
-    private final LinkedHashMap<String, Field> fields;
+    private final Map<String, Field> fields;
 
-    protected JSObject(LinkedHashMap<String, Field> fields) {
+    protected JSObject(Map<String, Field> fields) {
         this.fields = fields;
     }
 
@@ -158,6 +159,11 @@ public final class JSObject extends AbstractJSValue
             Functions.F<JSArray, T> fArr,
             Functions.F<JSObject, T> fObj) {
         return fObj.apply(this);
+    }
+
+    @Override
+    public <T> T apply(JsonAlg<T> alg) {
+        return alg.obj(Functors.map((String k, Field v) -> v.value.apply(alg), fields));
     }
 
     @Override

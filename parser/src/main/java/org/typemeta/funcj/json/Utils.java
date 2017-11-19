@@ -4,10 +4,6 @@ import org.typemeta.funcj.document.*;
 
 abstract class Utils {
 
-    static <T> T duplicateKeyError(T u, T v) {
-        throw new IllegalStateException("Duplicate keys - " + u + " & " + v);
-    }
-
     static String formatAsNumber(Object obj) {
         if (obj instanceof Double) {
             final double d = (Double) obj;

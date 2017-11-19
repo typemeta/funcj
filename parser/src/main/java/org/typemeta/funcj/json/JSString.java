@@ -2,11 +2,12 @@ package org.typemeta.funcj.json;
 
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.json.algebra.JsonAlg;
 
 /**
  * Models a JSON string.
  */
-public final class JSString extends AbstractJSValue {
+public final class JSString implements JSValue {
 
     protected final String value;
 
@@ -59,6 +60,11 @@ public final class JSString extends AbstractJSValue {
             Functions.F<JSArray, T> fArr,
             Functions.F<JSObject, T> fObj) {
         return fStr.apply(this);
+    }
+
+    @Override
+    public <T> T apply(JsonAlg<T> alg) {
+        return alg.str(value);
     }
 
     @Override
