@@ -1,4 +1,4 @@
-package org.typemeta.funcj.json;
+package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.document.*;
 
@@ -64,7 +64,7 @@ abstract class Utils {
                 default:
                     if (c <= '\u001F' ||
                             c >= '\u007F' && c <= '\u009F' ||
-                            c >= '\u2000' && c <= '\u20FF') {
+                            c >= '\u00ff') {
                         sb.append("\\u").append(Integer.toHexString(c | 0x10000).substring(1));
                     } else {
                         sb.append(c);

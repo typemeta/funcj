@@ -26,7 +26,7 @@
                     "cacheTemplatesStore" : 50,
                     "cacheTemplatesRefresh" : 15,
                     "cachePagesTrack" : 200,
-                    "cachePagesStore" : 100,
+                    "cachePagesStore" : "A\uabcdB",
                     "cachePagesRefresh" : 10,
                     "cachePagesDirtyRead" : 10,
                     "searchEngineListTemplate" : "forSearchEnginesList.htm",

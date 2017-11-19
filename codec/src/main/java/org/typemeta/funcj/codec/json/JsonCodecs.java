@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.json.*;
+import org.typemeta.funcj.json.model.*;
 
 import java.util.Optional;
 

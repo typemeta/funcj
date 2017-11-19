@@ -2,7 +2,7 @@ package org.typemeta.funcj.codec.json;
 
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.json.JSValue;
+import org.typemeta.funcj.json.model.JSValue;
 
 public class JsonCodecTest extends TestBase {
 

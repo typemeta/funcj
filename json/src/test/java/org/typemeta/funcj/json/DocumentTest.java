@@ -1,11 +1,12 @@
 package org.typemeta.funcj.json;
 
 import org.junit.Test;
+import org.typemeta.funcj.json.model.JSValue;
 
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
-import static org.typemeta.funcj.json.JSAPI.*;
+import static org.typemeta.funcj.json.model.JSAPI.*;
 
 public class DocumentTest {
 

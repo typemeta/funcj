@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.CodecCore;
-import org.typemeta.funcj.json.JSValue;
+import org.typemeta.funcj.json.model.JSValue;
 
 /**
  * Interface for classes which implement an encoding into JSON,

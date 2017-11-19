@@ -3,6 +3,7 @@ package org.typemeta.funcj.json;
 import org.junit.Test;
 import org.typemeta.funcj.control.Try;
 import org.typemeta.funcj.data.Chr;
+import org.typemeta.funcj.json.model.JSValue;
 import org.typemeta.funcj.parser.*;
 
 import java.io.*;
@@ -26,8 +27,10 @@ public class JsonTest {
 
     private static final String test6 = "{\"key\":[1.1,\"value\",true,null]}";
 
+    private static final String test7 = "\"A\\uabcdB\"";
+
     private static final String[] tests = {
-        test0, test1, test2, test3, test4, test5, test6
+        test0, test1, test2, test3, test4, test5, test6, test7
     };
 
     @Test

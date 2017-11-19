@@ -1,4 +1,4 @@
-package org.typemeta.funcj.json;
+package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.data.IList;
 

@@ -1,18 +1,29 @@
-package org.typemeta.funcj.json;
+package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.json.algebra.JsonAlg;
 
 /**
- * Models a JSON null value.
+ * Models JSON true and false values.
  */
-public enum JSNull implements JSValue {
-    NULL;
+public enum JSBool implements JSValue {
+    TRUE(true),
+    FALSE(false);
+
+    private final boolean value;
+
+    JSBool(boolean value) {
+        this.value = value;
+    }
+
+    public boolean getValue() {
+        return value;
+    }
 
     @Override
     public String toString() {
-        return "null";
+        return Boolean.toString(value);
     }
 
     @Override
@@ -33,22 +44,22 @@ public enum JSNull implements JSValue {
             Functions.F<JSString, T> fStr,
             Functions.F<JSArray, T> fArr,
             Functions.F<JSObject, T> fObj) {
-        return fNull.apply(this);
+        return fBool.apply(this);
     }
 
     @Override
     public <T> T apply(JsonAlg<T> alg) {
-        return alg.nul();
+        return alg.bool(value);
     }
 
     @Override
     public boolean isNull() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isBool() {
-        return false;
+        return true;
     }
 
     @Override
@@ -73,12 +84,12 @@ public enum JSNull implements JSValue {
 
     @Override
     public JSNull asNull() {
-        return this;
+        throw Utils.nullTypeError(getClass());
     }
 
     @Override
     public JSBool asBool() {
-        throw Utils.boolTypeError(getClass());
+        return this;
     }
 
     @Override

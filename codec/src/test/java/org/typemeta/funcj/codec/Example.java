@@ -3,7 +3,7 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.codec.json.JsonCodecCore;
 import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.control.Either;
-import org.typemeta.funcj.json.JSValue;
+import org.typemeta.funcj.json.model.JSValue;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.*;
