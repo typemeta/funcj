@@ -204,11 +204,11 @@ public interface StateR<S, A> {
         }
 
         /**
-         * Run this {@code Kleisli} operation
+         * Apply this {@code Kleisli} operation
          * @param a         the input value
          * @return          the result of the operation
          */
-        StateR<S, B> run(A a);
+        StateR<S, B> apply(A a);
 
         /**
          * Compose this {@code Kleisli} with another by applying this one first,
@@ -218,7 +218,7 @@ public interface StateR<S, A> {
          * @return          the composed {@code Kleisli}
          */
         default <C> Kleisli<S, A, C> andThen(Kleisli<S, B, C> kUV) {
-            return a -> run(a).flatMap(kUV::run);
+            return a -> apply(a).flatMap(kUV::apply);
         }
 
         /**
@@ -229,7 +229,7 @@ public interface StateR<S, A> {
          * @return          the composed {@code Kleisli}
          */
         default <C> Kleisli<S, C, B> compose(Kleisli<S, C, A> kST) {
-            return s -> kST.run(s).flatMap(this::run);
+            return s -> kST.apply(s).flatMap(this::apply);
         }
 
         /**
@@ -241,7 +241,7 @@ public interface StateR<S, A> {
          * @return          the composed {@code Kleisli}
          */
         default <C> Kleisli<S, A, C> map(F<B, C> f) {
-            return t -> run(t).map(f);
+            return t -> apply(t).map(f);
         }
     }
 

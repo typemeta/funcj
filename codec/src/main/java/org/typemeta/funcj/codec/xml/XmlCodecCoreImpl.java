@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.control.Exceptions;
+import org.typemeta.funcj.util.Exceptions;
 import org.typemeta.funcj.util.Folds;
 import org.w3c.dom.*;
 

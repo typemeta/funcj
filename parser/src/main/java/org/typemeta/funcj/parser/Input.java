@@ -1,6 +1,6 @@
 package org.typemeta.funcj.parser;
 
-import org.typemeta.funcj.control.Exceptions;
+import org.typemeta.funcj.util.Exceptions;
 import org.typemeta.funcj.data.Chr;
 
 import java.io.Reader;

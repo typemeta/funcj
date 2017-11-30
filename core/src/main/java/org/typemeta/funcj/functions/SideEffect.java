@@ -23,7 +23,7 @@ public abstract class SideEffect {
         }
 
         /**
-         * Apply this side-effect
+         * Apply this function
          */
         void apply();
     }

@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.control.Exceptions;
+import org.typemeta.funcj.util.Exceptions;
 
 import java.lang.reflect.*;
 import java.util.Objects;

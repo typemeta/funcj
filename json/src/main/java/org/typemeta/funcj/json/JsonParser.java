@@ -51,7 +51,11 @@ public class JsonParser {
 
         final Parser<Chr, Chr> uni =
                 hexDigit.and(hexDigit).and(hexDigit).and(hexDigit)
-                        .map((d0, d1, d2, d3) -> (d0.intValue() << 12) | (d1.intValue() << 8) | (d2.intValue() << 4) | d3.intValue())
+                        .map((d0, d1, d2, d3) ->
+                                (d0.intValue() << 12) |
+                                        (d1.intValue() << 8) |
+                                        (d2.intValue() << 4) |
+                                        d3.intValue())
                         .map(Chr::valueOf);
 
         final Parser<Chr, Chr> uChr = chr('u');

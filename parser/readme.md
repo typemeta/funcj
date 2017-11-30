@@ -62,7 +62,7 @@ Add this dependency to your project pom.xml:
 <dependency>
     <groupId>org.typemeta</groupId>
     <artifactId>funcj-parser</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>${funcj.parser.version}</version>
 </dependency>
 ```
 

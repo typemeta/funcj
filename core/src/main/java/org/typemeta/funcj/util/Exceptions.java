@@ -1,4 +1,4 @@
-package org.typemeta.funcj.control;
+package org.typemeta.funcj.util;
 
 import org.typemeta.funcj.functions.Functions.F;
 

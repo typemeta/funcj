@@ -1,6 +1,6 @@
 package org.typemeta.funcj.document;
 
-import org.typemeta.funcj.control.Exceptions;
+import org.typemeta.funcj.util.Exceptions;
 import org.typemeta.funcj.data.IList;
 
 import java.io.*;

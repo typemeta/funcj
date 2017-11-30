@@ -63,28 +63,37 @@ public class TryTest {
     }
 
     static class Utils {
-        private static Try<Integer> parse(String s) {
-            return Try.of(() -> Integer.parseInt(s));
-        }
+        static final Kleisli<Integer, Integer> isPositive = i ->
+                (i >= 0) ?
+                        Try.success(i) :
+                        Try.failure(new Error("Negative value"));
 
-        private static Try<Double> sqrt(int d) {
-            final double x = Math.sqrt(d);
-            if (Double.isNaN(x)) {
-                return Try.failure(new RuntimeException("NaN"));
+        static final Kleisli<Integer, Double> isEven = i ->
+                (i % 2 == 0) ?
+                        Try.success((double)i) :
+                        Try.failure(new Error("Odd value"));
+
+        static final Kleisli<Double, String> upToFirstZero = d -> {
+            final String s = Double.toString(d);
+            final int i = s.indexOf('0');
+            if (i != -1) {
+                return Try.success(s.substring(0, i));
             } else {
-                return Try.success(x);
+                return Try.failure(new Error("Negative value"));
             }
-        }
+        };
+
+        static final Kleisli<Integer, String> f =
+                (isPositive.andThen(isEven)).andThen(upToFirstZero);
+
+        static final Kleisli<Integer, String> g =
+                isPositive.andThen(isEven.andThen(upToFirstZero));
     }
 
     @Property
-    public void kleisli(int i) {
-        final String s = Integer.toString(i);
-        final Kleisli<String, Double> tk = Kleisli.of(Utils::parse).andThen(Utils::sqrt);
-        final Try<Double> td = tk.run(s);
-        final Try<Double> expected = (i >= 0) ?
-            Try.success(Math.sqrt(i)) :
-            Try.failure(new RuntimeException("NaN"));
-        assertEquals(expected, td);
+    public void kleisliIsAssociative(int i) {
+        final Try<String> rf = Utils.f.apply(i);
+        final Try<String> rg = Utils.g.apply(i);
+        assertEquals("", rf, rg);
     }
 }

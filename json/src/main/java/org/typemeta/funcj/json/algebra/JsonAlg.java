@@ -61,11 +61,11 @@ public interface JsonAlg<T> {
         }
 
         default T arr(List<T> elems) {
-            return m().fold(elems);
+            return m().combineAll(elems);
         }
 
         default T obj(Map<String, T> fields) {
-            return m().fold(fields.values());
+            return m().combineAll(fields.values());
         }
     }
 }

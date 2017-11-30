@@ -39,7 +39,7 @@ public class StateTest {
     public void kleisli(String a, String b) {
         final Kleisli<String, String, String> get = Kleisli.of(u -> State.<String>get());
         final Kleisli<String, String, Unit> wrap = get.andThen(s -> put("@" + s + "$"));
-        final String c = wrap.run(a).exec(b);
+        final String c = wrap.apply(a).exec(b);
         assertEquals("@" + b + "$", c);
     }
 }

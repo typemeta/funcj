@@ -40,7 +40,7 @@ Add this dependency to your project pom.xml:
 <dependency>
     <groupId>org.typemeta</groupId>
     <artifactId>funcj-codec</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>${funcj.codec.version}</version>
 </dependency>
 ```
 

@@ -4,7 +4,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.control.Exceptions;
+import org.typemeta.funcj.util.Exceptions;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import java.util.*;

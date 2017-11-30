@@ -2,7 +2,7 @@ package org.typemeta.funcj.codec.xml;
 
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.control.Exceptions;
+import org.typemeta.funcj.util.Exceptions;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.*;

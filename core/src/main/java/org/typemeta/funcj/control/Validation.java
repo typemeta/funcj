@@ -191,11 +191,11 @@ public interface Validation<E, T> {
         }
 
         /**
-         * Run this {@code Kleisli} operation
+         * Apply this {@code Kleisli} operation
          * @param t         the input value
          * @return          the result of the operation
          */
-        Validation<E, U> run(T t);
+        Validation<E, U> apply(T t);
 
         /**
          * Compose this {@code Kleisli} with another by applying this one first,
@@ -205,7 +205,7 @@ public interface Validation<E, T> {
          * @return          the composed {@code Kleisli}
          */
         default <V> Kleisli<E, T, V> andThen(Kleisli<E, U, V> kUV) {
-            return t -> run(t).flatMap(kUV::run);
+            return t -> apply(t).flatMap(kUV::apply);
         }
 
         /**
@@ -216,7 +216,7 @@ public interface Validation<E, T> {
          * @return          the composed {@code Kleisli}
          */
         default <S> Kleisli<E, S, U> compose(Kleisli<E, S, T> kST) {
-            return s -> kST.run(s).flatMap(this::run);
+            return s -> kST.apply(s).flatMap(this::apply);
         }
 
         /**
@@ -228,7 +228,7 @@ public interface Validation<E, T> {
          * @return          the composed {@code Kleisli}
          */
         default <V> Kleisli<E, T, V> map(F<U, V> f) {
-            return t -> run(t).map(f);
+            return t -> apply(t).map(f);
         }
     }
 

@@ -157,11 +157,11 @@ public interface Option<T> {
         }
 
         /**
-         * Run this {@code Kleisli} operation
+         * Apply this {@code Kleisli} operation
          * @param t         the input value
          * @return          the result of the operation
          */
-        Option<U> run(T t);
+        Option<U> apply(T t);
 
         /**
          * Compose this {@code Kleisli} with another by applying this one first,
@@ -171,7 +171,7 @@ public interface Option<T> {
          * @return          the composed {@code Kleisli}
          */
         default <V> Kleisli<T, V> andThen(Kleisli<U, V> kUV) {
-            return t -> run(t).flatMap(kUV::run);
+            return t -> apply(t).flatMap(kUV::apply);
         }
 
         /**
@@ -182,7 +182,7 @@ public interface Option<T> {
          * @return          the composed {@code Kleisli}
          */
         default <S> Kleisli<S, U> compose(Kleisli<S, T> kST) {
-            return s -> kST.run(s).flatMap(this::run);
+            return s -> kST.apply(s).flatMap(this::apply);
         }
 
         /**
@@ -194,7 +194,7 @@ public interface Option<T> {
          * @return          the composed {@code Kleisli}
          */
         default <V> Kleisli<T, V> map(F<U, V> f) {
-            return t -> run(t).map(f);
+            return t -> apply(t).map(f);
         }
     }
 
