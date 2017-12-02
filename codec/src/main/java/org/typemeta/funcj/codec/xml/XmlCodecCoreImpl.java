@@ -1,8 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.util.Exceptions;
-import org.typemeta.funcj.util.Folds;
+import org.typemeta.funcj.util.*;
 import org.w3c.dom.*;
 
 import java.lang.reflect.*;

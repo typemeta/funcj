@@ -1,9 +1,9 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.util.Exceptions;
 import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.json.model.*;
+import org.typemeta.funcj.util.Exceptions;
 
 import java.util.*;
 

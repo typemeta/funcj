@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static org.typemeta.funcj.control.State.*;
 import static org.typemeta.funcj.control.StateTest.Utils.*;
+import static org.typemeta.funcj.control.StateTest.Utils.pure;
 
 @RunWith(JUnitQuickcheck.class)
 public class StateTest {

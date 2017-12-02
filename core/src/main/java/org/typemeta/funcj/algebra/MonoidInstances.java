@@ -1,6 +1,6 @@
 package org.typemeta.funcj.algebra;
 
-import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.data.IList;
 
 public abstract class MonoidInstances {
     public static final Monoid<Double> monoidDouble = new  Monoid<Double>() {

@@ -1,8 +1,8 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
-import org.typemeta.funcj.util.Exceptions;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.util.Exceptions;
 
 import java.lang.reflect.*;
 import java.util.*;

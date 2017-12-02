@@ -2,12 +2,14 @@ package org.typemeta.funcj.control;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.junit.*;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 import static org.typemeta.funcj.control.StateR.*;
+import static org.typemeta.funcj.control.StateR.pure;
 import static org.typemeta.funcj.control.StateRTest.Utils.*;
+import static org.typemeta.funcj.control.StateRTest.Utils.pure;
 
 @RunWith(JUnitQuickcheck.class)
 public class StateRTest {
