@@ -68,7 +68,7 @@ public interface Trampoline<T> {
 
         @Override
         public String toString() {
-            return "Done{result=" + result + '}';
+            return "Pure{result=" + result + '}';
         }
     }
 
@@ -88,7 +88,7 @@ public interface Trampoline<T> {
 
         @Override
         public String toString() {
-            return "More{next=" + next + '}';
+            return "Suspend{next=" + next + '}';
         }
     }
 
@@ -121,7 +121,7 @@ public interface Trampoline<T> {
 
         @Override
         public String toString() {
-            return "FlatMap{sub=" + sub + '}';
+            return "FlatMapped{sub=" + sub + '}';
         }
     }
 
