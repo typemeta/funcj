@@ -2,10 +2,12 @@ package org.typemeta.funcj.control;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.control.Either.Kleisli;
 
 import static org.junit.Assert.*;
+import static org.typemeta.funcj.control.EitherTest.Utils.*;
 
 @RunWith(JUnitQuickcheck.class)
 public class EitherTest {
@@ -64,6 +66,8 @@ public class EitherTest {
     }
 
     static class Utils {
+        static final Kleisli<Error, Integer, Integer> pure = Kleisli.of(Either::right);
+
         static final Kleisli<Error, Integer, Integer> isPositive = i ->
                 (i >= 0) ?
                         Either.right(i) :
@@ -83,18 +87,35 @@ public class EitherTest {
                 return Either.left(new Error("Negative value"));
             }
         };
+    }
 
-        static final Kleisli<Error, Integer, String> f =
-                (isPositive.andThen(isEven)).andThen(upToFirstZero);
+    private static <T> void check(
+            String msg,
+            int i,
+            Kleisli<Error, Integer, T> lhs,
+            Kleisli<Error, Integer, T> rhs) {
+        Assert.assertEquals(
+                msg,
+                lhs.apply(i),
+                rhs.apply(i));
+    }
 
-        static final Kleisli<Error, Integer, String> g =
-                isPositive.andThen(isEven.andThen(upToFirstZero));
+    @Property
+    public void kleisliLeftIdentity(int i) {
+        check("Kleisli Left-identity", i, pure.andThen(isPositive), isPositive);
+    }
+
+    @Property
+    public void kleisliRightIdentity(int i) {
+        check("Kleisli Right-identity", i, isPositive.andThen(pure), isPositive);
     }
 
     @Property
     public void kleisliIsAssociative(int i) {
-        final Either<Error, String> rf = Utils.f.apply(i);
-        final Either<Error, String> rg = Utils.g.apply(i);
-        assertEquals("", rf, rg);
+        check(
+                "Kleisli Associativity",
+                i,
+                (isPositive.andThen(isEven)).andThen(upToFirstZero),
+                isPositive.andThen(isEven.andThen(upToFirstZero)));
     }
 }

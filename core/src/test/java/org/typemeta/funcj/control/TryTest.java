@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.typemeta.funcj.control.Try.Kleisli;
 
 import static org.junit.Assert.*;
+import static org.typemeta.funcj.control.TryTest.Utils.*;
 
 @RunWith(JUnitQuickcheck.class)
 public class TryTest {
@@ -63,6 +64,8 @@ public class TryTest {
     }
 
     static class Utils {
+        static final Kleisli<Integer, Integer> pure = Kleisli.of(Try::success);
+
         static final Kleisli<Integer, Integer> isPositive = i ->
                 (i >= 0) ?
                         Try.success(i) :
@@ -82,18 +85,35 @@ public class TryTest {
                 return Try.failure(new Error("Negative value"));
             }
         };
+    }
 
-        static final Kleisli<Integer, String> f =
-                (isPositive.andThen(isEven)).andThen(upToFirstZero);
+    private static <T> void check(
+            String msg,
+            int i,
+            Kleisli<Integer, T> lhs,
+            Kleisli<Integer, T> rhs) {
+        Assert.assertEquals(
+                msg,
+                lhs.apply(i),
+                rhs.apply(i));
+    }
 
-        static final Kleisli<Integer, String> g =
-                isPositive.andThen(isEven.andThen(upToFirstZero));
+    @Property
+    public void kleisliLeftIdentity(int i) {
+        check("Kleisli Left-identity", i, pure.andThen(isPositive), isPositive);
+    }
+
+    @Property
+    public void kleisliRightIdentity(int i) {
+        check("Kleisli Right-identity", i, isPositive.andThen(pure), isPositive);
     }
 
     @Property
     public void kleisliIsAssociative(int i) {
-        final Try<String> rf = Utils.f.apply(i);
-        final Try<String> rg = Utils.g.apply(i);
-        assertEquals("", rf, rg);
+        check(
+                "Kleisli Associativity",
+                i,
+                (isPositive.andThen(isEven)).andThen(upToFirstZero),
+                isPositive.andThen(isEven.andThen(upToFirstZero)));
     }
 }
