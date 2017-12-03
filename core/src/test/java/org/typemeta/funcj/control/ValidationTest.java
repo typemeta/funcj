@@ -145,7 +145,6 @@ public class ValidationTest {
                     lhs.apply(i),
                     rhs.apply(i));
         }
-
     }
 
     @Property
