@@ -33,37 +33,48 @@ Add this dependency to your project pom.xml:
 To construct an instance of the Java data mode for JSON, use the `JSAPI` class:
 
 ```java
-JSValue testNode =
-        obj(
-                field("numbers", arr(num(1.2), num(3.4), num(4.5))),
-                field("strings", arr(str("abcd"), str("efgh"), str("ijkl"))),
-                field("objects", arr(
-                        obj(
-                                field("a", num(1)),
-                                field("b", num(2))
-                        ),
-                        obj(
-                                field("c", num(3)),
-                                field("d", num(4))
-                        )
-                ))
-        );
+import static org.typemeta.funcj.json.model.JSAPI.*;
+
+class Test {
+    JSValue jsv =
+            obj(
+                    field("numbers", arr(num(1.2), num(3.4), num(4.5))),
+                    field("strings", arr(str("abcd"), str("efgh"), str("ijkl"))),
+                    field("objects", arr(
+                            obj(
+                                    field("a", num(1)),
+                                    field("b", num(2))
+                            ),
+                            obj(
+                                    field("c", num(3)),
+                                    field("d", num(4))
+                            )
+                    ))
+            );
+}
 ```
 
-To print it as JSON text, either use the `JSValue.toString` method:
+To render the `JSValue` value as JSON text, either use the `JSValue.toString` method:
+
+```java
+String text = jsv.toString();
+System.out.println(text);
+```
+
+to print it as unformatted text:
 
 ```json
 {"numbers":[1.2,3.4,4.5],"strings":["abcd","efgh","ijkl"],"objects":[{"a":1,"b":2},{"c":3,"d":4}]}
 ```
 
-or, use `JsonToDoc`:
+or, use `JsonToDoc.toString`:
 
 ```java
-String text = JsonToDoc.toString(node, 40));
+String text = JsonToDoc.toString(jsv, 40));
 System.out.println(text);
 ```
 
-to pretty-print thr JSON:
+to add indentation to the JSON:
 
 ```json
 {
@@ -80,7 +91,7 @@ to pretty-print thr JSON:
 }
 ```
 
-Meanwhile, to parse some JSON text back into the model representation, use `JsonParser`:
+Meanwhile, to parse some JSON text back into the model representation, use `JsonParser.parse`:
 
 ```java
 JSValue res = JsonParser.parse(text).getOrThrow();
