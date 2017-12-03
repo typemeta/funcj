@@ -43,7 +43,7 @@ public class DocumentTest {
 
     private static void checkJsonNode(JSValue node, int lines, int width) {
         final String text = JsonToDoc.toString(node, width);
-        System.out.println(text);
+        //System.out.println(text);
         checkSize(text, lines, width);
     }
 
