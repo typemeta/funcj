@@ -7,12 +7,24 @@ import java.util.*;
 public interface JsonAlg<T> {
     T nul();
     T bool(boolean b);
-    T num(double d);
+    T num(Object value);
     T str(String s);
     T arr(List<T> elems);
-    T obj(Map<String, T> fields);
+    T obj(LinkedHashMap<String, T> fields);
 
     interface Transform<T> extends JsonAlg<T> {
+        class Base<T> implements JsonAlg.Transform<T> {
+            protected final JsonAlg<T> alg;
+
+            public Base(JsonAlg<T> alg) {
+                this.alg = alg;
+            }
+
+            @Override
+            public JsonAlg<T> alg() {
+                return alg;
+            }
+        }
 
         JsonAlg<T> alg();
 
@@ -24,8 +36,8 @@ public interface JsonAlg<T> {
             return alg().bool(b);
         }
 
-        default T num(double d) {
-            return alg().num(d);
+        default T num(Object value) {
+            return alg().num(value);
         }
 
         default T str(String s) {
@@ -36,7 +48,7 @@ public interface JsonAlg<T> {
             return alg().arr(elems);
         }
 
-        default T obj(Map<String, T> fields) {
+        default T obj(LinkedHashMap<String, T> fields) {
             return alg().obj(fields);
         }
     }
@@ -52,7 +64,7 @@ public interface JsonAlg<T> {
             return m().zero();
         }
 
-        default T num(double d) {
+        default T num(Object value) {
             return m().zero();
         }
 
@@ -64,7 +76,7 @@ public interface JsonAlg<T> {
             return m().combineAll(elems);
         }
 
-        default T obj(Map<String, T> fields) {
+        default T obj(LinkedHashMap<String, T> fields) {
             return m().combineAll(fields.values());
         }
     }

@@ -6,6 +6,7 @@ import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.*;
 import java.util.stream.StreamSupport;
 
@@ -211,14 +212,69 @@ public abstract class Functors {
      * The keys are unchanged.
      * @param f         the function
      * @param m         the map
-     * @param <K>       the {@code Map} key type
-     * @param <V>       the {@code Map} value type
-     * @param <W>       the new {@code Map} value type
-     * @return          the new {@code Map}
+     * @param <K>       the map key type
+     * @param <V>       the map value type
+     * @param <W>       the new map value type
+     * @return          the new map
      */
     public static <K, V, W> Map<K, W> map(Functions.F2<K, V, W> f, Map<K, V> m) {
         return Streams.tupleStream(m)
                 .map(t2 -> Tuple2.of(t2._1, t2.apply(f)))
                 .collect(toMap(Tuple2::get1, Tuple2::get2));
+    }
+
+    /**
+     * Map a function over a {@link SortedMap}.
+     * Apply a binary function to each entry in a {@code SortedMap} to obtain the new {@code SortedMap} value.
+     * The keys are unchanged.
+     * @param f         the function
+     * @param m         the map
+     * @param <K>       the map key type
+     * @param <V>       the map value type
+     * @param <W>       the new map value type
+     * @return          the new map
+     */
+    public static <K, V, W> SortedMap<K, W> map(Functions.F2<K, V, W> f, SortedMap<K, V> m) {
+        return Streams.tupleStream(m)
+                .map(t2 -> Tuple2.of(t2._1, t2.apply(f)))
+                .collect(toMap(Tuple2::get1, Tuple2::get2, throwingMerger(), TreeMap::new));
+    }
+
+    /**
+     * Map a function over a {@link ConcurrentMap}.
+     * Apply a binary function to each entry in a {@code ConcurrentMap} to obtain the new {@code ConcurrentMap} value.
+     * The keys are unchanged.
+     * @param f         the function
+     * @param m         the map
+     * @param <K>       the map key type
+     * @param <V>       the map value type
+     * @param <W>       the new map value type
+     * @return          the new map
+     */
+    public static <K, V, W> ConcurrentMap<K, W> map(Functions.F2<K, V, W> f, ConcurrentMap<K, V> m) {
+        return Streams.tupleStream(m)
+                .map(t2 -> Tuple2.of(t2._1, t2.apply(f)))
+                .collect(toConcurrentMap(Tuple2::get1, Tuple2::get2));
+    }
+
+    /**
+     * Map a function over a {@link LinkedHashMap}.
+     * Apply a binary function to each entry in a {@code LinkedHashMap} to obtain the new {@code LinkedHashMap} value.
+     * The keys are unchanged.
+     * @param f         the function
+     * @param m         the map
+     * @param <K>       the map key type
+     * @param <V>       the map value type
+     * @param <W>       the new map value type
+     * @return          the new map
+     */
+    public static <K, V, W> LinkedHashMap<K, W> map(Functions.F2<K, V, W> f, LinkedHashMap<K, V> m) {
+        return Streams.tupleStream(m)
+                .map(t2 -> Tuple2.of(t2._1, t2.apply(f)))
+                .collect(toMap(Tuple2::get1, Tuple2::get2, throwingMerger(), LinkedHashMap::new));
+    }
+
+    private static <T> BinaryOperator<T> throwingMerger() {
+        return (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
     }
 }

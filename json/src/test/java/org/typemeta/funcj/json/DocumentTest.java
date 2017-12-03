@@ -1,7 +1,7 @@
 package org.typemeta.funcj.json;
 
 import org.junit.Test;
-import org.typemeta.funcj.json.model.JSValue;
+import org.typemeta.funcj.json.model.*;
 
 import java.util.Arrays;
 
@@ -42,7 +42,7 @@ public class DocumentTest {
     }
 
     private static void checkJsonNode(JSValue node, int lines, int width) {
-        final String text = node.toString(width);
+        final String text = JsonToDoc.toString(node, width);
         //System.out.println(text);
         checkSize(text, lines, width);
     }

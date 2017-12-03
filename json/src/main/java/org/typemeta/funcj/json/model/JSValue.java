@@ -1,6 +1,5 @@
 package org.typemeta.funcj.json.model;
 
-import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.json.algebra.JsonAlg;
 
@@ -10,12 +9,12 @@ import org.typemeta.funcj.json.algebra.JsonAlg;
 public interface JSValue {
 
     /**
-     * Pretty-print this value as a JSON string.
-     * @param width     maximum line length
-     * @return          string representation of formatted JSON
+     * Pretty-print a JSON value as a JSON string.
+     * @param width     the maximum line length
+     * @return          the string representation of formatted JSON
      */
-    default String toString(int width)  {
-        return DocFormat.format(width, toDocument());
+    default String toString(int width) {
+        return JsonToDoc.toString(this, width);
     }
 
     /**
@@ -142,13 +141,5 @@ public interface JSValue {
      * @param sb        the {@code StringBuilder}
      * @return          the {@code StringBuilder}
      */
-    /* private */ StringBuilder toString(StringBuilder sb);
-
-    /**
-     * Construct a {@link Document} instance from the value,
-     * which can thern be used to pretty-print the JSON text representation
-     * of this value.
-     * @return          the {@code Document} representation of this value
-     */
-    /* private */ Document toDocument();
+    /* protected */ StringBuilder toString(StringBuilder sb);
 }

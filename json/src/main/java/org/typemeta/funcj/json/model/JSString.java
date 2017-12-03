@@ -1,6 +1,5 @@
 package org.typemeta.funcj.json.model;
 
-import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.json.algebra.JsonAlg;
 
@@ -22,11 +21,6 @@ public final class JSString implements JSValue {
     @Override
     public String toString() {
         return Utils.format(value);
-    }
-
-    @Override
-    public Document toDocument() {
-        return API.text(toString());
     }
 
     @Override

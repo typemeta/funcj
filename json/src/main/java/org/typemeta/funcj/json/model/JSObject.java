@@ -1,6 +1,5 @@
 package org.typemeta.funcj.json.model;
 
-import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.json.algebra.JsonAlg;
 import org.typemeta.funcj.util.Functors;
@@ -55,9 +54,13 @@ public final class JSObject
         }
     }
 
-    private final Map<String, Field> fields;
+    private final LinkedHashMap<String, Field> fields;
 
     protected JSObject(Map<String, Field> fields) {
+        this.fields = new LinkedHashMap<String, Field>(fields);
+    }
+
+    protected JSObject(LinkedHashMap<String, Field> fields) {
         this.fields = fields;
     }
 
@@ -108,16 +111,6 @@ public final class JSObject
     }
 
     @Override
-    public Document toDocument() {
-        return API.enclose(
-                API.text('{'),
-                API.text(", "),
-                API.text('}'),
-                Functors.map(Utils::toDoc, fields.values())
-        );
-    }
-
-    @Override
     public StringBuilder toString(StringBuilder sb) {
         sb.append('{');
         boolean first = true;
@@ -163,7 +156,7 @@ public final class JSObject
 
     @Override
     public <T> T apply(JsonAlg<T> alg) {
-        return alg.obj(Functors.map((String k, Field v) -> v.value.apply(alg), fields));
+        return alg.obj(Functors.map((k, v) -> v.value.apply(alg), fields));
     }
 
     @Override

@@ -1,7 +1,5 @@
 package org.typemeta.funcj.json.model;
 
-import org.typemeta.funcj.document.*;
-
 abstract class Utils {
 
     static String formatAsNumber(Object obj) {
@@ -73,14 +71,6 @@ abstract class Utils {
         }
 
         return sb;
-    }
-
-    static Document toDoc(JSObject.Field field) {
-        return API.concat(
-                API.text("\"" + field.name + "\""),
-                API.text(" : "),
-                field.value.toDocument()
-        );
     }
 
     static RuntimeException nullTypeError(Class<?> clazz) {

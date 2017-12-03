@@ -1,6 +1,5 @@
 package org.typemeta.funcj.json.model;
 
-import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.json.algebra.JsonAlg;
 import org.typemeta.funcj.util.Functors;
@@ -62,16 +61,6 @@ public final class JSArray
     @Override
     public String toString() {
         return toString(new StringBuilder()).toString();
-    }
-
-    @Override
-    public Document toDocument() {
-        return API.enclose(
-                API.text('['),
-                API.text(", "),
-                API.text(']'),
-                Functors.map(JSValue::toDocument, values)
-        );
     }
 
     @Override
