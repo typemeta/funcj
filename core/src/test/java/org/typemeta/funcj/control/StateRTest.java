@@ -46,21 +46,22 @@ public class StateRTest {
 
         static final Kleisli<Double, Double, Double> div = d ->
                 StateR.<Double>get().flatMap(x -> put(x / d)).flatMap(u -> pure(d));
-    }
 
-    private static final double EPSILON = 1e-32;
-    private static final double INIT = 12.34;
+        static final double EPSILON = 1e-32;
+        static final double INIT = 12.34;
 
-    private static void check(
-            String msg,
-            double d,
-            Kleisli<Double, Double, Double> lhs,
-            Kleisli<Double, Double, Double> rhs) {
-        Assert.assertEquals(
-                msg,
-                lhs.apply(d).exec(INIT),
-                rhs.apply(d).exec(INIT),
-                EPSILON);
+        static void check(
+                String msg,
+                double d,
+                Kleisli<Double, Double, Double> lhs,
+                Kleisli<Double, Double, Double> rhs) {
+            Assert.assertEquals(
+                    msg,
+                    lhs.apply(d).exec(INIT),
+                    rhs.apply(d).exec(INIT),
+                    EPSILON);
+        }
+
     }
 
     @Property

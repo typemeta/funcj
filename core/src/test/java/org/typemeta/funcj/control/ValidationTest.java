@@ -134,17 +134,18 @@ public class ValidationTest {
                 return Validation.failure(new Error("Negative value"));
             }
         };
-    }
 
-    private static <T> void check(
-            String msg,
-            int i,
-            Kleisli<Error, Integer, T> lhs,
-            Kleisli<Error, Integer, T> rhs) {
-        Assert.assertEquals(
-                msg,
-                lhs.apply(i),
-                rhs.apply(i));
+        static <T> void check(
+                String msg,
+                int i,
+                Kleisli<Error, Integer, T> lhs,
+                Kleisli<Error, Integer, T> rhs) {
+            Assert.assertEquals(
+                    msg,
+                    lhs.apply(i),
+                    rhs.apply(i));
+        }
+
     }
 
     @Property

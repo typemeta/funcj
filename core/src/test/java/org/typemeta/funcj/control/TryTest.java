@@ -85,17 +85,18 @@ public class TryTest {
                 return Try.failure(new Error("Negative value"));
             }
         };
-    }
 
-    private static <T> void check(
-            String msg,
-            int i,
-            Kleisli<Integer, T> lhs,
-            Kleisli<Integer, T> rhs) {
-        Assert.assertEquals(
-                msg,
-                lhs.apply(i),
-                rhs.apply(i));
+        static <T> void check(
+                String msg,
+                int i,
+                Kleisli<Integer, T> lhs,
+                Kleisli<Integer, T> rhs) {
+            Assert.assertEquals(
+                    msg,
+                    lhs.apply(i),
+                    rhs.apply(i));
+        }
+
     }
 
     @Property
