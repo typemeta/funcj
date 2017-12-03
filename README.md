@@ -12,6 +12,7 @@ At present the project consists of three sub-libraries:
 
 * [core](https://github.com/typemeta/funcj/tree/master/core) - primarily data and control structures.
 * [parser](https://github.com/typemeta/funcj/tree/master/parser) - a combinator parser framework.
+* [json](https://github.com/typemeta/funcj/tree/master/json) - a parser and data model for JSON data.
 * [codec](https://github.com/typemeta/funcj/tree/master/codec) - a framework for serialising Java data.
 
 # Javadocs

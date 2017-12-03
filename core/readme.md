@@ -1,4 +1,4 @@
-![funcj.parser](https://github.com/typemeta/funcj/blob/master/core/resources/funcj-core.png)
+![funcj.core](https://github.com/typemeta/funcj/blob/master/core/resources/funcj-core.png)
 
 # Introduction
 
@@ -23,7 +23,7 @@ Add this dependency to your project pom.xml:
 ```xml
 <dependency>
     <groupId>org.typemeta</groupId>
-    <artifactId>funcj</artifactId>
+    <artifactId>funcj-core</artifactId>
     <version>${funcj.core.version}</version>
 </dependency>
 ```
