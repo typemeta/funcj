@@ -96,7 +96,6 @@ public class TryTest {
                     lhs.apply(i),
                     rhs.apply(i));
         }
-
     }
 
     @Property

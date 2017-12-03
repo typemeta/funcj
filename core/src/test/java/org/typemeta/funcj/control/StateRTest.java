@@ -61,7 +61,6 @@ public class StateRTest {
                     rhs.apply(d).exec(INIT),
                     EPSILON);
         }
-
     }
 
     @Property

@@ -92,7 +92,6 @@ public class OptionTest {
                     lhs.apply(i),
                     rhs.apply(i));
         }
-
     }
 
     @Property

@@ -98,7 +98,6 @@ public class EitherTest {
                     lhs.apply(i),
                     rhs.apply(i));
         }
-
     }
 
     @Property
