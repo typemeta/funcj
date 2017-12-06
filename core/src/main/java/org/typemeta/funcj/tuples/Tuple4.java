@@ -183,7 +183,7 @@ final public class Tuple4<A, B, C, D> {
      * @param <T>       the function return type
      * @return          the result of applying the function
      */
-    public <T> T apply(Functions.F4<? super A, ? super B, ? super C, ? super D, ? extends T> f) {
+    public <T> T applyFrom(Functions.F4<? super A, ? super B, ? super C, ? super D, ? extends T> f) {
         return f.apply(_1, _2, _3, _4);
     }
 

@@ -147,7 +147,7 @@ final public class Tuple3<A, B, C> {
      * @param <T>       the function return type
      * @return          the result of applying the function
      */
-    public <T> T apply(Functions.F3<? super A, ? super B, ? super C, ? extends T> f) {
+    public <T> T applyFrom(Functions.F3<? super A, ? super B, ? super C, ? extends T> f) {
         return f.apply(_1, _2, _3);
     }
 

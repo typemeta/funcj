@@ -327,7 +327,7 @@ final public class Tuple8<A, B, C, D, E, F, G, H> {
      * @param <T>       the function return type
      * @return          the result of applying the function
      */
-    public <T> T apply(Functions.F8<? super A, ? super B, ? super C, ? super D, ? super E, ? super F, ? super G, ? super H, ? extends T> f) {
+    public <T> T applyFrom(Functions.F8<? super A, ? super B, ? super C, ? super D, ? super E, ? super F, ? super G, ? super H, ? extends T> f) {
         return f.apply(_1, _2, _3, _4, _5, _6, _7, _8);
     }
 

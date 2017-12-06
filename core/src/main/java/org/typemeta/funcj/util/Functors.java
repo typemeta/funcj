@@ -219,7 +219,7 @@ public abstract class Functors {
      */
     public static <K, V, W> Map<K, W> map(Functions.F2<K, V, W> f, Map<K, V> m) {
         return Streams.tupleStream(m)
-                .map(t2 -> Tuple2.of(t2._1, t2.apply(f)))
+                .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(f)))
                 .collect(toMap(Tuple2::get1, Tuple2::get2));
     }
 
@@ -236,7 +236,7 @@ public abstract class Functors {
      */
     public static <K, V, W> SortedMap<K, W> map(Functions.F2<K, V, W> f, SortedMap<K, V> m) {
         return Streams.tupleStream(m)
-                .map(t2 -> Tuple2.of(t2._1, t2.apply(f)))
+                .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(f)))
                 .collect(toMap(Tuple2::get1, Tuple2::get2, throwingMerger(), TreeMap::new));
     }
 
@@ -253,7 +253,7 @@ public abstract class Functors {
      */
     public static <K, V, W> ConcurrentMap<K, W> map(Functions.F2<K, V, W> f, ConcurrentMap<K, V> m) {
         return Streams.tupleStream(m)
-                .map(t2 -> Tuple2.of(t2._1, t2.apply(f)))
+                .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(f)))
                 .collect(toConcurrentMap(Tuple2::get1, Tuple2::get2));
     }
 
@@ -270,7 +270,7 @@ public abstract class Functors {
      */
     public static <K, V, W> LinkedHashMap<K, W> map(Functions.F2<K, V, W> f, LinkedHashMap<K, V> m) {
         return Streams.tupleStream(m)
-                .map(t2 -> Tuple2.of(t2._1, t2.apply(f)))
+                .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(f)))
                 .collect(toMap(Tuple2::get1, Tuple2::get2, throwingMerger(), LinkedHashMap::new));
     }
 

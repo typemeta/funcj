@@ -25,7 +25,7 @@ final public class Tuple7<A, B, C, D, E, F, G> {
      * @param d         the fourth value
      * @param e         the fifth value
      * @param f         the sixth value
-     * @param f         the seventh value
+     * @param g         the seventh value
      * @param <A>       the first value type
      * @param <B>       the second value type
      * @param <C>       the third value type
@@ -291,7 +291,7 @@ final public class Tuple7<A, B, C, D, E, F, G> {
      * @param <T>       the function return type
      * @return          the result of applying the function
      */
-    public <T> T apply(Functions.F7<? super A, ? super B, ? super C, ? super D, ? super E, ? super F, ? super G, ? extends T> f) {
+    public <T> T applyFrom(Functions.F7<? super A, ? super B, ? super C, ? super D, ? super E, ? super F, ? super G, ? extends T> f) {
         return f.apply(_1, _2, _3, _4, _5, _6, _7);
     }
 

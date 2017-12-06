@@ -255,7 +255,7 @@ final public class Tuple6<A, B, C, D, E, F> {
      * @param <T>       the function return type
      * @return          the result of applying the function
      */
-    public <T> T apply(Functions.F6<? super A, ? super B, ? super C, ? super D, ? super E, ? super F, ? extends T> f) {
+    public <T> T applyFrom(Functions.F6<? super A, ? super B, ? super C, ? super D, ? super E, ? super F, ? extends T> f) {
         return f.apply(_1, _2, _3, _4, _5, _6);
     }
 
