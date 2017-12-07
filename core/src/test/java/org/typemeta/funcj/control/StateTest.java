@@ -40,7 +40,7 @@ public class StateTest {
                 State.<Double>get().flatMap(x -> put(x + i)).flatMap(u -> get());
 
         static final Kleisli<Double, Double, Double> sub = i ->
-            State.<Double>get().flatMap(x -> put(x - i)).flatMap(u -> get());
+                State.<Double>get().flatMap(x -> put(x - i)).flatMap(u -> get());
 
         static final Kleisli<Double, Double, Double> div = i ->
                 State.<Double>get().flatMap(x -> put(x / i)).flatMap(u -> get());
@@ -53,7 +53,7 @@ public class StateTest {
                 double d,
                 Kleisli<Double, Double, Double> lhs,
                 Kleisli<Double, Double, Double> rhs) {
-            Assert.assertEquals(
+            assertEquals(
                     msg,
                     lhs.apply(d).exec(INIT),
                     rhs.apply(d).exec(INIT),

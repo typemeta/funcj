@@ -2,6 +2,8 @@ package org.typemeta.funcj.algebra;
 
 import org.typemeta.funcj.data.IList;
 
+import java.util.*;
+
 public abstract class MonoidInstances {
     public static final Monoid<Double> monoidDouble = new  Monoid<Double>() {
         @Override
@@ -75,7 +77,7 @@ public abstract class MonoidInstances {
         }
     };
 
-    private static final Monoid<IList<Object>> monoidList = new Monoid<IList<Object>>() {
+    private static final Monoid<IList<Object>> monoidIList = new Monoid<IList<Object>>() {
         @Override
         public IList<Object> zero() {
             return IList.of();
@@ -87,8 +89,46 @@ public abstract class MonoidInstances {
         }
     };
 
+    private static final Monoid<List<Object>> monoidList = new Monoid<List<Object>>() {
+        @Override
+        public List<Object> zero() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<Object> combine(List<Object> x, List<Object> y) {
+            final List<Object> res = new ArrayList<>(x.size() + y.size());
+            res.addAll(x);
+            res.addAll(y);
+            return res;
+        }
+    };
+
     @SuppressWarnings("unchecked")
     public static <T> Monoid<IList<T>> monoidList() {
-        return (Monoid)monoidList;
+        return (Monoid)monoidIList;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Monoid<T> get(Class<T> clazz) {
+        if (clazz.equals(Double.class)) {
+            return (Monoid<T>)monoidDouble;
+        } else if (clazz.equals(Float.class)) {
+            return (Monoid<T>)monoidFloat;
+        } else if (clazz.equals(Integer.class)) {
+            return (Monoid<T>)monoidInteger;
+        } else if (clazz.equals(Long.class)) {
+            return (Monoid<T>)monoidLong;
+        } else if (clazz.equals(Short.class)) {
+            return (Monoid<T>)monoidShort;
+        } else if (clazz.equals(String.class)) {
+            return (Monoid<T>)monoidString;
+        } else if (clazz.equals(IList.class)) {
+            return (Monoid<T>)monoidIList;
+        } else if (clazz.equals(List.class)) {
+            return (Monoid<T>)monoidList;
+        } else {
+            throw new RuntimeException("No Monoid instance defined for type " + clazz.getName());
+        }
     }
 }

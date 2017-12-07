@@ -1,4 +1,4 @@
-package org.typemeta.funcj.util;
+package org.typemeta.funcj.control;
 
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions;
@@ -49,7 +49,6 @@ public abstract class Reader {
                 Functions.F.konst(IList.nil())
         );
     }
-
 
     /**
      * Variation of {@link Reader#sequence(IList)} for {@link Stream}.

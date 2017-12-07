@@ -140,7 +140,7 @@ public class ValidationTest {
                 int i,
                 Kleisli<Error, Integer, T> lhs,
                 Kleisli<Error, Integer, T> rhs) {
-            Assert.assertEquals(
+            assertEquals(
                     msg,
                     lhs.apply(i),
                     rhs.apply(i));

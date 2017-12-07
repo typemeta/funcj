@@ -87,7 +87,7 @@ public class OptionTest {
                 int i,
                 Kleisli<Integer, T> lhs,
                 Kleisli<Integer, T> rhs) {
-            Assert.assertEquals(
+            assertEquals(
                     msg,
                     lhs.apply(i),
                     rhs.apply(i));

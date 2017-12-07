@@ -288,7 +288,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @param l         the list to be appended to the end of this list
      * @return          the new list
      */
-    public abstract IList<T> appendAll(IList<T> l);
+    public abstract IList<T> appendAll(IList<? extends T> l);
 
     /**
      * @return          the length of this list.
@@ -431,8 +431,9 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public IList<T> appendAll(IList<T> l) {
-            return l;
+        @SuppressWarnings("unchecked")
+        public IList<T> appendAll(IList<? extends T> l) {
+            return (IList<T>)l;
         }
 
         @Override
@@ -612,7 +613,7 @@ public abstract class IList<T> implements Iterable<T> {
         }
 
         @Override
-        public IList<T> appendAll(IList<T> l) {
+        public IList<T> appendAll(IList<? extends T> l) {
             return new NonEmpty<T>(head, tail.appendAll(l));
         }
 

@@ -55,7 +55,7 @@ public class StateRTest {
                 double d,
                 Kleisli<Double, Double, Double> lhs,
                 Kleisli<Double, Double, Double> rhs) {
-            Assert.assertEquals(
+            assertEquals(
                     msg,
                     lhs.apply(d).exec(INIT),
                     rhs.apply(d).exec(INIT),
