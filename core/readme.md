@@ -30,6 +30,40 @@ Add this dependency to your project pom.xml:
 
 # Guide
 
+## Tuples
+
+func.core provide tuple types with lengths from 2 to 8.
+The first, `Tuple2`, is described below - the remaining tuple types follow the same pattern.
+
+### Tuple2
+
+`Tuple2` provides a static constructor:
+
+```Java
+Tuple2<Double, Boolean> p = Tuple2.of(1.2, false);
+```
+
+Each of the elements can be accessed via a field and a method:
+
+```Java
+assert(p._1 == p.get1());
+assert(p._2 == p.get2());
+```
+
+Either of the elements can be overriden to form a new tuple value:
+
+```Java
+Tuple2<String, Boolean> p2 = p.with1("test");
+Tuple2<Double, Character> p3 = p.with2('x');
+```
+
+Either element can also be overriden by applying a function to it:
+
+```Java
+Tuple2<String, Boolean> p4 = p.map1(Object::toString);
+Tuple2<Double, Character> p5 = p.map2(b -> b.toString().charAt(0));
+```
+
 ## Control
 
 The `org.typemeta.funcj.control` package contains data types relating to control of flow.

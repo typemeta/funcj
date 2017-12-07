@@ -55,7 +55,7 @@ public class JsonToDoc implements JsonAlg<Document> {
                 API.text('{'),
                 API.text(", "),
                 API.text('}'),
-                tupleStream(fields).map(fld -> fld.apply(JsonToDoc::fieldToDoc)).collect(toList())
+                tupleStream(fields).map(fld -> fld.applyFrom(JsonToDoc::fieldToDoc)).collect(toList())
         );
     }
 

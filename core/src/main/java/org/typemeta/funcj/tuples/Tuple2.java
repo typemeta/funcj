@@ -110,7 +110,7 @@ final public class Tuple2<A, B> {
      * @param <T>       the function return type
      * @return          the result of applying the function
      */
-    public <T> T apply(F2<? super A, ? super B, ? extends T> f) {
+    public <T> T applyFrom(F2<? super A, ? super B, ? extends T> f) {
         return f.apply(_1, _2);
     }
 
