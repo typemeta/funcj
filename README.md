@@ -1,4 +1,4 @@
-![Func::j](https://github.com/typemeta/funcj/blob/master/resources/funcj.png)
+![Funcj](https://github.com/typemeta/funcj/blob/master/resources/funcj.png)
 
 [![Build Status](https://travis-ci.org/typemeta/funcj.svg?branch=master)](https://travis-ci.org/typemeta/funcj) [<img src="https://img.shields.io/maven-central/v/org.typemeta/funcj.svg"/>](https://search.maven.org/#search%7Cga%7C1%7Cfuncj)
 
