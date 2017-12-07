@@ -2,8 +2,8 @@ package org.typemeta.funcj.control;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.functions.Functions.F.Kleisli;
 import org.typemeta.funcj.functions.Functions.F2;
@@ -68,35 +68,40 @@ public class ReaderTest {
                 kA.andThen(kB.andThen(kC)));
     }
 
-    interface RateRDAO {
-        double getFxRate(String ccy);
-        double getUsdIrRate(Integer years);
+    interface FXRateRDAO {
+        double getFxRate(Ccy ccy);
     }
 
-    private static final Map<String, Double> fxRates = new HashMap<>();
-    private static final Map<Integer, Double> irRates = new HashMap<>();
+    enum Ccy {
+        USD, EUR, GBP
+    }
+
+    private static final double usdGbp = 0.74566;
+    private static final double usdEur = 0.84778;
+
+    private static final Map<Ccy, Double> fxRates = new HashMap<>();
 
     static {
-        fxRates.put("USD", 1.0);
-        fxRates.put("GBP", 0.74566);
-        fxRates.put("EUR", 0.84778);
-
-        irRates.put(365, 2.0);
-        irRates.put(10*365, 3.0);
-        irRates.put(50*365, 5.0);
+        fxRates.put(Ccy.USD, 1.0);
+        fxRates.put(Ccy.GBP, usdGbp);
+        fxRates.put(Ccy.EUR, usdEur);
     }
 
-    private static void test() {
-        final Kleisli<RateRDAO, String, Double> getFxRateK = ccy -> dao -> dao.getFxRate(ccy);
-        final Kleisli<RateRDAO, Integer, Double> getUsdIrRateK = years -> dao -> dao.getUsdIrRate(years);
+    @Test
+    public void demo() {
+        final F<Ccy, F<FXRateRDAO, Double>> getFxRate = ccy -> dao -> dao.getFxRate(ccy);
 
-        final F<String, F<RateRDAO, Double>> getFxRate = ccy -> dao -> dao.getFxRate(ccy);
-        final F<Integer, F<RateRDAO, Double>> getUsdIrRate = years -> dao -> dao.getUsdIrRate(years);
+        final F2<Ccy, Ccy, F<FXRateRDAO, Double>> getFxRateAB =
+                (ccyA, ccyB) ->
+                        getFxRate.apply(ccyA).flatMap(fxA ->
+                                getFxRate.apply(ccyB).flatMap(fxB ->
+                                        konst(fxA / fxB)));
 
-        F2<String, Integer, F<RateRDAO, Double>> irRate =
-                (ccy, years) ->
-                        getFxRate.apply(ccy).flatMap(fx ->
-                                getUsdIrRate.apply(years).flatMap(ir ->
-                                        konst(fx * ir)));
+        final FXRateRDAO dao = fxRates::get;
+
+        final double gbpEurA = getFxRateAB.apply(Ccy.EUR, Ccy.GBP).apply(dao);
+        final double gbpEurE = usdEur/usdGbp;
+
+        assertEquals("GBP/EUR fx rate via DAO injection", gbpEurE, gbpEurA, 1e-8);
     }
 }
