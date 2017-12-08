@@ -4,8 +4,8 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.typemeta.funcj.control.Reader.Kleisli;
 import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.functions.Functions.F.Kleisli;
 import org.typemeta.funcj.functions.Functions.F2;
 
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class ReaderTest {
         assertEquals("add combined with times", exp, comb.apply(i).intValue());
     }
 
-    private static final Kleisli<Integer, Integer, Integer> pure = Kleisli.of(F::konst);
+    private static final Kleisli<Integer, Integer, Integer> pure = Kleisli.of(Reader::pure);
     private static final Kleisli<Integer, Integer, Integer> kA = x -> y -> x + y;
     private static final Kleisli<Integer, Integer, Integer> kB = x -> y -> x * y;
     private static final Kleisli<Integer, Integer, Integer> kC = x -> y -> x - y;
@@ -68,7 +68,7 @@ public class ReaderTest {
                 kA.andThen(kB.andThen(kC)));
     }
 
-    interface FXRateRDAO {
+    interface DAO {
         double getFxRate(Ccy ccy);
     }
 
@@ -89,15 +89,15 @@ public class ReaderTest {
 
     @Test
     public void demo() {
-        final F<Ccy, F<FXRateRDAO, Double>> getFxRate = ccy -> dao -> dao.getFxRate(ccy);
+        final F<Ccy, Reader<DAO, Double>> getFxRate = ccy -> dao -> dao.getFxRate(ccy);
 
-        final F2<Ccy, Ccy, F<FXRateRDAO, Double>> getFxRateAB =
+        final F2<Ccy, Ccy, Reader<DAO, Double>> getFxRateAB =
                 (ccyA, ccyB) ->
                         getFxRate.apply(ccyA).flatMap(fxA ->
                                 getFxRate.apply(ccyB).flatMap(fxB ->
-                                        konst(fxA / fxB)));
+                                        Reader.pure(fxA / fxB)));
 
-        final FXRateRDAO dao = fxRates::get;
+        final DAO dao = fxRates::get;
 
         final double gbpEurA = getFxRateAB.apply(Ccy.EUR, Ccy.GBP).apply(dao);
         final double gbpEurE = usdEur/usdGbp;

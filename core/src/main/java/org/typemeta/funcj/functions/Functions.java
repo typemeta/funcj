@@ -86,68 +86,6 @@ public abstract class Functions {
         }
 
         /**
-         * Kleisli models composable operations that return a {@code F}.
-         * @param <T>       the function (fixed) input type
-         * @param <U>       the input type of the returned {@code F} type
-         * @param <V>       the return type of the returned {@code F} type
-         */
-        @FunctionalInterface
-        interface Kleisli<T, U, V> {
-            /**
-             * Construct a {@code Kleisli} value from a function.
-             * @param f         the function
-             * @param <T>       the function (fixed) input type
-             * @param <U>       the input type of the returned {@code F} type
-             * @param <V>       the return type of the returned {@code F} type
-             * @return          the new {@code Kleisli}
-             */
-            static <T, U, V> Kleisli<T, U, V> of(F<U, F<T, V>> f) {
-                return f::apply;
-            }
-
-            /**
-             * Apply this {@code Kleisli} operation
-             * @param t         the input value
-             * @return          the result of the operation
-             */
-            F<T, V> apply(U t);
-
-            /**
-             * Compose this {@code Kleisli} with another by applying this one first,
-             * then the other.
-             * @param kVW       the {@code Kleisli} to be applied after this one
-             * @param <W>       the second {@code Kleisli}'s return type
-             * @return          the composed {@code Kleisli}
-             */
-            default <W> Kleisli<T, U, W> andThen(Kleisli<T, V, W> kVW) {
-                return t -> apply(t).flatMap(kVW::apply);
-            }
-
-            /**
-             * Compose this {@code Kleisli} with another by applying the other one first,
-             * and then this one.
-             * @param kSU       the {@code Kleisli} to be applied after this one
-             * @param <S>       the first {@code Kleisli}'s input type
-             * @return          the composed {@code Kleisli}
-             */
-            default <S> Kleisli<T, S, V> compose(Kleisli<T, S, U> kSU) {
-                return s -> kSU.apply(s).flatMap(this::apply);
-            }
-
-            /**
-             * Compose this {@code Kleisli} with a function,
-             * by applying this {@code Kleisli} first,
-             * and then mapping the function over the result.
-             * @param f         the function
-             * @param <W>       the function return type
-             * @return          the composed {@code Kleisli}
-             */
-            default <W> Kleisli<T, U, W> map(F<V, W> f) {
-                return t -> apply(t).map(f);
-            }
-        }
-
-        /**
          * Apply this function
          * @param a         the function argument
          * @return          the result of applying this function
