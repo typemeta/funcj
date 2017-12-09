@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.typemeta.funcj.control.Reader.pure;
 import static org.typemeta.funcj.functions.Functions.F.konst;
 
 @RunWith(JUnitQuickcheck.class)
@@ -22,12 +23,12 @@ public class ReaderTest {
 
     @Property
     public void flatMap(int i) {
-        final F<Integer, Integer> comb = add.flatMap(a -> times.flatMap(b -> konst(a + b)));
+        final F<Integer, Integer> addTimes = add.flatMap(a -> times.flatMap(b -> konst(a + b)));
         final int exp = i*2 + i+10;
-        assertEquals("add combined with times", exp, comb.apply(i).intValue());
+        assertEquals("add combined with times", exp, addTimes.apply(i).intValue());
     }
 
-    private static final Kleisli<Integer, Integer, Integer> pure = Kleisli.of(Reader::pure);
+    private static final Kleisli<Integer, Integer, Integer> kPure = Kleisli.of(Reader::pure);
     private static final Kleisli<Integer, Integer, Integer> kA = x -> y -> x + y;
     private static final Kleisli<Integer, Integer, Integer> kB = x -> y -> x * y;
     private static final Kleisli<Integer, Integer, Integer> kC = x -> y -> x - y;
@@ -46,16 +47,16 @@ public class ReaderTest {
 
     @Property
     public void kleisliLeftIdentity(int i, int j) {
-        check("Kleisli Left-identity 1", i, j, pure.andThen(kA), kA);
-        check("Kleisli Left-identity 2", i, j, pure.andThen(kB), kB);
-        check("Kleisli Left-identity 3", i, j, pure.andThen(kC), kC);
+        check("Kleisli Left-identity 1", i, j, kPure.andThen(kA), kA);
+        check("Kleisli Left-identity 2", i, j, kPure.andThen(kB), kB);
+        check("Kleisli Left-identity 3", i, j, kPure.andThen(kC), kC);
     }
 
     @Property
     public void kleisliRightIdentity(int i, int j) {
-        check("Kleisli Right-identity 1", i, j, kA.andThen(pure), kA);
-        check("Kleisli Right-identity 2", i, j, kB.andThen(pure), kB);
-        check("Kleisli Right-identity 3", i, j, kC.andThen(pure), kC);
+        check("Kleisli Right-identity 1", i, j, kA.andThen(kPure), kA);
+        check("Kleisli Right-identity 2", i, j, kB.andThen(kPure), kB);
+        check("Kleisli Right-identity 3", i, j, kC.andThen(kPure), kC);
     }
 
     @Property
@@ -87,15 +88,34 @@ public class ReaderTest {
         fxRates.put(Ccy.EUR, usdEur);
     }
 
+    private static final F<Ccy, Reader<DAO, Double>> getFxRate = ccy -> dao -> dao.getFxRate(ccy);
+
     @Test
-    public void demo() {
-        final F<Ccy, Reader<DAO, Double>> getFxRate = ccy -> dao -> dao.getFxRate(ccy);
+    public void monadDemo() {
 
         final F2<Ccy, Ccy, Reader<DAO, Double>> getFxRateAB =
                 (ccyA, ccyB) ->
                         getFxRate.apply(ccyA).flatMap(fxA ->
                                 getFxRate.apply(ccyB).flatMap(fxB ->
-                                        Reader.pure(fxA / fxB)));
+                                        pure(fxA / fxB)));
+
+        final DAO dao = fxRates::get;
+
+        final double gbpEurA = getFxRateAB.apply(Ccy.EUR, Ccy.GBP).apply(dao);
+        final double gbpEurE = usdEur/usdGbp;
+
+        assertEquals("GBP/EUR fx rate via DAO injection", gbpEurE, gbpEurA, 1e-8);
+    }
+
+    @Test
+    public void applicDemo() {
+
+        final F2<Ccy, Ccy, Reader<DAO, Double>> getFxRateAB =
+                (ccyA, ccyB) ->
+                        getFxRate.apply(ccyB).app(
+                                getFxRate.apply(ccyA)
+                                        .app(pure(fxA -> fxB -> fxA / fxB))
+                        );
 
         final DAO dao = fxRates::get;
 
