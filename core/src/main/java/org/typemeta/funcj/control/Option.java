@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /**
- * A type representing a value which mnay be either present or absent.
+ * A type representing a value which may be either present or absent.
  * <p>
  * A {@code Option<T>} value is either
  * the sub-type {@code Option.None<T>} which indicates an absent value, or
@@ -393,7 +393,7 @@ public interface Option<T> {
     final class None<T> implements Option<T> {
 
         static final None<Object> INSTANCE = new None<Object>();
-        
+
         private None() {
         }
 

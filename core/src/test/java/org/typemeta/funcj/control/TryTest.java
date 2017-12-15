@@ -57,10 +57,22 @@ public class TryTest {
     public void flatMap(char c) {
         final char e = c == 'X' ? 'x' : 'X';
         final String cs = String.valueOf(c);
-        Assert.assertEquals(Try.success(e), Try.success(c).flatMap(d -> Try.success(e)));
-        Assert.assertEquals(failure(cs), Try.success(c).flatMap(d -> failure(cs)));
-        Assert.assertEquals(failure(cs), failure(cs).flatMap(d -> Try.success(e)));
-        Assert.assertEquals(failure(cs), failure(cs).flatMap(d -> failure("error")));
+        assertEquals(Try.success(e), Try.success(c).flatMap(d -> Try.success(e)));
+        assertEquals(failure(cs), Try.success(c).flatMap(d -> failure(cs)));
+        assertEquals(failure(cs), failure(cs).flatMap(d -> Try.success(e)));
+        assertEquals(failure(cs), failure(cs).flatMap(d -> failure("error")));
+    }
+
+    private static final Try<Integer> fail = Try.failure(new Exception(""));
+
+    @Property
+    public void andMap(int a, int b) {
+        final Try<Integer> tiA = Try.success(a);
+        final Try<Integer> tiB = Try.success(b);
+
+        assertEquals("", Try.success(a+b), tiA.and(tiB).map(iA -> iB -> iA + iB));
+        assertEquals("", fail, fail.and(tiB).map(iA -> iB -> iA + iB));
+        assertEquals("", fail, tiA.and(fail).map(iA -> iB -> iA + iB));
     }
 
     static class Utils {

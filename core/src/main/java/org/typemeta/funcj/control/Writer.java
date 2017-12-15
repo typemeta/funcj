@@ -23,8 +23,8 @@ public abstract class Writer<T, W> {
         this.written = written;
     }
 
-    public <U> Writer<U, W> flatMap(Functions.F<T, Writer<U, W>> f) {
-        final Writer<U, W> wu = f.apply(value);
+    public <U> Writer<U, W> flatMap(Functions.F<T, Writer<U, W>> fw) {
+        final Writer<U, W> wu = fw.apply(value);
         return new Writer<U, W>(wu.value, monoid().combine(written, wu.written)) {
             @Override
             Monoid<W> monoid() {
