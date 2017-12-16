@@ -12,6 +12,7 @@ public class GrammarTest {
     private static void assertSuccess(String s, String expected) {
         final String result = Grammar.parse(s).getOrThrow().toString();
         Assert.assertEquals(expected, result);
+        //System.out.println(result);
         Assert.assertEquals(expected, Grammar.parse(result).getOrThrow().toString());
     }
 

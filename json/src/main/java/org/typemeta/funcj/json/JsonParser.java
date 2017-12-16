@@ -5,6 +5,7 @@ import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.parser.*;
 
 import java.io.Reader;
+import java.util.Optional;
 
 import static org.typemeta.funcj.parser.Combinators.*;
 import static org.typemeta.funcj.parser.Parser.pure;
@@ -20,6 +21,17 @@ public class JsonParser {
         return p.andL(ws.skipMany());
     }
 
+    private static double makeDbl(boolean sign, Long mntsa, Optional<Double> f, Optional<Integer> exp) {
+        double r = mntsa.doubleValue();
+        if (f.isPresent()) {
+            r += f.get();
+        }
+        if (exp.isPresent()) {
+            r = r * Math.pow(10.0, exp.get());
+        }
+        return sign ? r : -r;
+    }
+
     static {
         final Parser<Chr, JSNull> jnull = tok(string("null")).andR(pure(JSAPI.nul()));
 
@@ -28,9 +40,48 @@ public class JsonParser {
 
         final Parser<Chr, JSBool> jbool = tok(jtrue.or(jfalse)).map(JSAPI::bool);
 
+        final Parser<Chr, Long> nzMtsa =
+                nonZeroDigit.and(digit.many())
+                        .map(d -> ds -> ds.add(d))
+                        .map(ds -> ds.map(Text::digitToInt))
+                        .map(ds -> ds.foldLeft((acc, x) -> acc * 10l + x, 0l));
+
+        final Parser<Chr, Long> zeMtsa =
+                chr('0').map(zs -> 0l);
+
+        final Parser<Chr, Long> mtsa =
+                zeMtsa.or(nzMtsa);
+
+        final Parser<Chr, Double> floating =
+                nonZeroDigit.and(digit.many())
+                        .map(d -> ds -> ds.add(d))
+                        .map(ds -> ds.map(Text::digitToInt))
+                        .map(l -> l.foldRight((d, acc) -> d + acc / 10.0, 0.0) / 10.0);
+
+        final Parser<Chr, Integer> uexpnt =
+                digit.many1()
+                        .map(ds -> ds.map(Text::digitToInt))
+                        .map(ds -> ds.foldLeft1((acc, x) -> acc * 10 + x));
+
+        final Parser<Chr, Integer> expnt =
+                sign.and(uexpnt)
+                        .map((sign, i) -> sign ? i : -i);
+
+        final Parser<Chr, Boolean> sign =
+                choice(
+                        chr('-').andR(Parser.pure(false)),
+                        Parser.pure(true)
+                );
+
+        final Parser<Chr, Double> dble =
+                sign.and(mtsa)
+                        .and((chr('.').andR(floating)).optional())
+                        .and((chr('e').or(chr('E'))).andR(expnt).optional())
+                        .map(JsonParser::makeDbl);
+
         final Parser<Chr, JSNumber> jnumber = tok(dble).map(JSAPI::num);
 
-        final Parser<Chr, Byte> digit = Text.digit.map(Byte.class::cast);
+        final Parser<Chr, Byte> digit = Text.digit.map(c -> (byte)Chr.digit(c.charValue(), 10));
         final Parser<Chr, Byte> hexA = chr('a').or(chr('A')).map(u -> (byte)10);
         final Parser<Chr, Byte> hexB = chr('b').or(chr('B')).map(u -> (byte)11);
         final Parser<Chr, Byte> hexC = chr('c').or(chr('C')).map(u -> (byte)12);
@@ -77,7 +128,12 @@ public class JsonParser {
 
         final Parser<Chr, Chr> stringChar =
                 (bsChr.andR(esc)).or(
-                        satisfy("schar", c -> !c.equals('"') && !c.equals('\\'))
+                        satisfy("schar", c ->
+                                !c.equals('"') &&
+                                        !c.equals('\\') &&
+                                        !c.equals('\t') &&
+                                        !c.equals('\r') &&
+                                        !c.equals('\n'))
                 );
 
         final Parser<Chr, String> jstring =
@@ -91,7 +147,7 @@ public class JsonParser {
 
         final Ref<Chr, JSValue> jvalue = Parser.ref();
 
-        final Parser<Chr, JSArray> jarray =
+        final Parser<Chr, JSValue> jarray =
                 jvalue.sepBy(tok(chr(',')))
                         .between(
                                 tok(chr('[')),
@@ -104,7 +160,7 @@ public class JsonParser {
                         .and(jvalue)
                         .map(JSAPI::field);
 
-        final Parser<Chr, JSObject> jobject =
+        final Parser<Chr, JSValue> jobject =
                 jfield
                         .sepBy(tok(chr(',')))
                         .between(
@@ -123,7 +179,7 @@ public class JsonParser {
                 )
         );
 
-        parser = ws.skipMany().andR(tok(jvalue));
+        parser = ws.skipMany().andR(tok(jarray.or(jobject)));
     }
 
     /**

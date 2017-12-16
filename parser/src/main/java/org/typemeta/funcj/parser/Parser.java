@@ -252,7 +252,8 @@ public interface Parser<I, A> {
      * @param rhs       the second parser to attempt
      * @return          a parser which returns the result of either this parser or the {@code rhs} parser.
      */
-    default Parser<I, A> or(Parser<I, A> rhs) {
+    @SuppressWarnings("unchecked")
+    default <B extends A> Parser<I, A> or(Parser<I, B> rhs) {
         return new ParserImpl<I, A>(
             Utils.or(Parser.this.acceptsEmpty(), rhs.acceptsEmpty()),
             union(Parser.this.firstSet(), rhs.firstSet())
@@ -263,7 +264,7 @@ public interface Parser<I, A> {
                     if (Parser.this.acceptsEmpty().apply()) {
                         return Parser.this.parse(in, follow);
                     } else if (rhs.acceptsEmpty().apply()) {
-                        return rhs.parse(in, follow);
+                        return (Result<I, A>)rhs.parse(in, follow);
                     } else {
                         return failureEof(this, in);
                     }
@@ -272,12 +273,12 @@ public interface Parser<I, A> {
                     if (Parser.this.firstSet().apply().matches(next)) {
                         return Parser.this.parse(in, follow);
                     } else if (rhs.firstSet().apply().matches(next)) {
-                        return rhs.parse(in, follow);
+                        return (Result<I, A>)rhs.parse(in, follow);
                     } else if (follow.matches(next)) {
                         if (Parser.this.acceptsEmpty().apply()) {
                             return Parser.this.parse(in, follow);
                         } else if (rhs.acceptsEmpty().apply()) {
-                            return rhs.parse(in, follow);
+                            return (Result<I, A>)rhs.parse(in, follow);
                         }
                     }
                     return failure(this, in);

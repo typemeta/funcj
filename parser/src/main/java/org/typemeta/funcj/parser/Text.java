@@ -2,6 +2,8 @@ package org.typemeta.funcj.parser;
 
 import org.typemeta.funcj.data.Chr;
 
+import static org.typemeta.funcj.parser.Combinators.*;
+
 /**
  * Parser combinators for working with {@link Chr} streams.
  */
@@ -23,77 +25,92 @@ public abstract class Text {
      * @return          as parser that succeeds if the next input symbol equals the supplied char {@code c}
      */
     public static Parser<Chr, Chr> chr(char c) {
-        return Combinators.value(Chr.valueOf(c));
+        return value(Chr.valueOf(c));
     }
 
     /**
      * A parser that succeeds if the next input symbol is an alphabetic letter.
      */
-    public static final Parser<Chr, Chr> alpha = Combinators.satisfy("letter", Chr::isLetter);
+    public static final Parser<Chr, Chr> alpha = satisfy("letter", Chr::isLetter);
 
     /**
      * A parser that succeeds if the next input symbol is a numeric digit.
      */
-    public static final Parser<Chr, Chr> digit = Combinators.satisfy("digit", Chr::isDigit);
+    public static final Parser<Chr, Chr> digit = satisfy("digit", Chr::isDigit);
+
+    /**
+     * A parser that succeeds if the next input symbol is a numeric digit.
+     */
+    public static final Parser<Chr, Chr> nonZeroDigit = satisfy(
+            "nonZeroDigit",
+            c -> c.charValue() != '0' && Chr.isDigit(c));
 
     /**
      * A parser that succeeds if the next input symbol is a letter or a digit.
      */
-    public static final Parser<Chr, Chr> alphaNum = Combinators.satisfy("letterOrDigit", Chr::isLetterOrDigit);
+    public static final Parser<Chr, Chr> alphaNum = satisfy("letterOrDigit", Chr::isLetterOrDigit);
 
     /**
      * A parser that succeeds if the next input symbol is whitespace.
      */
-    public static final Parser<Chr, Chr> ws = Combinators.satisfy("ws", Chr::isWhitespace);
+    public static final Parser<Chr, Chr> ws = satisfy("ws", Chr::isWhitespace);
 
-    private static int digitToInt(char c) {
+    public static int digitToInt(char c) {
         return Chr.getNumericValue(c);
     }
 
-    private static int digitToInt(Chr c) {
+    public static int digitToInt(Chr c) {
         return Chr.getNumericValue(c.charValue());
     }
 
-    private static final Parser<Chr, Boolean> sign =
-            Combinators.choice(
+    public static final Parser<Chr, Boolean> sign =
+            choice(
                     chr('+').andR(Parser.pure(true)),
                     chr('-').andR(Parser.pure(false)),
                     Parser.pure(true)
             );
 
-    /**
-     * parser that parses an unsigned integer.
-     */
-    public static final Parser<Chr, Integer> uintr =
-            digit.map(Text::digitToInt)
-                    .many1()
-                    .map(l -> l.foldLeft1((acc, x) -> acc * 10 + x));
+    private static final Parser<Chr, Integer> uintrZero =
+            chr('0').map(zs -> 0);
+
+    private static final Parser<Chr, Integer> uintrNotZero =
+            nonZeroDigit.and(digit.many())
+                    .map(d -> ds -> ds.add(d))
+                    .map(ds -> ds.map(Text::digitToInt))
+                    .map(is -> is.foldLeft1((acc, x) -> acc * 10 + x));
 
     /**
-     * parser that parses a signed integer.
+     * A parser for an unsigned integer.
+     */
+    public static final Parser<Chr, Integer> uintr = uintrZero.or(uintrNotZero);
+
+    /**
+     * A parser for a signed integer.
      */
     public static final Parser<Chr, Integer> intr =
             sign.and(uintr)
                     .map((sign, i) -> sign ? i : -i);
 
-    /**
-     * parser that parses an unsigned long.
-     */
-    public static final Parser<Chr, Long> ulng =
-            digit.map(c -> (long)digitToInt(c))
-                    .many1()
-                    .map(l -> l.foldLeft1((acc, x) -> acc * 10 + x));
+    private static final Parser<Chr, Long> ulngZero =
+            chr('0').map(zs -> 0l);
+
+    private static final Parser<Chr, Long> ulngNotZero =
+            nonZeroDigit.and(digit.many())
+                    .map(d -> ds -> ds.add(d))
+                    .map(ds -> ds.map(Text::digitToInt))
+                    .map(ds -> ds.foldLeft((acc, x) -> acc * 10l + x, 0l));
 
     /**
-     * parser that parses a signed long.
+     * A parser for an unsigned long.
      */
-    public static final Parser<Chr, Long> lng =
-            sign.and(ulng)
-                    .map((sign, i) -> sign ? i : -i);
+    public static final Parser<Chr, Long> ulng = ulngZero.or(ulngNotZero);
+
+    private static final Parser<Chr, Double> udblZero =
+            chr('0').map(zs -> 0.0);
 
     private static final Parser<Chr, Double> floating =
-            digit.map(Text::digitToInt)
-                    .many()
+            digit.many()
+                    .map(ds -> ds.map(Text::digitToInt))
                     .map(l -> l.foldRight((d, acc) -> d + acc / 10.0, 0.0) / 10.0);
 
     private static final Parser<Chr, Integer> expnt =
@@ -101,7 +118,7 @@ public abstract class Text {
                     .andR(intr);
 
     /**
-     * parser that parses a floating point number.
+     * A parser for a floating point number.
      */
     public static final Parser<Chr, Double> dble =
             sign.and(ulng)
@@ -119,9 +136,9 @@ public abstract class Text {
                     });
 
     /**
-     * Construct a parser that succeeds if it can extract the supplied string from the input.
+     * A parser that succeeds if it can extract the supplied string from the input.
      * @param s         the expected string
-     * @return          a parser that parses the supplied string value
+     * @return          a parser for the supplied string value
      */
     public static Parser<Chr, String> string(String s) {
         switch (s.length()) {

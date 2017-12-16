@@ -61,8 +61,8 @@ public class JsonToDoc implements JsonAlg<Document> {
 
     private static Document fieldToDoc(String name, Document value) {
         return API.concat(
-                API.text("\"" + name + "\""),
-                API.text(" : "),
+                API.text(Utils.format(name)),
+                API.text(": "),
                 value);
     }
 }
