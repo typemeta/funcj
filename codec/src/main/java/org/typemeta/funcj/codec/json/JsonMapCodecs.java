@@ -11,26 +11,26 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class JsonMapCodecs {
 
-    public static class MapCodec<K, V> implements Codec<Map<K, V>, JSValue> {
+    public static class MapCodec<K, V> implements Codec<Map<K, V>, JsValue> {
         private final JsonCodecCoreImpl core;
-        private final Codec<K, JSValue> keyCodec;
-        private final Codec<V, JSValue> valueCodec;
+        private final Codec<K, JsValue> keyCodec;
+        private final Codec<V, JsValue> valueCodec;
 
         public MapCodec(
                 JsonCodecCoreImpl core,
-                Codec<K, JSValue> keyCodec,
-                Codec<V, JSValue> valueCodec) {
+                Codec<K, JsValue> keyCodec,
+                Codec<V, JsValue> valueCodec) {
             this.core = core;
             this.keyCodec = keyCodec;
             this.valueCodec = valueCodec;
         }
 
         @Override
-        public JSValue encode(Map<K, V> map, JSValue enc) {
+        public JsValue encode(Map<K, V> map, JsValue enc) {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
-            final List<JSValue> nodes = map.entrySet().stream()
+            final List<JsValue> nodes = map.entrySet().stream()
                     .map(en -> JSAPI.obj(
                             JSAPI.field(keyFieldName, keyCodec.encode(en.getKey(), enc)),
                             JSAPI.field(valueFieldName, valueCodec.encode(en.getValue(), enc))
@@ -40,12 +40,12 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Map<K, V> decode(Class<Map<K, V>> dynType, JSValue enc) {
+        public Map<K, V> decode(Class<Map<K, V>> dynType, JsValue enc) {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
-            final Functions.F<Map<K, V>, SideEffect.F<JSValue>> decodeF = m -> elemNode -> {
-                final JSObject elemObjNode = elemNode.asObject();
+            final Functions.F<Map<K, V>, SideEffect.F<JsValue>> decodeF = m -> elemNode -> {
+                final JsObject elemObjNode = elemNode.asObject();
                 final K key = keyCodec.decode(elemObjNode.get(keyFieldName));
                 final V val = valueCodec.decode(elemObjNode.get(valueFieldName));
                 m.put(key, val);
@@ -55,29 +55,29 @@ public abstract class JsonMapCodecs {
                     () -> core.getTypeConstructor(dynType).construct(),
                     JsonCodecException::new);
 
-            final JSArray objNode = enc.asArray();
-            final SideEffect.F<JSValue> decode = decodeF.apply(map);
+            final JsArray objNode = enc.asArray();
+            final SideEffect.F<JsValue> decode = decodeF.apply(map);
             objNode.forEach(decode::apply);
 
             return map;
         }
     }
 
-    public static class StringMapCodec<V> implements Codec<Map<String, V>, JSValue> {
+    public static class StringMapCodec<V> implements Codec<Map<String, V>, JsValue> {
         private final JsonCodecCoreImpl core;
-        private final Codec<V, JSValue> valueCodec;
+        private final Codec<V, JsValue> valueCodec;
 
-        public StringMapCodec(JsonCodecCoreImpl core, Codec<V, JSValue> valueCodec) {
+        public StringMapCodec(JsonCodecCoreImpl core, Codec<V, JsValue> valueCodec) {
             this.core = core;
             this.valueCodec = valueCodec;
         }
 
         @Override
-        public JSValue encode(Map<String, V> map, JSValue enc) {
-            final List<JSObject.Field> fields = new ArrayList<>(map.size());
+        public JsValue encode(Map<String, V> map, JsValue enc) {
+            final List<JsObject.Field> fields = new ArrayList<>(map.size());
 
             map.forEach((k, v) -> {
-                final JSValue value = valueCodec.encode(v, enc);
+                final JsValue value = valueCodec.encode(v, enc);
                 fields.add(JSAPI.field(k, value));
             });
 
@@ -85,8 +85,8 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Map<String, V> decode(Class<Map<String, V>> dynType, JSValue enc) {
-            final JSObject objNode = enc.asObject();
+        public Map<String, V> decode(Class<Map<String, V>> dynType, JsValue enc) {
+            final JsObject objNode = enc.asObject();
 
             final Map<String, V> map = Exceptions.wrap(
                     () -> core.getTypeConstructor(dynType).construct(),

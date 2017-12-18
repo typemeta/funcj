@@ -33,12 +33,12 @@ public class JsonParser {
     }
 
     static {
-        final Parser<Chr, JSNull> jnull = tok(string("null")).andR(pure(JSAPI.nul()));
+        final Parser<Chr, JsNull> jnull = tok(string("null")).andR(pure(JSAPI.nul()));
 
         final Parser<Chr, Boolean> jtrue = tok(string("true")).andR(pure(Boolean.TRUE));
         final Parser<Chr, Boolean> jfalse = tok(string("false")).andR(pure(Boolean.FALSE));
 
-        final Parser<Chr, JSBool> jbool = tok(jtrue.or(jfalse)).map(JSAPI::bool);
+        final Parser<Chr, JsBool> jbool = tok(jtrue.or(jfalse)).map(JSAPI::bool);
 
         final Parser<Chr, Long> nzMtsa =
                 nonZeroDigit.and(digit.many())
@@ -79,7 +79,7 @@ public class JsonParser {
                         .and((chr('e').or(chr('E'))).andR(expnt).optional())
                         .map(JsonParser::makeDbl);
 
-        final Parser<Chr, JSNumber> jnumber = tok(dble).map(JSAPI::num);
+        final Parser<Chr, JsNumber> jnumber = tok(dble).map(JSAPI::num);
 
         final Parser<Chr, Byte> digit = Text.digit.map(c -> (byte)Chr.digit(c.charValue(), 10));
         final Parser<Chr, Byte> hexA = chr('a').or(chr('A')).map(u -> (byte)10);
@@ -142,25 +142,25 @@ public class JsonParser {
                         .between(dqChr, dqChr)
                 );
 
-        final Parser<Chr, JSString> jtext =
+        final Parser<Chr, JsString> jtext =
                 jstring.map(JSAPI::str);
 
-        final Ref<Chr, JSValue> jvalue = Parser.ref();
+        final Ref<Chr, JsValue> jvalue = Parser.ref();
 
-        final Parser<Chr, JSValue> jarray =
+        final Parser<Chr, JsValue> jarray =
                 jvalue.sepBy(tok(chr(',')))
                         .between(
                                 tok(chr('[')),
                                 tok(chr(']')))
                         .map(JSAPI::arr);
 
-        final Parser<Chr, JSObject.Field> jfield =
+        final Parser<Chr, JsObject.Field> jfield =
                 jstring
                         .andL(tok(chr(':')))
                         .and(jvalue)
                         .map(JSAPI::field);
 
-        final Parser<Chr, JSValue> jobject =
+        final Parser<Chr, JsValue> jobject =
                 jfield
                         .sepBy(tok(chr(',')))
                         .between(
@@ -185,14 +185,14 @@ public class JsonParser {
     /**
      * Parser value (primarily for composing with other Parsers).
      */
-    public static final Parser<Chr, JSValue> parser;
+    public static final Parser<Chr, JsValue> parser;
 
     /**
      * Parse a JSON string into a parse result.
      * @param str JSON string
      * @return parse result
      */
-    public static Result<Chr, JSValue> parse(String str) {
+    public static Result<Chr, JsValue> parse(String str) {
         return parser.run(Input.of(str));
     }
 
@@ -202,7 +202,7 @@ public class JsonParser {
      * @param rdr JSON input stream
      * @return parse result
      */
-    public static Result<Chr, JSValue> parse(Reader rdr) {
+    public static Result<Chr, JsValue> parse(Reader rdr) {
         return parser.run(Input.of(rdr));
     }
 }

@@ -1,7 +1,6 @@
 package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.json.algebra.JsonAlg;
 import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
@@ -11,12 +10,12 @@ import java.util.stream.Stream;
 /**
  * Models a JSON array.
  */
-public final class JSArray
-        implements Iterable<JSValue>, JSValue {
+public final class JsArray
+        implements Iterable<JsValue>, JsValue {
 
-    private final List<JSValue> values;
+    private final List<JsValue> values;
 
-    protected JSArray(List<JSValue> values) {
+    protected JsArray(List<JsValue> values) {
         this.values = values;
     }
 
@@ -28,15 +27,15 @@ public final class JSArray
         return values.size();
     }
 
-    public JSValue get(int index) {
+    public JsValue get(int index) {
         return values.get(index);
     }
 
     @Override
-    public Iterator<JSValue> iterator() {
-        final Iterator<JSValue> iter = values.iterator();
+    public Iterator<JsValue> iterator() {
+        final Iterator<JsValue> iter = values.iterator();
 
-        return new Iterator<JSValue>() {
+        return new Iterator<JsValue>() {
 
             @Override
             public boolean hasNext() {
@@ -44,38 +43,23 @@ public final class JSArray
             }
 
             @Override
-            public JSValue next() {
+            public JsValue next() {
                 return iter.next();
             }
         };
     }
 
-    public Stream<JSValue> stream() {
+    public Stream<JsValue> stream() {
         return values.stream();
     }
 
-    public void forEach(Consumer<? super JSValue> action) {
+    public void forEach(Consumer<? super JsValue> action) {
         values.forEach(action);
     }
 
     @Override
     public String toString() {
         return toString(new StringBuilder()).toString();
-    }
-
-    @Override
-    public StringBuilder toString(StringBuilder sb) {
-        sb.append('[');
-        boolean first = true;
-        for (JSValue n : values) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(',');
-            }
-            n.toString(sb);
-        }
-        return sb.append(']');
     }
 
     @Override
@@ -86,7 +70,7 @@ public final class JSArray
         if (rhs == null || getClass() != rhs.getClass()) {
             return false;
         }
-        final JSArray that = (JSArray) rhs;
+        final JsArray that = (JsArray) rhs;
         return values.equals(that.values);
     }
 
@@ -97,12 +81,12 @@ public final class JSArray
 
     @Override
     public <T> T match(
-            Functions.F<JSNull, T> fNull,
-            Functions.F<JSBool, T> fBool,
-            Functions.F<JSNumber, T> fNum,
-            Functions.F<JSString, T> fStr,
-            Functions.F<JSArray, T> fArr,
-            Functions.F<JSObject, T> fObj) {
+            Functions.F<JsNull, T> fNull,
+            Functions.F<JsBool, T> fBool,
+            Functions.F<JsNumber, T> fNum,
+            Functions.F<JsString, T> fStr,
+            Functions.F<JsArray, T> fArr,
+            Functions.F<JsObject, T> fObj) {
         return fArr.apply(this);
     }
 
@@ -117,7 +101,7 @@ public final class JSArray
     }
 
     @Override
-    public JSArray asArray() {
+    public JsArray asArray() {
         return this;
     }
 }

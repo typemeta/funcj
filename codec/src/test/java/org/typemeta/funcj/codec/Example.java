@@ -3,7 +3,7 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.codec.json.JsonCodecCore;
 import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.control.Either;
-import org.typemeta.funcj.json.model.JSValue;
+import org.typemeta.funcj.json.model.JsValue;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.*;
@@ -67,7 +67,7 @@ public class Example {
                 ZonedDateTime::parse);
 
         // Serialise to JSON.
-        final JSValue json = codec.encode(person);
+        final JsValue json = codec.encode(person);
         System.out.println(json.toString(40));
 
         // Deserialise back to Java.

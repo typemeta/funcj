@@ -1,8 +1,8 @@
 package org.typemeta.funcj.json.model;
 
-abstract class Utils {
+public abstract class Utils {
 
-    static String formatAsNumber(Object obj) {
+    public static String formatAsNumber(Object obj) {
         if (obj instanceof Double) {
             final double d = (Double) obj;
             final long l = (long)d;
@@ -20,17 +20,17 @@ abstract class Utils {
         return obj.toString();
     }
 
-    static String format(String s) {
+    public static String format(String s) {
         return format(s, new StringBuilder()).toString();
     }
 
-    static StringBuilder format(String s, StringBuilder sb) {
+    public static StringBuilder format(String s, StringBuilder sb) {
         sb.append('"');
         escape(s, sb);
         return sb.append('"');
     }
 
-    static StringBuilder escape(String s, StringBuilder sb) {
+    public static StringBuilder escape(String s, StringBuilder sb) {
         final int len = s.length();
         for (int i = 0; i < len; ++i) {
             final char c = s.charAt(i);
@@ -74,27 +74,27 @@ abstract class Utils {
     }
 
     static RuntimeException nullTypeError(Class<?> clazz) {
-        return new RuntimeException(typeErrorMessage(JSNull.class, clazz));
+        return new RuntimeException(typeErrorMessage(JsNull.class, clazz));
     }
 
     static RuntimeException boolTypeError(Class<?> clazz) {
-        return new RuntimeException(typeErrorMessage(JSBool.class, clazz));
+        return new RuntimeException(typeErrorMessage(JsBool.class, clazz));
     }
 
     static RuntimeException numberTypeError(Class<?> clazz) {
-        return new RuntimeException(typeErrorMessage(JSNumber.class, clazz));
+        return new RuntimeException(typeErrorMessage(JsNumber.class, clazz));
     }
 
     static RuntimeException stringTypeError(Class<?> clazz) {
-        return new RuntimeException(typeErrorMessage(JSString.class, clazz));
+        return new RuntimeException(typeErrorMessage(JsString.class, clazz));
     }
 
     static RuntimeException arrayTypeError(Class<?> clazz) {
-        return new RuntimeException(typeErrorMessage(JSArray.class, clazz));
+        return new RuntimeException(typeErrorMessage(JsArray.class, clazz));
     }
 
     static RuntimeException objectTypeError(Class<?> clazz) {
-        return new RuntimeException(typeErrorMessage(JSObject.class, clazz));
+        return new RuntimeException(typeErrorMessage(JsObject.class, clazz));
     }
 
     private static String typeErrorMessage(Class<?> expType, Class<?> actualType) {

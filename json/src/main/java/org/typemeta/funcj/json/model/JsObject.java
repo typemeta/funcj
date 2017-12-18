@@ -1,7 +1,6 @@
 package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.json.algebra.JsonAlg;
 import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
@@ -11,14 +10,14 @@ import java.util.stream.Stream;
 /**
  * Models a JSON object.
  */
-public final class JSObject
-        implements Iterable<JSObject.Field>, JSValue {
+public final class JsObject
+        implements Iterable<JsObject.Field>, JsValue {
 
     public static class Field {
         public final String name;
-        public final JSValue value;
+        public final JsValue value;
 
-        public Field(String name, JSValue value) {
+        public Field(String name, JsValue value) {
             this.name = Objects.requireNonNull(name);
             this.value = Objects.requireNonNull(value);
         }
@@ -27,7 +26,7 @@ public final class JSObject
             return name;
         }
 
-        public JSValue getValue() {
+        public JsValue getValue() {
             return value;
         }
 
@@ -56,11 +55,11 @@ public final class JSObject
 
     private final LinkedHashMap<String, Field> fields;
 
-    protected JSObject(Map<String, Field> fields) {
+    protected JsObject(Map<String, Field> fields) {
         this.fields = new LinkedHashMap<String, Field>(fields);
     }
 
-    protected JSObject(LinkedHashMap<String, Field> fields) {
+    protected JsObject(LinkedHashMap<String, Field> fields) {
         this.fields = fields;
     }
 
@@ -76,7 +75,7 @@ public final class JSObject
         return fields.containsKey(name);
     }
 
-    public JSValue get(String name) {
+    public JsValue get(String name) {
         return fields.get(name).value;
     }
 
@@ -111,22 +110,6 @@ public final class JSObject
     }
 
     @Override
-    public StringBuilder toString(StringBuilder sb) {
-        sb.append('{');
-        boolean first = true;
-        for (Field field : fields.values()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(',');
-            }
-            Utils.format(field.name, sb).append(':');
-            field.value.toString(sb);
-        }
-        return sb.append('}');
-    }
-
-    @Override
     public boolean equals(Object rhs) {
         if (this == rhs) {
             return true;
@@ -134,7 +117,7 @@ public final class JSObject
         if (rhs == null || getClass() != rhs.getClass()) {
             return false;
         }
-        final JSObject that = (JSObject) rhs;
+        final JsObject that = (JsObject) rhs;
         return fields.equals(that.fields);
     }
 
@@ -145,12 +128,12 @@ public final class JSObject
 
     @Override
     public <T> T match(
-            Functions.F<JSNull, T> fNull,
-            Functions.F<JSBool, T> fBool,
-            Functions.F<JSNumber, T> fNum,
-            Functions.F<JSString, T> fStr,
-            Functions.F<JSArray, T> fArr,
-            Functions.F<JSObject, T> fObj) {
+            Functions.F<JsNull, T> fNull,
+            Functions.F<JsBool, T> fBool,
+            Functions.F<JsNumber, T> fNum,
+            Functions.F<JsString, T> fStr,
+            Functions.F<JsArray, T> fArr,
+            Functions.F<JsObject, T> fObj) {
         return fObj.apply(this);
     }
 
@@ -165,7 +148,7 @@ public final class JSObject
     }
 
     @Override
-    public JSObject asObject() {
+    public JsObject asObject() {
         return this;
     }
 }

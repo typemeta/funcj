@@ -12,20 +12,20 @@ public class JsonCodecs {
         return Codecs.registerAll(core);
     }
 
-    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, JSValue> {
+    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, JsValue> {
 
-        protected OptionalCodec(BaseCodecCore<JSValue> core) {
+        protected OptionalCodec(BaseCodecCore<JsValue> core) {
             super(core);
         }
 
         @Override
-        public JSValue encode(Optional<T> val, JSValue enc) {
+        public JsValue encode(Optional<T> val, JsValue enc) {
             return val.map(t -> core.dynamicCodec().encode(t, enc))
                     .orElseGet(JSAPI::obj);
         }
 
         @Override
-        public Optional<T> decode(JSValue enc) {
+        public Optional<T> decode(JsValue enc) {
             if (enc.isObject() && enc.asObject().isEmpty()) {
                 return Optional.empty();
             } else {

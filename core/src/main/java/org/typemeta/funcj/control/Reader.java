@@ -67,7 +67,7 @@ public interface Reader<A, R> {
      * @param lfu       the list of {@code F} values
      * @param <T>       the input type of the applicative function
      * @param <U>       the return type of the {@code F}s in the list
-     * @return
+     * @return          a {@codeReader} which wraps an {@link IList} of values
      */
     static <T, U> Reader<T, IList<U>> sequence(IList<Reader<T, U>> lfu) {
         return lfu.foldRight(
@@ -96,10 +96,9 @@ public interface Reader<A, R> {
     /**
      * Kleisli models composable operations that return a {@code Reader}.
      * @param <T>       the input type of the returned {@code Reader} type
-     * @param <U>
+     * @param <U>       the input type of the returned {@code F} type
      * @param <V>       the return type of the returned {@code Reader} type
      */
-
     @FunctionalInterface
     interface Kleisli<T, U, V> {
         /**

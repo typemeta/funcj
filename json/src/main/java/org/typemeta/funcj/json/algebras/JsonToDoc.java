@@ -1,7 +1,8 @@
-package org.typemeta.funcj.json.model;
+package org.typemeta.funcj.json.algebras;
 
 import org.typemeta.funcj.document.*;
-import org.typemeta.funcj.json.algebra.JsonAlg;
+import org.typemeta.funcj.json.model.*;
+import org.typemeta.funcj.json.model.Utils;
 
 import java.util.*;
 
@@ -15,13 +16,13 @@ public class JsonToDoc implements JsonAlg<Document> {
      * @param width     the maximum line length
      * @return          the string representation of formatted JSON
      */
-    public static String toString(JSValue jv, int width) {
+    public static String toString(JsValue jv, int width) {
         return DocFormat.format(width, jv.apply(new JsonToDoc()));
     }
 
     @Override
     public Document nul() {
-        return API.text(JSNull.NULL.toString());
+        return API.text(JsNull.NULL.toString());
     }
 
     @Override

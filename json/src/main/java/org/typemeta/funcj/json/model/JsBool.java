@@ -1,18 +1,17 @@
 package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.json.algebra.JsonAlg;
 
 /**
  * Models JSON true and false values.
  */
-public enum JSBool implements JSValue {
+public enum JsBool implements JsValue {
     TRUE(true),
     FALSE(false);
 
     private final boolean value;
 
-    JSBool(boolean value) {
+    JsBool(boolean value) {
         this.value = value;
     }
 
@@ -26,18 +25,13 @@ public enum JSBool implements JSValue {
     }
 
     @Override
-    public StringBuilder toString(StringBuilder sb) {
-        return sb.append(toString());
-    }
-
-    @Override
     public <T> T match(
-            Functions.F<JSNull, T> fNull,
-            Functions.F<JSBool, T> fBool,
-            Functions.F<JSNumber, T> fNum,
-            Functions.F<JSString, T> fStr,
-            Functions.F<JSArray, T> fArr,
-            Functions.F<JSObject, T> fObj) {
+            Functions.F<JsNull, T> fNull,
+            Functions.F<JsBool, T> fBool,
+            Functions.F<JsNumber, T> fNum,
+            Functions.F<JsString, T> fStr,
+            Functions.F<JsArray, T> fArr,
+            Functions.F<JsObject, T> fObj) {
         return fBool.apply(this);
     }
 
@@ -77,32 +71,32 @@ public enum JSBool implements JSValue {
     }
 
     @Override
-    public JSNull asNull() {
+    public JsNull asNull() {
         throw Utils.nullTypeError(getClass());
     }
 
     @Override
-    public JSBool asBool() {
+    public JsBool asBool() {
         return this;
     }
 
     @Override
-    public JSNumber asNumber() {
+    public JsNumber asNumber() {
         throw Utils.numberTypeError(getClass());
     }
 
     @Override
-    public JSString asString() {
+    public JsString asString() {
         throw Utils.stringTypeError(getClass());
     }
 
     @Override
-    public JSArray asArray() {
+    public JsArray asArray() {
         throw Utils.arrayTypeError(getClass());
     }
 
     @Override
-    public JSObject asObject() {
+    public JsObject asObject() {
         throw Utils.objectTypeError(getClass());
     }
 }

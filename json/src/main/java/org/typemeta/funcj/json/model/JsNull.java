@@ -1,12 +1,11 @@
 package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.json.algebra.JsonAlg;
 
 /**
  * Models a JSON null value.
  */
-public enum JSNull implements JSValue {
+public enum JsNull implements JsValue {
     NULL;
 
     @Override
@@ -15,18 +14,13 @@ public enum JSNull implements JSValue {
     }
 
     @Override
-    public StringBuilder toString(StringBuilder sb) {
-        return sb.append(toString());
-    }
-
-    @Override
     public <T> T match(
-            Functions.F<JSNull, T> fNull,
-            Functions.F<JSBool, T> fBool,
-            Functions.F<JSNumber, T> fNum,
-            Functions.F<JSString, T> fStr,
-            Functions.F<JSArray, T> fArr,
-            Functions.F<JSObject, T> fObj) {
+            Functions.F<JsNull, T> fNull,
+            Functions.F<JsBool, T> fBool,
+            Functions.F<JsNumber, T> fNum,
+            Functions.F<JsString, T> fStr,
+            Functions.F<JsArray, T> fArr,
+            Functions.F<JsObject, T> fObj) {
         return fNull.apply(this);
     }
 
@@ -66,32 +60,32 @@ public enum JSNull implements JSValue {
     }
 
     @Override
-    public JSNull asNull() {
+    public JsNull asNull() {
         return this;
     }
 
     @Override
-    public JSBool asBool() {
+    public JsBool asBool() {
         throw Utils.boolTypeError(getClass());
     }
 
     @Override
-    public JSNumber asNumber() {
+    public JsNumber asNumber() {
         throw Utils.numberTypeError(getClass());
     }
 
     @Override
-    public JSString asString() {
+    public JsString asString() {
         throw Utils.stringTypeError(getClass());
     }
 
     @Override
-    public JSArray asArray() {
+    public JsArray asArray() {
         throw Utils.arrayTypeError(getClass());
     }
 
     @Override
-    public JSObject asObject() {
+    public JsObject asObject() {
         throw Utils.objectTypeError(getClass());
     }
 }

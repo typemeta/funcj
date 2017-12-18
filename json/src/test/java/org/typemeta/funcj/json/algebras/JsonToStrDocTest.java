@@ -1,4 +1,4 @@
-package org.typemeta.funcj.json;
+package org.typemeta.funcj.json.algebras;
 
 import org.junit.Test;
 import org.typemeta.funcj.json.model.*;
@@ -6,43 +6,34 @@ import org.typemeta.funcj.json.model.*;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
-import static org.typemeta.funcj.json.model.JSAPI.*;
+import static org.typemeta.funcj.json.Example.testValue;
 
-public class DocumentTest {
+public class JsonToStrDocTest {
 
-    private static final JSValue testNode =
-            obj(
-                    field("numbers", arr(num(1.2), num(3.4), num(4.5))),
-                    field("strings", arr(str("abcd"), str("efgh"), str("ijkl"))),
-                    field("objects", arr(
-                            obj(
-                                    field("a", num(1)),
-                                    field("b", num(2))
-                            ),
-                            obj(
-                                    field("c", num(3)),
-                                    field("d", num(4))
-                            )
-                    ))
-            );
+    @Test
+    public void testJsonToString() {
+        final String exp = testValue.toString();
+        final String act = JsonToString.toString(testValue, new StringBuilder()).toString();
+        assertEquals("JsonToString matches toString", exp, act);
+    }
 
     @Test
     public void testJsonNode20() {
-        checkJsonNode(testNode, 22, 20);
+        checkJsonNode(testValue, 27, 20);
     }
 
     @Test
     public void testJsonNode40() {
-        checkJsonNode(testNode, 12, 40);
+        checkJsonNode(testValue, 14, 40);
     }
 
     @Test
     public void testJsonNode80() {
-        checkJsonNode(testNode, 5, 60);
+        checkJsonNode(testValue, 7, 60);
     }
 
-    private static void checkJsonNode(JSValue node, int lines, int width) {
-        final String text = JsonToDoc.toString(node, width);
+    private static void checkJsonNode(JsValue jsv, int lines, int width) {
+        final String text = JsonToDoc.toString(jsv, width);
         //System.out.println(text);
         checkSize(text, lines, width);
     }
@@ -54,7 +45,7 @@ public class DocumentTest {
         assertEquals("Number of lines", expLines, lines.length);
 
         Arrays.stream(lines)
-                .map(DocumentTest::stripTrailingSpace)
+                .map(JsonToStrDocTest::stripTrailingSpace)
                 .map(String::length)
                 .max(Integer::compare)
                 .ifPresent(actWidth -> checkWidth(expWidth, actWidth));

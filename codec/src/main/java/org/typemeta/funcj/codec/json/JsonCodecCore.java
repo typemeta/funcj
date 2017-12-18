@@ -1,14 +1,14 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.CodecCore;
-import org.typemeta.funcj.json.model.JSValue;
+import org.typemeta.funcj.json.model.JsValue;
 
 /**
  * Interface for classes which implement an encoding into JSON,
- * via the {@link JSValue} representation for JSON values.
+ * via the {@link JsValue} representation for JSON values.
  */
 @SuppressWarnings("unchecked")
-public interface JsonCodecCore extends CodecCore<JSValue> {
+public interface JsonCodecCore extends CodecCore<JsValue> {
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.
@@ -16,7 +16,7 @@ public interface JsonCodecCore extends CodecCore<JSValue> {
      * @param <T>   the decoded value type
      * @return      the encoded value
      */
-    default <T> JSValue encode(T val) {
+    default <T> JsValue encode(T val) {
         return encode((Class<T>)val.getClass(), val);
     }
 
@@ -27,7 +27,7 @@ public interface JsonCodecCore extends CodecCore<JSValue> {
      * @param <T>   the decoded value type
      * @return      the encoded value
      */
-    default <T> JSValue encode(Class<T> type, T val) {
+    default <T> JsValue encode(Class<T> type, T val) {
         return encode(type, val, null);
     }
 }

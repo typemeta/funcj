@@ -250,6 +250,7 @@ public interface Parser<I, A> {
      * Construct a parser which returns the result of either this parser or,
      * if it fails, then the result of the {@code rhs} parser.
      * @param rhs       the second parser to attempt
+     * @param <B>       the rhs parser result type
      * @return          a parser which returns the result of either this parser or the {@code rhs} parser.
      */
     @SuppressWarnings("unchecked")

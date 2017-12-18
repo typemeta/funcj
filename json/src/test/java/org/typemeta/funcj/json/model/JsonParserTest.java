@@ -1,9 +1,9 @@
-package org.typemeta.funcj.json;
+package org.typemeta.funcj.json.model;
 
 import org.junit.Test;
 import org.typemeta.funcj.control.Try;
 import org.typemeta.funcj.data.*;
-import org.typemeta.funcj.json.model.JSValue;
+import org.typemeta.funcj.json.JsonParser;
 import org.typemeta.funcj.parser.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
@@ -46,7 +46,7 @@ public class JsonParserTest {
 
     private static void roundTrip(String json) {
         //System.out.println(" Parsing: " + json);
-        final JSValue node = JsonParser.parse(json).getOrThrow();
+        final JsValue node = JsonParser.parse(json).getOrThrow();
 
         final String json2 = node.toString();
         //System.out.println(json2);
@@ -61,10 +61,10 @@ public class JsonParserTest {
 
     @Test
     public void testSuccessParse() throws IOException {
-        final Result<Chr, JSValue> result =
+        final Result<Chr, JsValue> result =
             JsonParser.parser.run(
                 Input.of(FileUtils.openResource("/example.json").get()));
-        final JSValue node = result.getOrThrow();
+        final JsValue node = result.getOrThrow();
         final String json2 = node.toString(100);
 
         //System.out.println(node.toString());
@@ -107,7 +107,7 @@ abstract class FileUtils {
     }
 
     static Unit roundTripJson(String name, String json) {
-        final Result<Chr, JSValue> result = JsonParser.parser.run(Input.of(json));
+        final Result<Chr, JsValue> result = JsonParser.parser.run(Input.of(json));
         //System.out.println(name + " : " + result.isSuccess());
         if (!result.isSuccess())
             //System.out.println(result);
@@ -117,10 +117,10 @@ abstract class FileUtils {
         } else {
             assertTrue("Parse expected to succeed: " + name, result.isSuccess());
 
-            final JSValue node = result.getOrThrow();
+            final JsValue node = result.getOrThrow();
             final String json2 = node.toString(100);
 
-            final JSValue node2 = JsonParser.parser.run(Input.of(json)).getOrThrow();
+            final JsValue node2 = JsonParser.parser.run(Input.of(json)).getOrThrow();
 
             //System.out.println(node.toString());
             assertEquals("Round-tripped JSON: " + name, node, node2);

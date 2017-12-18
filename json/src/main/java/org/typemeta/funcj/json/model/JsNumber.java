@@ -1,22 +1,21 @@
 package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.json.algebra.JsonAlg;
 
 import java.util.Objects;
 
 /**
  * Models a JSON number value.
  */
-public final class JSNumber implements JSValue {
+public final class JsNumber implements JsValue {
 
     private final Object value;
 
-    protected JSNumber(Number value) {
+    protected JsNumber(Number value) {
         this.value = Objects.requireNonNull(value);
     }
 
-    protected JSNumber(String value) {
+    protected JsNumber(String value) {
         this.value = value;
     }
 
@@ -74,11 +73,6 @@ public final class JSNumber implements JSValue {
     }
 
     @Override
-    public StringBuilder toString(StringBuilder sb) {
-        return sb.append(toString());
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -86,7 +80,7 @@ public final class JSNumber implements JSValue {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final JSNumber rhs = (JSNumber) obj;
+        final JsNumber rhs = (JsNumber) obj;
         return value.equals(rhs.value);
     }
 
@@ -97,18 +91,18 @@ public final class JSNumber implements JSValue {
 
     @Override
     public <T> T match(
-            Functions.F<JSNull, T> fNull,
-            Functions.F<JSBool, T> fBool,
-            Functions.F<JSNumber, T> fNum,
-            Functions.F<JSString, T> fStr,
-            Functions.F<JSArray, T> fArr,
-            Functions.F<JSObject, T> fObj) {
+            Functions.F<JsNull, T> fNull,
+            Functions.F<JsBool, T> fBool,
+            Functions.F<JsNumber, T> fNum,
+            Functions.F<JsString, T> fStr,
+            Functions.F<JsArray, T> fArr,
+            Functions.F<JsObject, T> fObj) {
         return fNum.apply(this);
     }
 
     @Override
     public <T> T apply(JsonAlg<T> alg) {
-        return alg.num(toDouble());
+        return alg.num(value);
     }
 
     @Override
@@ -117,7 +111,7 @@ public final class JSNumber implements JSValue {
     }
 
     @Override
-    public JSNumber asNumber() {
+    public JsNumber asNumber() {
         return this;
     }
 }

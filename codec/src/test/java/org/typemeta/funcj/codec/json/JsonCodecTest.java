@@ -2,7 +2,7 @@ package org.typemeta.funcj.codec.json;
 
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.json.model.JSValue;
+import org.typemeta.funcj.json.model.JsValue;
 
 public class JsonCodecTest extends TestBase {
 
@@ -15,7 +15,7 @@ public class JsonCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final JSValue node = codec.encode(clazz, val);
+        final JsValue node = codec.encode(clazz, val);
 
         final T val2 = codec.decode(clazz, node);
 

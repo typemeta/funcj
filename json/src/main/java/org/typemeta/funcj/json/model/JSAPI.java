@@ -10,83 +10,108 @@ import static java.util.stream.Collectors.toMap;
 
 public class JSAPI {
 
-    public static JSNull nul() {
-        return JSNull.NULL;
+    public static JsNull nul() {
+        return JsNull.NULL;
     }
 
-    public static JSBool bool(boolean value) {
-        return value ? JSBool.TRUE : JSBool.FALSE;
+    public static JsBool bool(boolean value) {
+        return value ? JsBool.TRUE : JsBool.FALSE;
     }
 
-    public static JSArray arr(JSValue... values) {
-        return new JSArray(Arrays.asList(values));
+    public static JsArray arr(JsValue... values) {
+        return new JsArray(Arrays.asList(values));
     }
 
-    public static JSArray arr(List<JSValue> values) {
-        return new JSArray(values);
+    public static JsArray arr(List<JsValue> values) {
+        return new JsArray(values);
     }
 
-    public static JSArray arr(IList<JSValue> values) {
-        return new JSArray(values.toList());
+    public static JsArray arr(IList<JsValue> values) {
+        return new JsArray(values.toList());
     }
 
-    public static JSNumber num(byte value) {
-        return new JSNumber(value);
+    public static JsNumber num(byte value) {
+        return new JsNumber(value);
     }
 
-    public static JSNumber num(short value) {
-        return new JSNumber(value);
+    public static JsNumber num(short value) {
+        return new JsNumber(value);
     }
 
-    public static JSNumber num(int value) {
-        return new JSNumber(value);
+    public static JsNumber num(int value) {
+        return new JsNumber(value);
     }
 
-    public static JSNumber num(long value) {
-        return new JSNumber(value);
+    public static JsNumber num(long value) {
+        return new JsNumber(value);
     }
 
-    public static JSNumber num(float value) {
-        return new JSNumber(value);
+    public static JsNumber num(float value) {
+        return new JsNumber(value);
     }
 
-    public static JSNumber num(double value) {
-        return new JSNumber(value);
+    public static JsNumber num(double value) {
+        return new JsNumber(value);
     }
 
-    public static JSNumber num(String value) {
-        return new JSNumber(value);
+    public static JsNumber num(String value) {
+        return new JsNumber(value);
     }
 
-    public static JSString str(String value) {
-        return new JSString(value);
+    public static JsNumber num(Number value) {
+        return new JsNumber(value);
     }
 
-    public static JSObject.Field field(String name, JSValue node) {
-        return new JSObject.Field(name, node);
+    public static JsNumber num(Object value) {
+        if (value instanceof Number) {
+            return num((Number)value);
+        } else {
+            return num(value.toString());
+        }
     }
 
-    public static JSObject obj(JSObject.Field... fields) {
-        final LinkedHashMap<String, JSObject.Field> fieldMap =
+    public static JsString str(String value) {
+        return new JsString(value);
+    }
+
+    public static JsObject.Field field(String name, JsValue node) {
+        return new JsObject.Field(name, node);
+    }
+
+    public static JsObject obj(JsObject.Field... fields) {
+        final LinkedHashMap<String, JsObject.Field> fieldMap =
                 Arrays.stream(fields)
                         .collect(toFieldMap());
         return obj(fieldMap);
     }
 
-    public static JSObject obj(Iterable<JSObject.Field> iter) {
-        final LinkedHashMap<String, JSObject.Field> fieldMap =
+    public static JsObject obj(Iterable<JsObject.Field> iter) {
+        final LinkedHashMap<String, JsObject.Field> fieldMap =
                 StreamSupport.stream(iter.spliterator(), false)
                         .collect(toFieldMap());
         return obj(fieldMap);
     }
 
-    public static JSObject obj(Map<String, JSObject.Field> values) {
-        return new JSObject(values);
+    public static JsObject obj(LinkedHashMap<String, JsValue> fields) {
+        final LinkedHashMap<String, JsObject.Field> fieldMap =
+                fields.entrySet()
+                        .stream()
+                        .collect(toMap(
+                                Map.Entry::getKey,
+                                en -> JSAPI.field(en.getKey(), en.getValue()),
+                                JSAPI::duplicateKeyError,
+                                LinkedHashMap::new
+                        ));
+        return obj(fieldMap);
     }
 
-    private static Collector<JSObject.Field, ?, LinkedHashMap<String, JSObject.Field>> toFieldMap() {
+    public static JsObject obj(Map<String, JsObject.Field> values) {
+        return new JsObject(values);
+    }
+
+    private static Collector<JsObject.Field, ?, LinkedHashMap<String, JsObject.Field>> toFieldMap() {
         return toMap(
-                JSObject.Field::getName,
+                JsObject.Field::getName,
                 Function.identity(),
                 JSAPI::duplicateKeyError,
                 LinkedHashMap::new
