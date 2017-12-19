@@ -3,33 +3,46 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.algebra.Monoid;
 import org.typemeta.funcj.functions.Functions;
 
-public abstract class Writer<T, W> {
+public interface Writer<T, W> {
+    class Base<T, W> implements Writer<T, W> {
+        final T value;
+        final Monoid<W> monoid;
+        final W written;
+
+        public Base(T value, Monoid<W> monoid, W written) {
+            this.value = value;
+            this.monoid = monoid;
+            this.written = written;
+        }
+
+        @Override
+        public T value() {
+            return value;
+        }
+
+        @Override
+        public Monoid<W> monoid() {
+            return monoid;
+        }
+
+        @Override
+        public W written() {
+            return written;
+        }
+    }
+
     static <T, W> Writer<T, W> pure(T value, Monoid<W> monoid) {
-        return new Writer<T, W>(value, monoid.zero()) {
-            @Override
-            Monoid<W> monoid() {
-                return monoid;
-            }
-        };
+        return new Base<T, W>(value, monoid, monoid.zero());
     }
 
-    abstract Monoid<W> monoid();
+    Monoid<W> monoid();
 
-    public final T value;
-    public final W written;
+    T value();
 
-    protected Writer(T value, W written) {
-        this.value = value;
-        this.written = written;
-    }
+    W written();
 
-    public <U> Writer<U, W> flatMap(Functions.F<T, Writer<U, W>> fw) {
-        final Writer<U, W> wu = fw.apply(value);
-        return new Writer<U, W>(wu.value, monoid().combine(written, wu.written)) {
-            @Override
-            Monoid<W> monoid() {
-                return Writer.this.monoid();
-            }
-        };
+    default <U> Writer<U, W> flatMap(Functions.F<T, Writer<U, W>> fw) {
+        final Writer<U, W> wu = fw.apply(value());
+        return new Base<U, W>(wu.value(), monoid(), monoid().combine(written(), wu.written()));
     }
 }
