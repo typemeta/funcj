@@ -67,7 +67,7 @@ public interface Reader<A, R> {
      * @param lfu       the list of {@code F} values
      * @param <T>       the input type of the applicative function
      * @param <U>       the return type of the {@code F}s in the list
-     * @return          a {@codeReader} which wraps an {@link IList} of values
+     * @return          a {@code Reader} which wraps an {@link IList} of values
      */
     static <T, U> Reader<T, IList<U>> sequence(IList<Reader<T, U>> lfu) {
         return lfu.foldRight(
