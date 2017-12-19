@@ -56,7 +56,7 @@ public class JsonParserTest {
 
     private static final String json =
         FileUtils.openResource("/example.json")
-            .map(FileUtils::loadFile)
+            .map(FileUtils::read)
             .get();
 
     @Test
@@ -75,7 +75,7 @@ public class JsonParserTest {
     public void testJsonSuite() {
         FileUtils.openDir("json")
                 .get()
-                .forEach(t2 -> t2.map2(FileUtils::loadFile)
+                .forEach(t2 -> t2.map2(FileUtils::read)
                         .applyFrom(FileUtils::roundTripJson));
     }
 }
@@ -85,7 +85,7 @@ abstract class FileUtils {
     static Try<BufferedReader> openResource(String name) {
         return Try.of(() -> {
             final InputStream is =
-                    Optional.ofNullable(JsonParserTest.class.getResourceAsStream(name))
+                    Optional.ofNullable(FileUtils.class.getResourceAsStream(name))
                             .orElseThrow(() -> new RuntimeException("File '" + name + "' not found"));
             return new BufferedReader(new InputStreamReader(is));
         });
@@ -102,7 +102,7 @@ abstract class FileUtils {
                                 .map(br -> Tuple2.of(file, br))));
     }
 
-    static String loadFile(BufferedReader rdr) {
+    static String read(BufferedReader rdr) {
         return rdr.lines().collect(Collectors.joining("\n"));
     }
 
