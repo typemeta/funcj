@@ -123,7 +123,6 @@ public class TextTest {
 
     private static void testDblImpl(String s) {
         final Result<Chr, Double> res = Text.dble.apply(Input.of(s));
-        System.out.println(s + " -> " + res);
 
         try {
             final double d = Double.parseDouble(s);
