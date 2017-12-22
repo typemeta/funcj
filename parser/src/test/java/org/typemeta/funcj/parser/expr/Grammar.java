@@ -87,6 +87,6 @@ public abstract class Grammar {
     public static final Parser<Chr, Expr> parser;
 
     public static Result<Chr, Expr> parse(String s) {
-        return parser.run(Input.of(s));
+        return parser.parse(Input.of(s));
     }
 }

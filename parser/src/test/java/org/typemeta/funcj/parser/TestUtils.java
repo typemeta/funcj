@@ -37,7 +37,7 @@ abstract class TestUtils {
     }
 
     static <I, A> void checkSuccess(Parser<I, A> p, Input<I> input, A expVal, Input<I> expInput) {
-        p.run(input).handle(
+        p.parse(input).handle(
                 succ -> {
                     Assert.assertEquals("Parse result value", expVal, succ.value());
                     Assert.assertEquals("Parse result next input", expInput, succ.next());
@@ -49,7 +49,7 @@ abstract class TestUtils {
     }
 
     static <I, A> void checkFailure(Parser<I, A> p, Input<I> input) {
-        p.run(input).handle(
+        p.parse(input).handle(
                 succ -> {
                     throw new RuntimeException("Unexpected parse success : " + succ);
                 },

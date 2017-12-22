@@ -20,7 +20,7 @@ public abstract class Combinators {
     public static <I, A> Parser<I, A> fail() {
         return new ParserImpl<I, A>(LTRUE, SymSet::empty) {
             @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, A> apply(Input<I> in, SymSet<I> follow) {
                 return failure(this, in);
             }
         };
@@ -36,7 +36,7 @@ public abstract class Combinators {
     public static <I, A> Parser<I, A> fail(String msg) {
         return new ParserImpl<I, A>(LTRUE, SymSet::empty) {
             @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, A> apply(Input<I> in, SymSet<I> follow) {
                 return failure(msg, in);
             }
         };
@@ -50,7 +50,7 @@ public abstract class Combinators {
     public static <I> Parser<I, Unit> eof() {
         return new ParserImpl<I, Unit>(LTRUE, SymSet::empty) {
             @Override
-            public Result<I, Unit> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, Unit> apply(Input<I> in, SymSet<I> follow) {
                 return in.isEof() ?
                         Result.success(Unit.UNIT, in) :
                         failure(this, in);
@@ -81,7 +81,7 @@ public abstract class Combinators {
     public static <I, A> Parser<I, A> value(I val, A res) {
         return new ParserImpl<I, A>(LFALSE, () -> SymSet.value(val)) {
             @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, A> apply(Input<I> in, SymSet<I> follow) {
                 return Result.success(res, in.next());
             }
         };
@@ -97,7 +97,7 @@ public abstract class Combinators {
     public static <I> Parser<I, I> satisfy(String name, Functions.Predicate<I> pred) {
         return new ParserImpl<I, I>(LFALSE, () -> SymSet.pred(name, pred)) {
             @Override
-            public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, I> apply(Input<I> in, SymSet<I> follow) {
                 return Result.success(in.get(), in.next());
             }
         };
@@ -111,7 +111,7 @@ public abstract class Combinators {
     public static <I> Parser<I, I> any() {
         return new ParserImpl<I, I>(LTRUE, SymSet::all) {
             @Override
-            public Result<I, I> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, I> apply(Input<I> in, SymSet<I> follow) {
                 return in.isEof() ?
                         failureEof(this, in) :
                         Result.success(in.get(), in.next());
@@ -168,7 +168,7 @@ public abstract class Combinators {
      */
     public static <I, A>
     Parser<I, A> choice(Parser<I, ? extends A> p1, Parser<I, ? extends A> p2) {
-        return Parser.choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast()));
+        return Parser.choice(IList.of(p1.cast(), p2.cast()));
     }
 
     /**

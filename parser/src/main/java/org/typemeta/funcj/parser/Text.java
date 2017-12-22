@@ -31,7 +31,7 @@ public abstract class Text {
     /**
      * A parser that succeeds if the next input symbol is an alphabetic letter.
      */
-    public static final Parser<Chr, Chr> alpha = satisfy("letter", Chr::isLetter);
+    public static final Parser<Chr, Chr> alpha = satisfy("letter", Chr::isAlphabetic);
 
     /**
      * A parser that succeeds if the next input symbol is a numeric digit.
@@ -55,12 +55,8 @@ public abstract class Text {
      */
     public static final Parser<Chr, Chr> ws = satisfy("ws", Chr::isWhitespace);
 
-    public static int digitToInt(char c) {
-        return Chr.getNumericValue(c);
-    }
-
     public static int digitToInt(Chr c) {
-        return Chr.getNumericValue(c.charValue());
+        return Chr.getNumericValue(c);
     }
 
     public static final Parser<Chr, Boolean> sign =
@@ -105,8 +101,12 @@ public abstract class Text {
      */
     public static final Parser<Chr, Long> ulng = ulngZero.or(ulngNotZero);
 
-    private static final Parser<Chr, Double> udblZero =
-            chr('0').map(zs -> 0.0);
+    /**
+     * A parser for an unsigned long.
+     */
+    public static final Parser<Chr, Long> lng =
+            sign.and(ulng)
+                    .map((sign, i) -> sign ? i : -i);
 
     private static final Parser<Chr, Double> floating =
             digit.many()
@@ -150,7 +150,7 @@ public abstract class Text {
                         () -> SymSet.value(Chr.valueOf(s.charAt(0)))
                 ) {
                     @Override
-                    public Result<Chr, String> parse(Input<Chr> in, SymSet<Chr> follow) {
+                    public Result<Chr, String> apply(Input<Chr> in, SymSet<Chr> follow) {
                         for (int i = 0; i < s.length(); ++i) {
                             if (in.isEof()) {
                                 return Utils.failureEof(this, in);

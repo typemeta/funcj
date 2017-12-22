@@ -24,55 +24,35 @@ public final class Chr implements Comparable<Chr> {
     }
 
     public static boolean isAlphabetic(Chr c) {
-        return Character.isAlphabetic(c.charValue());
+        return Character.isAlphabetic(c.value);
     }
 
     public static boolean isLetterOrDigit(Chr c) {
-        return isLetterOrDigit(c.charValue());
-    }
-
-    public static boolean isLetterOrDigit(char c) {
-        return isLetter(c) || isDigit(c);
+        return Character.isLetterOrDigit(c.value);
     }
 
     public static boolean isLetter(Chr c) {
-        return isLetter(c.charValue());
+        return Character.isAlphabetic(c.value);
     }
 
-    public static boolean isLetter(char c) {
-        return isUpperCase(c) || isLowerCase(c);
+    public static boolean isUpperCase(Chr c) {
+        return Character.isUpperCase(c.value);
     }
 
-    public static boolean isUpperCase(char c) {
-        return c >= 'A' && c <= 'Z';
-    }
-
-    public static boolean isLowerCase(char c) {
-        return c >= 'a' && c <= 'z';
+    public static boolean isLowerCase(Chr c) {
+        return Character.isLowerCase(c.value);
     }
 
     public static boolean isDigit(Chr c) {
-        return isDigit(c.charValue());
-    }
-
-    public static boolean isDigit(char c) {
-        return c >= '0' && c <= '9';
+        return Character.isDigit(c.value);
     }
 
     public static boolean isWhitespace(Chr c) {
-        return isWhitespace(c.charValue());
-    }
-
-    public static boolean isWhitespace(char c) {
-        return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+        return Character.isWhitespace(c.value);
     }
 
     public static int getNumericValue(Chr c) {
-        return getNumericValue(c.charValue());
-    }
-
-    public static int getNumericValue(char d) {
-        return d - '0';
+        return Character.getNumericValue(c.value);
     }
 
     public static final int ERROR = -1;

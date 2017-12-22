@@ -193,7 +193,7 @@ public class JsonParser {
      * @return parse result
      */
     public static Result<Chr, JsValue> parse(String str) {
-        return parser.run(Input.of(str));
+        return parser.parse(Input.of(str));
     }
 
 
@@ -203,7 +203,7 @@ public class JsonParser {
      * @return parse result
      */
     public static Result<Chr, JsValue> parse(Reader rdr) {
-        return parser.run(Input.of(rdr));
+        return parser.parse(Input.of(rdr));
     }
 }
 

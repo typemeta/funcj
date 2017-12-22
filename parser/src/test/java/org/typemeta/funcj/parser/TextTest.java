@@ -2,13 +2,14 @@ package org.typemeta.funcj.parser;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.junit.*;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.data.Chr;
 
 import java.io.StringReader;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
 
 @RunWith(JUnitQuickcheck.class)
 public class TextTest {
@@ -18,7 +19,7 @@ public class TextTest {
     }
 
     private static <T> T parseSuccess(Parser<Chr, T> parser, Input<Chr> in) {
-        return parser.parse(in).getOrThrow();
+        return parser.apply(in).getOrThrow();
     }
 
     private static <T> void parseFailure(Parser<Chr, T> parser, String s) {
@@ -27,47 +28,57 @@ public class TextTest {
     }
 
     private static <T> Result<Chr, T> parse(Parser<Chr, T> parser, Input<Chr> in) {
-        return parser.parse(in);
+        return parser.apply(in);
     }
 
-    @Test
-    public void testAlpha() {
-
+    @Property
+    public void testAlpha(char c) {
+        final Result<Chr, Chr> res = Text.alpha.parse(Input.of("" + c));
+        assertEquals("alpha parser applied to " + c, Character.isAlphabetic(c), res.isSuccess());
     }
 
-    @Test
-    public void testDigit() {
-
+    @Property
+    public void testDigit(char c) {
+        final Result<Chr, Chr> res = Text.digit.parse(Input.of("" + c));
+        assertEquals("digit parser applied to " + c, Character.isDigit(c), res.isSuccess());
     }
 
-    @Test
-    public void testAlphaNum() {
-
+    @Property
+    public void testAlphaNum(char c) {
+        final Result<Chr, Chr> res = Text.alphaNum.parse(Input.of("" + c));
+        assertEquals("alphaNum parser applied to " + c, Character.isLetterOrDigit(c), res.isSuccess());
     }
 
-    @Test
-    public void testWs() {
-
+    @Property
+    public void testWs(char c) {
+        final Result<Chr, Chr> res = Text.ws.parse(Input.of("" + c));
+        assertEquals("ws parser applied to " + c, Character.isWhitespace(c), res.isSuccess());
     }
 
-    @Test
-    public void testUintr() {
+    @Property
+    public void testIntr(int i) {
+        {
+            final Result<Chr, Integer> res = Text.intr.parse(Input.of("" + i));
+            assertEquals("alpha parser applied to " + i, i, res.getOrThrow().intValue());
+        }
 
+        if (i > 0) {
+            final Result<Chr, Integer> res = Text.uintr.parse(Input.of("" + i));
+            assertEquals("alpha parser applied to " + i, i, res.getOrThrow().intValue());
+        }
     }
 
-    @Test
-    public void testintr() {
+    @Property
+    public void testLng(long l) {
+        {
+            final Result<Chr, Long> res = Text.lng.parse(Input.of("" + l));
+            assertEquals("alpha parser applied to " + l, l, res.getOrThrow().longValue());
+        }
 
-    }
-
-    @Test
-    public void testUlng() {
-
-    }
-
-    @Test
-    public void testLng() {
-
+        if (l > 0) {
+            final Result<Chr, Long> res = Text.ulng.parse(Input.of("" + l));
+            assertEquals("alpha parser applied to " + l, l, res.getOrThrow().longValue());
+        }
     }
 
     @Property
@@ -79,17 +90,19 @@ public class TextTest {
     @Property
     public void testDbl(long mi, long mf, boolean signB, byte exp) {
         final double sign = signB ? 1.0 : -1.0;
-        final int mfd = 1 +(int)Math.log10(mf);
-        final double d = ((double)mi + (double)mf / Math.pow(10.0, mfd)) * Math.pow(10.0, sign * exp);
+        final int mfd = 1 + (int) Math.log10(mf);
+        final double d = ((double) mi + (double) mf / Math.pow(10.0, mfd)) * Math.pow(10.0, sign * exp);
 
         testDblImpl(d);
 
-        if ( Math.abs(d) > 1e-20) {
+        if (Math.abs(d) > 1e-20) {
             testDblImpl(1.0 / d);
         }
 
-        final String s = mi + "." + mf + "E" + (signB ? '+' : '-') + exp;
-        testDblImpl(s);
+        if (mf >= 0) {
+            final String s = mi + "." + mf + "E" + exp;
+            testDblImpl(s);
+        }
 
     }
 
@@ -101,15 +114,16 @@ public class TextTest {
         final double eps = Math.abs(d * 1e-12);
 
         final String s = Double.toString(d);
-        final Result<Chr, Double> res = Text.dble.parse(Input.of(s));
+        final Result<Chr, Double> res = Text.dble.apply(Input.of(s));
 
         assertTrue("Parsing double : " + s, res.isSuccess());
 
-        assertEquals("Round-tripped double : " + d, d, res.getOrThrow().doubleValue(), eps);
+        assertEquals("Round-tripped double : " + d, d, res.getOrThrow(), eps);
     }
 
     private static void testDblImpl(String s) {
-        final Result<Chr, Double> res = Text.dble.parse(Input.of(s));
+        final Result<Chr, Double> res = Text.dble.apply(Input.of(s));
+        System.out.println(s + " -> " + res);
 
         try {
             final double d = Double.parseDouble(s);
@@ -120,5 +134,14 @@ public class TextTest {
         } catch (NumberFormatException ex) {
             assertFalse("Parsing double expected to fail: " + s, res.isSuccess());
         }
+    }
+
+    @Property
+    public void testString(String s) {
+        assumeFalse(s.isEmpty());
+
+        final Parser<Chr, String> p = Text.string(s);
+        final Result<Chr, String> r = p.parse(Input.of(s));
+        assertEquals("string(" + s + ").parse(" + s + ")", s, r.getOrThrow());
     }
 }

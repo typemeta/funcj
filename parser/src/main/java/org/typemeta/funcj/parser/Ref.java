@@ -30,7 +30,7 @@ public class Ref<I, A> implements Parser<I, A> {
                 throw error();
             }
 
-            public Result<Object, Object> parse(Input<Object> in, SymSet<Object> follow) {
+            public Result<Object, Object> apply(Input<Object> in, SymSet<Object> follow) {
                 throw error();
             }
         };
@@ -80,7 +80,7 @@ public class Ref<I, A> implements Parser<I, A> {
     }
 
     @Override
-    public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
-        return impl.parse(in, follow);
+    public Result<I, A> apply(Input<I> in, SymSet<I> follow) {
+        return impl.apply(in, follow);
     }
 }

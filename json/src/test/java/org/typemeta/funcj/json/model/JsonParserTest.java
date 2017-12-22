@@ -62,7 +62,7 @@ public class JsonParserTest {
     @Test
     public void testSuccessParse() throws IOException {
         final Result<Chr, JsValue> result =
-            JsonParser.parser.run(
+            JsonParser.parser.parse(
                 Input.of(FileUtils.openResource("/example.json").get()));
         final JsValue node = result.getOrThrow();
         final String json2 = node.toString(100);
@@ -107,7 +107,7 @@ abstract class FileUtils {
     }
 
     static Unit roundTripJson(String name, String json) {
-        final Result<Chr, JsValue> result = JsonParser.parser.run(Input.of(json));
+        final Result<Chr, JsValue> result = JsonParser.parser.parse(Input.of(json));
         //System.out.println(name + " : " + result.isSuccess());
         if (!result.isSuccess())
             //System.out.println(result);
@@ -120,7 +120,7 @@ abstract class FileUtils {
             final JsValue node = result.getOrThrow();
             final String json2 = node.toString(100);
 
-            final JsValue node2 = JsonParser.parser.run(Input.of(json)).getOrThrow();
+            final JsValue node2 = JsonParser.parser.parse(Input.of(json)).getOrThrow();
 
             //System.out.println(node.toString());
             assertEquals("Round-tripped JSON: " + name, node, node2);

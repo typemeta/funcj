@@ -3,7 +3,6 @@ package org.typemeta.funcj.json;
 import org.typemeta.funcj.json.model.JsValue;
 
 import static org.typemeta.funcj.json.model.JSAPI.*;
-import static org.typemeta.funcj.json.model.JSAPI.num;
 
 public class Example {
     public static final JsValue testValue =

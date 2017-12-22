@@ -51,7 +51,7 @@ public interface Parser<I, A> {
     static <I, A> Parser<I, A> pure(A a) {
         return new ParserImpl<I, A>(LTRUE, SymSet::empty) {
             @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, A> apply(Input<I> in, SymSet<I> follow) {
                 return Result.success(a, in);
             }
         };
@@ -77,14 +77,14 @@ public interface Parser<I, A> {
             combine(pf.acceptsEmpty(), pf.firstSet(), pa.firstSet())
         ) {
             @Override
-            public Result<I, B> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, B> apply(Input<I> in, SymSet<I> follow) {
                 final SymSet<I> followF =
                         combine(
                                 pa.acceptsEmpty().apply(),
                                 pa.firstSet().apply(),
                                 follow);
 
-                final Result<I, F<A, B>> r = pf.parse(in, followF);
+                final Result<I, F<A, B>> r = pf.apply(in, followF);
 
                 if (r.isSuccess()) {
                     final Result.Success<I, F<A, B>> succ = (Result.Success<I, F<A, B>>) r;
@@ -97,7 +97,7 @@ public interface Parser<I, A> {
                         }
                     }
 
-                    final Result<I, A> r2 = pa.parse(next, follow);
+                    final Result<I, A> r2 = pa.apply(next, follow);
                     return r2.map(succ.value());
                 } else {
                     return ((Result.Failure<I, F<A, B>>) r).cast();
@@ -175,6 +175,24 @@ public interface Parser<I, A> {
     }
 
     /**
+     * Apply this parser to the input stream. Fail if eof isn't reached.
+     * @param in        the input stream
+     * @return          the parser result
+     */
+    default Result<I, A> parse(Input<I> in) {
+        final Parser<I, A> parserAndEof = this.andL(Combinators.eof());
+        if (acceptsEmpty().apply()) {
+            return parserAndEof.apply(in, SymSet.empty());
+        } else if (in.isEof()) {
+            return failureEof(this, in);
+        } else if (firstSet().apply().matches(in.get())) {
+            return parserAndEof.apply(in, SymSet.empty());
+        } else {
+            return failure(this, in);
+        }
+    }
+
+    /**
      * Indicate whether this parser accepts the empty symbol.
      * @return          a lazy wrapper for true iff the parser accepts the empty symbol
      */
@@ -188,42 +206,28 @@ public interface Parser<I, A> {
 
     /**
      * Apply this parser to the input stream.
+     * {@apiNote} If this parser is being used as a standalone parser,
+     * then call {@link Parser#parse(Input)} to parse an input.
      * @param in        the input stream
      * @param follow    the dynamic follow set
      * @return          the parse result
      */
-    Result<I, A> parse(Input<I> in, SymSet<I> follow);
+    Result<I, A> apply(Input<I> in, SymSet<I> follow);
+
+    /**
+     * Apply this parser to the input stream.
+     * {@apiNote} If this parser is being used as a standalone parser,
+     * then call {@link Parser#parse(Input)} to parse an input.
+     * @param in        the input stream
+     * @return          the parser result
+     */
+    default Result<I, A> apply(Input<I> in) {
+        return this.apply(in, SymSet.empty());
+    }
 
     @SuppressWarnings("unchecked")
     default <B> Parser<I, B> cast() {
         return (Parser<I, B>)this;
-    }
-
-    /**
-     * Apply this parser to the input stream.
-     * @param in        the input stream
-     * @return          the parser result
-     */
-    default Result<I, A> parse(Input<I> in) {
-        return this.parse(in, SymSet.empty());
-    }
-
-    /**
-     * Apply this parser to the input stream. Fail if eof isn't reached.
-     * @param in        the input stream
-     * @return          the parser result
-     */
-    default Result<I, A> run(Input<I> in) {
-        final Parser<I, A> parserAndEof = this.andL(Combinators.eof());
-        if (acceptsEmpty().apply()) {
-            return parserAndEof.parse(in, SymSet.empty());
-        } else if (in.isEof()) {
-            return failureEof(this, in);
-        } else if (firstSet().apply().matches(in.get())) {
-            return parserAndEof.parse(in, SymSet.empty());
-        } else {
-            return failure(this, in);
-        }
     }
 
     /**
@@ -240,8 +244,8 @@ public interface Parser<I, A> {
             Parser.this.firstSet()
         ) {
             @Override
-            public Result<I, B> parse(Input<I> in, SymSet<I> follow) {
-                return Parser.this.parse(in, follow).map(f);
+            public Result<I, B> apply(Input<I> in, SymSet<I> follow) {
+                return Parser.this.apply(in, follow).map(f);
             }
         };
     }
@@ -260,26 +264,26 @@ public interface Parser<I, A> {
             union(Parser.this.firstSet(), rhs.firstSet())
         ) {
             @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, A> apply(Input<I> in, SymSet<I> follow) {
                 if (in.isEof()) {
                     if (Parser.this.acceptsEmpty().apply()) {
-                        return Parser.this.parse(in, follow);
+                        return Parser.this.apply(in, follow);
                     } else if (rhs.acceptsEmpty().apply()) {
-                        return (Result<I, A>)rhs.parse(in, follow);
+                        return (Result<I, A>)rhs.apply(in, follow);
                     } else {
                         return failureEof(this, in);
                     }
                 } else {
                     final I next = in.get();
                     if (Parser.this.firstSet().apply().matches(next)) {
-                        return Parser.this.parse(in, follow);
+                        return Parser.this.apply(in, follow);
                     } else if (rhs.firstSet().apply().matches(next)) {
-                        return (Result<I, A>)rhs.parse(in, follow);
+                        return (Result<I, A>)rhs.apply(in, follow);
                     } else if (follow.matches(next)) {
                         if (Parser.this.acceptsEmpty().apply()) {
-                            return Parser.this.parse(in, follow);
+                            return Parser.this.apply(in, follow);
                         } else if (rhs.acceptsEmpty().apply()) {
-                            return (Result<I, A>)rhs.parse(in, follow);
+                            return (Result<I, A>)rhs.apply(in, follow);
                         }
                     }
                     return failure(this, in);
@@ -336,14 +340,14 @@ public interface Parser<I, A> {
         // for performance, and to avoid StackOverflowExceptions.
         return new ParserImpl<I, IList<A>>(LTRUE, this.firstSet()) {
             @Override
-            public Result<I, IList<A>> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, IList<A>> apply(Input<I> in, SymSet<I> follow) {
                 IList<A> acc = IList.of();
                 final SymSet<I> follow2 = follow.union(Parser.this.firstSet().apply());
                 while (true) {
                     if (!in.isEof()) {
                         final I i = in.get();
                         if (firstSet().apply().matches(i)) {
-                            final Result<I, A> r = Parser.this.parse(in, follow2);
+                            final Result<I, A> r = Parser.this.apply(in, follow2);
                             if (r.isSuccess()) {
                                 final Result.Success<I, A> succ = (Result.Success<I, A>) r;
                                 acc = acc.add(succ.value());
@@ -377,11 +381,11 @@ public interface Parser<I, A> {
                 ps.map(Parser::firstSet).foldLeft1(Utils::union)
         ) {
             @Override
-            public Result<I, A> parse(Input<I> in, SymSet<I> follow) {
+            public Result<I, A> apply(Input<I> in, SymSet<I> follow) {
                 if (in.isEof()) {
                     for (Parser<I, A> p : ps) {
                         if (p.acceptsEmpty().apply()) {
-                            return p.parse(in, follow);
+                            return p.apply(in, follow);
                         }
                     }
                     return failureEof(this, in);
@@ -389,13 +393,13 @@ public interface Parser<I, A> {
                     final I next = in.get();
                     for (Parser<I, A> p : ps) {
                         if (p.firstSet().apply().matches(next)) {
-                            return p.parse(in, follow);
+                            return p.apply(in, follow);
                         }
                     }
                     if (follow.matches(next)) {
                         for (Parser<I, A> p : ps) {
                             if (p.acceptsEmpty().apply()) {
-                                return p.parse(in, follow);
+                                return p.apply(in, follow);
                             }
                         }
                     }

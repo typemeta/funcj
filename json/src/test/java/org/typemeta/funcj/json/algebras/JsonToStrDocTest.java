@@ -1,7 +1,7 @@
 package org.typemeta.funcj.json.algebras;
 
 import org.junit.Test;
-import org.typemeta.funcj.json.model.*;
+import org.typemeta.funcj.json.model.JsValue;
 
 import java.util.Arrays;
 
