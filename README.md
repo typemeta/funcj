@@ -24,6 +24,3 @@ At present the project consists of three sub-libraries:
 
 * [0.6.3](https://typemeta.github.io/funcj/0.6.3/apidocs/index.html)
 * [0.6.2](https://typemeta.github.io/funcj/0.6.2/apidocs/index.html)
-* [0.6.1](https://typemeta.github.io/funcj/0.6.1/apidocs/index.html)
-* [0.6.0](https://typemeta.github.io/funcj/0.6.0/apidocs/index.html)
-
