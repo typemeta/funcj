@@ -63,7 +63,7 @@ public interface Reader<A, R> {
      * Standard applicative sequencing.
      * <p>
      * Translate a {@link IList} of {@code F}s into a {@code F} of an {@code IList},
-     * by composing each consecutive {@code F}s using the {@link F#app(F)} method.
+     * by composing each consecutive {@code F}s using the {@link F#app} method.
      * @param lfu       the list of {@code F} values
      * @param <T>       the input type of the applicative function
      * @param <U>       the return type of the {@code F}s in the list
