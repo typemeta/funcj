@@ -120,7 +120,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue> implements JsonCod
 
         @Override
         public byte decodePrim(JsValue enc) {
-            return enc.asNumber().toByte();
+            return (byte)enc.asNumber().getValue();
         }
     };
 
@@ -218,7 +218,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue> implements JsonCod
 
         @Override
         public short decodePrim(JsValue enc) {
-            return enc.asNumber().toShort();
+            return (short)enc.asNumber().getValue();
         }
     };
 
@@ -264,7 +264,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue> implements JsonCod
 
         @Override
         public int decodePrim(JsValue enc) {
-            return enc.asNumber().toInt();
+            return (int)enc.asNumber().getValue();
         }
     };
 
@@ -310,7 +310,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue> implements JsonCod
 
         @Override
         public long decodePrim(JsValue enc) {
-            return enc.asNumber().toLong();
+            return (long)enc.asNumber().getValue();
         }
     };
 
@@ -356,7 +356,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue> implements JsonCod
 
         @Override
         public float decodePrim(JsValue enc) {
-            return enc.asNumber().toFloat();
+            return (float)enc.asNumber().getValue();
         }
     };
 
@@ -402,7 +402,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue> implements JsonCod
 
         @Override
         public double decodePrim(JsValue enc) {
-            return enc.asNumber().toDouble();
+            return enc.asNumber().getValue();
         }
     };
 

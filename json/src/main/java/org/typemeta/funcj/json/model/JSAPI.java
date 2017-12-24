@@ -51,22 +51,10 @@ public class JSAPI {
     }
 
     public static JsNumber num(double value) {
-        return new JsNumber(value);
-    }
-
-    public static JsNumber num(String value) {
-        return new JsNumber(value);
-    }
-
-    public static JsNumber num(Number value) {
-        return new JsNumber(value);
-    }
-
-    public static JsNumber num(Object value) {
-        if (value instanceof Number) {
-            return num((Number)value);
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            throw new IllegalArgumentException("JsNumber does not allow " + value);
         } else {
-            return num(value.toString());
+            return new JsNumber(value);
         }
     }
 

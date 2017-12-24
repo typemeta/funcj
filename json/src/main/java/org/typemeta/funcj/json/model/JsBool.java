@@ -36,11 +36,6 @@ public enum JsBool implements JsValue {
     }
 
     @Override
-    public <T> T apply(JsonAlg<T> alg) {
-        return alg.bool(value);
-    }
-
-    @Override
     public boolean isNull() {
         return false;
     }

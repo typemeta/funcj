@@ -1,7 +1,6 @@
 package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -88,11 +87,6 @@ public final class JsArray
             Functions.F<JsArray, T> fArr,
             Functions.F<JsObject, T> fObj) {
         return fArr.apply(this);
-    }
-
-    @Override
-    public <T> T apply(JsonAlg<T> alg) {
-        return alg.arr(Functors.map(v -> v.apply(alg), values));
     }
 
     @Override

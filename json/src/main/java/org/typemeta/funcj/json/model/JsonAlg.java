@@ -7,14 +7,14 @@ import java.util.*;
 /**
  * An object algebra interface for JSON values.
  * <p>
- * An object albegra is applied to a {@link JsValue} by passing it to the
+ * An object algebra is applied to a {@link JsValue} by passing it to the
  * {@link JsValue#apply(JsonAlg)} method.
  * @param <T>       the object algebra result type
  */
 public interface JsonAlg<T> {
     T nul();
     T bool(boolean b);
-    T num(Object value);
+    T num(double value);
     T str(String s);
     T arr(List<T> elems);
     T obj(LinkedHashMap<String, T> fields);
@@ -48,7 +48,7 @@ public interface JsonAlg<T> {
             return m().zero();
         }
 
-        default T num(Object value) {
+        default T num(double value) {
             return m().zero();
         }
 
@@ -94,7 +94,7 @@ public interface JsonAlg<T> {
             return alg().bool(b);
         }
 
-        default T num(Object value) {
+        default T num(double value) {
             return alg().num(value);
         }
 

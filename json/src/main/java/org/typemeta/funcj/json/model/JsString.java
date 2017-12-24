@@ -51,11 +51,6 @@ public final class JsString implements JsValue {
     }
 
     @Override
-    public <T> T apply(JsonAlg<T> alg) {
-        return alg.str(value);
-    }
-
-    @Override
     public boolean isString() {
         return true;
     }

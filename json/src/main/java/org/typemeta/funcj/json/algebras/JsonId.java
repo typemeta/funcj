@@ -20,7 +20,7 @@ public class JsonId implements JsonAlg<JsValue> {
     }
 
     @Override
-    public JsValue num(Object value) {
+    public JsValue num(double value) {
         return JSAPI.num(value);
     }
 

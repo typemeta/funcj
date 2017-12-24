@@ -1,23 +1,16 @@
 package org.typemeta.funcj.json.model;
 
+import java.text.DecimalFormat;
+
 public abstract class Utils {
 
-    public static String formatAsNumber(Object obj) {
-        if (obj instanceof Double) {
-            final double d = (Double) obj;
-            final long l = (long)d;
-            if (d == l) {
-                return String.format("%d", l);
-            }
-        } else if (obj instanceof Float) {
-            final float f = (Float) obj;
-            final long l = (long)f;
-            if (f == l) {
-                return String.format("%d", l);
-            }
+    public static String format(double value) {
+        final String s = Double.toString(value);
+        if (s.length() > 2 && Double.toString(value).endsWith(".0")) {
+            return s.substring(0, s.length() - 2);
+        } else {
+            return s;
         }
-
-        return obj.toString();
     }
 
     public static String format(String s) {

@@ -27,7 +27,7 @@ public class JsonAlgQueryTest {
         }
 
         @Override
-        public Integer num(Object value) {
+        public Integer num(double value) {
             return 1;
         }
 
@@ -80,7 +80,7 @@ public class JsonAlgQueryTest {
         }
 
         @Override
-        public Long num(Object value) {
+        public Long num(double value) {
             return 5l;
         }
 

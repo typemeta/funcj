@@ -25,11 +25,6 @@ public enum JsNull implements JsValue {
     }
 
     @Override
-    public <T> T apply(JsonAlg<T> alg) {
-        return alg.nul();
-    }
-
-    @Override
     public boolean isNull() {
         return true;
     }

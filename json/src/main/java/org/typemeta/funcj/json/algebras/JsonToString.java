@@ -30,8 +30,8 @@ public class JsonToString implements JsonAlg<SideEffect.F<StringBuilder>> {
     }
 
     @Override
-    public SideEffect.F<StringBuilder> num(Object value) {
-        return sb -> sb.append(Utils.formatAsNumber(value));
+    public SideEffect.F<StringBuilder> num(double value) {
+        return sb -> sb.append(Utils.format(value));
     }
 
     @Override

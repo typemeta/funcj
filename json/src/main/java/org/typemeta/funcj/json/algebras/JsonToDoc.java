@@ -31,8 +31,8 @@ public class JsonToDoc implements JsonAlg<Document> {
     }
 
     @Override
-    public Document num(Object value) {
-        return API.text(Utils.formatAsNumber(value));
+    public Document num(double value) {
+        return API.text(Utils.format(value));
     }
 
     @Override

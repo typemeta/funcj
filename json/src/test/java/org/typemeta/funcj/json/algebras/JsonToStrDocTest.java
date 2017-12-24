@@ -1,6 +1,7 @@
 package org.typemeta.funcj.json.algebras;
 
 import org.junit.Test;
+import org.typemeta.funcj.json.JsonParser;
 import org.typemeta.funcj.json.model.JsValue;
 
 import java.util.Arrays;
@@ -12,9 +13,11 @@ public class JsonToStrDocTest {
 
     @Test
     public void testJsonToString() {
-        final String exp = testValue.toString();
-        final String act = JsonToString.toString(testValue, new StringBuilder()).toString();
-        assertEquals("JsonToString matches toString", exp, act);
+        final String str = testValue.toString();
+        assertEquals("JSON value toString expected length", 131, str.length());
+
+        final JsValue value2 = JsonParser.parse(str).getOrThrow();
+        assertEquals("Round-tripped JSON value", testValue, value2);
     }
 
     @Test

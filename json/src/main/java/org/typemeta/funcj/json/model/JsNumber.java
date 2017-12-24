@@ -9,67 +9,19 @@ import java.util.Objects;
  */
 public final class JsNumber implements JsValue {
 
-    private final Object value;
+    private final double value;
 
-    protected JsNumber(Number value) {
+    protected JsNumber(double value) {
         this.value = Objects.requireNonNull(value);
     }
 
-    protected JsNumber(String value) {
-        this.value = value;
-    }
-
-    public byte toByte() {
-        if (value instanceof Number) {
-            return ((Number) value).byteValue();
-        } else {
-            return Byte.parseByte(value.toString());
-        }
-    }
-
-    public short toShort() {
-        if (value instanceof Number) {
-            return ((Number) value).shortValue();
-        } else {
-            return Short.parseShort(value.toString());
-        }
-    }
-
-    public int toInt() {
-        if (value instanceof Number) {
-            return ((Number) value).intValue();
-        } else {
-            return Integer.parseInt(value.toString());
-        }
-    }
-
-    public long toLong() {
-        if (value instanceof Number) {
-            return ((Number) value).longValue();
-        } else {
-            return Long.parseLong(value.toString());
-        }
-    }
-
-    public float toFloat() {
-        if (value instanceof Number) {
-            return ((Number) value).floatValue();
-        } else {
-            return Float.parseFloat(value.toString());
-        }
-    }
-
-    public double toDouble() {
-        if (value instanceof Number) {
-            return ((Number) value).doubleValue();
-        } else {
-            return Double.parseDouble(value.toString());
-        }
+    public double getValue() {
+        return value;
     }
 
     @Override
     public String toString() {
-        return Utils.formatAsNumber(value);
+        return Utils.format(value);
     }
 
     @Override
@@ -81,7 +33,7 @@ public final class JsNumber implements JsValue {
             return false;
         }
         final JsNumber rhs = (JsNumber) obj;
-        return value.equals(rhs.value);
+        return value == rhs.value;
     }
 
     @Override
@@ -98,11 +50,6 @@ public final class JsNumber implements JsValue {
             Functions.F<JsArray, T> fArr,
             Functions.F<JsObject, T> fObj) {
         return fNum.apply(this);
-    }
-
-    @Override
-    public <T> T apply(JsonAlg<T> alg) {
-        return alg.num(value);
     }
 
     @Override

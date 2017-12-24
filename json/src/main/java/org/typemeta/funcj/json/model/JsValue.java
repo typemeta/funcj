@@ -53,7 +53,9 @@ public interface JsValue {
      * @param <T>       the object algebra result type
      * @return          the result of applying the object algebra
      */
-    <T> T apply(JsonAlg<T> alg);
+    default <T> T apply(JsonAlg<T> alg) {
+        return JsonAlgStack.apply(this, alg);
+    }
 
     /**
      * @return          true if this value is a {@link JsNull}, otherwise false
