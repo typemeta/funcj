@@ -91,14 +91,14 @@ and combining them using `and`, `andL` and `map`.
 The parser can be used as follows:
 
 ```java
-    int i = sum.run(Input.of("1+2")).getOrThrow();
+    int i = sum.parse(Input.of("1+2")).getOrThrow();
     assert i == 3;
 ```
 
 Meanwhile, if we give it invalid input:
 
 ```java
-    int i2 = sum.run(Input.of("1+z")).getOrThrow();
+    int i2 = sum.parse(Input.of("1+z")).getOrThrow();
 ```
 
 then it throws an exception with an error message that pinpoints the problem:
