@@ -26,12 +26,29 @@ public abstract class JsonAlgStack<T> {
         }
     }
 
+    /**
+     * Process a {Link JsValue} by applying a {@code JsonAlg} to it.
+     * @param value     the value to be processed
+     * @param alg       the object algebra to be applied
+     * @param <T>       the result type
+     * @return          the result of applying the object algebra
+     */
     public static <T> T apply(JsValue value, JsonAlg<T> alg) {
         final Deque<Entry> pendingStack = new ArrayDeque<>();
         final Deque<T> resultsStack = new ArrayDeque<>();
 
         pendingStack.push(new Entry(value));
 
+        // The basic approach is:
+        // Pull the next value off the pendingStack.
+        // 1) For a value with no JsValue children,
+        //    process the value and push the result onto the resultsStack.
+        // 2) For a value with children, if the value is not ready to be evaluated,
+        //    then set ready to true, and push it and its children onto the stack.
+        // 3) For a value with children, if the value is ready to be evaluated,
+        //    pull the child results off the resultsStack,
+        //    and then process the value and its children,
+        //    and push the result onto the resultsStack.
         while (!pendingStack.isEmpty()) {
             final Entry next = pendingStack.pop();
             final Class<? extends JsValue> cls = next.value.getClass();

@@ -12,11 +12,44 @@ import java.util.*;
  * @param <T>       the object algebra result type
  */
 public interface JsonAlg<T> {
+    /**
+     * Process a {@link JsNull} value.
+     * @return          the result of processing the value
+     */
     T nul();
+
+    /**
+     * Process a {@link JsBool} value.
+     * @param b         the {@code JsBool} boolean value
+     * @return          the result of processing the value
+     */
     T bool(boolean b);
+
+    /**
+     * Process a {@link JsNumber} value.
+     * @param value     the {@code JsNumber} double value
+     * @return          the result of processing the value
+     */
     T num(double value);
+
+    /**
+     * Process a {@link JsString} value.
+     * @param s         the {@code JsString} string value
+     * @return
+     */
     T str(String s);
+    /**
+     * Process a {@link JsArray} value.
+     * @param elems     the {@code JsArray} elements
+     * @return          the result of processing the value
+     */
     T arr(List<T> elems);
+
+    /**
+     * Process a {@link JsObject} value.
+     * @param fields    the {@link JsObject} fields
+     * @return          the result of processing the value
+     */
     T obj(LinkedHashMap<String, T> fields);
 
     /**
