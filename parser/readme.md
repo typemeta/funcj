@@ -77,7 +77,7 @@ The grammar for the language consists of a single production rule:
 sum ::= integer '+' integer
 ```
 
-This can be translated into the following ParsecJ parser:
+This can be translated into the following parser:
 
 ```java
     Parser<Chr, Integer> sum =
