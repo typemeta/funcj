@@ -35,7 +35,7 @@ obscures the relationship between the parsing functions and the language rules
 
 [Parser combinators](http://www.cs.nott.ac.uk/~gmh/bib.html#pearl)
 are an extension of recursive descent parsing,
-that use an applicative functor (or a monad) to encapsulate the plumbing.
+that encapsulate the plumbing, typically with an applicative functor or a monad.
 The framework provides the basic building blocks -
 parsers for constituent language elements such as characters, words and numbers,
 as well as combinators that allow more complex parsers to be constructed by composing existing ones.
@@ -80,8 +80,7 @@ sum ::= integer '+' integer
 This can be translated into the following parser:
 
 ```java
-    Parser<Chr, Integer> sum =
-            intr.andL(chr('+')).and(intr).map(Integer::sum);
+Parser<Chr, Integer> sum = intr.andL(chr('+')).and(intr).map(Integer::sum);
 ```
 
 The parser is constructed by taking the `intr` parser for integers,
@@ -91,14 +90,14 @@ and combining them using `and`, `andL` and `map`.
 The parser can be used as follows:
 
 ```java
-    int i = sum.parse(Input.of("1+2")).getOrThrow();
-    assert i == 3;
+int i = sum.parse(Input.of("1+2")).getOrThrow();
+assert i == 3;
 ```
 
 Meanwhile, if we give it invalid input:
 
 ```java
-    int i2 = sum.parse(Input.of("1+z")).getOrThrow();
+int i2 = sum.parse(Input.of("1+z")).getOrThrow();
 ```
 
 then it throws an exception with an error message that pinpoints the problem:
@@ -116,3 +115,99 @@ A typical approach to using the library to implement a parser for a language is 
 3. Translate the production rules into parsers using the library combinators. The parsers will typically construct values from the model.
 4. Invoke the parser by passing a `Input` object, usually constructed from a `String`, to the `run` method.
 5. The `Result` value returned  by `run` holds either the successfully parsed value or an error message.
+
+# Guide
+
+## Types
+
+All parsers implement the `Parser` interface.
+The framework internally uses the `Parser.apply` method to invoke the parser,
+however this method shouldn't be used directly.
+As a user of the library you use the `Parser.parse` method (),
+which takes an `Input` and returns a `Result` value.
+
+### Input
+
+`Input` is an abstraction which represents a stream on parseable tokens,
+typically (but not limited to) `Chr`s.
+
+To construct an `Input` value, use one of the static constructor methods:
+
+```java
+char[] charData = { 'A', 'B', 'C', 'D'};
+
+Input<Chr> chrArrInput = Input.of(charData);
+
+Input<Chr> strInput = Input.of("ABCD");
+
+Inout<Chr> rdrInput = Input.of(new CharArrayReader(charData))
+```
+### Result
+
+`Result` represents the result of applying a parser.
+It's essentially a discriminated union between a `Result.Success`,
+indicating a successful parse,
+and a `Result.Failure`, indicating a failure.
+The result value can be handled in various ways.
+
+```java
+Result<Chr, String> res = p.parse(Input.of("ABCD"));
+
+// Applicative-style function application.
+Result<Chr, Integer> resLen = res.map(String::length);
+
+// Apply a function to both result types.
+int len = res.match(succ -> succ.value.().length, fail -> -1);
+
+// Or just get the result (and throw an exception if it's a failure).
+int len = res.getOrThrow();
+```
+
+### Parser
+
+As well as the `parse` method,
+`Parser` also provides methods for either combining or modifying existing parsers to form new parsers.
+
+#### The `and` Combinator
+
+The `Parser.and` method is used to combine two or more (up to eight) parsers.
+The parsers are combined into one that applies each parser sequentially.
+If any parser fails then the operation is aborted and the failure is returned.
+If all of the parsers are successful then the results are passed to a `map` method.
+
+```java
+// A parser for a 3-digit number.
+Parser<Chr, Integer> p3d = digit.and(digit).and(digit).map(a -> b -> c -> a*100 + b*10 + c);
+```
+
+If the results of some of the parsers aren't required,
+then the results can be be ignored in the `map` function:
+
+```java
+// d is ignored
+Parser<Chr, Double> d = digit.and(chr('.')).and(digit).map(a -> d -> c -> a*10.0 + c/10.0);
+```
+
+Alternatively, the `andL` method can be used to indicate the result of the right-hand parser can be ignored:
+
+```java
+// Parser for a number of the form "a.b".
+Parser<Chr, Double> d = digit.andL(chr('.')).and(digit).map(a -> d -> c -> a*10.0 + c/10.0);
+```
+
+and the `andR` method can be used to indicate the result of the left-hand parser can be ignored:
+
+```java
+// Parser for a number of the form "0.b".
+Parser<Chr, Double> d2 = string("0.").andR(digit).map(a -> a/10.0);
+```
+
+### The `or` Combinator
+
+The `Parser.or` method combines two parsers into one that will apply either parser (but not both).
+The decision as to which parser gets applied is based on whichever parser can successfully parse the input.
+If neither can parse successfully then the result is a failure.
+
+```java
+Parser<Chr, Integer> binary = chr('0').or(chr'1');
+```
