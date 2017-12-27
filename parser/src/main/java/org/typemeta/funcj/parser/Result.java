@@ -27,14 +27,42 @@ public interface Result<I, A> {
         return new FailureMessage<I, A>(in, error);
     }
 
+    /**
+     * Indicates if this result is successful.
+     * @return          true if this is a {@code Success}, otherwise false
+     */
     boolean isSuccess();
 
+    /**
+     * Returns the parse value if the parse was successful, otherwise throws an exception
+     * @return          the parse value if the parse was successful
+     * @throw           RuntimeException if the parse was unsuccessful
+     */
     A getOrThrow();
 
+    /**
+     * Map a function over this {@code Result} value
+     * @param f         the function
+     * @param <B>       the function return type
+     * @return          if this is a {@code Success} then return a {@code Success} which wraps the result
+     *                  of applying the function to the success value, otherwise return this value
+     */
     <B> Result<I, B> map(F<A, B> f);
 
+    /**
+     * Apply one of two side-effects functions to this value.
+     * @param success   the function to be applied to a successful value
+     * @param failure   the function to be applied to a failure value
+     */
     void handle(SideEffect.F<Success<I, A>> success, SideEffect.F<Failure<I, A>> failure);
 
+    /**
+     * Apply one of two functions to this value.
+     * @param success   the function to be applied to a successful value
+     * @param failure   the function to be applied to a failure value
+     * @param <B>       the function return type
+     * @return          the result of applying either function
+     */
     <B> B match(F<Success<I, A>, B> success, F<Failure<I, A>, B> failure);
 
     /**

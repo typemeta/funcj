@@ -128,6 +128,54 @@ public class ApplyBuilder {
                         public <H> _6<G> andL(Parser<I, H> ph) {
                             return new _6<G>(pg.andL(ph));
                         }
+
+                        public <H> _7<H> and(Parser<I, H> ph) {
+                            return new _7<H>(ph);
+                        }
+
+                        public class _7<H> {
+                            private final Parser<I, H> ph;
+
+                            private _7(Parser<I, H> ph) {
+                                this.ph = ph;
+                            }
+
+                            public <R> Parser<I, R> map(Functions.F<A, F<B, F<C, F<D, F<E, F<G, F<H, R>>>>>>> f) {
+                                return Parser.ap(_6.this.map(f), ph);
+                            }
+
+                            public <R> Parser<I, R> map(Functions.F7<A, B, C, D, E, G, H, R> f) {
+                                return map(f.curry());
+                            }
+
+                            public <J> _7<H> andL(Parser<I, J> pj) {
+                                return new _7<H>(ph.andL(pj));
+                            }
+
+                            public <J> _8<J> and(Parser<I, J> pj) {
+                                return new _8<J>(pj);
+                            }
+
+                            public class _8<J> {
+                                private final Parser<I, J> pj;
+
+                                private _8(Parser<I, J> pj) {
+                                    this.pj = pj;
+                                }
+
+                                public <R> Parser<I, R> map(Functions.F<A, F<B, F<C, F<D, F<E, F<G, F<H, F<J, R>>>>>>>> f) {
+                                    return Parser.ap(_7.this.map(f), pj);
+                                }
+
+                                public <R> Parser<I, R> map(Functions.F8<A, B, C, D, E, G, H, J, R> f) {
+                                    return map(f.curry());
+                                }
+
+                                public <K> _8<J> andL(Parser<I, K> pk) {
+                                    return new _8<J>(pj.andL(pk));
+                                }
+                            }
+                        }
                     }
                 }
             }

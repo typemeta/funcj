@@ -29,15 +29,6 @@ public abstract class Grammar {
         final Parser<Chr, BinOp> mult = chr('*').andR(pure(BinOp.MULTIPLY));
         final Parser<Chr, BinOp> div = chr('/').andR(pure(BinOp.DIVIDE));
 
-        final Parser<Chr, NumExpr.Units> pct = string("%").andR(pure(NumExpr.Units.PCT));
-        final Parser<Chr, NumExpr.Units> bps = string("bp").andR(pure(NumExpr.Units.BPS));
-
-        final Parser<Chr, String> funcName =
-            chr('m')
-                .andR(
-                    (string("in").map(u -> "min"))
-                        .or(string("ax").map(u -> "max")));
-
         // addSub = add | sub
         final Parser<Chr, Op2<Expr>> addSub =
             add.or(sub).map(BinOp::ctor);
@@ -46,25 +37,16 @@ public abstract class Grammar {
         final Parser<Chr, Op2<Expr>> multDiv =
             mult.or(div).map(BinOp::ctor);
 
-        // units = % | bp
-        final Parser<Chr, NumExpr.Units> units =
-            pct.or(bps).or(pure(NumExpr.Units.ABS));
-
-        // num = intr
-        final Parser<Chr, Expr> num =
-            dble.and(units).map(Model::numExpr);
+        // num = <dble>
+        final Parser<Chr, Expr> num = dble.map(Model::numExpr);
 
         // brackExpr = open expr close
         final Parser<Chr, Expr> brackExpr =
             open.andR(expr).andL(close);
 
+        // var = <alpha>
         final Parser<Chr, Expr> var =
-            alpha.map(Model::varExpr);
-
-        // funcN = name { args | ε }
-        final Parser<Chr, Expr> funcN =
-            funcName.andL(open).and(expr).andL(comma).and(expr).andL(close)
-                .map(Model::func2Expr);
+            alpha.map(Chr::charValue).map(Model::varExpr);
 
         // sign = + | -
         final Parser<Chr, UnaryOp> sign = plus.or(minus);
@@ -75,7 +57,7 @@ public abstract class Grammar {
 
         // term = num | brackExpr | funcN | signedExpr
         final Parser<Chr, Expr> term =
-            num.or(brackExpr).or(funcN).or(var).or(signedExpr);
+            num.or(brackExpr).or(var).or(signedExpr);
 
         // prod = term chainl1 multDiv
         final Parser<Chr, Expr> prod = term.chainl1(multDiv);

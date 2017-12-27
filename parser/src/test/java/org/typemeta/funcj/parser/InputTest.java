@@ -8,7 +8,7 @@ import java.io.CharArrayReader;
 import static org.junit.Assert.*;
 
 public class InputTest {
-    private static final char[] charData = "ABCDEFGH".toCharArray();
+    private static final char[] charData = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 
     @Test
     public void testStringInput() {

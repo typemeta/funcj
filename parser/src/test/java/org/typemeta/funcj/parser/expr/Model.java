@@ -8,11 +8,11 @@ import org.typemeta.funcj.functions.Functions;
  */
 public class Model {
 
-    public static Expr numExpr(double val, NumExpr.Units units) {
-        return new NumExpr(val, units);
+    public static Expr numExpr(double val) {
+        return new NumExpr(val);
     }
 
-    public static Expr varExpr(Chr name) {
+    public static Expr varExpr(char name) {
         return new VarExpr(name);
     }
 
@@ -22,10 +22,6 @@ public class Model {
 
     public static Expr binOpExpr(Expr lhs, BinOp op, Expr rhs) {
         return new BinOpExpr(lhs, op, rhs);
-    }
-
-    public static Expr func2Expr(String name, Expr arg0, Expr arg1) {
-        return new Func2Expr(name, arg0, arg1);
     }
 
     public static abstract class Expr {
@@ -39,43 +35,23 @@ public class Model {
     }
 
     public static class NumExpr extends Expr {
-
-        public enum Units {
-            ABS(""),
-            PCT("%"),
-            BPS("bp");
-
-            private final String s;
-
-            Units(String s) {
-                this.s = s;
-            }
-
-            @Override
-            public String toString() {
-                return s;
-            }
-        }
-
         public final double value;
-        public final Units units;
 
-        public NumExpr(double value, Units units) {
+        public NumExpr(double value) {
             this.value = value;
-            this.units = units;
         }
 
         @Override
         public StringBuilder string(StringBuilder sb) {
-            return sb.append(value).append(units);
+            return sb.append(value);
         }
     }
 
     public static class VarExpr extends Expr {
 
-        public final Chr name;
+        public final char name;
 
-        public VarExpr(Chr name) {
+        public VarExpr(char name) {
             this.name = name;
         }
 
@@ -160,27 +136,6 @@ public class Model {
             lhs.string(sb);
             sb.append(op);
             rhs.string(sb);
-            return sb.append(')');
-        }
-    }
-
-    public static class Func2Expr extends Expr {
-        public final String name;
-        public final Expr arg0;
-        public final Expr arg1;
-
-        public Func2Expr(String name, Expr arg0, Expr arg1) {
-            this.name = name;
-            this.arg0 = arg0;
-            this.arg1 = arg1;
-        }
-
-        @Override
-        public StringBuilder string(StringBuilder sb) {
-            sb.append(name).append('(');
-            arg0.string(sb);
-            sb.append(',');
-            arg1.string(sb);
             return sb.append(')');
         }
     }
