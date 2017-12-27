@@ -13,7 +13,7 @@ Some notable features include:
 * Thread-safe due to immutable parsers and inputs.
 * Lightweight library with zero dependencies (aside from JUnit for the tests).
 * The framework computes first sets and follow sets,
-used to select the correct alternative when presented with a choice.
+which are used to implements deterministic, top-down parsing.
 
 ## Parser Combinators
 
