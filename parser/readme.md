@@ -179,6 +179,34 @@ however this method shouldn't be used directly.
 As a client of the library use the `Parser.parse` method (),
 which takes an `Input` value and returns a `Result` value.
 
+#### `Parser.Ref`
+
+Many grammars are recursive, meaning there's a circularity in the production rules.
+For example, consider the following grammar for addition expressions:
+
+```
+E ::= 'x' | 'a' E 'b'
+``` 
+
+Translating this directly into `Parser` values presents a problem,
+as E is defined in terms of itself.
+To circumvent this a parser reference can be used.
+The reference is initially uninitialised,
+however since it implements the `Parser` interface,
+it can be used as any other parser value would be.
+It must be initialised with an actual parser before it is invoked however.
+
+```java
+// Create an uninitialised parser reference.
+Ref<Chr, String> e = Parser.ref();
+
+// Use the reference.
+Parser<Chr, String> aEb = string("a").and(e).and(string("b")).map(a -> e -> b -> a + e + b);
+
+// Initialise the reference with a parser.
+e.set(string("x")or(aEb));
+```
+
 ## Combinators
 
 Parsers are constructed using combinators, some of which combine existing partsers to form new ones.
@@ -224,6 +252,11 @@ otherwise it will fail.
 
 The `Combinator.satisfy` parser will succeed if the next token passes the supplied predicate,
 and returns the satisfactory token.
+
+```java
+// A parser that only accepts numeric digits.
+Parser<Chr, Chr> pDigit = satisfy(Chr::isDigit);
+```
 
 ### The `and` Combinator
 
