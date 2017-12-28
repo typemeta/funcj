@@ -123,12 +123,12 @@ A typical approach to using the library to implement a parser for a language is 
 All parsers implement the `Parser` interface.
 The framework internally uses the `Parser.apply` method to invoke the parser,
 however this method shouldn't be used directly.
-As a user of the library you use the `Parser.parse` method (),
-which takes an `Input` and returns a `Result` value.
+As a user of the library use the `Parser.parse` method (),
+which takes an `Input` value and returns a `Result` value.
 
-### Input
+### `Input<I>`
 
-`Input` is an abstraction which represents a stream on parseable tokens,
+`Input` is an abstraction which represents a stream of parseable tokens,
 typically (but not limited to) `Chr`s.
 
 To construct an `Input` value, use one of the static constructor methods:
@@ -136,17 +136,20 @@ To construct an `Input` value, use one of the static constructor methods:
 ```java
 char[] charData = { 'A', 'B', 'C', 'D'};
 
+// Construct an input from a char array.
 Input<Chr> chrArrInput = Input.of(charData);
 
+// Construct an input from a String.
 Input<Chr> strInput = Input.of("ABCD");
 
+// Construct an input from a Reader.
 Inout<Chr> rdrInput = Input.of(new CharArrayReader(charData))
 ```
-### Result
+### `Result<I, T>`
 
 `Result` represents the result of applying a parser.
 It's essentially a discriminated union between a `Result.Success`,
-indicating a successful parse,
+indicating a successful parse with a parse value of type `T`,
 and a `Result.Failure`, indicating a failure.
 The result value can be handled in various ways.
 
@@ -163,9 +166,21 @@ int len = res.match(succ -> succ.value.().length, fail -> -1);
 int len = res.getOrThrow();
 ```
 
-### Parser
+### `Parser<I, T>`
 
-As well as the `parse` method,
+Some of the static methods on `Parser` provide some of the basic building blocks.
+
+```java
+// pure will simply return its argument, without consuming any input.
+Parser<Chr, Chr> pX = pure('X');
+
+// value will succeed if the next toek matches the supplied argument.
+Parser<Chr, Chr> pY = value(Chr.valueOf('Y'));
+
+// Text.chr(x) is a shorthand for value(Chr.valueOf(x).
+Parser<Chr, Chr> pY2 = chr('Y');
+```
+
 `Parser` also provides methods for either combining or modifying existing parsers to form new parsers.
 
 #### The `and` Combinator
@@ -185,20 +200,20 @@ then the results can be be ignored in the `map` function:
 
 ```java
 // d is ignored
-Parser<Chr, Double> d = digit.and(chr('.')).and(digit).map(a -> d -> c -> a*10.0 + c/10.0);
+Parser<Chr, Double> num = digit.and(chr('.')).and(digit).map(a -> d -> c -> a*10.0 + c/10.0);
 ```
 
 Alternatively, the `andL` method can be used to indicate the result of the right-hand parser can be ignored:
 
 ```java
-// Parser for a number of the form "a.b".
+// A parser for a number of the form "a.b".
 Parser<Chr, Double> d = digit.andL(chr('.')).and(digit).map(a -> d -> c -> a*10.0 + c/10.0);
 ```
 
 and the `andR` method can be used to indicate the result of the left-hand parser can be ignored:
 
 ```java
-// Parser for a number of the form "0.b".
+// A parser for a number of the form "0.b".
 Parser<Chr, Double> d2 = string("0.").andR(digit).map(a -> a/10.0);
 ```
 
@@ -211,3 +226,48 @@ If neither can parse successfully then the result is a failure.
 ```java
 Parser<Chr, Integer> binary = chr('0').or(chr'1');
 ```
+
+### The `choice` Combinator
+
+Use `choice` as a shorthand for multiple chained `or`s.
+
+```java
+Parser<Chr, String> digits = digit.and(digit).map(a -> b -> "" + a.charValue() + b.charValue());
+
+// A parser defined via chained 'or's.
+Parser<Chr, String> p = digits.or(string("ABCD")).or(value("FAIL"))
+
+// A parser defined using choice - p2 is equivalent to p.
+Parser<Chr, String> p2 = choice(digits, string("ABCD"), value("FAIL"));
+```
+
+## The `map` Combinator
+
+The `Parser.map` method allows the successful parse value to be transformed by applying a function to it.
+
+```java
+// A parser for either a numeric digit or the string expression "ABCD".
+Parser<Chr, String> p = digit.or(string("ABCD"));
+
+// A parser which returns the length of the string parsed value.
+Parser<Chr, Integer> p2 = p.map(String::length);
+```
+
+## The `many` Combinator
+
+`Parser.many` transforms a parser into one that applies the parser as many times as it can
+(i.e. until it fails).
+
+```java
+// A parser for a digit, which translates the result to an integer.
+Parser<Chr, Integer> digitToInt = digit.map(Chr::digit);
+
+// A parser for many digits (as ints)
+Parser<Chr, IList<Integer>> digits = digitToInt.many();
+```
+
+Note that since `many` will apply the parser *zero* or more times,
+if the parser fails immediately then the result is a success
+(which contains an empty list as the parse result).
+For a parser which applies the parser *one* or more times, use `Parser.many1`.
+

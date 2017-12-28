@@ -154,4 +154,8 @@ public final class Chr implements Comparable<Chr> {
     public int hashCode() {
         return (int)value;
     }
+
+    public int digit() {
+        return digit(value, 10);
+    }
 }
