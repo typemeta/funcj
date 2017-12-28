@@ -34,8 +34,8 @@ is that the extra plumbing required to implement error-handling and backtracking
 obscures the relationship between the parsing functions and the language rules
 
 [Parser combinators](http://www.cs.nott.ac.uk/~gmh/bib.html#pearl)
-are an extension of recursive descent parsing,
-that encapsulate the plumbing, typically with an applicative functor or a monad.
+are an extension of recursive descent parsing, 
+The framework encapsulates the plumbing, typically with an applicative functor or a monad.
 The framework provides the basic building blocks -
 parsers for constituent language elements such as characters, words and numbers,
 as well as combinators that allow more complex parsers to be constructed by composing existing ones.
@@ -118,40 +118,45 @@ A typical approach to using the library to implement a parser for a language is 
 
 # Guide
 
+A parser for a value of type `T` is essentially a function
+which takes as input a position in a token stream,
+and (if successful) returns the parsed `T` value and the next position in the token stream.
+If the parser can't accept the next input,
+or if it reaches the end of the inout stream,
+then it will return a failure.
+
 ## Types
 
-All parsers implement the `Parser` interface.
-The framework internally uses the `Parser.apply` method to invoke the parser,
-however this method shouldn't be used directly.
-As a user of the library use the `Parser.parse` method (),
-which takes an `Input` value and returns a `Result` value.
+### The `Input` Type
 
-### `Input<I>`
-
-`Input` is an abstraction which represents a stream of parseable tokens,
-typically (but not limited to) `Chr`s.
+The `Input<I>` type is an abstraction which represents a position in a stream of parseable tokens.
+The generic type parameter `I` is the token type,
+typically (but not limited to) `Chr`.
 
 To construct an `Input` value, use one of the static constructor methods:
 
 ```java
 char[] charData = { 'A', 'B', 'C', 'D'};
 
-// Construct an input from a char array.
+// Construct an Input from a char array.
 Input<Chr> chrArrInput = Input.of(charData);
 
-// Construct an input from a String.
+// Construct an Input from a String.
 Input<Chr> strInput = Input.of("ABCD");
 
-// Construct an input from a Reader.
+// Construct an Input from a Reader.
 Inout<Chr> rdrInput = Input.of(new CharArrayReader(charData))
 ```
-### `Result<I, T>`
+### The `Result` Type
 
-`Result` represents the result of applying a parser.
-It's essentially a discriminated union between a `Result.Success`,
-indicating a successful parse with a parse value of type `T`,
-and a `Result.Failure`, indicating a failure.
-The result value can be handled in various ways.
+`Result<I, T>` represents the result of applying a parser.
+It's essentially a discriminated union between thw two following sub-types:
+
+* `Result.Success` - indicating a successful parse,
+consisting of a parse value of type `T`, and an `Input` value pointing to the next positiion in the input stream.
+* `Result.Failure`, indicating a failure, consisting of a error message and the position at which the error occurred.
+
+The `Result` value can be handled in various ways.
 
 ```java
 Result<Chr, String> res = p.parse(Input.of("ABCD"));
@@ -166,24 +171,61 @@ int len = res.match(succ -> succ.value.().length, fail -> -1);
 int len = res.getOrThrow();
 ```
 
-### `Parser<I, T>`
+### The `Parser` Type
 
-Some of the static methods on `Parser` provide some of the basic building blocks.
+All parsers implement the `Parser<I, T>` interface.
+The framework internally uses the `Parser.apply` method to invoke the parser,
+however this method shouldn't be used directly.
+As a client of the library use the `Parser.parse` method (),
+which takes an `Input` value and returns a `Result` value.
+
+## Combinators
+
+Parsers are constructed using combinators, some of which combine existing partsers to form new ones.
+Various static and non-static methods on `Parser` and `Combinators` provide a base set of combinators.
+
+### The `pure` Combinator
+
+The `pure` parser will simply return its argument, without consuming any input.
+The name derives from its role in helping make `Parser` an applicative functor.
 
 ```java
-// pure will simply return its argument, without consuming any input.
+// A parser that always returns the Chr 'X'.
 Parser<Chr, Chr> pX = pure('X');
-
-// value will succeed if the next toek matches the supplied argument.
-Parser<Chr, Chr> pY = value(Chr.valueOf('Y'));
-
-// Text.chr(x) is a shorthand for value(Chr.valueOf(x).
-Parser<Chr, Chr> pY2 = chr('Y');
 ```
 
-`Parser` also provides methods for either combining or modifying existing parsers to form new parsers.
+### The `value` Combinator
 
-#### The `and` Combinator
+The `value` parser is constructed with an argument,
+and will succeed if the next token equals that argument.  
+
+```java
+// Combinator.value will succeed if the next token equals 'Y'.
+Parser<Chr, Chr> pY = value(Chr.valueOf('Y'));
+```
+
+### The `any` Combinator
+
+The `Combinator.any` parser will accept the next token value in the input stream,
+and will return it.
+
+### The `fail` Combinator
+
+The `Combinator.fail` parser will always fail.
+In and of itself, it may not seem that useful,
+but it can have a role in building more useful parsers.
+
+### The `eof` Combinator
+
+The `Combinator.eof` parser will succeed if the end of the inout stream is reached,
+otherwise it will fail.
+
+### The `satisfy` Combinator
+
+The `Combinator.satisfy` parser will succeed if the next token passes the supplied predicate,
+and returns the satisfactory token.
+
+### The `and` Combinator
 
 The `Parser.and` method is used to combine two or more (up to eight) parsers.
 The parsers are combined into one that applies each parser sequentially.
@@ -229,15 +271,15 @@ Parser<Chr, Integer> binary = chr('0').or(chr'1');
 
 ### The `choice` Combinator
 
-Use `choice` as a shorthand for multiple chained `or`s.
+Use `Combinator.choice` as a shorthand for multiple chained `or`s.
 
 ```java
 Parser<Chr, String> digits = digit.and(digit).map(a -> b -> "" + a.charValue() + b.charValue());
 
-// A parser defined via chained 'or's.
+// A parser defined via two chained 'or's.
 Parser<Chr, String> p = digits.or(string("ABCD")).or(value("FAIL"))
 
-// A parser defined using choice - p2 is equivalent to p.
+// The same parser defined using choice.
 Parser<Chr, String> p2 = choice(digits, string("ABCD"), value("FAIL"));
 ```
 
@@ -255,8 +297,8 @@ Parser<Chr, Integer> p2 = p.map(String::length);
 
 ## The `many` Combinator
 
-`Parser.many` transforms a parser into one that applies the parser as many times as it can
-(i.e. until it fails).
+`Parser.many` transforms a parser into one that keeps applying the parser until it fails,
+and then returns a list of the results.
 
 ```java
 // A parser for a digit, which translates the result to an integer.
