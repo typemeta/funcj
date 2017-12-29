@@ -194,7 +194,8 @@ To circumvent this a parser reference can be used.
 The reference is initially uninitialised,
 however since it implements the `Parser` interface,
 it can be used as any other parser value would be.
-It must be initialised with an actual parser before it is invoked however.
+It must be initialised with an actual parser before it is invoked -
+all methods other than set will throw an exception if invoked on an uninitialised `Ref` value.
 
 ```java
 // Create an uninitialised parser reference.
@@ -346,3 +347,75 @@ if the parser fails immediately then the result is a success
 (which contains an empty list as the parse result).
 For a parser which applies the parser *one* or more times, use `Parser.many1`.
 
+# Example
+
+Consider the following recursive grammar for simple arithmetic expressions
+which allow a single variable, *x*:
+
+```
+VAR ::= 'x'
+NUM ::= <integer>
+BINOP ::= '+' | '-' | '*' | '/'
+BINEXPR ::= '(' EXPR BINOP EXPR ')'
+EXPR ::= VAR | NUM | BINEXPR
+```
+
+The model for an expression is a function which accepts the variable value and
+returns the value of the expression.
+
+So, for example, `(x*((x/2)+x))` is a valid expression.
+If we parse it into a function and apply it 4 we should get 24.
+
+We need an enum for the binary operators, which also captures the semantics of the operator:
+
+```java
+enum BinOp {
+    ADD {Op2<Integer> op() {return (l, r) -> l + r;}},
+    SUB {Op2<Integer> op() {return (l, r) -> l - r;}},
+    MUL {Op2<Integer> op() {return (l, r) -> l * r;}},
+    DIV {Op2<Integer> op() {return (l, r) -> l / r;}};
+
+    abstract Op2<Integer> op();
+};
+```
+
+The grammar is as then follows:
+
+```java
+Ref<Chr, Op<Integer>> expr = Parser.ref();
+
+// VAR ::= 'x'
+Parser<Chr, Op<Integer>> var = chr('x').map(u -> x -> x);
+
+// NUM ::= <integer>
+Parser<Chr, Op<Integer>> num = intr.map(i -> x -> i);
+
+// BINOP ::= '+' | '-' | '*' | '/'
+Parser<Chr, BinOp> binOp =
+        choice(
+                chr('+').map(c -> BinOp.ADD),
+                chr('-').map(c -> BinOp.SUB),
+                chr('*').map(c -> BinOp.MUL),
+                chr('/').map(c -> BinOp.DIV)
+        );
+
+// BINEXPR ::= '(' EXPR BINOP EXPR ')'
+Parser<Chr, Op<Integer>> binExpr =
+        chr('(')
+                .andR(expr)
+                .and(binOp)
+                .and(expr)
+                .andL(chr(')'))
+                .map(lhs -> bo -> rhs -> x -> bo.op().apply(lhs.apply(x), rhs.apply(x)));
+
+// EXPR ::= VAR | NUM | BINEXPR
+expr.set(choice(var, num, binExpr));
+```
+
+We can parse an expression and evaluate like this:
+
+```java
+Op2<Integer> eval = expr.parse(Input.of("(x*((x/2)+x))")).getOrThrow();
+int i = eval.apply(4);
+assert(i == 24);
+```
