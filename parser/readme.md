@@ -118,7 +118,7 @@ A typical approach to using the library to implement a parser for a language is 
 
 # Guide
 
-A parser for a value of type `T` is essentially a function
+A parser for a value of type `T` is essentially a stateless function
 which takes as input a position in a token stream,
 and (if successful) returns the parsed `T` value and the next position in the token stream.
 If the parser can't accept the next input,
@@ -210,7 +210,9 @@ e.set(string("x")or(aEb));
 
 ## Combinators
 
-Parsers are constructed using combinators, some of which combine existing partsers to form new ones.
+Parsers are constructed using combinators, some of which combine existing parsers to form new ones.
+Note that in doing so, the original parsers are unaffected and still can be used as standalone parsers.
+
 Various static and non-static methods on `Parser` and `Combinators` provide a base set of combinators.
 
 ### The `pure` Combinator
@@ -264,7 +266,8 @@ Parser<Chr, Chr> pDigit = satisfy(Chr::isDigit);
 The `Parser.and` method is used to combine two or more (up to eight) parsers.
 The parsers are combined into one that applies each parser sequentially.
 If any parser fails then the operation is aborted and the failure is returned.
-If all of the parsers are successful then the results are passed to a `map` method.
+If all of the parsers are successful then the results are passed to a `map` method,
+which constructs the return value or the parser.
 
 ```java
 // A parser for a 3-digit number.
@@ -325,9 +328,12 @@ The `Parser.map` method allows the successful parse value to be transformed by a
 // A parser for either a numeric digit or the string expression "ABCD".
 Parser<Chr, String> p = digit.or(string("ABCD"));
 
-// A parser which returns the length of the string parsed value.
+// A parser which returns the length of the parsed string value.
 Parser<Chr, Integer> p2 = p.map(String::length);
 ```
+
+Note not to confuse this with the `map` method used with `Parser.and`.
+The latter is actually a method on the internal `ApplyBuilder` class.
 
 ## The `many` Combinator
 
@@ -364,7 +370,7 @@ The model for an expression is a function which accepts the variable value and
 returns the value of the expression.
 
 So, for example, `(x*((x/2)+x))` is a valid expression.
-If we parse it into a function and apply it 4 we should get 24.
+If we parse it into a function and apply it to the value 4 we should get a result of 24.
 
 We need an enum for the binary operators, which also captures the semantics of the operator:
 
