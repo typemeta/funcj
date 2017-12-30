@@ -189,18 +189,17 @@ public class JsonParser {
 
     /**
      * Parse a JSON string into a parse result.
-     * @param str JSON string
-     * @return parse result
+     * @param str   JSON string
+     * @return      parse result
      */
     public static Result<Chr, JsValue> parse(String str) {
         return parser.parse(Input.of(str));
     }
 
-
     /**
      * Parse a JSON input stream into a parse result.
-     * @param rdr JSON input stream
-     * @return parse result
+     * @param rdr   JSON input stream
+     * @return      parse result
      */
     public static Result<Chr, JsValue> parse(Reader rdr) {
         return parser.parse(Input.of(rdr));

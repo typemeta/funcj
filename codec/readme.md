@@ -1,4 +1,4 @@
-![funcj.parser](https://github.com/typemeta/funcj/blob/master/codec/resources/funcj-codec.png)
+![funcj.codec](https://github.com/typemeta/funcj/blob/master/codec/resources/funcj-codec.png)
 
 # Introduction
 
@@ -242,7 +242,7 @@ and:
 </person>
 ```
 
-For reference, the default codec for `ZonedDateTime` is defined as this:
+For reference, the default codec for `ZonedDateTime` is defined as below:
 
 ```java
 core.registerCodec(ZonedDateTime.class)

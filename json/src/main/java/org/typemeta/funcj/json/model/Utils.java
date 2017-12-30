@@ -1,7 +1,5 @@
 package org.typemeta.funcj.json.model;
 
-import java.text.DecimalFormat;
-
 public abstract class Utils {
 
     public static String format(double value) {

@@ -13,7 +13,7 @@ Some notable features include:
 * Thread-safe due to immutable parsers and inputs.
 * Lightweight library with zero dependencies (aside from JUnit for the tests).
 * The framework computes first sets and follow sets,
-which are used to implements deterministic, top-down parsing.
+which are then used to implements deterministic, top-down parsing.
 
 ## Parser Combinators
 
@@ -46,7 +46,7 @@ whereby each grammar instance implements an executable parser.
 
 ## Requirements
 
-funcj-parser requires Java 1.8 (or higher).
+funcj.parser requires Java 1.8 (or higher).
 
 ## Resources
 

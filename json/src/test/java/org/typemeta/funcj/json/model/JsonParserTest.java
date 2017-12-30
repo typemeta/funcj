@@ -34,9 +34,10 @@ public class JsonParserTest {
 
     private static final String test9 = "[\"\\ucafe\\ubabe\\uab98\\ufcde\\ubcda\\uef4a\\b\\f\\n\\r\\t\"]";
 
+    private static final String test10 = "{\"ids\":[1.2,\"test\",null,true]}";
 
     private static final String[] tests = {
-        test0, test1, test2, test3, test4, test5, test6, test7, test8, test9
+        test0, test1, test2, test3, test4, test5, test6, test7, test8, test9, test10
     };
 
     @Test

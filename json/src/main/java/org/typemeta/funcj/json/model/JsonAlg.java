@@ -58,6 +58,7 @@ public interface JsonAlg<T> {
      * @param <T>       the object algebra result type
      */
     interface Query<T> extends JsonAlg<T> {
+
         class Base<T> implements JsonAlg.Query<T> {
             protected final Monoid<T> m;
 

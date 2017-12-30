@@ -38,12 +38,12 @@ public class JsonAlgQueryTest {
 
         @Override
         public Integer arr(List<Integer> elems) {
-            return m().combine(super.arr(elems), 1);
+            return super.arr(elems) + 1;
         }
 
         @Override
         public Integer obj(LinkedHashMap<String, Integer> fields) {
-            return m.combine(super.obj(fields),1);
+            return super.obj(fields) + 1;
         }
     }
 
@@ -104,6 +104,6 @@ public class JsonAlgQueryTest {
     public void computeNodeAsPrimes() {
         final long nc = testValue.apply(new NodeAsPrimes());
         final long exp = 2l*3*3*5*5*5*5*5*5*5*7*7*7*11*11*11*11*13*13*13;
-        assertEquals("Count of nodes", exp, nc);
+        assertEquals("Nodes mapped into primes and summed", exp, nc);
     }
 }
