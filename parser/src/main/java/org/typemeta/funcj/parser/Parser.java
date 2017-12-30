@@ -206,7 +206,7 @@ public interface Parser<I, A> {
 
     /**
      * Apply this parser to the input stream.
-     * {@apiNote} If this parser is being used as a standalone parser,
+     * Note: If this parser is being used as a standalone parser,
      * then call {@link Parser#parse(Input)} to parse an input.
      * @param in        the input stream
      * @param follow    the dynamic follow set
@@ -216,7 +216,7 @@ public interface Parser<I, A> {
 
     /**
      * Apply this parser to the input stream.
-     * {@apiNote} If this parser is being used as a standalone parser,
+     * Note: If this parser is being used as a standalone parser,
      * then call {@link Parser#parse(Input)} to parse an input.
      * @param in        the input stream
      * @return          the parser result

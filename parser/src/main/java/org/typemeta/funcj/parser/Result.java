@@ -36,7 +36,7 @@ public interface Result<I, A> {
     /**
      * Returns the parse value if the parse was successful, otherwise throws an exception
      * @return          the parse value if the parse was successful
-     * @throw           RuntimeException if the parse was unsuccessful
+     * @throws          RuntimeException if the parse was unsuccessful
      */
     A getOrThrow();
 

@@ -147,6 +147,7 @@ public enum CountNodes implements JsonAlg<Integer> {
 JSValue jsv = obj(field("ids", arr(num(1.2), str("test"), nul(), bool(true))));
 int nodeCount = jsv.apply(CountNodes.INSTANCE);
 ```
+
 # Guide
 
 The library consists of three parts - 
@@ -197,6 +198,10 @@ The generic type parameter `T` indicates the target type for the processing oper
 In the the case of the `NodeCount` processor above,
 which counts the number of nodes in the JSON value,
 `T` is `Integer`.
+
+
+`JsonAlg` contains six methods, which correspond to the six JSON value types.
+
 
 ## `JsonAlg.Query`
 

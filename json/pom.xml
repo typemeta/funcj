@@ -21,12 +21,6 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>funcj-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>funcj-parser</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -37,11 +31,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.pholser</groupId>
-            <artifactId>junit-quickcheck-core</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>com.pholser</groupId>
             <artifactId>junit-quickcheck-generators</artifactId>
