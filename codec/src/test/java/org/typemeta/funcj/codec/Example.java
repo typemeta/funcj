@@ -6,7 +6,7 @@ import org.typemeta.funcj.control.Either;
 import org.typemeta.funcj.json.model.JsValue;
 import org.w3c.dom.*;
 
-import javax.xml.parsers.*;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.time.*;
 import java.util.*;
 
@@ -46,7 +46,7 @@ public class Example {
         }
     }
 
-    public static void main2(String[] args) throws ParserConfigurationException {
+    public static void main2(String[] args) throws Exception {
         jsonTest();
         xmlTest();
     }
@@ -59,7 +59,7 @@ public class Example {
                     ZoneId.of("GMT")),
             Colour.GREEN, Colour.BLUE);
 
-    static void jsonTest() {
+    static void jsonTest() throws Exception {
         final JsonCodecCore codec = Codecs.jsonCodec();
         codec.registerStringProxyCodec(
                 ZonedDateTime.class,
@@ -75,7 +75,7 @@ public class Example {
         assert(person.equals(person2));
     }
 
-    static void xmlTest() throws ParserConfigurationException {
+    static void xmlTest() throws Exception {
         final XmlCodecCore codec = Codecs.xmlCodec();
         codec.registerStringProxyCodec(
                 ZonedDateTime.class,

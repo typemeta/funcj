@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.util.Exceptions;
 import org.w3c.dom.*;
 
 import java.util.Map;
@@ -23,7 +22,7 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Element encode(Map<K, V> map, Element enc) {
+        public Element encode(Map<K, V> map, Element enc) throws Exception {
             int i = 0;
             for (Map.Entry<K, V> entry : map.entrySet()) {
                 final Element elem = core.addEntryElement(enc);
@@ -39,13 +38,11 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Map<K, V> decode(Class<Map<K, V>> dynType, Element enc) {
+        public Map<K, V> decode(Class<Map<K, V>> dynType, Element enc) throws Exception {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
 
-            final Map<K, V> map = Exceptions.wrap(
-                    () -> core.getTypeConstructor(dynType).construct(),
-                    XmlCodecException::new);
+            final Map<K, V> map = core.getTypeConstructor(dynType).construct();
 
             for (int i = 0; i < l; ++i) {
                 final Element elem = (Element)nodes.item(i);
@@ -68,7 +65,7 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Element encode(Map<String, V> map, Element enc) {
+        public Element encode(Map<String, V> map, Element enc) throws Exception {
             int i = 0;
             for (Map.Entry<String, V> entry : map.entrySet()) {
                 final Element elem = core.addEntryElement(enc);
@@ -80,13 +77,11 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Map<String, V> decode(Class<Map<String, V>> dynType, Element enc) {
+        public Map<String, V> decode(Class<Map<String, V>> dynType, Element enc) throws Exception {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
 
-            final Map<String, V> map = Exceptions.wrap(
-                    () -> core.getTypeConstructor(dynType).construct(),
-                    XmlCodecException::new);
+            final Map<String, V> map = core.getTypeConstructor(dynType).construct();
 
             for (int i = 0; i < l; ++i) {
                 final Element childElem = (Element)nodes.item(i);

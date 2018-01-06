@@ -5,10 +5,12 @@ import org.w3c.dom.Element;
 
 import java.util.Optional;
 
+import static org.typemeta.funcj.util.Exceptions.*;
+
 @SuppressWarnings("unchecked")
 public class XmlCodecs {
     public static XmlCodecCoreImpl registerAll(XmlCodecCoreImpl core) {
-        core.registerCodec(Optional.class, new XmlCodecs.OptionalCodec(core));
+        core.registerCodec(Optional.class, new OptionalCodec(core));
         return Codecs.registerAll(core);
     }
 
@@ -25,15 +27,19 @@ public class XmlCodecs {
         }
 
         @Override
-        public Element encode(Optional<T> val, Element enc) {
-            return val.map(t -> {
-                XmlUtils.setAttrValue(enc, attrName, presAttrVal);
-                return core.dynamicCodec().encode(t, enc);
-            }).orElseGet(() -> XmlUtils.setAttrValue(enc, attrName, emptyAttrVal));
+        public Element encode(Optional<T> val, Element enc) throws Exception {
+            return unwrap(() ->
+                    val.map(
+                            wrap(t -> {
+                                    XmlUtils.setAttrValue(enc, attrName, presAttrVal);
+                                    return core.dynamicCodec().encode(t, enc);
+                            })::apply
+                    ).orElseGet(() -> XmlUtils.setAttrValue(enc, attrName, emptyAttrVal))
+            );
         }
 
         @Override
-        public Optional<T> decode(Element enc) {
+        public Optional<T> decode(Element enc) throws Exception {
             if (enc.getAttribute(attrName).equals(emptyAttrVal)) {
                 return Optional.empty();
             } else {

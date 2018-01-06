@@ -1,5 +1,6 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.byteio.*;
 import org.typemeta.funcj.codec.json.*;
 import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.functions.Functions.F;
@@ -9,7 +10,7 @@ import java.time.*;
 public class Codecs {
 
     /**
-     * Construct and return a new instance of a {@code JsonCodecCore}.
+     * Construct and return a new instance of a {@link JsonCodecCore}.
      * @return the new {@code JsonCodecCore}
      */
     public static JsonCodecCore jsonCodec() {
@@ -18,12 +19,21 @@ public class Codecs {
     }
 
     /**
-     * Construct and return a new instance of a {@code XmlCodecCore}.
+     * Construct and return a new instance of a {@link XmlCodecCore}.
      * @return the new {@code XmlCodecCore}
      */
     public static XmlCodecCore xmlCodec() {
         final XmlCodecCoreImpl codec = new XmlCodecCoreImpl();
         return XmlCodecs.registerAll(codec);
+    }
+
+    /**
+     * Construct and return a new instance of a {@link ByteCodecCore}.
+     * @return the new {@code ByteCodecCore}
+     */
+    public static ByteCodecCore byteCodec() {
+        final ByteCodecCoreImpl codec = new ByteCodecCoreImpl();
+        return ByteCodecs.registerAll(codec);
     }
 
     public static <E, C extends BaseCodecCore<E>> C registerAll(C core) {
@@ -102,12 +112,12 @@ public class Codecs {
         }
 
         @Override
-        public E encode(Class val, E enc) {
+        public E encode(Class val, E enc) throws Exception {
             return core.stringCodec().encode(core.classToName(val), enc);
         }
 
         @Override
-        public Class decode(E enc) {
+        public Class decode(E enc) throws Exception {
             return core.nameToClass(core.stringCodec().decode(enc));
         }
     }
@@ -133,12 +143,12 @@ public class Codecs {
         }
 
         @Override
-        public E encode(T val, E enc) {
+        public E encode(T val, E enc) throws Exception {
             return core.stringCodec().encode(encode.apply(val), enc);
         }
 
         @Override
-        public T decode(E enc) {
+        public T decode(E enc) throws Exception {
             return decode.apply(core.stringCodec().decode(enc));
         }
     }

@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.json;
+package org.typemeta.funcj.codec.byteio;
 
 import org.typemeta.funcj.codec.CodecCore;
 import org.typemeta.funcj.json.model.JsValue;
@@ -8,7 +8,7 @@ import org.typemeta.funcj.json.model.JsValue;
  * via the {@link JsValue} representation for JSON values.
  */
 @SuppressWarnings("unchecked")
-public interface JsonCodecCore extends CodecCore<JsValue> {
+public interface ByteCodecCore extends CodecCore<ByteIO> {
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.
@@ -16,7 +16,7 @@ public interface JsonCodecCore extends CodecCore<JsValue> {
      * @param <T>   the decoded value type
      * @return      the encoded value
      */
-    default <T> JsValue encode(T val) throws Exception {
+    default <T> ByteIO encode(T val) throws Exception {
         return encode((Class<T>)val.getClass(), val);
     }
 
@@ -27,7 +27,7 @@ public interface JsonCodecCore extends CodecCore<JsValue> {
      * @param <T>   the decoded value type
      * @return      the encoded value
      */
-    default <T> JsValue encode(Class<T> type, T val) throws Exception {
+    default <T> ByteIO encode(Class<T> type, T val) throws Exception {
         return encode(type, val, null);
     }
 }

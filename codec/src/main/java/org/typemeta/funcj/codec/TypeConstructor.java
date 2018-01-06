@@ -1,5 +1,7 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.functions.FunctionsGenEx.F0;
+
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -19,7 +21,7 @@ public interface TypeConstructor<T> {
      * @throws          InstantiationException if type has no constructors
      */
     static <T> TypeConstructor<T> createTypeConstructor(Class<T> clazz)
-            throws InstantiationException {
+            throws CodecRuntimeException {
         // Get the empty-arg constructors.
         final List<Constructor<T>> ctors =
                 Arrays.stream(clazz.getDeclaredConstructors())
@@ -27,11 +29,11 @@ public interface TypeConstructor<T> {
                         .map(ctor -> (Constructor<T>)ctor)
                         .collect(toList());
 
-        // Select the an accessible ctor if there is one, otherwise just the first one.
+        // Select the accessible ctor if there is only one, otherwise just the first one.
         final Constructor<T> defCtor;
         switch (ctors.size()) {
             case 0:
-                throw new InstantiationException(clazz.getName() + " has no default constructor");
+                throw new CodecRuntimeException(clazz.getName() + " has no default constructor");
             case 1:
                 defCtor = ctors.get(0);
                 break;
@@ -43,23 +45,33 @@ public interface TypeConstructor<T> {
                 break;
         }
 
-        // Create a TypeConstructor from the ctor.
+        final F0<T, ReflectiveOperationException> ctor = () -> defCtor.newInstance((Object[])null);
+
+        final F0<T, ReflectiveOperationException> accCtor;
         if (defCtor.isAccessible()) {
-            return () -> defCtor.newInstance((Object[])null);
+            accCtor = ctor;
         } else {
-            return () -> {
+            accCtor = () -> {
                 defCtor.setAccessible(true);
-                final T result = defCtor.newInstance((Object[])null);
+                final T result = ctor.apply();
                 defCtor.setAccessible(false);
                 return result;
             };
         }
+
+        return () -> {
+            try {
+                return accCtor.apply();
+            } catch (ReflectiveOperationException ex) {
+                throw new CodecException("Unable to construct object of type '" + clazz.getName() + "'", ex);
+            }
+        };
     }
 
     /**
      * Construct a value of type {@code T}.
      * @return          newly constructed value
-     * @throws          ReflectiveOperationException typically thrown by {@link java.lang.reflect.Constructor#newInstance(Object[])}
+     * @throws          CodecException typically thrown by {@link java.lang.reflect.Constructor#newInstance(Object[])}
      */
-    T construct() throws ReflectiveOperationException;
+    T construct() throws CodecException;
 }

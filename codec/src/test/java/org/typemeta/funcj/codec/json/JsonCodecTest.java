@@ -14,7 +14,7 @@ public class JsonCodecTest extends TestBase {
     }
 
     @Override
-    protected <T> void roundTrip(T val, Class<T> clazz) {
+    protected <T> void roundTrip(T val, Class<T> clazz) throws Exception {
         final JsValue node = codec.encode(clazz, val);
 
         final T val2 = codec.decode(clazz, node);

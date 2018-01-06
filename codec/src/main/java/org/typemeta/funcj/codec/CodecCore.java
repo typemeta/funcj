@@ -82,7 +82,7 @@ public interface CodecCore<E> {
      * @param <T>       the decoded value type
      * @return          the encoded value
      */
-    <T> E encode(T val, E enc);
+    <T> E encode(T val, E enc) throws Exception;
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.
@@ -92,7 +92,7 @@ public interface CodecCore<E> {
      * @param <T>       the decoded value type
      * @return          the encoded value
      */
-    <T> E encode(Class<T> type, T val, E enc);
+    <T> E encode(Class<T> type, T val, E enc) throws Exception;
 
     /**
      * Decode a value of type {@code T} from encoded value of type {@code E}.
@@ -101,5 +101,5 @@ public interface CodecCore<E> {
      * @param <T>       the decoded value type
      * @return          the decoded value
      */
-    <T> T decode(Class<T> type, E enc);
+    <T> T decode(Class<T> type, E enc) throws Exception;
 }

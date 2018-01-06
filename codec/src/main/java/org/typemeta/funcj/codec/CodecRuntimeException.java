@@ -3,23 +3,23 @@ package org.typemeta.funcj.codec;
 /**
  * Exception class for encoding/decoding exceptions.
  */
-public class CodecException extends Exception {
-    public CodecException() {
+public class CodecRuntimeException extends RuntimeException {
+    public CodecRuntimeException() {
     }
 
-    public CodecException(String message) {
+    public CodecRuntimeException(String message) {
         super(message);
     }
 
-    public CodecException(String message, Throwable cause) {
+    public CodecRuntimeException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public CodecException(Throwable cause) {
+    public CodecRuntimeException(Throwable cause) {
         super(cause);
     }
 
-    public CodecException(
+    public CodecRuntimeException(
             String message,
             Throwable cause,
             boolean enableSuppression,

@@ -20,7 +20,7 @@ public interface Codec<T, E> {
          * @param enc       encoded value
          * @return          true if encoded value represents a null value
          */
-        boolean isNull(E enc);
+        boolean isNull(E enc) throws Exception;
     }
 
     /**
@@ -30,29 +30,29 @@ public interface Codec<T, E> {
     abstract class BooleanCodec<E> implements Codec<Boolean, E> {
 
         @Override
-        public E encode(Boolean val, E enc) {
+        public E encode(Boolean val, E enc) throws Exception {
             return encodePrim(val, enc) ;
         }
 
         @Override
-        public Boolean decode(Class<Boolean> dynType, E enc) {
+        public Boolean decode(Class<Boolean> dynType, E enc) throws Exception {
             return decodePrim(enc);
         }
 
         @Override
-        public Boolean decode(E enc) {
+        public Boolean decode(E enc) throws Exception {
             return decodePrim(enc);
         }
 
-        public E encodePrim(boolean val, E enc) {
+        public E encodePrim(boolean val, E enc) throws Exception {
             return encodePrim(val);
         }
 
-        public E encodePrim(boolean val) {
+        public E encodePrim(boolean val) throws Exception {
             throw new OperationNotImplementedException();
         }
 
-        public abstract boolean decodePrim(E enc);
+        public abstract boolean decodePrim(E enc) throws Exception;
     }
 
     /**
@@ -62,29 +62,29 @@ public interface Codec<T, E> {
     abstract class ByteCodec<E> implements Codec<Byte, E> {
 
         @Override
-        public E encode(Byte val, E enc) {
+        public E encode(Byte val, E enc) throws Exception {
             return encodePrim(val, enc) ;
         }
 
         @Override
-        public Byte decode(Class<Byte> dynType, E enc) {
+        public Byte decode(Class<Byte> dynType, E enc) throws Exception {
             return decodePrim(enc);
         }
 
         @Override
-        public Byte decode(E enc) {
+        public Byte decode(E enc) throws Exception {
             return decodePrim(enc);
         }
 
-        public E encodePrim(byte val, E enc) {
+        public E encodePrim(byte val, E enc) throws Exception {
             return encodePrim(val);
         }
 
-        public E encodePrim(byte val) {
+        public E encodePrim(byte val) throws Exception {
             throw new OperationNotImplementedException();
         }
 
-        public abstract byte decodePrim(E enc);
+        public abstract byte decodePrim(E enc) throws Exception;
     }
 
     /**
@@ -94,29 +94,29 @@ public interface Codec<T, E> {
     abstract class CharCodec<E> implements Codec<Character, E> {
 
         @Override
-        public E encode(Character val, E enc) {
+        public E encode(Character val, E enc) throws Exception {
             return encodePrim(val, enc) ;
         }
 
         @Override
-        public Character decode(Class<Character> dynType, E enc) {
+        public Character decode(Class<Character> dynType, E enc) throws Exception {
             return decodePrim(enc);
         }
 
         @Override
-        public Character decode(E enc) {
+        public Character decode(E enc) throws Exception {
             return decodePrim(enc);
         }
 
-        public E encodePrim(char val, E enc) {
+        public E encodePrim(char val, E enc) throws Exception {
             return encodePrim(val);
         }
 
-        public E encodePrim(char val) {
+        public E encodePrim(char val) throws Exception {
             throw new OperationNotImplementedException();
         }
 
-        public abstract char decodePrim(E enc);
+        public abstract char decodePrim(E enc) throws Exception;
     }
 
     /**
@@ -126,29 +126,29 @@ public interface Codec<T, E> {
     abstract class ShortCodec<E> implements Codec<Short, E> {
 
         @Override
-        public E encode(Short val, E enc) {
+        public E encode(Short val, E enc) throws Exception {
             return encodePrim(val, enc) ;
         }
 
         @Override
-        public Short decode(Class<Short> dynType, E enc) {
+        public Short decode(Class<Short> dynType, E enc) throws Exception {
             return decodePrim(enc);
         }
 
         @Override
-        public Short decode(E enc) {
+        public Short decode(E enc) throws Exception {
             return decodePrim(enc);
         }
 
-        public E encodePrim(short val, E enc) {
+        public E encodePrim(short val, E enc) throws Exception {
             return encodePrim(val);
         }
 
-        public E encodePrim(short val) {
+        public E encodePrim(short val) throws Exception {
             throw new OperationNotImplementedException();
         }
 
-        public abstract short decodePrim(E enc);
+        public abstract short decodePrim(E enc) throws Exception;
     }
 
     /**
@@ -158,29 +158,29 @@ public interface Codec<T, E> {
     abstract class IntCodec<E> implements Codec<Integer, E> {
 
         @Override
-        public E encode(Integer val, E enc) {
+        public E encode(Integer val, E enc) throws Exception {
             return encodePrim(val, enc) ;
         }
 
         @Override
-        public Integer decode(Class<Integer> dynType, E enc) {
+        public Integer decode(Class<Integer> dynType, E enc) throws Exception {
             return decodePrim(enc);
         }
 
         @Override
-        public Integer decode(E enc) {
+        public Integer decode(E enc) throws Exception {
             return decodePrim(enc);
         }
 
-        public E encodePrim(int val, E enc) {
+        public E encodePrim(int val, E enc) throws Exception {
             return encodePrim(val);
         }
 
-        public E encodePrim(int val) {
+        public E encodePrim(int val) throws Exception {
             throw new OperationNotImplementedException();
         }
 
-        public abstract int decodePrim(E enc);
+        public abstract int decodePrim(E enc) throws Exception;
     }
 
     /**
@@ -190,29 +190,29 @@ public interface Codec<T, E> {
     abstract class LongCodec<E> implements Codec<Long, E> {
 
         @Override
-        public E encode(Long val, E enc) {
+        public E encode(Long val, E enc) throws Exception {
             return encodePrim(val, enc) ;
         }
 
         @Override
-        public Long decode(Class<Long> dynType, E enc) {
+        public Long decode(Class<Long> dynType, E enc) throws Exception {
             return decodePrim(enc);
         }
 
         @Override
-        public Long decode(E enc) {
+        public Long decode(E enc) throws Exception {
             return decodePrim(enc);
         }
 
-        public E encodePrim(long val, E enc) {
+        public E encodePrim(long val, E enc) throws Exception {
             return encodePrim(val);
         }
 
-        public E encodePrim(long val) {
+        public E encodePrim(long val) throws Exception {
             throw new OperationNotImplementedException();
         }
 
-        public abstract long decodePrim(E enc);
+        public abstract long decodePrim(E enc) throws Exception;
     }
 
     /**
@@ -222,29 +222,29 @@ public interface Codec<T, E> {
     abstract class FloatCodec<E> implements Codec<Float, E> {
 
         @Override
-        public E encode(Float val, E enc) {
+        public E encode(Float val, E enc) throws Exception {
             return encodePrim(val, enc) ;
         }
 
         @Override
-        public Float decode(Class<Float> dynType, E enc) {
+        public Float decode(Class<Float> dynType, E enc) throws Exception {
             return decodePrim(enc);
         }
 
         @Override
-        public Float decode(E enc) {
+        public Float decode(E enc) throws Exception {
             return decodePrim(enc);
         }
 
-        public E encodePrim(float val, E enc) {
+        public E encodePrim(float val, E enc) throws Exception {
             return encodePrim(val);
         }
 
-        public E encodePrim(float val) {
+        public E encodePrim(float val) throws Exception {
             throw new OperationNotImplementedException();
         }
 
-        public abstract float decodePrim(E enc);
+        public abstract float decodePrim(E enc) throws Exception;
     }
 
     /**
@@ -254,29 +254,29 @@ public interface Codec<T, E> {
     abstract class DoubleCodec<E> implements Codec<Double, E> {
 
         @Override
-        public E encode(Double val, E enc) {
+        public E encode(Double val, E enc) throws Exception {
             return encodePrim(val, enc) ;
         }
 
         @Override
-        public Double decode(Class<Double> dynType, E enc) {
+        public Double decode(Class<Double> dynType, E enc) throws Exception {
             return decodePrim(enc);
         }
 
         @Override
-        public Double decode(E enc) {
+        public Double decode(E enc) throws Exception {
             return decodePrim(enc);
         }
 
-        public E encodePrim(double val, E enc) {
+        public E encodePrim(double val, E enc) throws Exception {
             return encodePrim(val);
         }
 
-        public E encodePrim(double val) {
+        public E encodePrim(double val) throws Exception {
             throw new OperationNotImplementedException();
         }
 
-        public abstract double decodePrim(E enc);
+        public abstract double decodePrim(E enc) throws Exception;
     }
 
     /**
@@ -285,7 +285,7 @@ public interface Codec<T, E> {
      * @param enc       the encoded parent value
      * @return          the encoded value
      */
-    E encode(T val, E enc);
+    E encode(T val, E enc) throws Exception;
 
     /**
      * Decode a value of type {@code E} back into a value of type {@code T}.
@@ -294,7 +294,7 @@ public interface Codec<T, E> {
      * @param enc       the encoded value
      * @return          the decoded value
      */
-    default T decode(Class<T> dynType, E enc) {
+    default T decode(Class<T> dynType, E enc) throws Exception {
         return decode(enc);
     }
 
@@ -304,7 +304,7 @@ public interface Codec<T, E> {
      * @param enc       the encoded value
      * @return          the decoded value
      */
-    default T decode(E enc) {
+    default T decode(E enc) throws Exception {
         throw new OperationNotImplementedException();
     }
 }

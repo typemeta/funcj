@@ -5,6 +5,8 @@ import org.typemeta.funcj.json.model.*;
 
 import java.util.Optional;
 
+import static org.typemeta.funcj.util.Exceptions.*;
+
 @SuppressWarnings("unchecked")
 public class JsonCodecs {
     public static JsonCodecCoreImpl registerAll(JsonCodecCoreImpl core) {
@@ -19,13 +21,13 @@ public class JsonCodecs {
         }
 
         @Override
-        public JsValue encode(Optional<T> val, JsValue enc) {
-            return val.map(t -> core.dynamicCodec().encode(t, enc))
-                    .orElseGet(JSAPI::obj);
+        public JsValue encode(Optional<T> val, JsValue enc) throws Exception {
+            return unwrap(() -> val.map(t -> wrap(() -> core.dynamicCodec().encode(t, enc)))
+                    .orElseGet(JSAPI::obj));
         }
 
         @Override
-        public Optional<T> decode(JsValue enc) {
+        public Optional<T> decode(JsValue enc) throws Exception {
             if (enc.isObject() && enc.asObject().isEmpty()) {
                 return Optional.empty();
             } else {

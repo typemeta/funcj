@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.functions.Functions.*;
+import org.typemeta.funcj.functions.*;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -15,19 +15,19 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class ObjectCodecBuilder<T, E> {
     public static class FieldCodec<T, E> {
-        protected final F2<T, E, E> encoder;
-        protected final F<E, Object> decoder;
+        protected final FunctionsEx.F2<T, E, E> encoder;
+        protected final FunctionsEx.F<E, Object> decoder;
 
-        <FT> FieldCodec(F<T, FT> getter, Codec<FT, E> codec) {
+        <FT> FieldCodec(FunctionsEx.F<T, FT> getter, Codec<FT, E> codec) {
             encoder = (val, enc) -> codec.encode(getter.apply(val), enc);
-            decoder = codec::decode;
+            decoder = enc -> codec.decode(enc);
         }
 
-        public E encodeField(T val, E enc) {
+        public E encodeField(T val, E enc) throws Exception {
             return encoder.apply(val, enc);
         }
 
-        public Object decodeField(E enc) {
+        public Object decodeField(E enc) throws Exception {
             return decoder.apply(enc);
         }
     }
@@ -60,119 +60,119 @@ public class ObjectCodecBuilder<T, E> {
         return core.dynamicCodec(core.getNullUnsafeCodec(stcType), stcType);
     }
 
-    <A> _1<A> field(String name, F<T, A> getter, Codec<A, E> codec) {
+    <A> _1<A> field(String name, FunctionsEx.F<T, A> getter, Codec<A, E> codec) {
         fields.put(name, new FieldCodec<T, E>(getter, codec));
         return new _1<A>();
     }
 
-    <A> _1<A> nullField(String name, F<T, A> getter, Class<A> clazz) {
+    <A> _1<A> nullField(String name, FunctionsEx.F<T, A> getter, Class<A> clazz) {
         return field(name, getter, getNullSafeCodec(clazz));
     }
 
-    <A> _1<A> field(String name, F<T, A> getter, Class<A> clazz) {
+    <A> _1<A> field(String name, FunctionsEx.F<T, A> getter, Class<A> clazz) {
         return field(name, getter, getNullUnsafeCodec(clazz));
     }
 
     class _1<A> {
-        public Codec<T, E> map(F<A, T> ctor) {
+        public Codec<T, E> map(Functions.F<A, T> ctor) {
             return registration(
                     core.createObjectCodec(
                             fields,
                             arr -> ctor.apply((A)arr[0])));
         }
 
-        <B> _2<B> field(String name, F<T, B> getter, Codec<B, E> codec) {
+        <B> _2<B> field(String name, FunctionsEx.F<T, B> getter, Codec<B, E> codec) {
             fields.put(name, new FieldCodec<T, E>(getter, codec));
             return new _2<B>();
         }
 
-        <B> _2<B> nullField(String name, F<T, B> getter, Class<B> clazz) {
+        <B> _2<B> nullField(String name, FunctionsEx.F<T, B> getter, Class<B> clazz) {
             return field(name, getter, getNullSafeCodec(clazz));
 
         }
 
-        <B> _2<B> field(String name, F<T, B> getter, Class<B> clazz) {
+        <B> _2<B> field(String name, FunctionsEx.F<T, B> getter, Class<B> clazz) {
             return field(name, getter, getNullUnsafeCodec(clazz));
         }
 
         class _2<B> {
-            public Codec<T, E> map(F2<A, B, T> ctor) {
+            public Codec<T, E> map(Functions.F2<A, B, T> ctor) {
                 return registration(
                         core.createObjectCodec(
                                 fields,
                                 arr -> ctor.apply((A)arr[0], (B)arr[1])));
             }
 
-            <C> _3<C> field(String name, F<T, C> getter, Codec<C, E> codec) {
+            <C> _3<C> field(String name, FunctionsEx.F<T, C> getter, Codec<C, E> codec) {
                 fields.put(name, new FieldCodec<T, E>(getter, codec));
                 return new _3<C>();
             }
 
-            <C> _3<C> nullField(String name, F<T, C> getter, Class<C> clazz) {
+            <C> _3<C> nullField(String name, FunctionsEx.F<T, C> getter, Class<C> clazz) {
                 return field(name, getter, getNullSafeCodec(clazz));
             }
 
-            <C> _3<C> field(String name, F<T, C> getter, Class<C> clazz) {
+            <C> _3<C> field(String name, FunctionsEx.F<T, C> getter, Class<C> clazz) {
                 return field(name, getter, getNullUnsafeCodec(clazz));
             }
 
             class _3<C> {
-                public Codec<T, E> map(F3<A, B, C, T> ctor) {
+                public Codec<T, E> map(Functions.F3<A, B, C, T> ctor) {
                     return registration(
                             core.createObjectCodec(
                                     fields,
                                     arr -> ctor.apply((A)arr[0], (B)arr[1], (C)arr[2])));
                 }
 
-                <D> _4<D> field(String name, F<T, D> getter, Codec<D, E> codec) {
+                <D> _4<D> field(String name, FunctionsEx.F<T, D> getter, Codec<D, E> codec) {
                     fields.put(name, new FieldCodec<T, E>(getter, codec));
                     return new _4<D>();
                 }
 
-                <D> _4<D> nullField(String name, F<T, D> getter, Class<D> clazz) {
+                <D> _4<D> nullField(String name, FunctionsEx.F<T, D> getter, Class<D> clazz) {
                     return field(name, getter, getNullSafeCodec(clazz));
                 }
 
-                <D> _4<D> field(String name, F<T, D> getter, Class<D> clazz) {
+                <D> _4<D> field(String name, FunctionsEx.F<T, D> getter, Class<D> clazz) {
                     return field(name, getter, getNullUnsafeCodec(clazz));
                 }
 
                 class _4<D> {
-                    public Codec<T, E> map(F4<A, B, C, D, T> ctor) {
+                    public Codec<T, E> map(Functions.F4<A, B, C, D, T> ctor) {
                         return registration(
                                 core.createObjectCodec(
                                         fields,
                                         arr -> ctor.apply((A)arr[0], (B)arr[1], (C)arr[2], (D)arr[3])));
                     }
 
-                    <N> _N field(String name, F<T, N> getter, Codec<N, E> codec) {
+                    <N> _N field(String name, FunctionsEx.F<T, N> getter, Codec<N, E> codec) {
                         fields.put(name, new FieldCodec<T, E>(getter, codec));
                         return new _N();
                     }
 
-                    <N> _N nullField(String name, F<T, N> getter, Class<N> clazz) {
+                    <N> _N nullField(String name, FunctionsEx.F<T, N> getter, Class<N> clazz) {
                         return field(name, getter, getNullSafeCodec(clazz));
                     }
 
-                    <N> _N field(String name, F<T, N> getter, Class<N> clazz) {
+                    <N> _N field(String name, FunctionsEx.F<T, N> getter, Class<N> clazz) {
                         return field(name, getter, getNullUnsafeCodec(clazz));
                     }
 
                     class _N {
-                        public Codec<T, E> map(F<Object[], T> ctor) {
+                        public Codec<T, E> map(Functions.F<Object[], T> ctor) {
                             return registration(core.createObjectCodec(fields, ctor));
                         }
 
-                        <N> _N field(String name, F<T, N> getter, Codec<N, E> codec) {
+                        <N> _N field(String name, FunctionsEx.F<T, N> getter, Codec<N, E> codec) {
                             fields.put(name, new FieldCodec<T, E>(getter, codec));
                             return new _N();
                         }
 
-                        <N> _N nullField(String name, F<T, N> getter, Class<N> clazz) {
+                        <N> _N nullField(String name, FunctionsEx.F<T, N> getter, Class<N> clazz) {
                             return field(name, getter, getNullSafeCodec(clazz));
                         }
 
-                        <N> _N field(String name, F<T, N> getter, Class<N> clazz) {
+                        <N> _N field(String name, FunctionsEx.F<T, N> getter, Class<N> clazz) {
                             return field(name, getter, getNullUnsafeCodec(clazz));
                         }
                     }

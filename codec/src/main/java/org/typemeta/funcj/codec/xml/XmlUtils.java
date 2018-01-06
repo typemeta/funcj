@@ -1,5 +1,6 @@
 package org.typemeta.funcj.codec.xml;
 
+import org.typemeta.funcj.codec.CodecException;
 import org.w3c.dom.*;
 
 import javax.xml.transform.*;
@@ -9,7 +10,7 @@ import java.io.*;
 import java.util.Optional;
 
 public abstract class XmlUtils {
-    public static String nodeToString(Node node, boolean pretty) {
+    public static String nodeToString(Node node, boolean pretty) throws CodecException {
         try {
             final Transformer tf = TransformerFactory.newInstance().newTransformer();
             tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -22,7 +23,7 @@ public abstract class XmlUtils {
             tf.transform(new DOMSource(node), new StreamResult(out));
             return out.toString();
         } catch (TransformerException ex) {
-            throw new XmlCodecException(ex);
+            throw new CodecException(ex);
         }
     }
 
@@ -40,13 +41,13 @@ public abstract class XmlUtils {
         return parent;
     }
 
-    public static Element firstChildElement(Node node, String name) {
+    public static Element firstChildElement(Node node, String name) throws CodecException {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() == Node.ELEMENT_NODE && name.equals(child.getNodeName())) {
                 return (Element) child;
             }
         }
-        throw new XmlCodecException("No ELEMENT_NODE child found for node " + node.getNodeName());
+        throw new CodecException("No ELEMENT_NODE child found for node " + node.getNodeName());
     }
 
     public static Optional<Text> firstChildTextOpt(Node node) {
@@ -58,13 +59,13 @@ public abstract class XmlUtils {
         return Optional.empty();
     }
 
-    public static Text firstChildText(Node node) {
+    public static Text firstChildText(Node node) throws CodecException {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() == Node.TEXT_NODE) {
                 return (Text) child;
             }
         }
-        throw new XmlCodecException("No TEXT_NODE child found for node " + node.getNodeName());
+        throw new CodecException("No TEXT_NODE child found for node " + node.getNodeName());
     }
 
     public static String getAttrValue(Element elem, String name) {

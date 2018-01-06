@@ -22,7 +22,7 @@ public class XmlCodecTest extends TestBase {
     }
 
     @Override
-    protected <T> void roundTrip(T val, Class<T> clazz) {
+    protected <T> void roundTrip(T val, Class<T> clazz) throws Exception {
 
         final Document doc = docBuilder.newDocument();
 

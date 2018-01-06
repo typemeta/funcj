@@ -2,38 +2,24 @@ package org.typemeta.funcj.data;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.junit.*;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.tuples.Tuple2;
-import org.typemeta.funcj.util.Exceptions;
+import org.typemeta.funcj.functions.Functions;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
+import static org.typemeta.funcj.util.Exceptions.wrap;
 
 @RunWith(JUnitQuickcheck.class)
 public class LazyTest {
     private static class InternalTestException extends RuntimeException {}
 
     private static int nextVal = 123;
-
-    private static <T> Lazy<T> delayedLazy(boolean threadSafe, T r, long delay) {
-        if (threadSafe) {
-            return Lazy.of(() -> {
-                Exceptions.wrap(() -> Thread.sleep(delay));
-                return r;
-            });
-        } else {
-            return Lazy.ofTS(() -> {
-                Exceptions.wrap(() -> Thread.sleep(delay));
-                return r;
-            });
-        }
-    }
 
     @Property
     public void testGet(String s) {
@@ -81,37 +67,64 @@ public class LazyTest {
         assertEquals(l.apply(), l.apply());
     }
 
+    @Test
+    public void testTSIsThreadSafe() throws InterruptedException {
+        // Changing this to false will result in exceptions.
+        final boolean USE_THREADSAFE_LAZY = true;
+        final int N_VALUES = 10;
+        final int N_THREADS = N_VALUES * N_VALUES;
+        final ExecutorService executor = Executors.newFixedThreadPool(N_THREADS);
+
+        final List<Lazy<Integer>> lct2 =
+            IntStream.range(0, N_VALUES)
+                .boxed()
+                .map(i -> delayedLazy(USE_THREADSAFE_LAZY, i))
+                .collect(toList());
+
+        final List<Callable<Integer>> llzi =
+                IntStream.range(0, N_THREADS)
+                        .boxed()
+                        .map(i -> lct2.get(i % N_VALUES))
+                        .map(lz -> callable((lz::apply)))
+                        .collect(toList());
+
+        executor.invokeAll(llzi)
+                .forEach(flzi -> wrap(() -> flzi.get()));
+    }
+
+    private static <T> Lazy<Integer> delayedLazy(boolean threadSafe, int i) {
+        final Functions.F0<Integer> res = new Delayed(i);
+
+        if (threadSafe) {
+            return Lazy.ofTS(res);
+        } else {
+            return Lazy.of(res);
+        }
+    }
+
     private static <T> Callable<T> callable(Supplier<T> supp) {
         return supp::get;
     }
 
-    @Test
-    public void testTSIsThreadSafe() throws InterruptedException {
-        final int N_THREADS = 100;
-        final int N_VALUES = 10;
-        final int DELAY = 1000;
-        final Random rng = new Random();
-        final ExecutorService executor = Executors.newFixedThreadPool(N_THREADS * N_VALUES / 2);
+    static class Delayed implements Functions.F0<Integer> {
+        private static final int DELAY = 100;
 
-        final Map<Integer, Lazy<Integer>> lm =
-            IntStream.range(0, N_VALUES)
-                .boxed()
-                .collect(toMap(
-                    i -> i,
-                    i -> delayedLazy(true, i, rng.nextInt(DELAY))
-                ));
+        final int initValue;
+        int value;
 
-        final List<Callable<Tuple2<Integer, Integer>>> lct2 =
-            IntStream.range(0, N_THREADS)
-                .boxed()
-                .flatMap(i -> IntStream.range(1, N_VALUES)
-                    .mapToObj(j -> callable(() -> Tuple2.of(j, lm.get(j).apply())))
-                ).collect(toList());
+        public Delayed(int value) {
+            this.initValue = value;
+            this.value = value - 1;
+        }
 
-        executor
-            .invokeAll(lct2)
-            .stream()
-            .map(ft2 -> Exceptions.wrap(() -> ft2.get()))
-            .forEach(t2 -> Assert.assertEquals(t2._1.toString(), t2._1, t2._2));
+        @Override
+        public Integer apply() {
+            ++value;
+            wrap(() -> Thread.sleep(DELAY));
+            // Delayed.apply should only get called once for each object.
+            // A failure here implied Delayed.apply has been called multiple times.
+            assertEquals("value has only been incremented once", initValue, value);
+            return value;
+        }
     }
 }
