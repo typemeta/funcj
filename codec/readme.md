@@ -8,13 +8,13 @@ and can deserialise the data to reconstruct the original Java values.
 
 ## Features
 
-* Supports serialisation via JSON and XML, and can be extended to support further formats.
-* Serialisation is driven by Reflection ,consequently the serialised form mirrors the structure of the Java data.
-  * Static type information is used where possible to reduce the amount of type meta data present in the serialised data.
+* Supports serialisation via JSON, XML, and b yte streams. Can be extended to support further formats.
+* Serialisation is driven by Reflection, consequently the serialised form mirrors the structure of the Java data.
+  * Static type information is used where possible to reduce the amount of type metadata present in the serialised data.
 * Custom codecs can be registered with the framework, to handle awkward types,
 or to simply override the default serialisation provided by the framework.
   * A fluent API is provided to simplify the creation of custom codecs.
-* Framework is thread-safe.
+* The framework is thread-safe.
 
 ## Limitations
 
