@@ -11,9 +11,8 @@ import static org.typemeta.funcj.json.algebras.JsonAlgStackUtils.*;
  * Iterative, stack-based implementation of applying an object algebra.
  * <p>
  * To avoid {@code StackOverflowException}s, we use a stack to traverse the JSON tree structure.
- * @param <T>       the result type
  */
-public abstract class JsonAlgStack<T> {
+public abstract class JsonAlgStack {
     private static final class Entry {
         // The JSON value.
         final JsValue value;
