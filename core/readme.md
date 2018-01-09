@@ -1,4 +1,5 @@
 [![Javadocs](http://www.javadoc.io/badge/org.typemeta/funcj-core.svg)](http://www.javadoc.io/doc/org.typemeta/funcj-core)
+
 ![funcj.core](https://github.com/typemeta/funcj/blob/master/core/resources/funcj-core.png)
 
 # Introduction
