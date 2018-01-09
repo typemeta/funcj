@@ -1,3 +1,5 @@
+[![Javadocs](http://www.javadoc.io/badge/org.typemeta/funcj-parser.svg)](http://www.javadoc.io/doc/org.typemeta/funcj-parser)
+
 ![funcj.parser](https://github.com/typemeta/funcj/blob/master/parser/resources/funcj-parser.png)
 
 # Introduction
@@ -52,7 +54,7 @@ funcj.parser requires Java 1.8 (or higher).
 
 * **Release builds** are available on the [Releases](https://github.com/typemeta/funcj/releases) page.
 * **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.parser)
-* **Javadocs** are for the latest build are on the [Javadocs](http://typemeta.github.io/funcj/javadocs/) page.
+* **Javadocs** are for the latest build are on [javadocs.io](http://www.javadoc.io/doc/org.typemeta/funcj-parser) page.
 
 ## Maven
 
