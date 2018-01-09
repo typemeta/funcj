@@ -18,7 +18,6 @@ At present the project consists of three sub-libraries:
 # Javadocs
 
 * [The latest RELEASE Javadocs](https://typemeta.github.io/funcj/0.6.4/apidocs/index.html)
-* [The latest SNAPSHOT Javadocs](https://typemeta.github.io/funcj/snapshot/apidocs/index.html)
 
 ## Older versions
 
