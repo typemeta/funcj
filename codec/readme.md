@@ -1,3 +1,5 @@
+[![Javadocs](http://www.javadoc.io/badge/org.typemeta/funcj-codec.svg)](http://www.javadoc.io/doc/org.typemeta/funcj-codec)
+
 ![funcj.codec](https://github.com/typemeta/funcj/blob/master/codec/resources/funcj-codec.png)
 
 # Introduction
@@ -30,7 +32,7 @@ funcj.codec requires Java 1.8 (or higher).
 
 * **Release builds** are available on the [Releases](https://github.com/typemeta/funcj/releases) page.
 * **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.codec)
-* **Javadocs** are for the latest build are on the [Javadocs](http://typemeta.github.io/funcj/javadocs/) page.
+* **Javadocs** are for the latest build are on [javadocs.io](http://www.javadoc.io/doc/org.typemeta/funcj-codec) page.
 
 ## Maven
 
