@@ -1,3 +1,5 @@
+[![Javadocs](http://www.javadoc.io/badge/org.typemeta/funcj-json.svg)](http://www.javadoc.io/doc/org.typemeta/funcj-json)
+
 ![funcj.json](https://github.com/typemeta/funcj/blob/master/json/resources/funcj-json.png)
 
 # Introduction
@@ -20,8 +22,8 @@ funcj.json requires Java 1.8 (or higher).
 ## Resources
 
 * **Release builds** are available on the [Releases](https://github.com/typemeta/funcj/releases) page.
-* **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.core)
-* **Javadocs** are for the latest build are on the [Javadocs](http://typemeta.github.io/funcj/javadocs/) page.
+* **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.json)
+* **Javadocs** are for the latest build are on [javadocs.io](http://www.javadoc.io/doc/org.typemeta/funcj-json) page.
 
 ## Maven
 

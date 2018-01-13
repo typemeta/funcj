@@ -1,24 +1,26 @@
+[![Javadocs](http://www.javadoc.io/badge/org.typemeta/funcj-codec.svg)](http://www.javadoc.io/doc/org.typemeta/funcj-codec)
+
 ![funcj.codec](https://github.com/typemeta/funcj/blob/master/codec/resources/funcj-codec.png)
 
 # Introduction
 
-**funcj.codec** is a Java framework for round-tripping Java data via a structured data format such as JSON and XML.
+**funcj.codec** is a Java framework for round-tripping Java data via a structured data formats such as JSON and XML, as well as byte streams.
 It can serialise Java object graphs into serialised form,
 and can deserialise the data to reconstruct the original Java values.
 
 ## Features
 
-* Supports serialisation via JSON and XML, and can be extended to support further formats.
-* Serialisation is driven by Reflection ,consequently the serialised form mirrors the structure of the Java data.
-  * Static type information is used where possible to reduce the amount of type meta data present in the serialised data.
+* Supports serialisation via JSON, XML, and byte streams. Can be extended to support further formats.
+* Serialisation is driven by Reflection, consequently the serialised form mirrors the structure of the Java data.
+  * Static type information is used where possible to reduce the amount of type metadata present in the serialised data.
 * Custom codecs can be registered with the framework, to handle awkward types,
 or to simply override the default serialisation provided by the framework.
   * A fluent API is provided to simplify the creation of custom codecs.
-* Framework is thread-safe.
+* The framework is thread-safe.
 
 ## Limitations
 
-* Not optimised for speed.
+* The design favours flexibility over performance.
 
 # Getting Started
 
@@ -30,7 +32,7 @@ funcj.codec requires Java 1.8 (or higher).
 
 * **Release builds** are available on the [Releases](https://github.com/typemeta/funcj/releases) page.
 * **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.codec)
-* **Javadocs** are for the latest build are on the [Javadocs](http://typemeta.github.io/funcj/javadocs/) page.
+* **Javadocs** are for the latest build are on [javadocs.io](http://www.javadoc.io/doc/org.typemeta/funcj-codec) page.
 
 ## Maven
 
