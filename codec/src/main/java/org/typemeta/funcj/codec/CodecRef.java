@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * A reference to a {@link Codec}.
  * {@code CodecRef} implements the {@link Codec} interface.
- * The main use is when looking up a codec for a recursive type.
+ * Used when looking up a codec for a recursive type.
  * @param <T>       the raw type to be encoded/decoded
  * @param <E>       the encoded type
  */

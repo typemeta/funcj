@@ -8,12 +8,20 @@ import java.io.*;
  * ByteIO wraps either a DataInput or a DataOutput.
  */
 public interface ByteIO {
-    static ByteIO of(DataInput input) {
+    static ByteIO ofInputStream(InputStream is) {
+        return new Input(new DataInputStream(is));
+    }
+
+    static ByteIO ofDataInput(DataInput input) {
         return new Input(input);
         //return new Input(new DebugDataInput(System.out, input));
     }
 
-    static ByteIO of(DataOutput output) {
+    static ByteIO ofOutputStream(OutputStream os) {
+        return new Output(new DataOutputStream(os));
+    }
+
+    static ByteIO ofDataOutput(DataOutput output) {
         return new Output(output);
         //return new Output(new DebugDataOutput(System.out, output));
     }
@@ -86,7 +94,7 @@ public interface ByteIO {
 
     String readString() throws IOException;
 }
-
+/*
 class DebugDataOutput implements DataOutput {
     final PrintStream debug;
     final DataOutput dataOutput;
@@ -321,3 +329,4 @@ class DebugDataInput implements DataInput {
         return b;
     }
 }
+*/
