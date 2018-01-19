@@ -10,12 +10,14 @@ import java.util.*;
 public abstract class FoldsGenEx {
     /**
      * Left-fold a function over an {@link Iterable}.
-     * @param f binary function to be applied for the fold
-     * @param z starting value for the fold
-     * @param iter Iterable to be folded over
-     * @param <T> iterable element type
-     * @param <R> result type of fold operation
-     * @return the folded value
+     * @param f         the binary function to be applied for the fold
+     * @param z         the starting value for the fold
+     * @param iter      the iterable to be folded over
+     * @param <T>       the iterable element type
+     * @param <R>       the result type of fold operation
+     * @param <X>       the exception type
+     * @return          the folded value
+     * @throws X        the exception thrown by the function
      */
     public static <T, R, X extends Exception> R foldLeft(F2<R, T, R, X> f, R z, Iterable<T> iter) throws X {
         R acc = z;
@@ -27,10 +29,12 @@ public abstract class FoldsGenEx {
 
     /**
      * Left-fold a function over a non-empty {@link Iterable}.
-     * @param f binary operator to be applied for the fold
-     * @param iter Iterable to be folded over
-     * @param <T> iterable element type
-     * @return the folded value
+     * @param f         the binary operator to be applied for the fold
+     * @param iter      the iterable to be folded over
+     * @param <T>       the iterable element type
+     * @param <X>       the exception type
+     * @return          the folded value
+     * @throws X        the exception thrown by the operator
      */
     public static <T, X extends Exception> T foldLeft1(Op2<T, X> f, Iterable<T> iter) throws X {
         T acc = null;
@@ -52,12 +56,14 @@ public abstract class FoldsGenEx {
     /**
      *
      * Right-fold a function over an {@link List}}
-     * @param f binary function to be applied for the fold
-     * @param z starting value for the fold
-     * @param l list to fold over
-     * @param <T> list element type
-     * @param <R> result type of fold operation
-     * @return the folded value
+     * @param f         the binary function to be applied for the fold
+     * @param z         the starting value for the fold
+     * @param l         the list to fold over
+     * @param <T>       the list element type
+     * @param <R>       the result type of fold operation
+     * @param <X>       the exception type
+     * @return          the folded value
+     * @throws X        the exception thrown by the function
      */
     public static <T, R, X extends Exception> R foldRight(F2<T, R, R, X> f, R z, List<T> l) throws X {
         R acc = z;
@@ -69,10 +75,12 @@ public abstract class FoldsGenEx {
 
     /**
      * Right-fold a function over a non-empty {@link List}.
-     * @param f binary operator to be applied for the fold
-     * @param l {@code List} to fold over
-     * @param <T> list element type
-     * @return the folded value
+     * @param f         the binary operator to be applied for the fold
+     * @param l         the list to fold over
+     * @param <T>       the list element type
+     * @param <X>       the exception type
+     * @return          the folded value
+     * @throws X        the exception thrown by the operator
      */
     public static <T, X extends Exception> T foldRight1(Op2<T, X> f, List<T> l) throws X {
         final int i0 = l.size() - 1;
@@ -89,12 +97,14 @@ public abstract class FoldsGenEx {
 
     /**
      * Right-fold a function over an {@link Set}}
-     * @param f binary function to be applied for the fold
-     * @param z starting value for the fold
-     * @param s set to fold over
-     * @param <T> set element type
-     * @param <R> result type of fold operation
-     * @return the folded value
+     * @param f         the binary function to be applied for the fold
+     * @param z         the starting value for the fold
+     * @param s         the set to fold over
+     * @param <T>       the set element type
+     * @param <R>       the result type of fold operation
+     * @param <X>       the exception type
+     * @return          the folded value
+     * @throws X        the exception thrown by the function
      */
     public static <T, R, X extends Exception> R foldRight(F2<T, R, R, X> f, R z, Set<T> s) throws X {
         return foldRight(f, z, new ArrayList<T>(s));
@@ -102,10 +112,12 @@ public abstract class FoldsGenEx {
 
     /**
      * Right-fold a function over a non-empty  {@link Set}}
-     * @param f binary function to be applied for the fold
-     * @param s set to fold over
-     * @param <T> set element type
-     * @return the folded value
+     * @param f         the binary operator to be applied for the fold
+     * @param s         the set to fold over
+     * @param <T>       the set element type
+     * @param <X>       the exception type
+     * @return          the folded value
+     * @throws X        the exception thrown by the operator
      */
     public static <T, X extends Exception> T foldRight1(Op2<T, X> f, Set<T> s) throws X {
         return foldRight1(f, new ArrayList<T>(s));

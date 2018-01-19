@@ -15,6 +15,7 @@ public interface JsonCodecCore extends CodecCore<JsValue> {
      * @param val   the value to encode
      * @param <T>   the decoded value type
      * @return      the encoded value
+     * @throws Exception if the operation fails
      */
     default <T> JsValue encode(T val) throws Exception {
         return encode((Class<T>)val.getClass(), val);
@@ -26,6 +27,7 @@ public interface JsonCodecCore extends CodecCore<JsValue> {
      * @param val   the value to encode
      * @param <T>   the decoded value type
      * @return      the encoded value
+     * @throws Exception if the operation fails
      */
     default <T> JsValue encode(Class<T> type, T val) throws Exception {
         return encode(type, val, null);

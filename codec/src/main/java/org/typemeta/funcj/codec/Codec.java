@@ -19,6 +19,7 @@ public interface Codec<T, E> {
          * Check whether an encoded value represents a null value.
          * @param enc       encoded value
          * @return          true if encoded value represents a null value
+         * @throws Exception if the operation fails
          */
         boolean isNull(E enc) throws Exception;
     }
@@ -284,6 +285,7 @@ public interface Codec<T, E> {
      * @param val       the unencoded value
      * @param enc       the encoded parent value
      * @return          the encoded value
+     * @throws Exception  if the operation fails
      */
     E encode(T val, E enc) throws Exception;
 
@@ -293,6 +295,7 @@ public interface Codec<T, E> {
      * @param dynType   the dynamic type to decode into.
      * @param enc       the encoded value
      * @return          the decoded value
+     * @throws Exception  if the operation fails
      */
     default T decode(Class<T> dynType, E enc) throws Exception {
         return decode(enc);
@@ -303,6 +306,7 @@ public interface Codec<T, E> {
      * One of the two {@code decode} methods must be implemented by sub-classes.
      * @param enc       the encoded value
      * @return          the decoded value
+     * @throws Exception  if the operation fails
      */
     default T decode(E enc) throws Exception {
         throw new OperationNotImplementedException();

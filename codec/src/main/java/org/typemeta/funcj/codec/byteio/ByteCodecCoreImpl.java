@@ -15,23 +15,6 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO> implements ByteCode
 
     public ByteCodecCoreImpl() {
     }
-//
-//    private final Codec.NullCodec<ByteIO> nullCodec = new Codec.NullCodec<ByteIO>() {
-//        @Override
-//        public boolean isNull(ByteIO enc) throws Exception {
-//            throw new OperationNotImplementedException();
-//        }
-//
-//        @Override
-//        public ByteIO encode(Object val, ByteIO enc) throws Exception {
-//            return booleanCodec().encode(Boolean.TRUE, enc);
-//        }
-//
-//        @Override
-//        public Object decode(ByteIO enc) throws Exception {
-//            return booleanCodec().decode(enc);
-//        }
-//    };
 
     public <T> ByteIO encode(T val) throws Exception {
         return encode((Class<T>)val.getClass(), val);
@@ -44,7 +27,6 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO> implements ByteCode
     @Override
     public Codec.NullCodec<ByteIO> nullCodec() {
         throw new OperationNotImplementedException();
-        //return nullCodec;
     }
 
     protected final Codec.BooleanCodec<ByteIO> booleanCodec = new Codec.BooleanCodec<ByteIO>() {

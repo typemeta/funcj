@@ -35,7 +35,7 @@ public interface JsonAlg<T> {
     /**
      * Process a {@link JsString} value.
      * @param s         the {@code JsString} string value
-     * @return
+     * @return          the result of processing the value
      */
     T str(String s);
     /**

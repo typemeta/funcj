@@ -81,6 +81,7 @@ public interface CodecCore<E> {
      * @param enc       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
      * @return          the encoded value
+     * @throws Exception the exception
      */
     <T> E encode(T val, E enc) throws Exception;
 
@@ -91,6 +92,7 @@ public interface CodecCore<E> {
      * @param enc       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
      * @return          the encoded value
+     * @throws Exception the exception
      */
     <T> E encode(Class<T> type, T val, E enc) throws Exception;
 
@@ -100,6 +102,7 @@ public interface CodecCore<E> {
      * @param enc       the value to decode
      * @param <T>       the decoded value type
      * @return          the decoded value
+     * @throws Exception the exception
      */
     <T> T decode(Class<T> type, E enc) throws Exception;
 }

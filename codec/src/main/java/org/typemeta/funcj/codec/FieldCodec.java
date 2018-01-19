@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * A {@code FieldCodec} encapsulates encoding a field
  * to an encoded type {@code E}, and vice-versa.
- * @param <E> encoded type
+ * @param <E>       the encoded type
  */
 @SuppressWarnings("unchecked")
 public interface FieldCodec<E> {
@@ -501,16 +501,18 @@ public interface FieldCodec<E> {
 
     /**
      * Encode a field with an object into an encoded type {@code E}.
-     * @param obj object to which the field belongs
-     * @param enc encoded parent value
-     * @return encoded value
+     * @param obj       the object to which the field belongs
+     * @param enc       the encoded parent value
+     * @return          the encoded value
+     * @throws Exception if the operation fails
      */
     E encodeField(Object obj, E enc) throws Exception;
 
     /**
      * One of the two {@code decode} methods must be implemented by sub-classes.
-     * @param obj object to which the field belongs
-     * @param enc the encoded value
+     * @param obj       object to which the field belongs
+     * @param enc       the encoded value
+     * @throws Exception if the operation fails
      */
     void decodeField(Object obj, E enc) throws Exception;
 }

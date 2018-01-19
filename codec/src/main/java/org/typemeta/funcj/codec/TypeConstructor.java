@@ -9,7 +9,7 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * Interface for constructing an uninitialised value of type {@code T}.
- * @param <T>       type of value to be constructed
+ * @param <T>       the type of value to be constructed
  */
 @SuppressWarnings("unchecked")
 public interface TypeConstructor<T> {
@@ -18,7 +18,7 @@ public interface TypeConstructor<T> {
      * @param clazz type descriptor which conveys the type argument
      * @param <T>       the type we want a {@code TypeConstructor} for
      * @return          a {@code TypeConstructor}
-     * @throws          InstantiationException if type has no constructors
+     * @throws CodecRuntimeException if type has no constructors
      */
     static <T> TypeConstructor<T> createTypeConstructor(Class<T> clazz)
             throws CodecRuntimeException {

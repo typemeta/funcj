@@ -23,8 +23,10 @@ public abstract class FunctorsGenEx {
      * @param ts        the collection
      * @param <T>       the element type of the collection
      * @param <U>       the return type of the function
+     * @param <X>       the exception type
      * @return          a collection consisting of the results of applying the function to
      *                  each element in the input collection
+     * @throws X        the exception thrown by the function
      */
     public static <T, U, X extends Exception> List<U> map(F<T, U, X> f, Collection<T> ts) throws X {
         return unwrap(() -> ts.stream().map(wrap(f::apply)::apply).collect(toList()));
@@ -36,8 +38,10 @@ public abstract class FunctorsGenEx {
      * @param iter      the iterable
      * @param <T>       the element type of the iterable
      * @param <U>       the return type of the function
+     * @param <X>       the exception type
      * @return          a collection consisting of the results of applying the function to
      *                  each element in the input iterable
+     * @throws X        the exception thrown by the function
      */
     public static <T, U, X extends Exception> List<U> map(F<T, U, X> f, Iterable<T> iter) throws X {
         return unwrap(() -> StreamSupport.stream(
@@ -52,7 +56,9 @@ public abstract class FunctorsGenEx {
      * @param ot        the optional value
      * @param <T>       the value type within the {@code Optional}
      * @param <U>       the return type of the function
+     * @param <X>       the exception type
      * @return          an {@code Optional} that contains the result of applying the function
+     * @throws X        the exception thrown by the function
      */
     public static <T, U, X extends Exception> Optional<U> map(F<T, U, X> f, Optional<T> ot) throws X {
         return unwrap(() -> ot.map(wrap(f::apply)::apply));
@@ -65,7 +71,9 @@ public abstract class FunctorsGenEx {
      * @param to        the output array
      * @param <A>       the element type of the input array
      * @param <B>       the element type of the output array
+     * @param <X>       the exception type
      * @return          the output array
+     * @throws X        the exception thrown by the function
      */
     @SuppressWarnings("unchecked")
     public static <A, B, X extends Exception> B[] map(F<A, B, X> f, A[] from, B[] to) throws X {
@@ -93,10 +101,12 @@ public abstract class FunctorsGenEx {
      * @param <K>       the map key type
      * @param <V>       the map value type
      * @param <W>       the new map value type
+     * @param <X>       the exception type
      * @return          the new map
+     * @throws X        the exception thrown by the function
      */
     public static <K, V, W, X extends Exception> Map<K, W> map(F2<K, V, W, X> f, Map<K, V> m) throws X {
-        return unwrap(() ->
+        return Exceptions.<Map<K, W>, X>unwrap(() ->
                 Streams.tupleStream(m)
                         .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(wrap(f::apply))))
                         .collect(toMap(Tuple2::get1, Tuple2::get2))
@@ -112,10 +122,12 @@ public abstract class FunctorsGenEx {
      * @param <K>       the map key type
      * @param <V>       the map value type
      * @param <W>       the new map value type
+     * @param <X>       the exception type
      * @return          the new map
+     * @throws X        the exception thrown by the function
      */
-    public static <K, V, W, X extends Exception> SortedMap<K, W> map(F2<K, V, W, X> f, SortedMap<K, V> m) {
-        return unwrap(() ->
+    public static <K, V, W, X extends Exception> SortedMap<K, W> map(F2<K, V, W, X> f, SortedMap<K, V> m) throws X {
+        return Exceptions.<SortedMap<K, W>, X>unwrap(() ->
                 Streams.tupleStream(m)
                         .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(wrap(f::apply))))
                         .collect(toMap(Tuple2::get1, Tuple2::get2, throwingMerger(), TreeMap::new))
@@ -131,10 +143,12 @@ public abstract class FunctorsGenEx {
      * @param <K>       the map key type
      * @param <V>       the map value type
      * @param <W>       the new map value type
+     * @param <X>       the exception type
      * @return          the new map
+     * @throws X        the exception thrown by the function
      */
-    public static <K, V, W, X extends Exception> ConcurrentMap<K, W> map(F2<K, V, W, X> f, ConcurrentMap<K, V> m) {
-        return unwrap(() ->
+    public static <K, V, W, X extends Exception> ConcurrentMap<K, W> map(F2<K, V, W, X> f, ConcurrentMap<K, V> m) throws X {
+        return Exceptions.<ConcurrentMap<K, W>, X>unwrap(() ->
                 Streams.tupleStream(m)
                         .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(wrap(f::apply))))
                         .collect(toConcurrentMap(Tuple2::get1, Tuple2::get2))
@@ -150,10 +164,12 @@ public abstract class FunctorsGenEx {
      * @param <K>       the map key type
      * @param <V>       the map value type
      * @param <W>       the new map value type
+     * @param <X>       the exception type
      * @return          the new map
+     * @throws X        the exception thrown by the function
      */
-    public static <K, V, W, X extends Exception> LinkedHashMap<K, W> map(F2<K, V, W, X> f, LinkedHashMap<K, V> m) {
-        return unwrap(() ->
+    public static <K, V, W, X extends Exception> LinkedHashMap<K, W> map(F2<K, V, W, X> f, LinkedHashMap<K, V> m) throws X {
+        return Exceptions.<LinkedHashMap<K, W>, X>unwrap(() ->
                 Streams.tupleStream(m)
                         .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(wrap(f::apply))))
                         .collect(toMap(Tuple2::get1, Tuple2::get2, throwingMerger(), LinkedHashMap::new))

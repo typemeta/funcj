@@ -4,12 +4,14 @@ import org.typemeta.funcj.tuples.*;
 
 /**
  * Interfaces for composable functions that have no return type,
- * i.e. side-effects, but may throw generic exceptions.
+ * that may throw generic exceptions.
  */
 public abstract class SideEffectGenEx {
 
     /**
+     *
      * Side-effect of arity 0.
+     * @param <X>       the exception type
      */
     @FunctionalInterface
     public interface F0<X extends Exception> {
@@ -24,6 +26,7 @@ public abstract class SideEffectGenEx {
 
         /**
          * Apply this function
+         * @throws X        the exception
          */
         void apply() throws X;
     }
@@ -31,6 +34,7 @@ public abstract class SideEffectGenEx {
     /**
      * Side-effect of arity 1.
      * @param <A>       the function argument type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
     public interface F<A, X extends Exception> {
@@ -38,6 +42,7 @@ public abstract class SideEffectGenEx {
          * Static constructor.
          * @param f         the function
          * @param <A>       the function argument type
+         * @param <X>       the exception type
          * @return          the function
          */
         static <A, X extends Exception> F<A, X> of(F<A, X> f) {
@@ -47,6 +52,7 @@ public abstract class SideEffectGenEx {
         /**
          * Apply this function
          * @param a         the function argument
+         * @throws X        the exception
          */
         void apply(A a) throws X;
     }
@@ -55,6 +61,7 @@ public abstract class SideEffectGenEx {
      * Side-effect of arity 2.
      * @param <A>       the function's first argument type
      * @param <B>       the function's second argument type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
     public interface F2<A, B, X extends Exception> {
@@ -63,6 +70,7 @@ public abstract class SideEffectGenEx {
          * @param f         the function
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
+         * @param <X>       the exception type
          * @return          the function
          */
         static <A, B, X extends Exception> F2<A, B, X> of(F2<A, B, X> f) {
@@ -73,6 +81,7 @@ public abstract class SideEffectGenEx {
          * Apply this function.
          * @param a         the function's first argument
          * @param b         the function's second argument
+         * @throws X        the exception
          */
         void apply(A a, B b) throws X;
 
@@ -107,6 +116,7 @@ public abstract class SideEffectGenEx {
      * @param <A>       the function's first argument type
      * @param <B>       the function's second argument type
      * @param <C>       the function's third argument type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
     public interface F3<A, B, C, X extends Exception> {
@@ -116,6 +126,7 @@ public abstract class SideEffectGenEx {
          * @param <A>       the function's first argument type
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
+         * @param <X>       the exception type
          * @return          the function
          */
         static <A, B, C, X extends Exception> F3<A, B, C, X> of(F3<A, B, C, X> f) {
@@ -127,6 +138,7 @@ public abstract class SideEffectGenEx {
          * @param a         the function's first argument
          * @param b         the function's second argument
          * @param c         the function's third argument
+         * @throws X        the exception
          */
         void apply(A a, B b, C c) throws X;
 
@@ -164,6 +176,7 @@ public abstract class SideEffectGenEx {
      * @param <B>       the function's second argument type
      * @param <C>       the function's third argument type
      * @param <D>       the function's fourth argument type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
     public interface F4<A, B, C, D, X extends Exception> {
@@ -174,6 +187,7 @@ public abstract class SideEffectGenEx {
          * @param <B>       the function's second argument type
          * @param <C>       the function's third argument type
          * @param <D>       the function's fourth argument type
+         * @param <X>       the exception type
          * @return          the function
          */
         static <A, B, C, D, X extends Exception> F4<A, B, C, D, X> of(F4<A, B, C, D, X> f) {
@@ -186,6 +200,7 @@ public abstract class SideEffectGenEx {
          * @param b         the function's second argument
          * @param c         the function's third argument
          * @param d         the function's fourth argument
+         * @throws X        the exception
          */
         void apply(A a, B b, C c, D d) throws X;
 
@@ -227,6 +242,7 @@ public abstract class SideEffectGenEx {
      * @param <C>       the function's third argument type
      * @param <D>       the function's fourth argument type
      * @param <E>       the function's fifth argument type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
     public interface F5<A, B, C, D, E, X extends Exception> {
@@ -238,6 +254,7 @@ public abstract class SideEffectGenEx {
          * @param <C>       the function's third argument type
          * @param <D>       the function's fourth argument type
          * @param <E>       the function's fifth argument type
+         * @param <X>       the exception type
          * @return          the function
          */
         static <A, B, C, D, E, X extends Exception> F5<A, B, C, D, E, X> of(F5<A, B, C, D, E, X> f) {
@@ -251,6 +268,7 @@ public abstract class SideEffectGenEx {
          * @param c         the function's third argument
          * @param d         the function's fourth argument
          * @param e         the function's fifth argument
+         * @throws X        the exception
          */
         void apply(A a, B b, C c, D d, E e) throws X;
 
@@ -305,6 +323,7 @@ public abstract class SideEffectGenEx {
      * @param <D>       the function's fourth argument type
      * @param <E>       the function's fifth argument type
      * @param <G>       the function's sixth argument type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
     public interface F6<A, B, C, D, E, G, X extends Exception> {
@@ -317,6 +336,7 @@ public abstract class SideEffectGenEx {
          * @param <D>       the function's fourth argument type
          * @param <E>       the function's fifth argument type
          * @param <G>       the function's sixth argument type
+         * @param <X>       the exception type
          * @return          the function
          */
         static <A, B, C, D, E, G, X extends Exception> F6<A, B, C, D, E, G, X> of(F6<A, B, C, D, E, G, X> f) {
@@ -331,6 +351,7 @@ public abstract class SideEffectGenEx {
          * @param d         the function's fourth argument
          * @param e         the function's fifth argument
          * @param g         the function's sixth argument
+         * @throws X        the exception
          */
         void apply(A a, B b, C c, D d, E e, G g) throws X;
 
@@ -399,6 +420,7 @@ public abstract class SideEffectGenEx {
      * @param <E>       the function's fifth argument type
      * @param <G>       the function's sixth argument type
      * @param <H>       the function's seventh argument type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
     public interface F7<A, B, C, D, E, G, H, X extends Exception> {
@@ -412,6 +434,7 @@ public abstract class SideEffectGenEx {
          * @param <E>       the function's fifth argument type
          * @param <G>       the function's sixth argument type
          * @param <H>       the function's seventh argument type
+         * @param <X>       the exception type
          * @return          the function
          */
         static <A, B, C, D, E, G, H, X extends Exception> F7<A, B, C, D, E, G, H, X> of(F7<A, B, C, D, E, G, H, X> f) {
@@ -427,6 +450,7 @@ public abstract class SideEffectGenEx {
          * @param e         the function's fifth argument
          * @param g         the function's sixth argument
          * @param h         the function's seventh argument
+         * @throws X        the exception
          */
         void apply(A a, B b, C c, D d, E e, G g, H h) throws X;
 
@@ -510,6 +534,7 @@ public abstract class SideEffectGenEx {
      * @param <G>       the function's sixth argument type
      * @param <H>       the function's seventh argument type
      * @param <I>       the function's eighth argument type
+     * @param <X>       the exception type
      */
     @FunctionalInterface
     public interface F8<A, B, C, D, E, G, H, I, X extends Exception> {
@@ -524,6 +549,7 @@ public abstract class SideEffectGenEx {
          * @param <G>       the function's sixth argument type
          * @param <H>       the function's seventh argument type
          * @param <I>       the function's eighth argument type
+         * @param <X>       the exception type
          * @return          the function
          */
         static <A, B, C, D, E, G, H, I, X extends Exception> F8<A, B, C, D, E, G, H, I, X> of(F8<A, B, C, D, E, G, H, I, X> f) {
@@ -540,6 +566,7 @@ public abstract class SideEffectGenEx {
          * @param g         the function's sixth argument
          * @param h         the function's seventh argument
          * @param i         the function's eighth argument
+         * @throws X        the exception
          */
         void apply(A a, B b, C c, D d, E e, G g, H h, I i) throws X;
 

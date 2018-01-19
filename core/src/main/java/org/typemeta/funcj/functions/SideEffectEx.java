@@ -24,6 +24,7 @@ public abstract class SideEffectEx {
 
         /**
          * Apply this function
+         * @throws Exception the exception
          */
         void apply() throws Exception;
     }
@@ -47,6 +48,7 @@ public abstract class SideEffectEx {
         /**
          * Apply this function
          * @param a         the function argument
+         * @throws Exception the exception
          */
         void apply(A a) throws Exception;
     }
@@ -73,6 +75,7 @@ public abstract class SideEffectEx {
          * Apply this function.
          * @param a         the function's first argument
          * @param b         the function's second argument
+         * @throws Exception the exception
          */
         void apply(A a, B b) throws Exception;
 
@@ -127,6 +130,7 @@ public abstract class SideEffectEx {
          * @param a         the function's first argument
          * @param b         the function's second argument
          * @param c         the function's third argument
+         * @throws Exception the exception
          */
         void apply(A a, B b, C c) throws Exception;
 
@@ -186,6 +190,7 @@ public abstract class SideEffectEx {
          * @param b         the function's second argument
          * @param c         the function's third argument
          * @param d         the function's fourth argument
+         * @throws Exception the exception
          */
         void apply(A a, B b, C c, D d) throws Exception;
 
@@ -251,6 +256,7 @@ public abstract class SideEffectEx {
          * @param c         the function's third argument
          * @param d         the function's fourth argument
          * @param e         the function's fifth argument
+         * @throws Exception the exception
          */
         void apply(A a, B b, C c, D d, E e) throws Exception;
 
@@ -331,6 +337,7 @@ public abstract class SideEffectEx {
          * @param d         the function's fourth argument
          * @param e         the function's fifth argument
          * @param g         the function's sixth argument
+         * @throws Exception the exception
          */
         void apply(A a, B b, C c, D d, E e, G g) throws Exception;
 
@@ -427,6 +434,7 @@ public abstract class SideEffectEx {
          * @param e         the function's fifth argument
          * @param g         the function's sixth argument
          * @param h         the function's seventh argument
+         * @throws Exception the exception
          */
         void apply(A a, B b, C c, D d, E e, G g, H h) throws Exception;
 
@@ -540,6 +548,7 @@ public abstract class SideEffectEx {
          * @param g         the function's sixth argument
          * @param h         the function's seventh argument
          * @param i         the function's eighth argument
+         * @throws Exception the exception
          */
         void apply(A a, B b, C c, D d, E e, G g, H h, I i) throws Exception;
 
