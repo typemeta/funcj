@@ -12,7 +12,7 @@
     </parent>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>A database query framework.</description>
+    <description>A parser and algebra for JSON values</description>
     <url>https://github.com/typemeta/funcj/query</url>
 
     <packaging>jar</packaging>
