@@ -7,7 +7,10 @@ import org.typemeta.funcj.functions.Functions.F;
 
 import java.time.*;
 
-public class Codecs {
+/**
+ * Factory methods for creating CodecCore instances.
+ */
+public abstract class Codecs {
 
     /**
      * Construct and return a new instance of a {@link JsonCodecCore}.

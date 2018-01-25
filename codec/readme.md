@@ -368,3 +368,27 @@ jsonCodecCore.registerCodec(
         ZonedDateTime.class,
         new ZonedDateTimeJsonCodec(jsonCodecCore));
 ```
+
+# Supported Types
+
+The framework comes with support for the following types:
+
+* Primitive Java types - `boolean`, `byte`, `char`, `short`, `int`, `long`, `float` & `double`.
+* Arrays of primitives - `boolean[]`, `byte[]`, `char[]`, `short[]`, `int[]`, `long[]`, `float[]` & `double[]`.
+* Object arrays - `T[]`.
+* `String`.
+* Collections - `Set`, `List` & `Map`. Note: `Map<String, T>` is handled as a special case.
+* `Enum` types.
+* `null` values.
+
+`CodecCore` instances created using the `Codecs` class
+will also contain pre-registered codecs for the following types:
+
+* The Java `Class` type.
+* Java 8 date/time types - `LocalDate`, `LocalTime`, `LocalDateTime`, `ZoneId`, `ZoneOffset`,
+`OffsetTime`, `OffsetDateTime`, & `ZonedDateTime`.
+
+For any classes encountered by the framework that it doesn't recognise,
+it will introspect the class structure in order to create an object codec for that type.
+The class will need to have an empty constructor.
+The resultant codec is then cached and re-used for subsequent occurrences of that class.
