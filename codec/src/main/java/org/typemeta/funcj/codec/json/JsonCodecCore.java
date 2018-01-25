@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.CodecCore;
+import org.typemeta.funcj.codec.CodecCoreIntl;
 import org.typemeta.funcj.json.model.JsValue;
 
 /**
@@ -8,7 +8,7 @@ import org.typemeta.funcj.json.model.JsValue;
  * via the {@link JsValue} representation for JSON values.
  */
 @SuppressWarnings("unchecked")
-public interface JsonCodecCore extends CodecCore<JsValue> {
+public interface JsonCodecCore extends CodecCoreIntl<JsValue> {
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.

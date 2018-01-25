@@ -3,7 +3,7 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.functions.Functions;
 
 /**
- * Interface for classes which implement an encoding into a specific target type {@code E}.
+ * Interface for classes which providing an encoding into a specific target type {@code E}.
  * Unlike {@link Codec}, which can only encode a single type,
  * {@code CodecCore} implementations will handle any type.
  * @param <E>       the encoded type

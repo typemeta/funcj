@@ -6,7 +6,6 @@ import org.typemeta.funcj.functions.Functions;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -15,7 +14,7 @@ import static java.util.stream.Collectors.toList;
  * @param <E> the encoded type
  */
 @SuppressWarnings("unchecked")
-public abstract class BaseCodecCore<E> implements CodecCore<E> {
+public abstract class BaseCodecCore<E> implements CodecCoreIntl<E> {
 
     /**
      * A map from class name to {@code Codec}, associating a class with its {@code Codec}.
@@ -106,10 +105,12 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
      * @param clazz the class
      * @return the class name
      */
+    @Override
     public String classToName(Class<?> clazz) {
         return clazz.getName();
     }
 
+    @Override
     public <X> Class<X> remapType(Class<X> type) {
         final String typeName = classToName(type);
         if (typeProxyRegistry.containsKey(typeName)) {
@@ -119,6 +120,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         }
     }
 
+    @Override
     public <T> Class<T> nameToClass(String name) throws CodecException {
         try {
             return (Class<T>) Class.forName(name);
@@ -127,6 +129,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         }
     }
 
+    @Override
     public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
         final String name = classToName(clazz);
         return (TypeConstructor<T>) typeCtorRegistry.computeIfAbsent(
@@ -134,6 +137,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
                 n -> TypeConstructor.createTypeConstructor(clazz));
     }
 
+    @Override
     public <T> Codec<T, E> makeNullSafeCodec(Codec<T, E> codec) {
         final Codec.NullCodec<E> nullCodec = nullCodec();
         return new Codec<T, E>() {
@@ -166,44 +170,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         };
     }
 
-    public abstract Codec.NullCodec<E> nullCodec();
-
-    public abstract Codec.BooleanCodec<E> booleanCodec();
-
-    public abstract Codec<boolean[], E> booleanArrayCodec();
-
-    public abstract Codec.ByteCodec<E> byteCodec();
-
-    public abstract Codec<byte[], E> byteArrayCodec();
-
-    public abstract Codec.CharCodec<E> charCodec();
-
-    public abstract Codec<char[], E> charArrayCodec();
-
-    public abstract Codec.ShortCodec<E> shortCodec();
-
-    public abstract Codec<short[], E> shortArrayCodec();
-
-    public abstract Codec.IntCodec<E> intCodec();
-
-    public abstract Codec<int[], E> intArrayCodec();
-
-    public abstract Codec.LongCodec<E> longCodec();
-
-    public abstract Codec<long[], E> longArrayCodec();
-
-    public abstract Codec.FloatCodec<E> floatCodec();
-
-    public abstract Codec<float[], E> floatArrayCodec();
-
-    public abstract Codec.DoubleCodec<E> doubleCodec();
-
-    public abstract Codec<double[], E> doubleArrayCodec();
-
-    public abstract Codec<String, E> stringCodec();
-
-    public abstract <EM extends Enum<EM>> Codec<EM, E> enumCodec(Class<? super EM> enumType);
-
+    @Override
     public <K, V> Codec<Map<K, V>, E> mapCodec(Class<K> keyType, Class<V> valType)  {
         final Codec<V, E> valueCodec = dynamicCodec(valType);
         if (String.class.equals(keyType)) {
@@ -214,28 +181,12 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         }
     }
 
-    public abstract <V> Codec<Map<String, V>, E> mapCodec(Codec<V, E> valueCodec);
-
-    public abstract <K, V> Codec<Map<K, V>, E> mapCodec(
-            Codec<K, E> keyCodec,
-            Codec<V, E> valueCodec);
-
-    public abstract <T> Codec<Collection<T>, E> collCodec(
-            Class<T> elemType,
-            Codec<T, E> elemCodec);
-
-    public abstract <T> Codec<T[], E> objectArrayCodec(
-            Class<T> elemType,
-            Codec<T, E> elemCodec);
-
+    @Override
     public Codec<Object, E> dynamicCodec() {
         return dynamicCodec(Object.class);
     }
 
-    public abstract <T> Codec<T, E> dynamicCodec(Class<T> stcType);
-
-    public abstract <T> Codec<T, E> dynamicCodec(Codec<T, E> codec, Class<T> stcType);
-
+    @Override
     public <T> Codec<T, E> getNullSafeCodec(Class<T> type) {
         return makeNullSafeCodec(getNullUnsafeCodec(type));
     }
@@ -252,7 +203,8 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
      * @param <T>       the raw type to be encoded/decoded
      * @return          the {@code Codec} for the specified name
      */
-    protected <T> Codec<T, E> getCodec(String name, Functions.F0<Codec<T, E>> codecSupp) {
+    @Override
+    public <T> Codec<T, E> getCodec(String name, Functions.F0<Codec<T, E>> codecSupp) {
         // First attempt, without locking.
         if (codecRegistry.containsKey(name)) {
             return (Codec<T, E>)codecRegistry.get(name);
@@ -276,12 +228,14 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         }
     }
 
+    @Override
     public <T> Codec<T, E> getNullUnsafeCodec(Class<T> type) {
         final Class<T> type2 = remapType(type);
         final String name = classToName(type2);
         return getCodec(name, () -> getNullUnsafeCodecImplDyn(type2));
     }
 
+    @Override
     public <T> Codec<T, E> getNullUnsafeCodecImplDyn(Class<T> dynType) {
         final Codec<T, E> codec = getNullUnsafeCodecImpl(dynType);
         if (codec == null) {
@@ -291,6 +245,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         }
     }
 
+    @Override
     public <T> Codec<T, E> getNullUnsafeCodecImplStc(Class<T> stcType) {
         final Codec<T, E> codec = getNullUnsafeCodecImpl(stcType);
         if (codec == null) {
@@ -305,6 +260,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         }
     }
 
+    @Override
     public <T> Codec<T, E> getNullUnsafeCodecImpl(Class<T> type) {
         if (type.isPrimitive()) {
             if (type.equals(boolean.class)) {
@@ -407,6 +363,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         }
     }
 
+    @Override
     public <T> Codec<T, E> createObjectCodec(Class<T> type) {
         final Map<String, FieldCodec<E>> fieldCodecs = new LinkedHashMap<>();
         Class<?> clazz = type;
@@ -425,27 +382,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         return createObjectCodec(fieldCodecs);
     }
 
-    public static abstract class ObjectMeta<T, E, RA extends ObjectMeta.ResultAccumlator<T>>
-            implements Iterable<ObjectMeta.Field<T, E, RA>> {
-        public interface ResultAccumlator<T> {
-            T construct();
-        }
-
-        public interface Field<T, E, RA> {
-            String name();
-            E encodeField(T val, E enc) throws Exception;
-            RA decodeField(RA acc, E enc) throws Exception;
-        }
-
-        public abstract RA startDecode(Class<T> type) throws CodecException;
-
-        public Stream<Field<T, E, RA>> stream() {
-            return StreamSupport.stream(spliterator(), false);
-        }
-
-        public abstract int size();
-    }
-
+    @Override
     public <T> Codec<T, E> createObjectCodec(Map<String, FieldCodec<E>> fieldCodecs) {
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final T val;
@@ -503,10 +440,12 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         });
     }
 
+    @Override
     public <T> ObjectCodecBuilder<T, E> objectCodec(Class<T> clazz) {
         return new ObjectCodecBuilder<T, E>(this);
     }
 
+    @Override
     public <T> ObjectCodecBuilder<T, E> objectCodecDeferredRegister(Class<T> clazz) {
         return new ObjectCodecBuilder<T, E>(this) {
             @Override
@@ -517,6 +456,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         };
     }
 
+    @Override
     public <T> Codec<T, E> createObjectCodec(
             Map<String, ObjectCodecBuilder.FieldCodec<T, E>> fieldCodecs,
             Functions.F<Object[], T> ctor) {
@@ -577,8 +517,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         });
     }
 
-    public abstract <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, E> createObjectCodec(ObjectMeta<T, E, RA> objMeta);
-
+    @Override
     public String getFieldName(Field field, int depth, Set<String> existingNames) {
         String name = field.getName();
         while (existingNames.contains(name)) {
@@ -587,6 +526,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         return name;
     }
 
+    @Override
     public <T> FieldCodec<E> getFieldCodec(Field field) {
         final Class<T> stcType = (Class<T>)field.getType();
         if (stcType.isPrimitive()) {
@@ -679,6 +619,7 @@ public abstract class BaseCodecCore<E> implements CodecCore<E> {
         }
     }
 
+    @Override
     public <T> Codec<T, E> dynamicCheck(Codec<T, E> codec, Class<T> stcType) {
         if (Modifier.isFinal(stcType.getModifiers())) {
             return codec;

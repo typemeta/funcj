@@ -1,14 +1,12 @@
 package org.typemeta.funcj.codec.byteio;
 
-import org.typemeta.funcj.codec.CodecCore;
-import org.typemeta.funcj.json.model.JsValue;
+import org.typemeta.funcj.codec.CodecCoreIntl;
 
 /**
- * Interface for classes which implement an encoding into JSON,
- * via the {@link JsValue} representation for JSON values.
+ * Interface for classes which implement an encoding into a byte stream.
  */
 @SuppressWarnings("unchecked")
-public interface ByteCodecCore extends CodecCore<ByteIO> {
+public interface ByteCodecCore extends CodecCoreIntl<ByteIO> {
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.

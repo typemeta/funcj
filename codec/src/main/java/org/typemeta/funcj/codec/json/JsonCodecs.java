@@ -16,7 +16,7 @@ public class JsonCodecs {
 
     public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, JsValue> {
 
-        protected OptionalCodec(BaseCodecCore<JsValue> core) {
+        protected OptionalCodec(CodecCoreIntl<JsValue> core) {
             super(core);
         }
 

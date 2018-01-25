@@ -12,7 +12,7 @@ public class ByteCodecs {
     }
     public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, ByteIO> {
 
-        protected OptionalCodec(BaseCodecCore<ByteIO> core) {
+        protected OptionalCodec(CodecCoreIntl<ByteIO> core) {
             super(core);
         }
 

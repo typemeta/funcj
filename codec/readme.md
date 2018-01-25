@@ -4,18 +4,21 @@
 
 # Introduction
 
-**funcj.codec** is a Java framework for round-tripping Java data via a structured data formats such as JSON and XML, as well as byte streams.
-It can serialise Java object graphs into serialised form,
-and can deserialise the data to reconstruct the original Java values.
+**funcj.codec** is a Java framework for round-tripping Java data via a structured data formats
+such as JSON and XML, as well as byte streams.
+It can encode Java object graphs into an encoded form,
+and can then decode the data to reconstruct the original Java values.
 
 ## Features
 
-* Supports serialisation via JSON, XML, and byte streams. Can be extended to support further formats.
-* Serialisation is driven by Reflection, consequently the serialised form mirrors the structure of the Java data.
-  * Static type information is used where possible to reduce the amount of type metadata present in the serialised data.
+* Supports encoding via JSON, XML, and byte streams. Can be extended to support further formats.
+* Encoding is driven by Reflection,
+consequently the encoded form mirrors the structure of the original Java data.
+  * Static type information is used where possible to reduce the amount of type metadata present in the encoded data.
 * Custom codecs can be registered with the framework, to handle awkward types,
-or to simply override the default serialisation provided by the framework.
+or to simply override the default encoding provided by the framework.
   * A fluent API is provided to simplify the creation of custom codecs.
+  * Custom codecs are generally agnostic to a specific encoding, meaning they can be re-used for all encoding types.
 * The framework is thread-safe.
 
 ## Limitations
@@ -48,7 +51,7 @@ Add this dependency to your project pom.xml:
 
 ## Example
 
-First some sample types we want to serialise:
+First some sample types we want to encode:
 
 ```java
 enum Colour {RED, GREEN, BLUE}
@@ -96,16 +99,16 @@ To round trip the data via JSON:
 ```java
 final JsonCodecCore codec = Codecs.jsonCodec();
 
-// Serialise to JSON.
+// Encode to JSON.
 final JSValue json = codec.encode(person);
 System.out.println(json.toString(40));
 
-// Deserialise back to Java.
+// Decode back to Java.
 final Person person2 = codec.decode(Person.class, json);
 assert(person.equals(person2));
 ```
 
-The serialised JSON then looks like this:
+The encoded JSON then looks like this:
 
 ```json
 {
@@ -138,10 +141,20 @@ The serialised JSON then looks like this:
 }
 ```
 
+A few things to note:
+
+* The encoded form mirrors the structure of the Java data.
+* For most fields type information is not required,
+as the framework will use the static type information.
+* A couple of fields have extra type metadata.
+In these cases the dynamic type of the value (e.g. `HashSet`)
+is different to the static type (e.g. `Set`),
+hence the extra type metadata is included in the encoded representation.
+
 ### XML
 
-If, instead, we want to serialise via XML,
-then since it's XML there's a little more ceremony,
+If, instead, we want to encode as XML,
+then as it's XML there's a little more ceremony,
 but the basics are the same:
 
 ```java
@@ -153,11 +166,11 @@ final Document doc =
                 .newDocumentBuilder()
                 .newDocument();
 
-// Serialise to XML.
+// Encode to XML.
 final Element elem = codec.encode(Person.class, person, doc.createElement("person"));
 System.out.println(XmlUtils.nodeToString(elem, true));
 
-// Deserialise back to Java.
+// Decode back to Java.
 final Person person2 = codec.decode(Person.class, elem);
 assert(person.equals(person2));
 ```
@@ -200,10 +213,25 @@ and the resultant XML is as follows:
 
 The framework allows custom codecs to be registered to override the default behaviour.
 
+Custom codecs can be agnostic to the codec implementation encoding,
+meaning the same custom codec can be used for JSON, XML, byte streams, etc.
+Alternatively a custom codec can target a specific encoding.
+
 #### Custom Codec Builder
 
-If, for example, we want to override how the `ZonedDateTime` type is serialised,
-to serialise it as a `String`,
+The simplest way to define a custom codec is to call `CodecCore.registerCodec`,
+and pass it the class value for the type in question. 
+This returns a `ObjectCodecBuilder`,
+which has a fluent API for defining custom codecs.
+You first call `field` for each field comprising the class,
+supplying the field name, a getter for the field,
+and either a codec,
+or a class value (which is used to look up the appropriate codec).
+Finally call `map` with the method which,
+given the field values, will constuct an instance of the type.
+
+For example, if we want to override how the `ZonedDateTime` type is encoded,
+to encode it as a `String`,
 we can do so like this:
 
 ```java
@@ -212,7 +240,7 @@ codec.registerCodec(ZonedDateTime.class)
         .map(ZonedDateTime::parse);
 ```
 
-The serialised results are then:
+The encoded results are then:
 
 ```json
 {
@@ -256,7 +284,13 @@ core.registerCodec(ZonedDateTime.class)
 
 #### StringProxyCodec
 
-Alternatively, we can use `StringProxyCodec` to encode the `ZonedDateTime` as a `String`:
+If you simply want to encode a type as a string value,
+then you can use a `StringProxyCodec`.
+To do so, call `CodecCore.registerStringProxyCodec` and provide
+the type class, a function which converts the value to a string,
+and a function which constructs the value from a string.
+ 
+For example, to encode the `ZonedDateTime` as a `String`:
 
 ```java
 codec.registerStringProxyCodec(
@@ -265,7 +299,7 @@ codec.registerStringProxyCodec(
         ZonedDateTime::parse);
 ```
 
-The serialised results are then:
+The encoded results are then:
 
 ```json
 {
@@ -291,4 +325,46 @@ and:
         <elem>BLUE</elem>
     </favColours>
 </person>
+```
+
+#### Custom Codec Direct Implementation
+
+The third way to define a custom codec is to write a class that implements the `Codec` interface.
+As the codec is dealing directly with the underlying encoding - e.g. JSON values,
+it has to be specialised for a specific encoding.
+
+For example, a custom JSON codec for the `ZonedDateTime` could be written as follows:
+
+```java
+class ZonedDateTimeJsonCodec extends Codecs.CodecBase<ZonedDateTime, JsValue> {
+
+    public ZonedDateTimeJsonCodec(JsonCodecCore core) {
+        super(core);
+    }
+
+    @Override
+    public JsValue encode(ZonedDateTime val, JsValue enc) {
+        return JSAPI.obj(
+                JSAPI.field("dateTime", core.encode(val.toLocalDateTime(), enc)),
+                JSAPI.field("zone", core.encode(val.getZone(), enc)),
+                JSAPI.field("offset", core.encode(val.getOffset(), enc)));
+    }
+
+    @Override
+    public ZonedDateTime decode(JsValue enc) {
+        final JsObject obj = enc.asObject();
+        return ZonedDateTime.ofLocal(
+                core.decode(LocalDateTime.class, obj.get("dateTime")),
+                core.decode(ZoneId.class, obj.get("zone")),
+                core.decode(ZoneOffset.class, obj.get("offset")));
+    }
+}
+```
+
+and registered like this:
+
+```java
+jsonCodecCore.registerCodec(
+        ZonedDateTime.class,
+        new ZonedDateTimeJsonCodec(jsonCodecCore));
 ```
