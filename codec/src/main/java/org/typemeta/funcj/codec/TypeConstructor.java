@@ -20,7 +20,7 @@ public interface TypeConstructor<T> {
      * @return          a {@code TypeConstructor}
      * @throws CodecRuntimeException if type has no constructors
      */
-    static <T> TypeConstructor<T> createTypeConstructor(Class<T> clazz)
+    static <T> TypeConstructor<T> create(Class<T> clazz)
             throws CodecRuntimeException {
         // Get the empty-arg constructors.
         final List<Constructor<T>> ctors =

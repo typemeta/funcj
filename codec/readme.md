@@ -11,7 +11,10 @@ and can then decode the data to reconstruct the original Java values.
 
 ## Features
 
+* Encodes objects based the field members that comprise them.
 * Supports encoding via JSON, XML, and byte streams. Can be extended to support further formats.
+* Should round-trip data perfectly, meaning that for example,
+a `TreeMap` will be reconstructed as the same type (and not as a `HashMap`).
 * Encoding is driven by Reflection,
 consequently the encoded form mirrors the structure of the original Java data.
   * Static type information is used where possible to reduce the amount of type metadata present in the encoded data.
@@ -282,6 +285,8 @@ core.registerCodec(ZonedDateTime.class)
         .map(ZonedDateTime::ofLocal);
 ```
 
+Note that the same custom codec can be used for any encoding format.
+
 #### StringProxyCodec
 
 If you simply want to encode a type as a string value,
@@ -329,8 +334,8 @@ and:
 
 #### Custom Codec Direct Implementation
 
-The third way to define a custom codec is to write a class that implements the `Codec` interface.
-As the codec is dealing directly with the underlying encoding - e.g. JSON values,
+The third way to define a custom codec is to define a class that implements the `Codec` interface.
+As the codec is dealing directly with the underlying encoding - e.g. JSON,
 it has to be specialised for a specific encoding.
 
 For example, a custom JSON codec for the `ZonedDateTime` could be written as follows:
@@ -369,7 +374,9 @@ jsonCodecCore.registerCodec(
         new ZonedDateTimeJsonCodec(jsonCodecCore));
 ```
 
-# Supported Types
+# Reference
+
+## Supported Types
 
 The framework comes with support for the following types:
 
@@ -377,7 +384,12 @@ The framework comes with support for the following types:
 * Arrays of primitives - `boolean[]`, `byte[]`, `char[]`, `short[]`, `int[]`, `long[]`, `float[]` & `double[]`.
 * Object arrays - `T[]`.
 * `String`.
-* Collections - `Set`, `List` & `Map`. Note: `Map<String, T>` is handled as a special case.
+* Collections
+  * `Map` and  `Map<String, T>` are handled as special cases.
+  * All other collections types are treat as a generic sequence of values.
+  *  Note that for all collection types,
+    the name of the specific implementation type (e.g. `HashSet` and `TreeMap`),
+    is encoded if necessary, allowing the original collection value to be reconstructed.
 * `Enum` types.
 * `null` values.
 
@@ -388,7 +400,17 @@ will also contain pre-registered codecs for the following types:
 * Java 8 date/time types - `LocalDate`, `LocalTime`, `LocalDateTime`, `ZoneId`, `ZoneOffset`,
 `OffsetTime`, `OffsetDateTime`, & `ZonedDateTime`.
 
+## Object Codecs
+
 For any classes encountered by the framework that it doesn't recognise,
 it will introspect the class structure in order to create an object codec for that type.
-The class will need to have an empty constructor.
-The resultant codec is then cached and re-used for subsequent occurrences of that class.
+For each non-static, non-transient field found in the class, and its parents,
+the codec for that type will be fetched (or created).
+The codec for the class is then a composition of the codecs for its constituent fields.
+
+If the class does not have an empty constructor,
+or if the system `SecurityManager` prevents access to said constructore or its fields,
+then creation of the codec will fail.
+
+If successfully created,
+the resultant codec is then cached and re-used for any subsequent occurrences of that class.

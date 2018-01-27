@@ -134,7 +134,7 @@ public abstract class BaseCodecCore<E> implements CodecCoreIntl<E> {
         final String name = classToName(clazz);
         return (TypeConstructor<T>) typeCtorRegistry.computeIfAbsent(
                 name,
-                n -> TypeConstructor.createTypeConstructor(clazz));
+                n -> TypeConstructor.create(clazz));
     }
 
     @Override
