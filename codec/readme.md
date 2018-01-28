@@ -11,13 +11,13 @@ and can then decode the data to reconstruct the original Java values.
 
 ## Features
 
-* Encodes objects based the field members that comprise them.
 * Supports encoding via JSON, XML, and byte streams. Can be extended to support further formats.
 * Should round-trip data perfectly, meaning that for example,
 a `TreeMap` will be reconstructed as the same type (and not as a `HashMap`).
-* Encoding is driven by Reflection,
+* Encoding is driven by reflecting over the field memebers that comprise each class,
 consequently the encoded form mirrors the structure of the original Java data.
-  * Static type information is used where possible to reduce the amount of type metadata present in the encoded data.
+  * Static type information is used where possible
+to reduce the amount of type metadata present in the encoded data.
 * Custom codecs can be registered with the framework, to handle awkward types,
 or to simply override the default encoding provided by the framework.
   * A fluent API is provided to simplify the creation of custom codecs.
@@ -26,6 +26,7 @@ or to simply override the default encoding provided by the framework.
 
 ## Limitations
 
+* Does not, currently, handle object graphs with loops.
 * The design favours flexibility over performance.
 
 # Getting Started
@@ -82,7 +83,7 @@ static class Person {
 
     @Override
     public boolean equals(Object o) {
-        // Implementation elided.
+        // Implementation elided for brevity.
     }
 }
 
@@ -102,12 +103,14 @@ To round trip the data via JSON:
 ```java
 final JsonCodecCore codec = Codecs.jsonCodec();
 
-// Encode to JSON.
+// Encode Person to JSON.
 final JSValue json = codec.encode(person);
-System.out.println(json.toString(40));
+System.out.println(JsonToDoc.toString(json, 40));
 
 // Decode back to Java.
 final Person person2 = codec.decode(Person.class, json);
+
+// Assert the round-tripped value matches the original.
 assert(person.equals(person2));
 ```
 
@@ -163,18 +166,21 @@ but the basics are the same:
 ```java
 final XmlCodecCore codec = Codecs.xmlCodec();
 
+// Create an XML Document object.
 final Document doc =
         DocumentBuilderFactory
                 .newInstance()
                 .newDocumentBuilder()
                 .newDocument();
 
-// Encode to XML.
+// Encode Person to XML.
 final Element elem = codec.encode(Person.class, person, doc.createElement("person"));
 System.out.println(XmlUtils.nodeToString(elem, true));
 
 // Decode back to Java.
 final Person person2 = codec.decode(Person.class, elem);
+
+// Assert the round-tripped value matches the original.
 assert(person.equals(person2));
 ```
 
