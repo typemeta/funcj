@@ -11,7 +11,7 @@
   - [Example](#example)
     - [JSON](#json)
     - [XML](#xml)
-    - [Custom Codecs](#xxxx)
+    - [Custom Codecs](#custom-codecs)
       - [Custom Codec Builder](#custom-codec-builder)
       - [StringProxyCodec](#stringproxycodec)
       - [Custom Codec Direct Implementation](#custom-codec-direct-implementation)
@@ -19,7 +19,7 @@
   - [Supported Types](#supported-types)
   - [Object Codecs](#object-codecs)
 - [FAQ](#faq)
-  -[Why not Jackson?](#why-not-jackson%3F)
+  -[Why not Jackson?](#why-not-jackson%)
 
 # Introduction
 
