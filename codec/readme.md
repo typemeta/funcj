@@ -2,6 +2,25 @@
 
 ![funcj.codec](https://github.com/typemeta/funcj/blob/master/codec/resources/funcj-codec.png)
 
+- [Introduction](#introduction)
+  - [Features](#features)
+- [Getting Started](#getting-started)
+  - [Requirements](#requirements)
+  - [Resources](#resources)
+  - [Maven](#maven)
+  - [Example](#example)
+    - [JSON](#json)
+    - [XML](#xml)
+    - [Custom Codecs](#xxxx)
+      - [Custom Codec Builder](#custom-codec-builder)
+      - [StringProxyCodec](#stringproxycodec)
+      - [Custom Codec Direct Implementation](#custom-codec-direct-implementation)
+- [Reference](#reference)
+  - [Supported Types](#supported-types)
+  - [Object Codecs](#object-codecs)
+- [FAQ](#faq)
+  -[Why not Jackson?](#why-not-jackson%3F)
+
 # Introduction
 
 **funcj.codec** is a Java framework for round-tripping Java data via a structured data formats
@@ -221,7 +240,7 @@ and the resultant XML is as follows:
 </person>
 ```
 
-### Custom Codec
+### Custom Codecs
 
 The framework allows custom codecs to be registered to override the default behaviour.
 
@@ -435,7 +454,7 @@ The caching takes place within the `CodecCore` implementation object.
 
 # FAQ
 
-## What does funcj.codec do that Jackson can't do.
+## Why not Jackson?
 
 I was motivated to write this library after numerous failed attempts
 getting Jackson to serialise/deserialise classes based on their fields,
