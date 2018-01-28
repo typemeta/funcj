@@ -14,7 +14,11 @@ and can then decode the data to reconstruct the original Java values.
 * Supports encoding via JSON, XML, and byte streams. Can be extended to support further formats.
 * Should round-trip data perfectly, meaning that for example,
 a `TreeMap` will be reconstructed as the same type (and not as a `HashMap`).
-* Encoding is driven by reflecting over the field memebers that comprise each class,
+* The framework is thread-safe.
+* The framework is relatively non-invasive - the only requirement imposed on your types are that they contain a default constructor -
+one that takes no arguments (the constructor can be private).
+  * Note, this requirement can be bypassed by providing a custom codec for the class.
+* Encoding is driven by reflecting over the field members that comprise each class,
 consequently the encoded form mirrors the structure of the original Java data.
   * Static type information is used where possible
 to reduce the amount of type metadata present in the encoded data.
@@ -22,12 +26,11 @@ to reduce the amount of type metadata present in the encoded data.
 or to simply override the default encoding provided by the framework.
   * A fluent API is provided to simplify the creation of custom codecs.
   * Custom codecs are generally agnostic to a specific encoding, meaning they can be re-used for all encoding types.
-* The framework is thread-safe.
+
 
 ## Limitations
 
 * Does not, currently, handle object graphs with loops.
-* The design favours flexibility over performance.
 
 # Getting Started
 
@@ -150,12 +153,12 @@ The encoded JSON then looks like this:
 A few things to note:
 
 * The encoded form mirrors the structure of the Java data.
-* For most fields type information is not required,
+* For most fields type information is not required in the encoded representation,
 as the framework will use the static type information.
-* A couple of fields have extra type metadata.
+  * However a couple of fields do have extra type metadata.
 In these cases the dynamic type of the value (e.g. `HashSet`)
 is different to the static type (e.g. `Set`),
-hence the extra type metadata is included in the encoded representation.
+hence the extra type metadata is included in the encoded form.
 
 ### XML
 
@@ -414,9 +417,39 @@ For each non-static, non-transient field found in the class, and its parents,
 the codec for that type will be fetched (or created).
 The codec for the class is then a composition of the codecs for its constituent fields.
 
-If the class does not have an empty constructor,
-or if the system `SecurityManager` prevents access to said constructore or its fields,
+For each field and it's corresonding value,
+the static type is compared to the dynamic type.
+If they are the same, then no type meta data need be encoded.
+If they are different, then the dynamic type is added to the encoding.
+
+The class must have a default constructor.
+The constructor can be private -
+the framework will attempt to temporarily disable this by calling `AccessibleObject.setAccessible`.
+If the class does not have a default constructor,
+or if the system `SecurityManager` prevents access to said constructor or the class's fields,
 then creation of the codec will fail.
 
 If successfully created,
 the resultant codec is then cached and re-used for any subsequent occurrences of that class.
+The caching takes place within the `CodecCore` implementation object.
+
+# FAQ
+
+## What does funcj.codec do that Jackson can't do.
+
+I was motivated to write this library after numerous failed attempts
+getting Jackson to serialise/deserialise classes based on their fields,
+and to round-trip data correctly,
+without heavily annotating the classes with Jackson annotations.
+
+For example, if I run the tutorial's `Person` class through the Jackson `ObjectMapper`,
+I get the following error:
+
+```
+com.fasterxml.jackson.databind.exc.InvalidDefinitionException:
+No serializer found for class org.typemeta.funcj.codec.Example$Person and no properties discovered to create BeanSerializer (to avoid exception, disable SerializationFeature.FAIL_ON_EMPTY_BEANS)
+	at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
+```
+
+
+If, as suggested, I disable the `FAIL_ON_EMPTY_BEANS` feature, then I get an empty JSON object.
