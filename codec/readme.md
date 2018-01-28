@@ -19,7 +19,7 @@
   - [Supported Types](#supported-types)
   - [Object Codecs](#object-codecs)
 - [FAQ](#faq)
-  -[Why not Jackson?](#why-not-jackson%)
+  - [Why not Jackson?](#why-not-jackson)
 
 # Introduction
 
