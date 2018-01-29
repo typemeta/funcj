@@ -406,17 +406,17 @@ jsonCodecCore.registerCodec(
 
 ## Supported Types
 
-The framework comes with support for the following types:
+The framework comes with built-in support for the following types:
 
 * Primitive Java types - `boolean`, `byte`, `char`, `short`, `int`, `long`, `float` & `double`.
 * Arrays of primitives - `boolean[]`, `byte[]`, `char[]`, `short[]`, `int[]`, `long[]`, `float[]` & `double[]`.
 * Object arrays - `T[]`.
 * `String`.
 * Collections
-  * `Map` and  `Map<String, T>` are handled as special cases.
-  * All other collections types are treat as a generic sequence of values.
-  *  Note that for all collection types,
-    the name of the specific implementation type (e.g. `HashSet` and `TreeMap`),
+  * `Map<K, V>` and  `Map<String, V>` are handled as special cases.
+  * All other collections types are treated as a generic sequence of values.
+  * Note that for all collection types,
+    the name of the specific implementation type (`HashSet`, `TreeMap` etc),
     is encoded if necessary, allowing the original collection value to be reconstructed.
 * `Enum` types.
 * `null` values.
@@ -445,12 +445,12 @@ The class must have a default constructor.
 The constructor can be private -
 the framework will attempt to temporarily disable this by calling `AccessibleObject.setAccessible`.
 If the class does not have a default constructor,
-or if the system `SecurityManager` prevents access to said constructor or the class's fields,
+or if the system `SecurityManager` prevents access to said constructor or to the class's fields,
 then creation of the codec will fail.
 
 If successfully created,
-the resultant codec is then cached and re-used for any subsequent occurrences of that class.
-The caching takes place within the `CodecCore` implementation object.
+the resultant codec is then cached within the `CodecCore` instance,
+and re-used for any subsequent occurrences of that class.
 
 # FAQ
 
