@@ -31,9 +31,10 @@ and can then decode the data to reconstruct the original Java values.
 ## Features
 
 * Supports encoding via JSON, XML, and byte streams. Can be extended to support further formats.
+* Supports primitive types, generics, collections, Optionals, as well as any Java class using field-based Reflection.
 * Should round-trip data perfectly, meaning that for example,
 a `TreeMap` will be reconstructed as the same type (and not as a `HashMap`).
-* The framework is thread-safe.
+* Is thread-safe.
 * The framework is relatively non-invasive - the only requirement imposed on your types are that they contain a default constructor -
 one that takes no arguments (the constructor can be private).
   * Note, this requirement can be bypassed by providing a custom codec for the class.
@@ -45,7 +46,6 @@ to reduce the amount of type metadata present in the encoded data.
 or to simply override the default encoding provided by the framework.
   * A fluent API is provided to simplify the creation of custom codecs.
   * Custom codecs are generally agnostic to a specific encoding, meaning they can be re-used for all encoding types.
-
 
 ## Limitations
 
