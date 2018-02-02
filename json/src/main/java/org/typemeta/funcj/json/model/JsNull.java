@@ -14,6 +14,11 @@ public enum JsNull implements JsValue {
     }
 
     @Override
+    public Type type() {
+        return Type.NULL;
+    }
+
+    @Override
     public <T> T match(
             Functions.F<JsNull, T> fNull,
             Functions.F<JsBool, T> fBool,

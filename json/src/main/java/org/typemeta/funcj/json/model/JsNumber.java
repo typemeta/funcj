@@ -42,6 +42,11 @@ public final class JsNumber implements JsValue {
     }
 
     @Override
+    public Type type() {
+        return Type.NUMBER;
+    }
+
+    @Override
     public <T> T match(
             Functions.F<JsNull, T> fNull,
             Functions.F<JsBool, T> fBool,

@@ -40,6 +40,11 @@ public final class JsString implements JsValue {
     }
 
     @Override
+    public Type type() {
+        return Type.STRING;
+    }
+
+    @Override
     public <T> T match(
             Functions.F<JsNull, T> fNull,
             Functions.F<JsBool, T> fBool,

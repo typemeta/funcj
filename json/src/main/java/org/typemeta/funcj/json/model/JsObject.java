@@ -126,6 +126,11 @@ public final class JsObject
     }
 
     @Override
+    public Type type() {
+        return Type.OBJECT;
+    }
+
+    @Override
     public <T> T match(
             Functions.F<JsNull, T> fNull,
             Functions.F<JsBool, T> fBool,

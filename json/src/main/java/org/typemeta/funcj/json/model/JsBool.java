@@ -25,6 +25,11 @@ public enum JsBool implements JsValue {
     }
 
     @Override
+    public Type type() {
+        return Type.BOOL;
+    }
+
+    @Override
     public <T> T match(
             Functions.F<JsNull, T> fNull,
             Functions.F<JsBool, T> fBool,

@@ -9,6 +9,18 @@ import org.typemeta.funcj.json.algebras.*;
 public interface JsValue {
 
     /**
+     * Value type enumeration.
+     */
+    enum Type {
+        ARRAY,
+        BOOL,
+        OBJECT,
+        NUMBER,
+        NULL,
+        STRING
+    }
+
+    /**
      * Pretty-print a JSON value as a JSON string.
      * @param width     the maximum line length
      * @return          the string representation of formatted JSON
@@ -25,6 +37,12 @@ public interface JsValue {
     default StringBuilder toString(StringBuilder sb) {
         return JsonToString.toString(this, sb);
     }
+
+    /**
+     * Return the type of this value.
+     * @return          the type of this value
+     */
+    Type type();
 
     /**
      * Select the one supplied function that corresponds to the type of this value,

@@ -79,6 +79,11 @@ public final class JsArray
     }
 
     @Override
+    public Type type() {
+        return Type.ARRAY;
+    }
+
+    @Override
     public <T> T match(
             Functions.F<JsNull, T> fNull,
             Functions.F<JsBool, T> fBool,
