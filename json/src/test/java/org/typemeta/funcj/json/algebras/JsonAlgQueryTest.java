@@ -2,7 +2,6 @@ package org.typemeta.funcj.json.algebras;
 
 import org.junit.Test;
 import org.typemeta.funcj.algebra.*;
-import org.typemeta.funcj.json.model.JsonAlg;
 
 import java.util.*;
 
