@@ -12,7 +12,7 @@
     </parent>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>An algebra and Java codec for JSON values, using JSON-P</description>
+    <description>An algebra and Java codec for JSON values, using json streaming</description>
     <url>https://github.com/typemeta/funcj/query</url>
 
     <packaging>jar</packaging>
