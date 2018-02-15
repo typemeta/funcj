@@ -24,7 +24,6 @@
         <connection>scm:git:git@github.com:typemeta/${project.artifactId}.git</connection>
         <developerConnection>scm:git:git@github.com:typemeta/${project.artifactId}.git</developerConnection>
         <url>http://github.com:typemeta/${project.artifactId}/tree/master</url>
-        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
@@ -151,12 +150,12 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven-javadoc-plugin.version}</version>
                 <executions>
-                    <!--<execution>-->
-                        <!--<id>attach-javadocs</id>-->
-                        <!--<goals>-->
-                            <!--<goal>jar</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

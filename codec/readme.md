@@ -466,7 +466,7 @@ I get the following error:
 
 ```
 com.fasterxml.jackson.databind.exc.InvalidDefinitionException:
-No serializer found for class org.typemeta.funcj.codec.json.Example$Person and no properties discovered to create BeanSerializer (to avoid exception, disable SerializationFeature.FAIL_ON_EMPTY_BEANS)
+No serializer found for class org.typemeta.funcj.codec.Example$Person and no properties discovered to create BeanSerializer (to avoid exception, disable SerializationFeature.FAIL_ON_EMPTY_BEANS)
 	at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
 ```
 

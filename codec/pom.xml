@@ -15,12 +15,28 @@
     <description>A encoder/decoder framework.</description>
     <url>https://github.com/typemeta/funcj/codec</url>
 
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
-    <modules>
-        <module>core</module>
-        <module>json</module>
-        <module>jsonp</module>
-    </modules>
+    <dependencies>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>funcj-json</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.pholser</groupId>
+            <artifactId>junit-quickcheck-generators</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 
 </project>
