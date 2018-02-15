@@ -105,8 +105,13 @@ public abstract class MonoidInstances {
     };
 
     @SuppressWarnings("unchecked")
-    public static <T> Monoid<IList<T>> monoidList() {
+    public static <T> Monoid<IList<T>> monoidIList() {
         return (Monoid)monoidIList;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Monoid<List<T>> monoidList() {
+        return (Monoid)monoidList;
     }
 
     @SuppressWarnings("unchecked")
