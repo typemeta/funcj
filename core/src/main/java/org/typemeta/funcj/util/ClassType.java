@@ -50,7 +50,7 @@ public class ClassType<T> {
      * @param fail      function to be applied if the object value does not match
      * @param <S>       the object value type
      * @param <R>       the return type of both functions
-     * @return          the result of appllying either function
+     * @return          the result of applying either function
      */
     @SuppressWarnings("unchecked")
     public <S, R> R match(S value, F<T, R> success, F<S, R> fail) {
