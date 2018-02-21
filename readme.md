@@ -14,12 +14,3 @@ At present the project consists of three sub-libraries:
 * [parser](https://github.com/typemeta/funcj/tree/master/parser) - a combinator parser framework.
 * [json](https://github.com/typemeta/funcj/tree/master/json) - a parser and data model for JSON data.
 * [codec](https://github.com/typemeta/funcj/tree/master/codec) - a framework for serialising Java data.
-
-# Javadocs
-
-* [The latest RELEASE Javadocs](https://typemeta.github.io/funcj/0.6.4/apidocs/index.html)
-
-## Older versions
-
-* [0.6.3](https://typemeta.github.io/funcj/0.6.3/apidocs/index.html)
-* [0.6.2](https://typemeta.github.io/funcj/0.6.2/apidocs/index.html)
