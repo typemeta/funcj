@@ -187,7 +187,7 @@ public interface StateR<S, A> {
      * {@code Kleisli} models composable operations that return a {@code StateR}.
      * @param <S>       the state type
      * @param <A>       the input type
-     * @param <B>       the value type of the returned @{code StateR} type
+     * @param <B>       the value type of the returned {@code StateR} type
      */
     @FunctionalInterface
     interface Kleisli<S, A, B> {
@@ -196,7 +196,7 @@ public interface StateR<S, A> {
          * @param f         the function
          * @param <S>       the state type
          * @param <T>       the input type
-         * @param <U>       the value type of the returned @{code State} value
+         * @param <U>       the value type of the returned {@code State} value
          * @return          the new {@code Kleisli}
          */
         static <S, T, U> Kleisli<S, T, U> of(F<T, StateR<S, U>> f) {
