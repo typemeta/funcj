@@ -90,8 +90,8 @@ public interface Either<E, S> {
      * @return          a {@code Either} which wraps an {@link List} of values
      */
     static <E, S, T> Either<E, List<T>> traverse(List<S> ls, F<S, Either<E, T>> f) {
-        return Folds.foldRight(
-                (s, elt) -> f.apply(s).apply(elt.map(lt -> t -> {lt.add(t); return lt;})),
+        return Folds.foldLeft(
+                (elt, s) -> f.apply(s).apply(elt.map(lt -> t -> {lt.add(t); return lt;})),
                 right(new ArrayList<>(ls.size())),
                 ls
         );

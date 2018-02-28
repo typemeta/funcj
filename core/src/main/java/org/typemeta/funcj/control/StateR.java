@@ -3,8 +3,9 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
+import org.typemeta.funcj.util.Folds;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.typemeta.funcj.data.Unit.UNIT;
@@ -12,11 +13,11 @@ import static org.typemeta.funcj.data.Unit.UNIT;
 /**
  * State monad.
  * <p>
- * Each {@code State} instance is a state processor that takes a state of type {@code S},
+ * Each {@code StateR} instance is a state processor that takes a state of type {@code S},
  * and produces a new state and a result of type {@code A}.
  * The state processor is represented by the {@link StateR#runState(Object)} SAM.
  * <p>
- * Note, this {@code State} type uses recursion and will blow the stack
+ * Note, this {@code StateR} type uses recursion and will blow the stack
  * for heavily chained computations.
  * If this is an issue then use {@link State}, which avoids recursion.
  * @param <S>       the state type
@@ -26,54 +27,54 @@ import static org.typemeta.funcj.data.Unit.UNIT;
 public interface StateR<S, A> {
 
     /**
-     * A construct a {@code State} instance which leaves the input state unchanged and sets the result to a.
+     * A construct a {@code StateR} instance which leaves the input state unchanged and sets the result to a.
      * @param a         the state result value
      * @param <S>       the state type
      * @param <A>       the result type
-     * @return          the new {@code State} instance
+     * @return          the new {@code StateR} instance
      */
     static <S, A> StateR<S, A> pure(A a) {
         return st -> Tuple2.of(st, a);
     }
 
     /**
-     * Take a function provided by a {@code State} and apply it to a value in another {@code State}.
+     * Take a function provided by a {@code StateR} and apply it to a value in another {@code StateR}.
      * @param sf        the state that wraps a function type
      * @param sa        the state that wraps the function argument type
      * @param <S>       the state type
      * @param <A>       the function argument type
      * @param <B>       the function return type
-     * @return          a new {@code State} instance which contains the result of applying the function
+     * @return          a new {@code StateR} instance which contains the result of applying the function
      */
     static <S, A, B> StateR<S, B> ap(StateR<S, F<A, B>> sf, StateR<S, A> sa) {
         return sa.apply(sf);
     }
 
     /**
-     * Construct a {@code State} which sets the state to {@code st} and sets the result to {@link Unit#UNIT}.
+     * Construct a {@code StateR} which sets the state to {@code st} and sets the result to {@link Unit#UNIT}.
      * @param st        the state value
      * @param <S>       the state type
-     * @return          the new {@code State} instance
+     * @return          the new {@code StateR} instance
      */
     static <S> StateR<S, Unit> put(S st) {
         return u -> Tuple2.of(st, UNIT);
     }
 
     /**
-     * Construct a {@code State} which leaves the state value unchanged and sets the result to the supplied value.
+     * Construct a {@code StateR} which leaves the state value unchanged and sets the result to the supplied value.
      * @param <S>       the state type
-     * @return          the new {@code State} instance
+     * @return          the new {@code StateR} instance
      */
     static <S> StateR<S, S> get() {
         return s -> Tuple2.of(s, s);
     }
 
     /**
-     * Construct a {@code State} which applies a function to the state,
+     * Construct a {@code StateR} which applies a function to the state,
      * and sets the result to {@link Unit#UNIT}.
      * @param f         the function
      * @param <S>       the state type
-     * @return          the new {@code State} instance
+     * @return          the new {@code StateR} instance
      */
     static <S> StateR<S, Unit> modify(F<S, S> f) {
         return StateR.<S>get().flatMap(x ->
@@ -87,7 +88,7 @@ public interface StateR<S, A> {
      * @param f         the function
      * @param <S>       the state type
      * @param <A>       the result type
-     * @return          the new {@code State} instance
+     * @return          the new {@code StateR} instance
      */
     static <S, A> StateR<S, A> inspect(F<S, A> f) {
         return StateR.<S>get().map(f);
@@ -99,7 +100,7 @@ public interface StateR<S, A> {
      * @param f         the function
      * @param <S>       the state type
      * @param <A>       the result type
-     * @return          the new {@code State} instance
+     * @return          the new {@code StateR} instance
      */
     static <S, A> StateR<S, A> gets(F<S, A> f) {
         return StateR.<S>get().map(f);
@@ -112,7 +113,7 @@ public interface StateR<S, A> {
      * @param <S>       the state type
      * @param <A>       type of list elements
      * @param <B>       the state result type
-     * @return          a {@code State} which wraps an {@link IList} of values
+     * @return          a {@code StateR} which wraps an {@link IList} of values
      */
     static <S, A, B> StateR<S, IList<B>> traverse(IList<A> lt, F<A, StateR<S, B>> f) {
         return lt.foldRight(
@@ -122,11 +123,30 @@ public interface StateR<S, A> {
     }
 
     /**
+     * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
+     * @param la        list of values
+     * @param f         function to be applied to each value in the list
+     * @param <S>       the state type
+     * @param <A>       type of list elements
+     * @param <B>       the state result type
+     * @return          a {@code StateR} which wraps an {@link List} of values
+     */
+    static <S, A, B> StateR<S, List<B>> traverse(List<A> la, F<A, StateR<S, B>> f) {
+        return Folds.foldLeft(
+                (slb, s) -> f.apply(s).apply(slb.map(F.of(lb -> (B b) -> {lb.add(b); return lb;}))),
+                pure(new ArrayList<>()),
+                la
+        );
+    }
+
+    /**
      * Standard applicative sequencing.
-     * @param lsa       the list of {@code State} values
+     * @param lsa       the list of {@code StateR} values
      * @param <S>       the state type
      * @param <A>       the state result type
-     * @return          a {@code State} which wraps an {@link IList} of values
+     * @return          a {@code StateR} which wraps an {@link IList} of values
      */
     static <S, A> StateR<S, IList<A>> sequence(IList<? extends StateR<S, A>> lsa) {
         return lsa.foldRight(
@@ -196,7 +216,7 @@ public interface StateR<S, A> {
          * @param f         the function
          * @param <S>       the state type
          * @param <T>       the input type
-         * @param <U>       the value type of the returned {@code State} value
+         * @param <U>       the value type of the returned {@code StateR} value
          * @return          the new {@code Kleisli}
          */
         static <S, T, U> Kleisli<S, T, U> of(F<T, StateR<S, U>> f) {
@@ -260,7 +280,7 @@ public interface StateR<S, A> {
      * Map a function over the state processor.
      * @param f         the function to be mapped
      * @param <B>       the return type of the function
-     * @return          the new {@code State}
+     * @return          the new {@code StateR}
      */
     default <B> StateR<S, B> map(F<? super A, ? extends B> f) {
         return st -> {
@@ -270,12 +290,12 @@ public interface StateR<S, A> {
     }
 
     /**
-     * Combine a {@code State} that wraps a function with a {@code State} that wraps a value,
-     * to yield a {@code State} that wraps the result of applying the function to the value.
+     * Combine a {@code StateR} that wraps a function with a {@code StateR} that wraps a value,
+     * to yield a {@code StateR} that wraps the result of applying the function to the value.
      * Applicative apply operation (with args reversed).
-     * @param sf        the {@code State} that wraps a function
-     * @param <B>       the {@code State} that wraps a value
-     * @return          a {@code State} that wraps the result of applying the function to the value
+     * @param sf        the {@code StateR} that wraps a function
+     * @param <B>       the {@code StateR} that wraps a value
+     * @return          a {@code StateR} that wraps the result of applying the function to the value
      */
     default <B> StateR<S, B> apply(StateR<S, F<A, B>> sf) {
         return st -> {
@@ -287,12 +307,12 @@ public interface StateR<S, A> {
     /**
      * FlatMap a function over the state.
      * <p>
-     * Compose a {@code State} with a function that yields another a {@code State},
-     * to form a new a {@code State}.
+     * Compose a {@code StateR} with a function that yields another a {@code StateR},
+     * to form a new a {@code StateR}.
      * A.k.a. monadic bind operation.
-     * @param f         the function that yields a {@code State}
+     * @param f         the function that yields a {@code StateR}
      * @param <B>       result value type
-     * @return          a {@code State}
+     * @return          a {@code StateR}
      */
     default <B> StateR<S, B> flatMap(F<A, StateR<S, B>> f) {
         return st -> {

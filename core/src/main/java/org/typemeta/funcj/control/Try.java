@@ -99,8 +99,8 @@ public interface Try<T> {
      * @return          a {@code Try} which wraps an {@link IList} of values
      */
     static <T, U> Try<List<U>> traverse(List<T> lt, F<T, Try<U>> f) {
-        return Folds.foldRight(
-                (t, tlt) -> f.apply(t).apply(tlt.map(lu -> u -> {lu.add(u); return lu;})),
+        return Folds.foldLeft(
+                (tlt, t) -> f.apply(t).apply(tlt.map(lu -> u -> {lu.add(u); return lu;})),
                 success(new ArrayList<>(lt.size())),
                 lt
         );

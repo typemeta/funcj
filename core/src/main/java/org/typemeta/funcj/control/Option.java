@@ -89,8 +89,8 @@ public interface Option<T> {
      * @return          a {@code Option} which wraps an {@link List} of values
      */
     static <T, U> Option<List<U>> traverse(List<T> lt, F<T, Option<U>> f) {
-        return Folds.foldRight(
-                (t, olu) -> f.apply(t).apply(olu.map(lu -> u -> {lu.add(u); return lu;})),
+        return Folds.foldLeft(
+                (olu, t) -> f.apply(t).apply(olu.map(lu -> u -> {lu.add(u); return lu;})),
                 some(new ArrayList<>(lt.size())),
                 lt
         );

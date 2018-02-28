@@ -46,6 +46,18 @@ public interface Validation<E, T> {
 
     /**
      * Create a {@code Failure} value that wraps a error result.
+     * @param errors list of failures result to be wrapped
+     * @param <E>       the error type
+     * @param <T>       the successful result type
+     * @return          a failure value
+     * @throws          NullPointerException if {@code errors} is null
+     */
+    static <E, T> Validation<E, T> failure(Iterable<E> errors) {
+        return new Failure<E, T>(IList.ofIterable(errors));
+    }
+
+    /**
+     * Create a {@code Failure} value that wraps a error result.
      * @param error single failure result to be wrapped
      * @param <E>       the error type
      * @param <T>       the successful result type
@@ -118,8 +130,8 @@ public interface Validation<E, T> {
      * @return          a {@code Validation} which wraps an {@link List} of values
      */
     static <E, T, U> Validation<E, List<U>> traverse(List<T> lt, F<T, Validation<E, U>> f) {
-        return Folds.foldRight(
-                (t, vlu) -> f.apply(t).apply(vlu.map(lu -> u -> {lu.add(u); return lu;})),
+        return Folds.foldLeft(
+                (vlu, t) -> f.apply(t).apply(vlu.map(lu -> u -> {lu.add(u); return lu;})),
                 success(new ArrayList<>(lt.size())),
                 lt
         );

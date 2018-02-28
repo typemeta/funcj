@@ -3,8 +3,9 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
+import org.typemeta.funcj.util.Folds;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.typemeta.funcj.control.Trampoline.*;
@@ -98,17 +99,36 @@ public interface State<S, A> {
      * Standard applicative traversal.
      * <p>
      * Equivalent to <pre>sequence(lt.map(f))</pre>.
-     * @param lt        list of values
+     * @param la        list of values
      * @param f         function to be applied to each value in the list
      * @param <S>       the state type
      * @param <A>       type of list elements
      * @param <B>       the state result type
      * @return          a {@code State} which wraps an {@link IList} of values
      */
-    static <S, A, B> State<S, IList<B>> traverse(IList<A> lt, F<A, State<S, B>> f) {
-        return lt.foldRight(
-            (a, slb) -> f.apply(a).apply(slb.map(l -> l::add)),
+    static <S, A, B> State<S, IList<B>> traverse(IList<A> la, F<A, State<S, B>> f) {
+        return la.foldRight(
+            (a, slb) -> f.apply(a).apply(slb.map(lb -> lb::add)),
             pure(IList.nil())
+        );
+    }
+
+    /**
+     * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
+     * @param la        list of values
+     * @param f         function to be applied to each value in the list
+     * @param <S>       the state type
+     * @param <A>       type of list elements
+     * @param <B>       the state result type
+     * @return          a {@code State} which wraps an {@link List} of values
+     */
+    static <S, A, B> State<S, List<B>> traverse(List<A> la, F<A, State<S, B>> f) {
+        return Folds.foldLeft(
+                (slb, s) -> f.apply(s).apply(slb.map(F.of(lb -> (B b) -> {lb.add(b); return lb;}))),
+                pure(new ArrayList<>()),
+                la
         );
     }
 
