@@ -3,6 +3,7 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.functions.*;
+import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -106,6 +107,25 @@ public interface Validation<E, T> {
     }
 
     /**
+     * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
+     * @param lt        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <E>       the error type
+     * @param <T>       the type of list elements
+     * @param <U>       the type wrapped by the {@code Try} returned by the function
+     * @return          a {@code Validation} which wraps an {@link List} of values
+     */
+    static <E, T, U> Validation<E, List<U>> traverse(List<T> lt, F<T, Validation<E, U>> f) {
+        return Folds.foldRight(
+                (t, vlu) -> f.apply(t).apply(vlu.map(lu -> u -> {lu.add(u); return lu;})),
+                success(new ArrayList<>(lt.size())),
+                lt
+        );
+    }
+
+    /**
      * Standard applicative sequencing.
      * <p>
      * Translate a {@link IList} of {@code Validation} into a {@code Validation} of an {@code IList},
@@ -123,7 +143,7 @@ public interface Validation<E, T> {
     }
 
     /**
-     * Variation of {@link Validation#sequence(IList)} for {@link Stream}.
+     * Variation of {@link Validation#sequence(IList)} for a {@link Stream}.
      * @param svt       the stream of {@code Validation} values
      * @param <E>       the error type
      * @param <T>       the value type of the {@code Validation}s in the stream
@@ -137,6 +157,21 @@ public interface Validation<E, T> {
             vlt = vt.apply(vlt.map(lt -> lt::add));
         }
         return vlt.map(IList::stream);
+    }
+
+    /**
+     * Variation of {@link Validation#sequence(IList)} for a {@link List}.
+     * @param lvt       the list of {@code Validation} values
+     * @param <E>       the error type
+     * @param <T>       the value type of the {@code Validation}s in the stream
+     * @return          a {@code Validation} which wraps an {@link Stream} of values
+     */
+    static <E, T> Validation<E, List<T>> sequence(List<Validation<E, T>> lvt) {
+        return Folds.foldRight(
+                (vt, vlt) -> vt.apply(vlt.map(lt -> t -> {lt.add(t); return lt;})),
+                success(new ArrayList<>(lvt.size())),
+                lvt
+        );
     }
 
     /**
@@ -171,79 +206,26 @@ public interface Validation<E, T> {
     }
 
     /**
-     * Kleisli models composable operations that return a {@code Validation}.
-     * @param <E>       the error type
-     * @param <T>       the input type
-     * @param <U>       the value type of the returned {@code Validation} type
-     */
-    @FunctionalInterface
-    interface Kleisli<E, T, U> {
-        /**
-         * Construct a {@code Kleisli} value from a function.
-         * @param f         the function
-         * @param <E>       the error type
-         * @param <T>       the input type
-         * @param <U>       the value type of the returned {@code Validation} value
-         * @return          the new {@code Kleisli}
-         */
-        static <E, T, U> Kleisli<E, T, U> of(F<T, Validation<E, U>> f) {
-            return f::apply;
-        }
-
-        /**
-         * Apply this {@code Kleisli} operation
-         * @param t         the input value
-         * @return          the result of the operation
-         */
-        Validation<E, U> apply(T t);
-
-        /**
-         * Compose this {@code Kleisli} with another by applying this one first,
-         * then the other.
-         * @param kUV       the {@code Kleisli} to be applied after this one
-         * @param <V>       the second {@code Kleisli}'s return type
-         * @return          the composed {@code Kleisli}
-         */
-        default <V> Kleisli<E, T, V> andThen(Kleisli<E, U, V> kUV) {
-            return t -> apply(t).flatMap(kUV::apply);
-        }
-
-        /**
-         * Compose this {@code Kleisli} with another by applying the other one first,
-         * and then this one.
-         * @param kST       the {@code Kleisli} to be applied after this one
-         * @param <S>       the first {@code Kleisli}'s input type
-         * @return          the composed {@code Kleisli}
-         */
-        default <S> Kleisli<E, S, U> compose(Kleisli<E, S, T> kST) {
-            return s -> kST.apply(s).flatMap(this::apply);
-        }
-
-        /**
-         * Compose this {@code Kleisli} with a function,
-         * by applying this {@code Kleisli} first,
-         * and then mapping the function over the result.
-         * @param f         the function
-         * @param <V>       the function return type
-         * @return          the composed {@code Kleisli}
-         */
-        default <V> Kleisli<E, T, V> map(F<U, V> f) {
-            return t -> apply(t).map(f);
-        }
-    }
-
-    /**
-     * Indicates if this is a {code Success} value.
+     * Indicates if this is a {@code Success} value.
      * @return          the true if this value is a {code Success} value
      */
     boolean isSuccess();
 
     /**
-     * Downgrade this value into an {@link java.util.Optional}.
-     * @return          a populated {@code Optional} value if this is a {Code Success} value,
-     * otherwise an empty {@code Optional}
+     * Either return the wrapped value if it's a {@code Success},
+     * otherwise return the supplied default value.
+     * @param defaultValue value to be returned if this is a failure value.
+     * @return          the success result value if it's a {@code Success},
+     *                  otherwise return the supplied default value.
      */
-    Optional<T> asOptional();
+    T getOrElse(T defaultValue);
+
+    /**
+     * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
+     * @return          the wrapped value if it's a {@code Success}
+     * @throws          Exception if the wrapped value is a {@code Failure}
+     */
+    T getOrThrow() throws Exception;
 
     /**
      * Push the result to a {@link SideEffect.F}.
@@ -280,16 +262,6 @@ public interface Validation<E, T> {
      * @return          a {@code Validation} wrapping the result of applying the function, or a {@code Failure} value
      */
     <U> Validation<E, U> apply(Validation<E, F<T, U>> vf);
-
-    /**
-     * Monadic bind/flatMap.
-     * If this is a {@code Success} then apply the function to the value and return the result,
-     * otherwise return the {@code Failure} result.
-     * @param f         the function to be applied
-     * @param <U>       the type parameter to the {@code Validation} returned by the function
-     * @return          the result of combining this value with the function {@code f}
-     */
-    <U> Validation<E, U> flatMap(F<T, Validation<E, U>> f);
 
     /**
      * Builder API for chaining together n {@code Validation}s,
@@ -362,13 +334,13 @@ public interface Validation<E, T> {
         }
 
         @Override
-        public <U> Validation<E, U> flatMap(F<T, Validation<E, U>> f) {
-            return f.apply(value);
+        public T getOrElse(T defaultValue) {
+            return value;
         }
 
         @Override
-        public Optional<T> asOptional() {
-            return Optional.of(value);
+        public T getOrThrow() throws Exception {
+            return value;
         }
     }
 
@@ -432,13 +404,13 @@ public interface Validation<E, T> {
         }
 
         @Override
-        public <U> Validation<E, U> flatMap(F<T, Validation<E, U>> f) {
-            return cast();
+        public T getOrElse(T defaultValue) {
+            return defaultValue;
         }
 
         @Override
-        public Optional<T> asOptional() {
-            return Optional.empty();
+        public T getOrThrow() throws Exception {
+            throw new Exception("Validation.getOrThrow() called on a Validation.Failure value");
         }
 
         @SuppressWarnings("unchecked")

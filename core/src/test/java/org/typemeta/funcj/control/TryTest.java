@@ -22,12 +22,6 @@ public class TryTest {
     }
 
     @Property
-    public void asOptional(char c) {
-        assertTrue(Try.success(c).asOptional().isPresent());
-        assertFalse(failure("fail").asOptional().isPresent());
-    }
-
-    @Property
     public void handle (char c) {
         Try.success(c).handle(l -> {throw new RuntimeException("Unexpected failure value");}, r -> {});
         failure("fail").handle(l -> {}, r -> {throw new RuntimeException("Unexpected success value");});

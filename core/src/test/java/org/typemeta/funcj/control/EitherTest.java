@@ -18,12 +18,6 @@ public class EitherTest {
     }
 
     @Property
-    public void asOptional(char c) {
-        assertTrue(Either.right(c).asOptional().isPresent());
-        assertFalse(Either.left(c).asOptional().isPresent());
-    }
-
-    @Property
     public void handle (char c) {
         Either.right(c).handle(l -> {throw new RuntimeException("Unexpected left value");}, r -> {});
         Either.left(c).handle(l -> {}, r -> {throw new RuntimeException("Unexpected right value");});

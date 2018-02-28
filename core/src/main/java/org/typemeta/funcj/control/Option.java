@@ -3,6 +3,7 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.functions.SideEffect;
+import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -72,8 +73,26 @@ public interface Option<T> {
      */
     static <T, U> Option<IList<U>> traverse(IList<T> lt, F<T, Option<U>> f) {
         return lt.foldRight(
-                (t, tlu) -> f.apply(t).apply(tlu.map(lu -> lu::add)),
+                (t, olu) -> f.apply(t).apply(olu.map(lu -> lu::add)),
                 some(IList.nil())
+        );
+    }
+
+    /**
+     * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
+     * @param lt        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <T>       the type of list elements
+     * @param <U>       the type wrapped by the {@code Try} returned by the function
+     * @return          a {@code Option} which wraps an {@link List} of values
+     */
+    static <T, U> Option<List<U>> traverse(List<T> lt, F<T, Option<U>> f) {
+        return Folds.foldRight(
+                (t, olu) -> f.apply(t).apply(olu.map(lu -> u -> {lu.add(u); return lu;})),
+                some(new ArrayList<>(lt.size())),
+                lt
         );
     }
 
@@ -82,16 +101,17 @@ public interface Option<T> {
      * <p>
      * Translate a {@link IList} of {@code Option} into a {@code Option} of an {@code IList},
      * by composing each consecutive {@code Option} using the {@link Option#apply(Option)} method.
-     * @param ltt       the list of {@code Option} values
+     * @param lot       the list of {@code Option} values
      * @param <T>       the value type of the {@code Option}s in the list
      * @return          a {@code Option} which wraps an {@link IList} of values
      */
-    static <T> Option<IList<T>> sequence(IList<Option<T>> ltt) {
-        return ltt.foldRight(
-            (tt, tlt) -> tt.apply(tlt.map(lt -> lt::add)),
+    static <T> Option<IList<T>> sequence(IList<Option<T>> lot) {
+        return lot.foldRight(
+            (ot, olt) -> ot.apply(olt.map(lt -> lt::add)),
                 some(IList.nil())
         );
     }
+
 
     /**
      * Variation of {@link Option#sequence(IList)} for {@link Stream}.
@@ -107,6 +127,20 @@ public interface Option<T> {
             tlt = tt.apply(tlt.map(lt -> lt::add));
         }
         return tlt.map(IList::stream);
+    }
+
+    /**
+     * Variation of {@link Try#sequence(IList)} for a {@link List}.
+     * @param lot       the list of {@code Validation} values
+     * @param <T>       the value type of the {@code Validation}s in the stream
+     * @return          a {@code Validation} which wraps an {@link Stream} of values
+     */
+    static <T> Option<List<T>> sequence(List<Option<T>> lot) {
+        return Folds.foldRight(
+                (ot, olt) -> ot.apply(olt.map(lt -> t -> {lt.add(t); return lt;})),
+                some(new ArrayList<>(lot.size())),
+                lot
+        );
     }
 
     /**
@@ -217,6 +251,13 @@ public interface Option<T> {
      * @return          the success result value if it's a {@code Some}, otherwise return the supplied default value.
      */
     T getOrElse(T defaultValue);
+
+    /**
+     * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
+     * @return          the wrapped value if it's a {@code Success}
+     * @throws          Exception if the wrapped value is a {@code Failure}
+     */
+    T getOrThrow() throws Exception;
 
     /**
      * Return the wrapped value if it's a {@code Some},
@@ -346,6 +387,11 @@ public interface Option<T> {
         }
 
         @Override
+        public T getOrThrow() throws Exception {
+            return value;
+        }
+
+        @Override
         public <X extends Throwable> T getOrThrow(F0<X> exSupp) throws X {
             return value;
         }
@@ -427,13 +473,18 @@ public interface Option<T> {
         }
 
         @Override
+        public T getOrThrow() throws Exception {
+            throw new Exception("Option.getOrThrow() called on Option.None");
+        }
+
+        @Override
         public <X extends Throwable> T getOrThrow(F0<X> exSupp) throws X {
             throw exSupp.apply();
         }
 
         @Override
         public T get() {
-            throw new RuntimeException("Option.None.get() called");
+            throw new RuntimeException("Option.getOrThrow() called on Option.None");
         }
 
         @Override

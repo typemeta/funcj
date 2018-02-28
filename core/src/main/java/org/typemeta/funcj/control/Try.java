@@ -3,6 +3,7 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.functions.*;
+import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -84,6 +85,38 @@ public interface Try<T> {
         return lt.foldRight(
                 (t, tlu) -> f.apply(t).apply(tlu.map(lu -> lu::add)),
                 success(IList.nil())
+        );
+    }
+
+    /**
+     * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
+     * @param lt        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <T>       the type of list elements
+     * @param <U>       the type wrapped by the {@code Try} returned by the function
+     * @return          a {@code Try} which wraps an {@link IList} of values
+     */
+    static <T, U> Try<List<U>> traverse(List<T> lt, F<T, Try<U>> f) {
+        return Folds.foldRight(
+                (t, tlt) -> f.apply(t).apply(tlt.map(lu -> u -> {lu.add(u); return lu;})),
+                success(new ArrayList<>(lt.size())),
+                lt
+        );
+    }
+
+    /**
+     * Variation of {@link Try#sequence(IList)} for a {@link List}.
+     * @param ltt       the list of {@code Validation} values
+     * @param <T>       the value type of the {@code Validation}s in the stream
+     * @return          a {@code Validation} which wraps an {@link Stream} of values
+     */
+    static <T> Try<List<T>> sequence(List<Try<T>> ltt) {
+        return Folds.foldRight(
+                (tt, tlt) -> tt.apply(tlt.map(lt -> t -> {lt.add(t); return lt;})),
+                success(new ArrayList<>(ltt.size())),
+                ltt
         );
     }
 
@@ -216,16 +249,11 @@ public interface Try<T> {
     boolean isSuccess();
 
     /**
-     * Downgrade this value into an {@link java.util.Optional}.
-     * @return          a populated {@code Optional} value if this is a {Code Success} value,
-     *                  otherwise an empty {@code Optional}
-     */
-    Optional<T> asOptional();
-
-    /**
-     * Either return the wrapped value if it's a {@code Success}, otherwise return the supplied default value.
+     * Either return the wrapped value if it's a {@code Success},
+     * otherwise return the supplied default value.
      * @param defaultValue value to be returned if this is a failure value.
-     * @return          the success result value if it's a {@code Success}, otherwise return the supplied default value.
+     * @return          the success result value if it's a {@code Success},
+     *                  otherwise return the supplied default value.
      */
     T getOrElse(T defaultValue);
 
@@ -387,11 +415,6 @@ public interface Try<T> {
         public <U> Try<U> flatMap(F<? super T, Try<U>> f) {
             return f.apply(value);
         }
-
-        @Override
-        public Optional<T> asOptional() {
-            return Optional.of(value);
-        }
     }
 
     /**
@@ -484,11 +507,6 @@ public interface Try<T> {
         @Override
         public <U> Try<U> flatMap(F<? super T, Try<U>> f) {
             return cast();
-        }
-
-        @Override
-        public Optional<T> asOptional() {
-            return Optional.empty();
         }
 
         @SuppressWarnings("unchecked")

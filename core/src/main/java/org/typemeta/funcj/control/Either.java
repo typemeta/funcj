@@ -3,6 +3,7 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -78,6 +79,25 @@ public interface Either<E, S> {
     }
 
     /**
+     * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
+     * @param ls        the list of values
+     * @param f         the function to be applied to each value in the list
+     * @param <E>       the left-hand type of the {@code Either} returned by the function
+     * @param <S>       the type of list elements
+     * @param <S>       the right-hand type of the {@code Either} returned by the function
+     * @return          a {@code Either} which wraps an {@link List} of values
+     */
+    static <E, S, T> Either<E, List<T>> traverse(List<S> ls, F<S, Either<E, T>> f) {
+        return Folds.foldRight(
+                (s, elt) -> f.apply(s).apply(elt.map(lt -> t -> {lt.add(t); return lt;})),
+                right(new ArrayList<>(ls.size())),
+                ls
+        );
+    }
+
+    /**
      * Standard applicative sequencing.
      * @param les       the list of {@code Try} values
      * @param <E>       the left-hand type
@@ -107,6 +127,22 @@ public interface Either<E, S> {
         }
         return elt.map(IList::stream);
     }
+
+    /**
+     * Variation of {@link Either#sequence(IList)} for a {@link List}.
+     * @param let       the list of {@code Validation} values
+     * @param <E>       the error type
+     * @param <T>       the value type of the {@code Validation}s in the stream
+     * @return          a {@code Validation} which wraps an {@link Stream} of values
+     */
+    static <E, T> Either<E, List<T>> sequence(List<Either<E, T>> let) {
+        return Folds.foldRight(
+                (et, elt) -> et.apply(elt.map(lt -> t -> {lt.add(t); return lt;})),
+                right(new ArrayList<>(let.size())),
+                let
+        );
+    }
+
     /**
      * Repeatedly call the function {@code f} until it returns {@code Either.Right}.
      * <p>
@@ -207,11 +243,20 @@ public interface Either<E, S> {
     boolean isRight();
 
     /**
-     * Downgrade this value into an {@link java.util.Optional}.
-     * @return          a populated {@code Optional} value if this is a {Code Right} value,
-     *                  otherwise an empty {@code Optional}
+     * Either return the wrapped value if it's a {@code Right},
+     * otherwise return the supplied default value.
+     * @param defaultValue value to be returned if this is a {@code Left} value.
+     * @return          the success result value if it's a {@code Right},
+     *                  otherwise return the supplied default value.
      */
-    Optional<S> asOptional();
+    S getOrElse(S defaultValue);
+
+    /**
+     * Return the wrapped value if it's a {@code Right}, otherwise throw an exception.
+     * @return          the wrapped value if it's a {@code Right}
+     * @throws          Exception if the wrapped value is a {@code Left}
+     */
+    S getOrThrow() throws Exception;
 
     /**
      * Push the result to a {@link SideEffect.F}.
@@ -320,8 +365,13 @@ public interface Either<E, S> {
         }
 
         @Override
-        public Optional<S> asOptional() {
-            return Optional.empty();
+        public S getOrElse(S defaultValue) {
+            return defaultValue;
+        }
+
+        @Override
+        public S getOrThrow() throws Exception {
+            throw new Exception("Either.getOrThrow() called on a Either.Left value");
         }
 
         @Override
@@ -403,8 +453,13 @@ public interface Either<E, S> {
         }
 
         @Override
-        public Optional<S> asOptional() {
-            return Optional.of(value);
+        public S getOrElse(S defaultValue) {
+            return value;
+        }
+
+        @Override
+        public S getOrThrow() throws Exception {
+            return value;
         }
 
         @Override

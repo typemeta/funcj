@@ -10,12 +10,12 @@ import java.util.*;
 public abstract class Folds {
     /**
      * Left-fold a function over an {@link java.lang.Iterable}.
-     * @param f binary function to be applied for the fold
-     * @param z starting value for the fold
-     * @param iter Iterable to be folded over
-     * @param <T> iterable element type
-     * @param <R> result type of fold operation
-     * @return the folded value
+     * @param f         the binary function to be applied for the fold
+     * @param z         the starting value for the fold
+     * @param iter      the iterable to be folded over
+     * @param <T>       the iterable element type
+     * @param <R>       the result type of fold operation
+     * @return          the folded value
      */
     public static <T, R> R foldLeft(Functions.F2<R, T, R> f, R z, Iterable<T> iter) {
         R acc = z;
@@ -27,10 +27,10 @@ public abstract class Folds {
 
     /**
      * Left-fold a function over a non-empty {@link java.lang.Iterable}.
-     * @param f binary operator to be applied for the fold
-     * @param iter Iterable to be folded over
-     * @param <T> iterable element type
-     * @return the folded value
+     * @param f         the binary operator to be applied for the fold
+     * @param iter      the iterable to be folded over
+     * @param <T>       the iterable element type
+     * @return          the folded value
      */
     public static <T> T foldLeft1(Functions.Op2<T> f, Iterable<T> iter) {
         T acc = null;
@@ -52,12 +52,12 @@ public abstract class Folds {
     /**
      *
      * Right-fold a function over an {@link java.util.List}}
-     * @param f binary function to be applied for the fold
-     * @param z starting value for the fold
-     * @param l list to fold over
-     * @param <T> list element type
-     * @param <R> result type of fold operation
-     * @return the folded value
+     * @param f         the binary function to be applied for the fold
+     * @param z         the starting value for the fold
+     * @param l         the list to fold over
+     * @param <T>       the list element type
+     * @param <R>       the result type of fold operation
+     * @return          the folded value
      */
     public static <T, R> R foldRight(Functions.F2<T, R, R> f, R z, List<T> l) {
         R acc = z;
@@ -69,10 +69,10 @@ public abstract class Folds {
 
     /**
      * Right-fold a function over a non-empty {@link java.util.List}.
-     * @param f binary operator to be applied for the fold
-     * @param l {@code List} to fold over
-     * @param <T> list element type
-     * @return the folded value
+     * @param f         the binary operator to be applied for the fold
+     * @param l         the {@code List} to fold over
+     * @param <T>       the list element type
+     * @return          the folded value
      */
     public static <T> T foldRight1(Functions.Op2<T> f, List<T> l) {
         final int i0 = l.size() - 1;
@@ -89,12 +89,12 @@ public abstract class Folds {
 
     /**
      * Right-fold a function over an {@link Set}}
-     * @param f binary function to be applied for the fold
-     * @param z starting value for the fold
-     * @param s set to fold over
-     * @param <T> set element type
-     * @param <R> result type of fold operation
-     * @return the folded value
+     * @param f         the binary function to be applied for the fold
+     * @param z         the starting value for the fold
+     * @param s         the set to fold over
+     * @param <T>       the set element type
+     * @param <R>       the result type of fold operation
+     * @return          the folded value
      */
     public static <T, R> R foldRight(Functions.F2<T, R, R> f, R z, Set<T> s) {
         return foldRight(f, z, new ArrayList<T>(s));
@@ -102,10 +102,10 @@ public abstract class Folds {
 
     /**
      * Right-fold a function over a non-empty  {@link Set}}
-     * @param f binary function to be applied for the fold
-     * @param s set to fold over
-     * @param <T> set element type
-     * @return the folded value
+     * @param f         the binary function to be applied for the fold
+     * @param s         the set to fold over
+     * @param <T>       the set element type
+     * @return          the folded value
      */
     public static <T> T foldRight1(Functions.Op2<T> f, Set<T> s) {
         return foldRight1(f, new ArrayList<T>(s));
