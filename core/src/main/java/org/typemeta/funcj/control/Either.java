@@ -86,7 +86,7 @@ public interface Either<E, S> {
      * @param f         the function to be applied to each value in the list
      * @param <E>       the left-hand type of the {@code Either} returned by the function
      * @param <S>       the type of list elements
-     * @param <S>       the right-hand type of the {@code Either} returned by the function
+     * @param <T>       the right-hand type of the {@code Either} returned by the function
      * @return          a {@code Either} which wraps an {@link List} of values
      */
     static <E, S, T> Either<E, List<T>> traverse(List<S> ls, F<S, Either<E, T>> f) {
@@ -386,7 +386,7 @@ public interface Either<E, S> {
 
         @Override
         public <T> Either<T, S> mapLeft(F<? super E, ? extends T> f) {
-            return Either.<T, S>left(f.apply(value));
+            return Either.left(f.apply(value));
         }
 
         @Override

@@ -14,7 +14,7 @@ import static org.typemeta.funcj.util.Exceptions.*;
 
 /**
  * Utility functions for mapping functions over Functor types, such as Collections.
- * Specialised for lambdas with can throw.
+ * Specialised for lambdas that may throw.
  */
 public abstract class FunctorsGenEx {
     /**

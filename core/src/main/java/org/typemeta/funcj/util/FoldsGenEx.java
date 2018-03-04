@@ -5,7 +5,7 @@ import org.typemeta.funcj.functions.FunctionsGenEx.*;
 import java.util.*;
 
 /**
- * Fold operations for lambdas with can throw.
+ * Fold operations for lambdas that may throw.
  */
 public abstract class FoldsGenEx {
     /**
