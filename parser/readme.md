@@ -322,7 +322,7 @@ Parser<Chr, String> p = digits.or(string("ABCD")).or(value("FAIL"))
 Parser<Chr, String> p2 = choice(digits, string("ABCD"), value("FAIL"));
 ```
 
-## The `map` Combinator
+### The `map` Combinator
 
 The `Parser.map` method allows the successful parse value to be transformed by applying a function to it.
 
@@ -337,7 +337,7 @@ Parser<Chr, Integer> p2 = p.map(String::length);
 Note not to confuse this with the `map` method used with `Parser.and`.
 The latter is actually a method on the internal `ApplyBuilder` class.
 
-## The `many` Combinator
+### The `many` Combinator
 
 `Parser.many` transforms a parser into one that keeps applying the parser until it fails,
 and then returns a list of the results.
