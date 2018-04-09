@@ -53,7 +53,7 @@ funcj.parser requires Java 1.8 (or higher).
 ## Resources
 
 * **Release builds** are available on the [Releases](https://github.com/typemeta/funcj/releases) page.
-* **Maven Artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.parser)
+* **Maven artifacts** are available on the [Sonatype Nexus repository](https://repository.sonatype.org/#nexus-search;quick~funcj.parser)
 * **Javadocs** are for the latest build are on [javadocs.io](http://www.javadoc.io/doc/org.typemeta/funcj-parser) page.
 
 ## Maven
@@ -152,7 +152,7 @@ Inout<Chr> rdrInput = Input.of(new CharArrayReader(charData))
 ### The `Result` Type
 
 `Result<I, T>` represents the result of applying a parser.
-It's essentially a discriminated union between thw two following sub-types:
+It's essentially a discriminated union between the two following sub-types:
 
 * `Result.Success` - indicating a successful parse,
 consisting of a parse value of type `T`, and an `Input` value pointing to the next positiion in the input stream.
@@ -184,7 +184,7 @@ which takes an `Input` value and returns a `Result` value.
 #### `Parser.Ref`
 
 Many grammars are recursive, meaning there's a circularity in the production rules.
-For example, consider the following grammar for addition expressions:
+For example, consider the following grammar:
 
 ```
 E ::= 'x' | 'a' E 'b'
@@ -195,8 +195,8 @@ as E is defined in terms of itself.
 To circumvent this a parser reference can be used.
 The reference is initially uninitialised,
 however since it implements the `Parser` interface,
-it can be used as any other parser value would be.
-It must be initialised with an actual parser before it is invoked -
+it can be used to  construct fudther parsers as with any other parser value.
+It must subsequently be initialised with an actual parser before it is invoked -
 all methods other than set will throw an exception if invoked on an uninitialised `Ref` value.
 
 ```java
@@ -230,7 +230,7 @@ Parser<Chr, Chr> pX = pure('X');
 ### The `value` Combinator
 
 The `value` parser is constructed with an argument,
-and will succeed if the next token equals that argument.  
+and will succeed if the next token in the input stream equals that argument.  
 
 ```java
 // Combinator.value will succeed if the next token equals 'Y'.
@@ -250,7 +250,7 @@ but it can have a role in building more useful parsers.
 
 ### The `eof` Combinator
 
-The `Combinator.eof` parser will succeed if the end of the inout stream is reached,
+The `Combinator.eof` parser will succeed if the end of the input stream is reached,
 otherwise it will fail.
 
 ### The `satisfy` Combinator
@@ -269,7 +269,7 @@ The `Parser.and` method is used to combine two or more (up to eight) parsers.
 The parsers are combined into one that applies each parser sequentially.
 If any parser fails then the operation is aborted and the failure is returned.
 If all of the parsers are successful then the results are passed to a `map` method,
-which constructs the return value or the parser.
+which constructs the return value for the combined parser.
 
 ```java
 // A parser for a 3-digit number.
@@ -420,7 +420,7 @@ Parser<Chr, Op<Integer>> binExpr =
 expr.set(choice(var, num, binExpr));
 ```
 
-We can parse an expression and evaluate like this:
+We can parse an expression and evaluate it like this:
 
 ```java
 Op2<Integer> eval = expr.parse(Input.of("(x*((x/2)+x))")).getOrThrow();
