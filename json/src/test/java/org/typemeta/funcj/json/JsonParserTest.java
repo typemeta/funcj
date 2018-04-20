@@ -1,9 +1,9 @@
-package org.typemeta.funcj.json.model;
+package org.typemeta.funcj.json;
 
 import org.junit.Test;
 import org.typemeta.funcj.control.Try;
 import org.typemeta.funcj.data.*;
-import org.typemeta.funcj.json.JsonParser;
+import org.typemeta.funcj.json.model.JsValue;
 import org.typemeta.funcj.parser.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
@@ -36,8 +36,10 @@ public class JsonParserTest {
 
     private static final String test10 = "{\"ids\":[1.2,\"test\",null,true]}";
 
+    private static final String test11 = "[1.0E7,1.2E7,1.2E7,-1.2E7,1.2E-7,-1.2E-7]";
+
     private static final String[] tests = {
-        test0, test1, test2, test3, test4, test5, test6, test7, test8, test9, test10
+        test0, test1, test2, test3, test4, test5, test6, test7, test8, test9, test10, test11
     };
 
     @Test

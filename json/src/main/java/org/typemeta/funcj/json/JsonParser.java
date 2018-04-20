@@ -53,8 +53,7 @@ public class JsonParser {
                 zeMtsa.or(nzMtsa);
 
         final Parser<Chr, Double> floating =
-                nonZeroDigit.and(digit.many())
-                        .map(d -> ds -> ds.add(d))
+                digit.many()
                         .map(ds -> ds.map(Text::digitToInt))
                         .map(l -> l.foldRight((d, acc) -> d + acc / 10.0, 0.0) / 10.0);
 
