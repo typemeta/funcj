@@ -141,8 +141,8 @@ The `Try<T>` data type is equivalent to `Either<Exception, T>`.
 I.e. it is a union type between a `Failure` which contains an `Exception`,
 and a `Success` which contains a value of type `T`.
 
-### Validation
+### Validated
 
-The `Validation<E, T>` data type is equivalent to `Either<List<E>, T>`.
+The `Validated<E, T>` data type is equivalent to `Either<List<E>, T>`.
 I.e. it is a union type between a `Failure` which contains an `List<E>`,
 and a `Success` which contains a value of type `T`.

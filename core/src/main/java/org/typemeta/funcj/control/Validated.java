@@ -9,17 +9,17 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /**
- * Union type of a successfult result and a list of errors.
+ * Union type of a successful result and a list of errors.
  * <p>
  * A {@code Validation<T>} value is either
- * the sub-type {@code Validation.Failure<T>} which wraps an list of errors, or
- * the sub-type {@code Validation.Success<T>} which wraps a value of type T.
+ * the sub-type {@code Validated.Failure<T>} which wraps an list of errors, or
+ * the sub-type {@code Validated.Success<T>} which wraps a value of type T.
  * <p>
  * Null values are not allowed.
  * @param <E>       the error type
  * @param <T>       the successful result type
  */
-public interface Validation<E, T> {
+public interface Validated<E, T> {
     /**
      * Create a {@code Success} value that wraps a successful result.
      * @param result successful result to be wrapped
@@ -28,7 +28,7 @@ public interface Validation<E, T> {
      * @return          a success value
      * @throws          NullPointerException if {@code result} is null
      */
-    static <E, T> Validation<E, T> success(T result) {
+    static <E, T> Validated<E, T> success(T result) {
         return new Success<E, T>(result);
     }
 
@@ -40,7 +40,7 @@ public interface Validation<E, T> {
      * @return          a failure value
      * @throws          NullPointerException if {@code errors} is null
      */
-    static <E, T> Validation<E, T> failure(IList<E> errors) {
+    static <E, T> Validated<E, T> failure(IList<E> errors) {
         return new Failure<E, T>(errors);
     }
 
@@ -52,7 +52,7 @@ public interface Validation<E, T> {
      * @return          a failure value
      * @throws          NullPointerException if {@code errors} is null
      */
-    static <E, T> Validation<E, T> failure(Iterable<E> errors) {
+    static <E, T> Validated<E, T> failure(Iterable<E> errors) {
         return new Failure<E, T>(IList.ofIterable(errors));
     }
 
@@ -64,22 +64,21 @@ public interface Validation<E, T> {
      * @return          a failure value
      * @throws          NullPointerException if {@code error} is null
      */
-    static <E, T> Validation<E, T> failure(E error) {
+    static <E, T> Validated<E, T> failure(E error) {
         return new Failure<E, T>(IList.of(error));
     }
 
     /**
-     * Create a {@code Validation} value from a function which either yields a result or throws.
+     * Create a {@code Validated} value from a function which either yields a result or throws.
      * @param f  function which may throw
      * @param error exception to error translator
      * @param <E>       the error type
      * @param <T>       the successful result type
      * @param <X>       the exception type
-     * @return          the {@code Validation} value which wraps the function result
+     * @return          the {@code Validated} value which wraps the function result
      */
     @SuppressWarnings("unchecked")
-    static <E, T, X extends Exception>
-    Validation<E, T> of(FunctionsGenEx.F0<T, X> f, F<X, E> error) {
+    static <E, T, X extends Exception> Validated<E, T> of(FunctionsGenEx.F0<T, X> f, F<X, E> error) {
         try {
             return success(f.apply());
         } catch (Exception ex) {
@@ -89,14 +88,14 @@ public interface Validation<E, T> {
 
     /**
      * Applicative function application.
-     * @param vf        the function wrapped in a {@code Validation}
-     * @param va        the function argument wrapped in a {@code Validation}
+     * @param vf        the function wrapped in a {@code Validated}
+     * @param va        the function argument wrapped in a {@code Validated}
      * @param <E>       the error type
      * @param <A>       the function argument type
      * @param <B>       the function return type
-     * @return          the result of applying the function to the argument, wrapped in a {@code Validation}
+     * @return          the result of applying the function to the argument, wrapped in a {@code Validated}
      */
-    static <E, A, B> Validation<E, B> ap(Validation<E, F<A, B>> vf, Validation<E, A> va) {
+    static <E, A, B> Validated<E, B> ap(Validated<E, F<A, B>> vf, Validated<E, A> va) {
         return va.apply(vf);
     }
 
@@ -109,9 +108,9 @@ public interface Validation<E, T> {
      * @param <E>       the error type
      * @param <T>       the type of list elements
      * @param <U>       the type wrapped by the {@code Try} returned by the function
-     * @return          a {@code Validation} which wraps an {@link IList} of values
+     * @return          a {@code Validated} which wraps an {@link IList} of values
      */
-    static <E, T, U> Validation<E, IList<U>> traverse(IList<T> lt, F<T, Validation<E, U>> f) {
+    static <E, T, U> Validated<E, IList<U>> traverse(IList<T> lt, F<T, Validated<E, U>> f) {
         return lt.foldRight(
                 (t, vlu) -> f.apply(t).apply(vlu.map(lu -> lu::add)),
                 success(IList.nil())
@@ -127,9 +126,9 @@ public interface Validation<E, T> {
      * @param <E>       the error type
      * @param <T>       the type of list elements
      * @param <U>       the type wrapped by the {@code Try} returned by the function
-     * @return          a {@code Validation} which wraps an {@link List} of values
+     * @return          a {@code Validated} which wraps an {@link List} of values
      */
-    static <E, T, U> Validation<E, List<U>> traverse(List<T> lt, F<T, Validation<E, U>> f) {
+    static <E, T, U> Validated<E, List<U>> traverse(List<T> lt, F<T, Validated<E, U>> f) {
         return Folds.foldLeft(
                 (vlu, t) -> f.apply(t).apply(vlu.map(lu -> u -> {lu.add(u); return lu;})),
                 success(new ArrayList<>(lt.size())),
@@ -140,14 +139,14 @@ public interface Validation<E, T> {
     /**
      * Standard applicative sequencing.
      * <p>
-     * Translate a {@link IList} of {@code Validation} into a {@code Validation} of an {@code IList},
-     * by composing each consecutive {@code Validation} using the {@link Validation#apply(Validation)} method.
-     * @param lvt       the list of {@code Validation} values
+     * Translate a {@link IList} of {@code Validated} into a {@code Validated} of an {@code IList},
+     * by composing each consecutive {@code Validated} using the {@link Validated#apply(Validated)} method.
+     * @param lvt       the list of {@code Validated} values
      * @param <E>       the error type
-     * @param <T>       the value type of the {@code Validation}s in the list
-     * @return          a {@code Validation} which wraps an {@link IList} of values
+     * @param <T>       the value type of the {@code Validated}s in the list
+     * @return          a {@code Validated} which wraps an {@link IList} of values
      */
-    static <E, T> Validation<E, IList<T>> sequence(IList<Validation<E, T>> lvt) {
+    static <E, T> Validated<E, IList<T>> sequence(IList<Validated<E, T>> lvt) {
         return lvt.foldRight(
                 (vt, vlt) -> vt.apply(vlt.map(lt -> lt::add)),
                 success(IList.nil())
@@ -155,30 +154,30 @@ public interface Validation<E, T> {
     }
 
     /**
-     * Variation of {@link Validation#sequence(IList)} for a {@link Stream}.
-     * @param svt       the stream of {@code Validation} values
+     * Variation of {@link Validated#sequence(IList)} for a {@link Stream}.
+     * @param svt       the stream of {@code Validated} values
      * @param <E>       the error type
-     * @param <T>       the value type of the {@code Validation}s in the stream
-     * @return          a {@code Validation} which wraps an {@link Stream} of values
+     * @param <T>       the value type of the {@code Validated}s in the stream
+     * @return          a {@code Validated} which wraps an {@link Stream} of values
      */
-    static <E, T> Validation<E, Stream<T>> sequence(Stream<Validation<E, T>> svt) {
-        final Iterator<Validation<E, T>> iter = svt.iterator();
-        Validation<E, IList<T>> vlt = success(IList.nil());
+    static <E, T> Validated<E, Stream<T>> sequence(Stream<Validated<E, T>> svt) {
+        final Iterator<Validated<E, T>> iter = svt.iterator();
+        Validated<E, IList<T>> vlt = success(IList.nil());
         while (iter.hasNext()) {
-            final Validation<E, T> vt = iter.next();
+            final Validated<E, T> vt = iter.next();
             vlt = vt.apply(vlt.map(lt -> lt::add));
         }
         return vlt.map(IList::stream);
     }
 
     /**
-     * Variation of {@link Validation#sequence(IList)} for a {@link List}.
-     * @param lvt       the list of {@code Validation} values
+     * Variation of {@link Validated#sequence(IList)} for a {@link List}.
+     * @param lvt       the list of {@code Validated} values
      * @param <E>       the error type
-     * @param <T>       the value type of the {@code Validation}s in the stream
-     * @return          a {@code Validation} which wraps an {@link Stream} of values
+     * @param <T>       the value type of the {@code Validated}s in the stream
+     * @return          a {@code Validated} which wraps an {@link Stream} of values
      */
-    static <E, T> Validation<E, List<T>> sequence(List<Validation<E, T>> lvt) {
+    static <E, T> Validated<E, List<T>> sequence(List<Validated<E, T>> lvt) {
         return Folds.foldRight(
                 (vt, vlt) -> vt.apply(vlt.map(lt -> t -> {lt.add(t); return lt;})),
                 success(new ArrayList<>(lvt.size())),
@@ -199,19 +198,19 @@ public interface Validation<E, T> {
      * @return          the final value
      */
     @SuppressWarnings("unchecked")
-    static <E, A, B> Validation<E, B> tailRecM(A a, F<A, Validation<E, Either<A, B>>> f) {
+    static <E, A, B> Validated<E, B> tailRecM(A a, F<A, Validated<E, Either<A, B>>> f) {
         while (true) {
-            final Validation<E, Either<A, B>> ve = f.apply(a);
-            if (ve instanceof Validation.Failure) {
-                return ((Validation.Failure)ve).cast();
+            final Validated<E, Either<A, B>> ve = f.apply(a);
+            if (ve instanceof Validated.Failure) {
+                return ((Validated.Failure)ve).cast();
             } else {
-                final Validation.Success<E, Either<A, B>> vse = (Validation.Success<E, Either<A, B>>)ve;
+                final Validated.Success<E, Either<A, B>> vse = (Validated.Success<E, Either<A, B>>)ve;
                 if (vse.value instanceof Either.Left) {
                     final Either.Left<A, B> left = (Either.Left<A, B>) vse.value;
                     a = left.value;
                 } else {
                     final Either.Right<A, B> right = (Either.Right<A, B>) vse.value;
-                    return Validation.success(right.value);
+                    return Validated.success(right.value);
                 }
             }
         }
@@ -261,28 +260,38 @@ public interface Validation<E, T> {
      * otherwise if this is a {@code Failure} then leave it untouched.
      * @param f         the function to be applied
      * @param <U>       the function return type
-     * @return          a {@code Validation} that wraps the function result, or the original failure
+     * @return          a {@code Validated} that wraps the function result, or the original failure
      */
-    <U> Validation<E, U> map(F<T, U> f);
+    <U> Validated<E, U> map(F<T, U> f);
 
     /**
      * Applicative function application (inverted).
      * If the {@code vf} parameter is a {@code Success} value and this is a {@code Success} value,
      * then apply the function wrapped in the {@code tf} to this.
-     * @param vf        the function wrapped in a {@code Validation}
+     * @param vf        the function wrapped in a {@code Validated}
      * @param <U>       the return type of function
-     * @return          a {@code Validation} wrapping the result of applying the function, or a {@code Failure} value
+     * @return          a {@code Validated} wrapping the result of applying the function, or a {@code Failure} value
      */
-    <U> Validation<E, U> apply(Validation<E, F<T, U>> vf);
+    <U> Validated<E, U> apply(Validated<E, F<T, U>> vf);
 
     /**
-     * Builder API for chaining together n {@code Validation}s,
+     * Return the result of applying a function to the {@code Success} value,
+     * or return the {@code Failure} value.
+     * @param f         the function to be applied to the {@code Success} value.
+     * @param <U>       the type of the successful value on the function return type.
+     * @return          the result of applying a function to the {@code Success} value,
+     *                  or return the {@code Failure} value.
+     */
+    <U> Validated<E, U> andThen(F<T, Validated<E, U>> f);
+
+    /**
+     * Builder API for chaining together n {@code Validated}s,
      * and applying an n-ary function at the end.
-     * @param vb        the next {@code Validation} value to chain
-     * @param <U>       the successful result type for next {@code Validation}
+     * @param vb        the next {@code Validated} value to chain
+     * @param <U>       the successful result type for next {@code Validated}
      * @return          the next builder
      */
-    default <U> ApplyBuilder._2<E, T, U> and(Validation<E, U> vb) {
+    default <U> ApplyBuilder._2<E, T, U> and(Validated<E, U> vb) {
         return new ApplyBuilder._2<E, T, U>(this, vb);
     }
 
@@ -291,7 +300,7 @@ public interface Validation<E, T> {
      * @param <E>       the error type
      * @param <T>       the successful result type
      */
-    class Success<E, T> implements Validation<E, T> {
+    class Success<E, T> implements Validated<E, T> {
         public final T value;
 
         public Success(T value) {
@@ -336,13 +345,18 @@ public interface Validation<E, T> {
         }
 
         @Override
-        public <U> Validation<E, U> map(F<T, U> f) {
+        public <U> Validated<E, U> map(F<T, U> f) {
             return success(f.apply(value));
         }
 
         @Override
-        public <U> Validation<E, U> apply(Validation<E, F<T, U>> vf) {
+        public <U> Validated<E, U> apply(Validated<E, F<T, U>> vf) {
             return vf.map(f -> f.apply(value));
+        }
+
+        @Override
+        public <U> Validated<E, U> andThen(F<T, Validated<E, U>> f) {
+            return f.apply(value);
         }
 
         @Override
@@ -361,7 +375,7 @@ public interface Validation<E, T> {
      * @param <E>       the error type
      * @param <T>       the successful result type
      */
-    class Failure<E, T> implements Validation<E, T> {
+    class Failure<E, T> implements Validated<E, T> {
         public final IList<E> errors;
 
         public Failure(IList<E> errors) {
@@ -406,12 +420,17 @@ public interface Validation<E, T> {
         }
 
         @Override
-        public <U> Validation<E, U> map(F<T, U> f) {
+        public <U> Validated<E, U> map(F<T, U> f) {
             return cast();
         }
 
         @Override
-        public <U> Validation<E, U> apply(Validation<E, F<T, U>> vf) {
+        public <U> Validated<E, U> apply(Validated<E, F<T, U>> vf) {
+            return cast();
+        }
+
+        @Override
+        public <U> Validated<E, U> andThen(F<T, Validated<E, U>> f) {
             return cast();
         }
 
@@ -422,7 +441,7 @@ public interface Validation<E, T> {
 
         @Override
         public T getOrThrow() throws Exception {
-            throw new Exception("Validation.getOrThrow() called on a Validation.Failure value");
+            throw new Exception("Validated.getOrThrow() called on a Validated.Failure value");
         }
 
         @SuppressWarnings("unchecked")
@@ -433,95 +452,95 @@ public interface Validation<E, T> {
 
     class ApplyBuilder {
         public static class _2<E, A, B> {
-            private final Validation<E, A> va;
-            private final Validation<E, B> vb;
+            private final Validated<E, A> va;
+            private final Validated<E, B> vb;
 
-            _2(Validation<E, A> va, Validation<E, B> vb) {
+            _2(Validated<E, A> va, Validated<E, B> vb) {
                 this.va = va;
                 this.vb = vb;
             }
 
-            public <R> Validation<E, R> map(F<A, F<B, R>> f) {
+            public <R> Validated<E, R> map(F<A, F<B, R>> f) {
                 return vb.apply(va.map(f));
             }
 
-            public <R> Validation<E, R> map(F2<A, B, R> f) {
+            public <R> Validated<E, R> map(F2<A, B, R> f) {
                 return map(f.curry());
             }
 
-            public <C> _3<C> and(Validation<E, C> vc) {
+            public <C> _3<C> and(Validated<E, C> vc) {
                 return new _3<C>(vc);
             }
 
             public class _3<C> {
-                private final Validation<E, C> vc;
+                private final Validated<E, C> vc;
 
-                private _3(Validation<E, C> vc) {
+                private _3(Validated<E, C> vc) {
                     this.vc = vc;
                 }
 
-                public <R> Validation<E, R> map(F<A, F<B, F<C, R>>> f) {
+                public <R> Validated<E, R> map(F<A, F<B, F<C, R>>> f) {
                     return ap(_2.this.map(f), vc);
                 }
 
-                public <R> Validation<E, R> map(F3<A, B, C, R> f) {
+                public <R> Validated<E, R> map(F3<A, B, C, R> f) {
                     return map(f.curry());
                 }
 
-                public <D> _4<D> and(Validation<E, D> vd) {
+                public <D> _4<D> and(Validated<E, D> vd) {
                     return new _4<D>(vd);
                 }
 
                 public class _4<D> {
-                    private final Validation<E, D> vd;
+                    private final Validated<E, D> vd;
 
-                    private _4(Validation<E, D> vd) {
+                    private _4(Validated<E, D> vd) {
                         this.vd = vd;
                     }
 
-                    public <R> Validation<E, R> map(F<A, F<B, F<C, F<D, R>>>> f) {
+                    public <R> Validated<E, R> map(F<A, F<B, F<C, F<D, R>>>> f) {
                         return ap(_3.this.map(f), vd);
                     }
 
-                    public <R> Validation<E, R> map(F4<A, B, C, D, R> f) {
+                    public <R> Validated<E, R> map(F4<A, B, C, D, R> f) {
                         return map(f.curry());
                     }
 
-                    public <G> _5<G> and(Validation<E, G> vg) {
+                    public <G> _5<G> and(Validated<E, G> vg) {
                         return new _5<G>(vg);
                     }
 
                     public class _5<G> {
-                        private final Validation<E, G> vg;
+                        private final Validated<E, G> vg;
 
-                        private _5(Validation<E, G> vg) {
+                        private _5(Validated<E, G> vg) {
                             this.vg = vg;
                         }
 
-                        public <R> Validation<E, R> map(F<A, F<B, F<C, F<D, F<G, R>>>>> f) {
+                        public <R> Validated<E, R> map(F<A, F<B, F<C, F<D, F<G, R>>>>> f) {
                             return ap(_4.this.map(f), vg);
                         }
 
-                        public <R> Validation<E, R> map(F5<A, B, C, D, G, R> f) {
+                        public <R> Validated<E, R> map(F5<A, B, C, D, G, R> f) {
                             return map(f.curry());
                         }
 
-                        public <H> _6<H> and(Validation<E, H> vg) {
+                        public <H> _6<H> and(Validated<E, H> vg) {
                             return new _6<H>(vg);
                         }
 
                         public class _6<H> {
-                            private final Validation<E, H> vh;
+                            private final Validated<E, H> vh;
 
-                            private _6(Validation<E, H> vh) {
+                            private _6(Validated<E, H> vh) {
                                 this.vh = vh;
                             }
 
-                            public <R> Validation<E, R> map(F<A, F<B, F<C, F<D, F<G, F<H, R>>>>>> f) {
+                            public <R> Validated<E, R> map(F<A, F<B, F<C, F<D, F<G, F<H, R>>>>>> f) {
                                 return ap(_5.this.map(f), vh);
                             }
 
-                            public <R> Validation<E, R> map(F6<A, B, C, D, G, H, R> f) {
+                            public <R> Validated<E, R> map(F6<A, B, C, D, G, H, R> f) {
                                 return map(f.curry());
                             }
                         }
