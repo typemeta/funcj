@@ -47,7 +47,7 @@ public class Ref<I, A> implements Parser<I, A> {
 
     private Parser<I, A> impl;
 
-    Ref(Parser<I, A> p) {
+    Ref(Parser<I, A> impl) {
         this.impl = Objects.requireNonNull(impl);
     }
 
