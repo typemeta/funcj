@@ -70,7 +70,7 @@ public abstract class Combinators {
     }
 
     /**
-     * A parser that succeeds if the next inout symbol equals the supplied {@code value},
+     * A parser that succeeds if the next input symbol equals the supplied {@code value},
      * and returns the supplied {@code res} value.
      * @param val       the value expected by the parser
      * @param res       the value returned by the parser

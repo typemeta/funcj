@@ -124,7 +124,7 @@ A parser for a value of type `T` is essentially a stateless function
 which takes as input a position in a token stream,
 and (if successful) returns the parsed `T` value and the next position in the token stream.
 If the parser can't accept the next input,
-or if it reaches the end of the inout stream,
+or if it reaches the end of the input stream,
 then it will return a failure.
 
 ## Types
@@ -147,7 +147,7 @@ Input<Chr> chrArrInput = Input.of(charData);
 Input<Chr> strInput = Input.of("ABCD");
 
 // Construct an Input from a Reader.
-Inout<Chr> rdrInput = Input.of(new CharArrayReader(charData))
+Input<Chr> rdrInput = Input.of(new CharArrayReader(charData))
 ```
 ### The `Result` Type
 
