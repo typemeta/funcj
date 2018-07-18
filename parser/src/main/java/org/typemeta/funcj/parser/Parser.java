@@ -410,6 +410,23 @@ public interface Parser<I, A> {
     }
 
     /**
+     * A parser that attempts one or more parsers in turn and returns the result
+     * of the first that succeeds, or else fails.
+     * @param ps        the list of parsers
+     * @param <I>       the input stream symbol type
+     * @param <A>       the parser result type
+     * @return          a parser that attempts one or more parsers in turn
+     */
+    static <I, A>
+    Parser<I, A> choice(Parser<I, A>... ps) {
+        if (ps.length == 0) {
+            throw new RuntimeException("Cannot construct a choice from an empty list of parsers");
+        } else {
+            return choice((IList.NonEmpty<Parser<I, A>>)IList.ofArray(ps));
+        }
+    }
+
+    /**
      * A parser which applies this parser one or more times until it fails,
      * and then returns an {@link IList} of the results.
      * Note, if this parser fails on the first attempt then the parser fails.

@@ -131,9 +131,9 @@ public interface Option<T> {
 
     /**
      * Variation of {@link Try#sequence(IList)} for a {@link List}.
-     * @param lot       the list of {@code Validation} values
-     * @param <T>       the value type of the {@code Validation}s in the stream
-     * @return          a {@code Validation} which wraps an {@link Stream} of values
+     * @param lot       the list of {@code Option} values
+     * @param <T>       the value type of the {@code Option}s in the stream
+     * @return          a {@code Option} which wraps an {@link Stream} of values
      */
     static <T> Option<List<T>> sequence(List<Option<T>> lot) {
         return Folds.foldRight(

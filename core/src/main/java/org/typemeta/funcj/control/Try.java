@@ -108,9 +108,9 @@ public interface Try<T> {
 
     /**
      * Variation of {@link Try#sequence(IList)} for a {@link List}.
-     * @param ltt       the list of {@code Validation} values
-     * @param <T>       the value type of the {@code Validation}s in the stream
-     * @return          a {@code Validation} which wraps an {@link Stream} of values
+     * @param ltt       the list of {@code Try} values
+     * @param <T>       the value type of the {@code Try}s in the stream
+     * @return          a {@code Try} which wraps an {@link Stream} of values
      */
     static <T> Try<List<T>> sequence(List<Try<T>> ltt) {
         return Folds.foldRight(

@@ -19,8 +19,8 @@ import java.util.stream.Stream;
  * {@code Right} value and bypass the {@code Left} value.
  * <p>
  * Null values are not allowed.
- * @param <E>       the left-hand type (possibly an error type)
- * @param <S>       the right-hand type (possibly a success type)
+ * @param <E>       the left-hand type (typically an error type)
+ * @param <S>       the right-hand type (typically a success type)
  */
 public interface Either<E, S> {
     /**
@@ -130,10 +130,10 @@ public interface Either<E, S> {
 
     /**
      * Variation of {@link Either#sequence(IList)} for a {@link List}.
-     * @param let       the list of {@code Validation} values
+     * @param let       the list of {@code Validated} values
      * @param <E>       the error type
-     * @param <T>       the value type of the {@code Validation}s in the stream
-     * @return          a {@code Validation} which wraps an {@link Stream} of values
+     * @param <T>       the value type of the {@code Validated}s in the stream
+     * @return          a {@code Validated} which wraps an {@link Stream} of values
      */
     static <E, T> Either<E, List<T>> sequence(List<Either<E, T>> let) {
         return Folds.foldRight(

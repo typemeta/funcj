@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 /**
  * Union type of a successful result and a list of errors.
  * <p>
- * A {@code Validation<T>} value is either
+ * A {@code Validated<T>} value is either
  * the sub-type {@code Validated.Failure<T>} which wraps an list of errors, or
  * the sub-type {@code Validated.Success<T>} which wraps a value of type T.
  * <p>
