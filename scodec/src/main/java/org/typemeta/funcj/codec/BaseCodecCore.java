@@ -125,7 +125,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
         try {
             return (Class<T>) Class.forName(name);
         } catch (ClassNotFoundException ex) {
-            throw new CodecRuntimeException("Cannot create class from class name '" + name + "'", ex);
+            throw new CodecException("Cannot create class from class name '" + name + "'", ex);
         }
     }
 

@@ -6,7 +6,8 @@ import org.typemeta.funcj.functions.Functions;
  * Interface for classes which providing an encoding into a specific target type {@code E}.
  * Unlike {@link Codec}, which can only encode a single type,
  * {@code CodecCore} implementations will handle any type.
- * @param <IN, OUT>       the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 public interface CodecCore<IN, OUT> {
 
@@ -81,7 +82,6 @@ public interface CodecCore<IN, OUT> {
      * @param out       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
      * @return          the encoded value
-     * @throws Exception the exception
      */
     <T> OUT encode(T val, OUT out);
 
@@ -92,7 +92,6 @@ public interface CodecCore<IN, OUT> {
      * @param out       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
      * @return          the encoded value
-     * @throws Exception the exception
      */
     <T> OUT encode(Class<T> type, T val, OUT out);
 
@@ -102,7 +101,6 @@ public interface CodecCore<IN, OUT> {
      * @param in        the value to decode
      * @param <T>       the decoded value type
      * @return          the decoded value
-     * @throws Exception the exception
      */
     <T> T decode(Class<T> type, IN in);
 }

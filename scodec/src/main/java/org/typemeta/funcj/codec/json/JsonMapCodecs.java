@@ -7,7 +7,6 @@ import org.typemeta.funcj.json.model.*;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
-import static org.typemeta.funcj.util.Exceptions.*;
 
 public abstract class JsonMapCodecs {
 
@@ -32,7 +31,7 @@ public abstract class JsonMapCodecs {
 
             final List<JsValue> nodes =
                     map.entrySet().stream()
-                            .map(en -> CodecRuntimeException.wrap(() ->
+                            .map(en -> CodecException.wrap(() ->
                                 JSAPI.obj(
                                         JSAPI.field(keyFieldName, keyCodec.encode(en.getKey(), enc)),
                                         JSAPI.field(valueFieldName, valueCodec.encode(en.getValue(), enc))
@@ -78,7 +77,7 @@ public abstract class JsonMapCodecs {
             final List<JsObject.Field> fields = new ArrayList<>(map.size());
 
             map.forEach((k, v) -> {
-                    final JsValue value = CodecRuntimeException.wrap(() -> valueCodec.encode(v, enc));
+                    final JsValue value = CodecException.wrap(() -> valueCodec.encode(v, enc));
                     fields.add(JSAPI.field(k, value));
             });
 
@@ -92,7 +91,7 @@ public abstract class JsonMapCodecs {
             final Map<String, V> map = core.getTypeConstructor(dynType).construct();
 
             objNode.forEach(field -> {
-                    final V value = CodecRuntimeException.wrap(() -> valueCodec.decode(field.getValue()));
+                    final V value = CodecException.wrap(() -> valueCodec.decode(field.getValue()));
                     map.put(field.getName(), value);
             });
 

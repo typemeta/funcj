@@ -2,7 +2,6 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.json.JsonCodecCore;
 import org.typemeta.funcj.codec.xml.*;
-import org.typemeta.funcj.control.Either;
 import org.typemeta.funcj.json.model.*;
 import org.w3c.dom.*;
 
@@ -110,7 +109,7 @@ public class Example {
                 ZonedDateTime::toString,
                 ZonedDateTime::parse);
 
-        final Document doc = CodecRuntimeException.wrap(() ->
+        final Document doc = CodecException.wrap(() ->
                 DocumentBuilderFactory
                         .newInstance()
                         .newDocumentBuilder()

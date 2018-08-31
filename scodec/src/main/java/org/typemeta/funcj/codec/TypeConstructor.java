@@ -15,13 +15,13 @@ import static java.util.stream.Collectors.toList;
 public interface TypeConstructor<T> {
     /**
      * Create a {@code TypeConstructor} for the specified class.
-     * @param clazz type descriptor which conveys the type argument
+     * @param clazz     type descriptor which conveys the type argument
      * @param <T>       the type we want a {@code TypeConstructor} for
      * @return          a {@code TypeConstructor}
-     * @throws CodecRuntimeException if type has no constructors
+     * @throws CodecException if type has no constructors
      */
     static <T> TypeConstructor<T> create(Class<T> clazz)
-            throws CodecRuntimeException {
+            throws CodecException {
         // Get the empty-arg constructors.
         final List<Constructor<T>> ctors =
                 Arrays.stream(clazz.getDeclaredConstructors())
@@ -34,7 +34,7 @@ public interface TypeConstructor<T> {
         final Constructor<T> defCtor;
         switch (ctors.size()) {
             case 0:
-                throw new CodecRuntimeException(clazz.getName() + " has no default constructor");
+                throw new CodecException(clazz.getName() + " has no default constructor");
             case 1:
                 defCtor = ctors.get(0);
                 break;
@@ -64,7 +64,7 @@ public interface TypeConstructor<T> {
             try {
                 return accCtor.apply();
             } catch (ReflectiveOperationException ex) {
-                throw new CodecRuntimeException("Unable to construct object of type '" + clazz.getName() + "'", ex);
+                throw new CodecException("Unable to construct object of type '" + clazz.getName() + "'", ex);
             }
         };
     }
@@ -72,7 +72,6 @@ public interface TypeConstructor<T> {
     /**
      * Construct a value of type {@code T}.
      * @return          newly constructed value
-     * @throws          CodecException typically thrown by {@link java.lang.reflect.Constructor#newInstance(Object[])}
      */
-    T construct() throws CodecRuntimeException;
+    T construct();
 }

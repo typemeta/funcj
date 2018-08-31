@@ -9,8 +9,9 @@ import java.util.*;
  * Provides a builder interface for building an object {@link Codec},
  * by specifying the means by which the fields that comprise the object
  * are extracted, and the mechanism used to construct an instance of the object.
- * @param <T> raw type to be encoded/decoded
- * @param <IN, OUT> encoded type
+ * @param <T>       raw type to be encoded/decoded
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 @SuppressWarnings("unchecked")
 public class ObjectCodecBuilder<T, IN, OUT> {
@@ -20,7 +21,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
 
         <FT> FieldCodec(Functions.F<T, FT> getter, Codec<FT, IN, OUT> codec) {
             encoder = (val, out) -> codec.encode(getter.apply(val), out);
-            decoder = in -> codec.decode(in);
+            decoder = codec::decode;
         }
 
         public OUT encodeField(T val, OUT out) {
@@ -34,7 +35,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
 
     private final CodecCoreIntl<IN, OUT> core;
 
-    final Map<String, FieldCodec<T, IN, OUT>> fields = new LinkedHashMap<>();
+    protected final Map<String, FieldCodec<T, IN, OUT>> fields = new LinkedHashMap<>();
 
     public ObjectCodecBuilder(CodecCoreIntl<IN, OUT> core) {
         this.core = core;

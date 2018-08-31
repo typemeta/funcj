@@ -9,7 +9,8 @@ import java.util.Objects;
  * {@code CodecRef} implements the {@link Codec} interface.
  * Used when looking up a codec for a recursive type.
  * @param <T>       the raw type to be encoded/decoded
- * @param <IN, OUT>       the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
 

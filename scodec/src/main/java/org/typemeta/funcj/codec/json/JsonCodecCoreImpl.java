@@ -161,7 +161,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue, JsValue> implement
             if (s.length() == 1) {
                 return s.charAt(0);
             } else {
-                throw new CodecRuntimeException(
+                throw new CodecException(
                         "Unexpected String of length " + s.length() + " when decoding a char");
             }
         }

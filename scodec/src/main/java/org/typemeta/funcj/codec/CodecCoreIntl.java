@@ -8,7 +8,8 @@ import java.util.stream.*;
 
 /**
  * Internal interface for {@link CodecCore} implementations.
- * @param <IN, OUT>       the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 

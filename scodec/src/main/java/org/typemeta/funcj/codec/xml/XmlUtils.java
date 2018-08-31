@@ -23,7 +23,7 @@ public abstract class XmlUtils {
             tf.transform(new DOMSource(node), new StreamResult(out));
             return out.toString();
         } catch (TransformerException ex) {
-            throw new CodecRuntimeException(ex);
+            throw new CodecException(ex);
         }
     }
 
@@ -47,7 +47,7 @@ public abstract class XmlUtils {
                 return (Element) child;
             }
         }
-        throw new CodecRuntimeException("No ELEMENT_NODE child found for node " + node.getNodeName());
+        throw new CodecException("No ELEMENT_NODE child found for node " + node.getNodeName());
     }
 
     public static Optional<Text> firstChildTextOpt(Node node) {
@@ -65,7 +65,7 @@ public abstract class XmlUtils {
                 return (Text) child;
             }
         }
-        throw new CodecRuntimeException("No TEXT_NODE child found for node " + node.getNodeName());
+        throw new CodecException("No TEXT_NODE child found for node " + node.getNodeName());
     }
 
     public static String getAttrValue(Element elem, String name) {

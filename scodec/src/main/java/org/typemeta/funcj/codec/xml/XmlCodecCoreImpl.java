@@ -61,7 +61,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
             if (isNull(enc)) {
                 return null;
             } else {
-                throw new CodecRuntimeException("Expected a null node but got " + enc.getNodeName());
+                throw new CodecException("Expected a null node but got " + enc.getNodeName());
             }
         }
     };
@@ -79,7 +79,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
         }
 
         @Override
-        public boolean decodePrim(Element enc) throws CodecRuntimeException {
+        public boolean decodePrim(Element enc) throws CodecException {
             return Boolean.parseBoolean(XmlUtils.firstChildText(enc).getWholeText());
         }
     };
@@ -133,7 +133,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
         }
 
         @Override
-        public byte decodePrim(Element enc) throws CodecRuntimeException {
+        public byte decodePrim(Element enc) throws CodecException {
             return Byte.parseByte(XmlUtils.firstChildText(enc).getWholeText());
         }
     };
@@ -187,7 +187,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
         }
 
         @Override
-        public char decodePrim(Element enc) throws CodecRuntimeException {
+        public char decodePrim(Element enc) throws CodecException {
             return XmlUtils.firstChildText(enc).getWholeText().charAt(0);
         }
     };
@@ -241,7 +241,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
         }
 
         @Override
-        public short decodePrim(Element enc) throws CodecRuntimeException {
+        public short decodePrim(Element enc) throws CodecException {
             return Short.parseShort(XmlUtils.firstChildText(enc).getWholeText());
         }
     };
@@ -295,7 +295,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
         }
 
         @Override
-        public int decodePrim(Element enc) throws CodecRuntimeException {
+        public int decodePrim(Element enc) throws CodecException {
             return Integer.parseInt(XmlUtils.firstChildText(enc).getWholeText());
         }
     };
@@ -349,7 +349,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
         }
 
         @Override
-        public long decodePrim(Element enc) throws CodecRuntimeException {
+        public long decodePrim(Element enc) throws CodecException {
             return Long.parseLong(XmlUtils.firstChildText(enc).getWholeText());
         }
     };
@@ -403,7 +403,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
         }
 
         @Override
-        public float decodePrim(Element enc) throws CodecRuntimeException {
+        public float decodePrim(Element enc) throws CodecException {
             return Float.parseFloat(XmlUtils.firstChildText(enc).getWholeText());
         }
     };
@@ -457,7 +457,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
         }
 
         @Override
-        public double decodePrim(Element enc) throws CodecRuntimeException {
+        public double decodePrim(Element enc) throws CodecException {
             return Double.parseDouble(XmlUtils.firstChildText(enc).getWholeText());
         }
     };

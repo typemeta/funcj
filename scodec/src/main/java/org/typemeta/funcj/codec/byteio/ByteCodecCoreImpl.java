@@ -4,7 +4,6 @@ import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.utils.OperationNotImplementedException;
 import org.typemeta.funcj.util.*;
 
-import java.io.IOException;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -33,13 +32,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(boolean val, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeBoolean(val));
+            CodecException.wrap(() -> out.output().writeBoolean(val));
             return out;
         }
 
         @Override
         public boolean decodePrim(ByteIO.Input in) {
-            return CodecRuntimeException.wrap(() -> in.input().readBoolean());
+            return CodecException.wrap(() -> in.input().readBoolean());
         }
     };
 
@@ -52,7 +51,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(boolean[] vals, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeInt(vals.length));
+            CodecException.wrap(() -> out.output().writeInt(vals.length));
 
             for (boolean val : vals) {
                 booleanCodec().encode(val, out);
@@ -63,7 +62,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public boolean[] decode(ByteIO.Input in) {
-            final int l = CodecRuntimeException.wrap(() -> in.input().readInt());
+            final int l = CodecException.wrap(() -> in.input().readInt());
             final boolean[] vals = new boolean[l];
 
             for (int i = 0; i < l; ++i) {
@@ -83,13 +82,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(byte val, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeByte(val));
+            CodecException.wrap(() -> out.output().writeByte(val));
             return out;
         }
 
         @Override
         public byte decodePrim(ByteIO.Input in) {
-            return CodecRuntimeException.wrap(() -> in.input().readByte());
+            return CodecException.wrap(() -> in.input().readByte());
         }
     };
 
@@ -102,7 +101,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(byte[] vals, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeInt(vals.length));
+            CodecException.wrap(() -> out.output().writeInt(vals.length));
 
             for (byte val : vals) {
                 byteCodec().encode(val, out);
@@ -113,7 +112,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public byte[] decode(ByteIO.Input in) {
-            final int l = CodecRuntimeException.wrap(() -> in.input().readInt());
+            final int l = CodecException.wrap(() -> in.input().readInt());
             final byte[] vals = new byte[l];
 
             for (int i = 0; i < l; ++i) {
@@ -133,13 +132,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(char val, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeChar(val));
+            CodecException.wrap(() -> out.output().writeChar(val));
             return out;
         }
 
         @Override
         public char decodePrim(ByteIO.Input in) {
-            return CodecRuntimeException.wrap(() -> in.input().readChar());
+            return CodecException.wrap(() -> in.input().readChar());
         }
     };
 
@@ -152,7 +151,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(char[] vals, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeInt(vals.length));
+            CodecException.wrap(() -> out.output().writeInt(vals.length));
 
             for (char val : vals) {
                 charCodec().encode(val, out);
@@ -163,7 +162,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public char[] decode(ByteIO.Input in) {
-            final int l = CodecRuntimeException.wrap(() -> in.input().readInt());
+            final int l = CodecException.wrap(() -> in.input().readInt());
             final char[] vals = new char[l];
 
             for (int i = 0; i < l; ++i) {
@@ -183,13 +182,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(short val, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeShort(val));
+            CodecException.wrap(() -> out.output().writeShort(val));
             return out;
         }
 
         @Override
         public short decodePrim(ByteIO.Input in) {
-            return CodecRuntimeException.wrap(() -> in.input().readShort());
+            return CodecException.wrap(() -> in.input().readShort());
         }
     };
 
@@ -202,7 +201,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(short[] vals, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeInt(vals.length));
+            CodecException.wrap(() -> out.output().writeInt(vals.length));
 
             for (short val : vals) {
                 shortCodec().encode(val, out);
@@ -213,7 +212,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public short[] decode(ByteIO.Input in) {
-            final int l = CodecRuntimeException.wrap(() -> in.input().readInt());
+            final int l = CodecException.wrap(() -> in.input().readInt());
             final short[] vals = new short[l];
 
             for (int i = 0; i < l; ++i) {
@@ -233,13 +232,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(int val, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeInt(val));
+            CodecException.wrap(() -> out.output().writeInt(val));
             return out;
         }
 
         @Override
         public int decodePrim(ByteIO.Input in) {
-            return CodecRuntimeException.wrap(() -> in.input().readInt());
+            return CodecException.wrap(() -> in.input().readInt());
         }
     };
 
@@ -252,7 +251,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(int[] vals, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeInt(vals.length));
+            CodecException.wrap(() -> out.output().writeInt(vals.length));
 
             for (int val : vals) {
                 intCodec().encode(val, out);
@@ -263,7 +262,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public int[] decode(ByteIO.Input in) {
-            final int l = CodecRuntimeException.wrap(() -> in.input().readInt());
+            final int l = CodecException.wrap(() -> in.input().readInt());
             final int[] vals = new int[l];
 
             for (int i = 0; i < l; ++i) {
@@ -283,13 +282,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(long val, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeLong(val));
+            CodecException.wrap(() -> out.output().writeLong(val));
             return out;
         }
 
         @Override
         public long decodePrim(ByteIO.Input in) {
-            return CodecRuntimeException.wrap(() -> in.input().readLong());
+            return CodecException.wrap(() -> in.input().readLong());
         }
     };
 
@@ -302,7 +301,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(long[] vals, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeInt(vals.length));
+            CodecException.wrap(() -> out.output().writeInt(vals.length));
 
             for (long val : vals) {
                 longCodec().encode(val, out);
@@ -313,7 +312,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public long[] decode(ByteIO.Input in) {
-            final int l = CodecRuntimeException.wrap(() -> in.input().readInt());
+            final int l = CodecException.wrap(() -> in.input().readInt());
             final long[] vals = new long[l];
 
             for (int i = 0; i < l; ++i) {
@@ -333,13 +332,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(float val, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeFloat(val));
+            CodecException.wrap(() -> out.output().writeFloat(val));
             return out;
         }
 
         @Override
         public float decodePrim(ByteIO.Input in) {
-            return CodecRuntimeException.wrap(() -> in.input().readFloat());
+            return CodecException.wrap(() -> in.input().readFloat());
         }
     };
 
@@ -352,7 +351,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(float[] vals, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeInt(vals.length));
+            CodecException.wrap(() -> out.output().writeInt(vals.length));
 
             for (float val : vals) {
                 floatCodec().encode(val, out);
@@ -363,7 +362,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public float[] decode(ByteIO.Input in) {
-            final int l = CodecRuntimeException.wrap(() -> in.input().readInt());
+            final int l = CodecException.wrap(() -> in.input().readInt());
             final float[] vals = new float[l];
 
             for (int i = 0; i < l; ++i) {
@@ -383,13 +382,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(double val, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeDouble(val));
+            CodecException.wrap(() -> out.output().writeDouble(val));
             return out;
         }
 
         @Override
         public double decodePrim(ByteIO.Input in) {
-            return CodecRuntimeException.wrap(() -> in.input().readDouble());
+            return CodecException.wrap(() -> in.input().readDouble());
         }
     };
 
@@ -402,7 +401,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(double[] vals, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.output().writeInt(vals.length));
+            CodecException.wrap(() -> out.output().writeInt(vals.length));
 
             for (double val : vals) {
                 doubleCodec().encode(val, out);
@@ -413,7 +412,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public double[] decode(ByteIO.Input in) {
-            final int l = CodecRuntimeException.wrap(() -> in.input().readInt());
+            final int l = CodecException.wrap(() -> in.input().readInt());
             final double[] vals = new double[l];
 
             for (int i = 0; i < l; ++i) {
@@ -432,13 +431,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     protected final Codec<String, ByteIO.Input, ByteIO.Output> stringCodec = new Codec<String, ByteIO.Input, ByteIO.Output>() {
         @Override
         public ByteIO.Output encode(String val, ByteIO.Output out) {
-            CodecRuntimeException.wrap(() -> out.writeString(val));
+            CodecException.wrap(() -> out.writeString(val));
             return out;
         }
 
         @Override
         public String decode(ByteIO.Input in) {
-            return CodecRuntimeException.wrap(() -> in.readString());
+            return CodecException.wrap(() -> in.readString());
         }
     };
 

@@ -6,27 +6,29 @@ import org.typemeta.funcj.codec.utils.OperationNotImplementedException;
  * Interface for classes that encapsulates the logic for encoding a value of type {@code T}
  * into a value of type {@code IN} and vice versa.
  * @param <T>       the raw type to be encoded/decoded
- * @param <IN, OUT>       the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 public interface Codec<T, IN, OUT> {
 
     /**
      * Codec for null values.
-     * @param <IN, OUT>       the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     interface NullCodec<IN, OUT> extends Codec<Object, IN, OUT> {
         /**
          * Check whether an encoded value represents a null value.
-         * @param in       encoded value
+         * @param in        encoded value
          * @return          true if encoded value represents a null value
-         * @throws Exception if the operation fails
          */
         boolean isNull(IN in);
     }
 
     /**
      * Codec for {@link java.lang.Boolean} and {@code boolean} values.
-     * @param <IN, OUT>       the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     abstract class BooleanCodec<IN, OUT> implements Codec<Boolean, IN, OUT> {
 
@@ -52,7 +54,8 @@ public interface Codec<T, IN, OUT> {
 
     /**
      * Codec for {@link java.lang.Byte} and {@code byte} values.
-     * @param <IN, OUT>       the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     abstract class ByteCodec<IN, OUT> implements Codec<Byte, IN, OUT> {
 
@@ -78,7 +81,8 @@ public interface Codec<T, IN, OUT> {
 
     /**
      * Codec for {@link java.lang.Character} and {@code char} values.
-     * @param <IN, OUT>       the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     abstract class CharCodec<IN, OUT> implements Codec<Character, IN, OUT> {
 
@@ -104,7 +108,8 @@ public interface Codec<T, IN, OUT> {
 
     /**
      * Codec for {@link java.lang.Short} and {@code short} values.
-     * @param <IN, OUT>       the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     abstract class ShortCodec<IN, OUT> implements Codec<Short, IN, OUT> {
 
@@ -130,7 +135,8 @@ public interface Codec<T, IN, OUT> {
 
     /**
      * Codec for {@link java.lang.Integer} and {@code int} values.
-     * @param <IN, OUT>       the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     abstract class IntCodec<IN, OUT> implements Codec<Integer, IN, OUT> {
 
@@ -156,7 +162,8 @@ public interface Codec<T, IN, OUT> {
 
     /**
      * Codec for {@link java.lang.Long} and {@code long} values.
-     * @param <IN, OUT>       the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     abstract class LongCodec<IN, OUT> implements Codec<Long, IN, OUT> {
 
@@ -182,7 +189,8 @@ public interface Codec<T, IN, OUT> {
 
     /**
      * Codec for {@link java.lang.Float} and {@code float} values.
-     * @param <IN, OUT>       the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     abstract class FloatCodec<IN, OUT> implements Codec<Float, IN, OUT> {
 
@@ -208,7 +216,8 @@ public interface Codec<T, IN, OUT> {
 
     /**
      * Codec for {@link java.lang.Double} and {@code double} values.
-     * @param <IN, OUT>       the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     abstract class DoubleCodec<IN, OUT> implements Codec<Double, IN, OUT> {
 
@@ -237,7 +246,6 @@ public interface Codec<T, IN, OUT> {
      * @param val       the unencoded value
      * @param out       the encoded parent value
      * @return          the encoded value
-     * @throws Exception  if the operation fails
      */
     OUT encode(T val, OUT out);
 
@@ -245,9 +253,8 @@ public interface Codec<T, IN, OUT> {
      * Decode a value of type {@code IN} back into a value of type {@code T}.
      * One of the two {@code decode} methods must be implemented by sub-classes.
      * @param dynType   the dynamic type to decode into.
-     * @param in       the encoded value
+     * @param in        the encoded value
      * @return          the decoded value
-     * @throws Exception  if the operation fails
      */
     default T decode(Class<T> dynType, IN in) {
         return decode(in);
@@ -256,9 +263,8 @@ public interface Codec<T, IN, OUT> {
     /**
      * Decode an encoded value of type {@code IN} back into a value of type {@code T}.
      * One of the two {@code decode} methods must be implemented by sub-classes.
-     * @param in       the encoded value
+     * @param in        the encoded value
      * @return          the decoded value
-     * @throws Exception  if the operation fails
      */
     default T decode(IN in) {
         throw new OperationNotImplementedException();

@@ -92,8 +92,9 @@ public abstract class Codecs {
 
     /**
      * Base class for {@code Codec}s.
-     * @param <T> the raw type to be encoded/decoded
-     * @param <E> the encoded type
+     * @param <T>       the raw type to be encoded/decoded
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     public static abstract class CodecBase<T, IN, OUT> implements Codec<T, IN, OUT> {
 
@@ -106,7 +107,8 @@ public abstract class Codecs {
 
     /**
      * A {@code Codec} for the {@link Class} type.
-     * @param <IN, OUT> the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     public static class ClassCodec<IN, OUT> extends CodecBase<Class, IN, OUT> {
 
@@ -129,7 +131,8 @@ public abstract class Codecs {
      * Utility class for creating a {@code Codec} that encodes a type
      * as a {@code String}.
      * @param <T> the raw type to be encoded/decoded
-     * @param <IN> the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     public static class StringProxyCodec<T, IN, OUT> extends CodecBase<T, IN, OUT> {
 
