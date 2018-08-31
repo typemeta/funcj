@@ -11,7 +11,8 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * Base class for classes which implement an encoding into a specific target type.
- * @param <IN, OUT> the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 @SuppressWarnings("unchecked")
 public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
