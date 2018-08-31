@@ -95,8 +95,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
     }
 
     @Override
-    public <T> T decode(Class<T> type, IN enc) {
-        return dynamicCodec(type).decode(enc);
+    public <T> T decode(Class<T> type, IN in) {
+        return dynamicCodec(type).decode(in);
     }
 
     /**
@@ -151,20 +151,20 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
             }
 
             @Override
-            public T decode(Class<T> dynType, IN enc) {
-                if (nullCodec.isNull(enc)) {
-                    return (T)nullCodec.decode(enc);
+            public T decode(Class<T> dynType, IN in) {
+                if (nullCodec.isNull(in)) {
+                    return (T)nullCodec.decode(in);
                 } else {
-                    return codec.decode(dynType, enc);
+                    return codec.decode(dynType, in);
                 }
             }
 
             @Override
-            public T decode(IN enc) {
-                if (nullCodec.isNull(enc)) {
-                    return (T)nullCodec.decode(enc);
+            public T decode(IN in) {
+                if (nullCodec.isNull(in)) {
+                    return (T)nullCodec.decode(in);
                 } else {
-                    return codec.decode(enc);
+                    return codec.decode(in);
                 }
             }
         };
@@ -414,8 +414,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                                 }
 
                                 @Override
-                                public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN enc) {
-                                    codec.decodeField(acc.val, enc);
+                                public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN in) {
+                                    codec.decodeField(acc.val, in);
                                     return acc;
                                 }
                             };
@@ -490,8 +490,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                         }
 
                         @Override
-                        public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN enc) {
-                            acc.ctorArgs[acc.i++] = codec.decodeField(enc);
+                        public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN in) {
+                            acc.ctorArgs[acc.i++] = codec.decodeField(in);
                             return acc;
                         }
                     };
