@@ -121,7 +121,7 @@ public abstract class TestBase {
         roundTrip(TestTypes.NoEmptyCtor.create(true), TestTypes.NoEmptyCtor.class);
     }
 
-    public static <E> void registerCustomCodec(CodecCore<E> core) {
+    public static <IN, OUT> void registerCustomCodec(CodecCore<IN, OUT> core) {
         core.registerCodec(TestTypes.Custom.class)
                 .nullField("colour", c -> c.colour, TestTypes.Custom.Colour.class)
                 .nullField("date", c -> c.date, LocalDate.class)

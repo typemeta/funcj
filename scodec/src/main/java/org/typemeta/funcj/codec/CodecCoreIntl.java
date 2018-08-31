@@ -16,7 +16,7 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
     <X> Class<X> remapType(Class<X> type);
 
-    <T> Class<T> nameToClass(String name) throws CodecException;
+    <T> Class<T> nameToClass(String name);
 
     <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz);
 
@@ -106,7 +106,7 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
             Functions.F<Object[], T> ctor);
 
-    <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(ObjectMeta<T, IN, RA> objMeta);
+    <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(ObjectMeta<T, IN, OUT, RA> objMeta);
 
     String getFieldName(Field field, int depth, Set<String> existingNames);
 
@@ -114,21 +114,21 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
     <T> Codec<T, IN, OUT> dynamicCheck(Codec<T, IN, OUT> codec, Class<T> stcType);
 
-    abstract class ObjectMeta<T, E, RA extends CodecCoreIntl.ObjectMeta.ResultAccumlator<T>>
-            implements Iterable<CodecCoreIntl.ObjectMeta.Field<T, E, RA>> {
+    abstract class ObjectMeta<T, IN, OUT, RA extends CodecCoreIntl.ObjectMeta.ResultAccumlator<T>>
+            implements Iterable<CodecCoreIntl.ObjectMeta.Field<T, IN, OUT, RA>> {
         public interface ResultAccumlator<T> {
             T construct();
         }
 
-        public interface Field<T, E, RA> {
+        public interface Field<T, IN, OUT, RA> {
             String name();
-            E encodeField(T val, E in) throws Exception;
-            RA decodeField(RA acc, E in) throws Exception;
+            OUT encodeField(T val, OUT out);
+            RA decodeField(RA acc, IN in);
         }
 
-        public abstract RA startDecode(Class<T> type) throws CodecException;
+        public abstract RA startDecode(Class<T> type);
 
-        public Stream<BaseCodecCore.ObjectMeta.Field<T, E, RA>> stream() {
+        public Stream<BaseCodecCore.ObjectMeta.Field<T, IN, OUT, RA>> stream() {
             return StreamSupport.stream(spliterator(), false);
         }
 

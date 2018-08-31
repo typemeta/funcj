@@ -1,51 +1,38 @@
 package org.typemeta.funcj.codec.byteio;
 
-import org.typemeta.funcj.codec.CodecRuntimeException;
-
 import java.io.*;
 
 /**
  * ByteIO wraps either a DataInput or a DataOutput.
  */
-public interface ByteIO {
-    static ByteIO ofInputStream(InputStream is) {
+public abstract class ByteIO {
+    static ByteIO.Input ofInputStream(InputStream is) {
         return new Input(new DataInputStream(is));
     }
 
-    static ByteIO ofDataInput(DataInput input) {
+    static ByteIO.Input ofDataInput(DataInput input) {
         return new Input(input);
         //return new Input(new DebugDataInput(System.out, input));
     }
 
-    static ByteIO ofOutputStream(OutputStream os) {
+    static ByteIO.Output ofOutputStream(OutputStream os) {
         return new Output(new DataOutputStream(os));
     }
 
-    static ByteIO ofDataOutput(DataOutput output) {
+    static ByteIO.Output ofDataOutput(DataOutput output) {
         return new Output(output);
         //return new Output(new DebugDataOutput(System.out, output));
     }
 
-    final class Input implements ByteIO {
+    final static class Input {
         private final DataInput input;
 
         Input(DataInput input) {
             this.input = input;
         }
 
-        @Override
         public DataInput input() {
             return input;
-        }
-
-        @Override
-        public DataOutput output() {
-            throw new CodecRuntimeException("output() called on ByteIO.Input");
-        }
-
-        @Override
-        public void writeString(String s) {
-            throw new CodecRuntimeException("writeString() called on ByteIO.Input");
         }
 
         public String readString() throws IOException {
@@ -58,19 +45,13 @@ public interface ByteIO {
         }
     }
 
-    final class Output implements ByteIO {
+    final static class Output {
         private final DataOutput output;
 
         Output(DataOutput output) {
             this.output = output;
         }
 
-        @Override
-        public DataInput input() {
-            throw new CodecRuntimeException("input() called on ByteIO.Output");
-        }
-
-        @Override
         public DataOutput output() {
             return output;
         }
@@ -79,20 +60,7 @@ public interface ByteIO {
             output.writeInt(s.length());
             output.writeChars(s);
         }
-
-        @Override
-        public String readString() {
-            throw new CodecRuntimeException("readString() called on ByteIO.Output");
-        }
     }
-
-    DataInput input();
-    
-    DataOutput output();
-    
-    void writeString(String s) throws IOException;
-
-    String readString() throws IOException;
 }
 /*
 class DebugDataOutput implements DataOutput {

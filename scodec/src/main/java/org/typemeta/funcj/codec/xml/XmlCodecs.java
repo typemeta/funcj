@@ -14,7 +14,7 @@ public class XmlCodecs {
         return Codecs.registerAll(core);
     }
 
-    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, Element> {
+    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, Element, Element> {
 
         private static final String emptyAttrVal = "empty";
         private static final String presAttrVal = "present";
@@ -27,19 +27,15 @@ public class XmlCodecs {
         }
 
         @Override
-        public Element encode(Optional<T> val, Element enc) throws Exception {
-            return unwrap(() ->
-                    val.map(
-                            wrap(t -> {
-                                    XmlUtils.setAttrValue(enc, attrName, presAttrVal);
-                                    return core.dynamicCodec().encode(t, enc);
-                            })::apply
-                    ).orElseGet(() -> XmlUtils.setAttrValue(enc, attrName, emptyAttrVal))
-            );
+        public Element encode(Optional<T> val, Element enc) {
+            return val.map(t -> {
+                XmlUtils.setAttrValue(enc, attrName, presAttrVal);
+                return core.dynamicCodec().encode(t, enc);
+            }).orElseGet(() -> XmlUtils.setAttrValue(enc, attrName, emptyAttrVal));
         }
 
         @Override
-        public Optional<T> decode(Element enc) throws Exception {
+        public Optional<T> decode(Element enc) {
             if (enc.getAttribute(attrName).equals(emptyAttrVal)) {
                 return Optional.empty();
             } else {

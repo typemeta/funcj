@@ -46,19 +46,19 @@ public class Example {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         jsonTest();
         xmlTest();
     }
 
-    static class ZonedDateTimeJsonCodec extends Codecs.CodecBase<ZonedDateTime, JsValue> {
+    static class ZonedDateTimeJsonCodec extends Codecs.CodecBase<ZonedDateTime, JsValue, JsValue> {
 
         public ZonedDateTimeJsonCodec(JsonCodecCore core) {
             super(core);
         }
 
         @Override
-        public JsValue encode(ZonedDateTime val, JsValue enc) throws Exception {
+        public JsValue encode(ZonedDateTime val, JsValue enc) {
             return JSAPI.obj(
                     JSAPI.field("dateTime", core.encode(val.toLocalDateTime(), enc)),
                     JSAPI.field("zone", core.encode(val.getZone(), enc)),
@@ -67,7 +67,7 @@ public class Example {
         }
 
         @Override
-        public ZonedDateTime decode(JsValue enc) throws Exception {
+        public ZonedDateTime decode(JsValue enc) {
             final JsObject obj = enc.asObject();
             return ZonedDateTime.ofLocal(
                     core.decode(LocalDateTime.class, obj.get("dateTime")),
@@ -85,7 +85,7 @@ public class Example {
                     ZoneId.of("GMT")),
             Colour.GREEN, Colour.BLUE);
 
-    static void jsonTest() throws Exception {
+    static void jsonTest() {
         final JsonCodecCore jsonCodecCore = Codecs.jsonCodec();
 //        codec.registerStringProxyCodec(
 //                ZonedDateTime.class,
@@ -103,18 +103,19 @@ public class Example {
         assert(person.equals(person2));
     }
 
-    static void xmlTest() throws Exception {
+    static void xmlTest() {
         final XmlCodecCore mmlCodecCore = Codecs.xmlCodec();
         mmlCodecCore.registerStringProxyCodec(
                 ZonedDateTime.class,
                 ZonedDateTime::toString,
                 ZonedDateTime::parse);
 
-        final Document doc =
+        final Document doc = CodecRuntimeException.wrap(() ->
                 DocumentBuilderFactory
                         .newInstance()
                         .newDocumentBuilder()
-                        .newDocument();
+                        .newDocument()
+        );
 
         // Serialise to XML.
         final Element elem = mmlCodecCore.encode(Person.class, person, doc.createElement("person"));

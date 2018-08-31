@@ -14,20 +14,20 @@ public class JsonCodecs {
         return Codecs.registerAll(core);
     }
 
-    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, JsValue> {
+    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, JsValue, JsValue> {
 
-        protected OptionalCodec(CodecCoreIntl<JsValue> core) {
+        protected OptionalCodec(CodecCoreIntl<JsValue, JsValue> core) {
             super(core);
         }
 
         @Override
-        public JsValue encode(Optional<T> val, JsValue enc) throws Exception {
+        public JsValue encode(Optional<T> val, JsValue enc) {
             return unwrap(() -> val.map(t -> wrap(() -> core.dynamicCodec().encode(t, enc)))
                     .orElseGet(JSAPI::obj));
         }
 
         @Override
-        public Optional<T> decode(JsValue enc) throws Exception {
+        public Optional<T> decode(JsValue enc) {
             if (enc.isObject() && enc.asObject().isEmpty()) {
                 return Optional.empty();
             } else {

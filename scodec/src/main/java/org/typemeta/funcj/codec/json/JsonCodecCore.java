@@ -8,7 +8,7 @@ import org.typemeta.funcj.json.model.JsValue;
  * via the {@link JsValue} representation for JSON values.
  */
 @SuppressWarnings("unchecked")
-public interface JsonCodecCore extends CodecCoreIntl<JsValue> {
+public interface JsonCodecCore extends CodecCoreIntl<JsValue, JsValue> {
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.
@@ -17,7 +17,7 @@ public interface JsonCodecCore extends CodecCoreIntl<JsValue> {
      * @return      the encoded value
      * @throws Exception if the operation fails
      */
-    default <T> JsValue encode(T val) throws Exception {
+    default <T> JsValue encode(T val) {
         return encode((Class<T>)val.getClass(), val);
     }
 
@@ -29,7 +29,7 @@ public interface JsonCodecCore extends CodecCoreIntl<JsValue> {
      * @return      the encoded value
      * @throws Exception if the operation fails
      */
-    default <T> JsValue encode(Class<T> type, T val) throws Exception {
+    default <T> JsValue encode(Class<T> type, T val) {
         return encode(type, val, null);
     }
 }

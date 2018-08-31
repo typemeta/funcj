@@ -15,19 +15,19 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class ObjectCodecBuilder<T, IN, OUT> {
     public static class FieldCodec<T, IN, OUT> {
-        protected final FunctionsEx.F2<T, IN, IN, OUT> encoder;
-        protected final FunctionsEx.F<IN, Object> decoder;
+        protected final Functions.F2<T, OUT, OUT> encoder;
+        protected final Functions.F<IN, Object> decoder;
 
-        <FT> FieldCodec(FunctionsEx.F<T, FT> getter, Codec<FT, IN, OUT> codec) {
-            encoder = (val, in) -> codec.encode(getter.apply(val), in);
+        <FT> FieldCodec(Functions.F<T, FT> getter, Codec<FT, IN, OUT> codec) {
+            encoder = (val, out) -> codec.encode(getter.apply(val), out);
             decoder = in -> codec.decode(in);
         }
 
-        public IN encodeField(T val, IN in) throws Exception {
-            return encoder.apply(val, in);
+        public OUT encodeField(T val, OUT out) {
+            return encoder.apply(val, out);
         }
 
-        public Object decodeField(IN in) throws Exception {
+        public Object decodeField(IN in)  {
             return decoder.apply(in);
         }
     }
@@ -60,16 +60,16 @@ public class ObjectCodecBuilder<T, IN, OUT> {
         return core.dynamicCodec(core.getNullUnsafeCodec(stcType), stcType);
     }
 
-    <A> _1<A> field(String name, FunctionsEx.F<T, A> getter, Codec<A, IN, OUT> codec) {
+    <A> _1<A> field(String name, Functions.F<T, A> getter, Codec<A, IN, OUT> codec) {
         fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
         return new _1<A>();
     }
 
-    <A> _1<A> nullField(String name, FunctionsEx.F<T, A> getter, Class<A> clazz) {
+    <A> _1<A> nullField(String name, Functions.F<T, A> getter, Class<A> clazz) {
         return field(name, getter, getNullSafeCodec(clazz));
     }
 
-    <A> _1<A> field(String name, FunctionsEx.F<T, A> getter, Class<A> clazz) {
+    <A> _1<A> field(String name, Functions.F<T, A> getter, Class<A> clazz) {
         return field(name, getter, getNullUnsafeCodec(clazz));
     }
 
@@ -81,17 +81,17 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                             arr -> ctor.apply((A)arr[0])));
         }
 
-        <B> _2<B> field(String name, FunctionsEx.F<T, B> getter, Codec<B, IN, OUT> codec) {
+        <B> _2<B> field(String name, Functions.F<T, B> getter, Codec<B, IN, OUT> codec) {
             fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
             return new _2<B>();
         }
 
-        <B> _2<B> nullField(String name, FunctionsEx.F<T, B> getter, Class<B> clazz) {
+        <B> _2<B> nullField(String name, Functions.F<T, B> getter, Class<B> clazz) {
             return field(name, getter, getNullSafeCodec(clazz));
 
         }
 
-        <B> _2<B> field(String name, FunctionsEx.F<T, B> getter, Class<B> clazz) {
+        <B> _2<B> field(String name, Functions.F<T, B> getter, Class<B> clazz) {
             return field(name, getter, getNullUnsafeCodec(clazz));
         }
 
@@ -103,16 +103,16 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                                 arr -> ctor.apply((A)arr[0], (B)arr[1])));
             }
 
-            <C> _3<C> field(String name, FunctionsEx.F<T, C> getter, Codec<C, IN, OUT> codec) {
+            <C> _3<C> field(String name, Functions.F<T, C> getter, Codec<C, IN, OUT> codec) {
                 fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
                 return new _3<C>();
             }
 
-            <C> _3<C> nullField(String name, FunctionsEx.F<T, C> getter, Class<C> clazz) {
+            <C> _3<C> nullField(String name, Functions.F<T, C> getter, Class<C> clazz) {
                 return field(name, getter, getNullSafeCodec(clazz));
             }
 
-            <C> _3<C> field(String name, FunctionsEx.F<T, C> getter, Class<C> clazz) {
+            <C> _3<C> field(String name, Functions.F<T, C> getter, Class<C> clazz) {
                 return field(name, getter, getNullUnsafeCodec(clazz));
             }
 
@@ -124,16 +124,16 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                                     arr -> ctor.apply((A)arr[0], (B)arr[1], (C)arr[2])));
                 }
 
-                <D> _4<D> field(String name, FunctionsEx.F<T, D> getter, Codec<D, IN, OUT> codec) {
+                <D> _4<D> field(String name, Functions.F<T, D> getter, Codec<D, IN, OUT> codec) {
                     fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
                     return new _4<D>();
                 }
 
-                <D> _4<D> nullField(String name, FunctionsEx.F<T, D> getter, Class<D> clazz) {
+                <D> _4<D> nullField(String name, Functions.F<T, D> getter, Class<D> clazz) {
                     return field(name, getter, getNullSafeCodec(clazz));
                 }
 
-                <D> _4<D> field(String name, FunctionsEx.F<T, D> getter, Class<D> clazz) {
+                <D> _4<D> field(String name, Functions.F<T, D> getter, Class<D> clazz) {
                     return field(name, getter, getNullUnsafeCodec(clazz));
                 }
 
@@ -145,16 +145,16 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                                         arr -> ctor.apply((A)arr[0], (B)arr[1], (C)arr[2], (D)arr[3])));
                     }
 
-                    <N> _N field(String name, FunctionsEx.F<T, N> getter, Codec<N, IN, OUT> codec) {
+                    <N> _N field(String name, Functions.F<T, N> getter, Codec<N, IN, OUT> codec) {
                         fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
                         return new _N();
                     }
 
-                    <N> _N nullField(String name, FunctionsEx.F<T, N> getter, Class<N> clazz) {
+                    <N> _N nullField(String name, Functions.F<T, N> getter, Class<N> clazz) {
                         return field(name, getter, getNullSafeCodec(clazz));
                     }
 
-                    <N> _N field(String name, FunctionsEx.F<T, N> getter, Class<N> clazz) {
+                    <N> _N field(String name, Functions.F<T, N> getter, Class<N> clazz) {
                         return field(name, getter, getNullUnsafeCodec(clazz));
                     }
 
@@ -163,16 +163,16 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                             return registration(core.createObjectCodec(fields, ctor));
                         }
 
-                        <N> _N field(String name, FunctionsEx.F<T, N> getter, Codec<N, IN, OUT> codec) {
+                        <N> _N field(String name, Functions.F<T, N> getter, Codec<N, IN, OUT> codec) {
                             fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
                             return new _N();
                         }
 
-                        <N> _N nullField(String name, FunctionsEx.F<T, N> getter, Class<N> clazz) {
+                        <N> _N nullField(String name, Functions.F<T, N> getter, Class<N> clazz) {
                             return field(name, getter, getNullSafeCodec(clazz));
                         }
 
-                        <N> _N field(String name, FunctionsEx.F<T, N> getter, Class<N> clazz) {
+                        <N> _N field(String name, Functions.F<T, N> getter, Class<N> clazz) {
                             return field(name, getter, getNullUnsafeCodec(clazz));
                         }
                     }

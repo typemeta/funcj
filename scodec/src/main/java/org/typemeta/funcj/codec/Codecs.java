@@ -12,14 +12,14 @@ import java.time.*;
  */
 public abstract class Codecs {
 
-//    /**
-//     * Construct and return a new instance of a {@link JsonCodecCore}.
-//     * @return the new {@code JsonCodecCore}
-//     */
-//    public static JsonCodecCore jsonCodec() {
-//        final JsonCodecCoreImpl codec = new JsonCodecCoreImpl();
-//        return JsonCodecs.registerAll(codec);
-//    }
+    /**
+     * Construct and return a new instance of a {@link JsonCodecCore}.
+     * @return the new {@code JsonCodecCore}
+     */
+    public static JsonCodecCore jsonCodec() {
+        final JsonCodecCoreImpl codec = new JsonCodecCoreImpl();
+        return JsonCodecs.registerAll(codec);
+    }
 
     /**
      * Construct and return a new instance of a {@link XmlCodecCore}.
@@ -115,12 +115,12 @@ public abstract class Codecs {
         }
 
         @Override
-        public IN encode(Class val, IN in) throws Exception {
-            return core.stringCodec().encode(core.classToName(val), in);
+        public OUT encode(Class val, OUT out) {
+            return core.stringCodec().encode(core.classToName(val), out);
         }
 
         @Override
-        public Class decode(IN in) throws Exception {
+        public Class decode(IN in) {
             return core.nameToClass(core.stringCodec().decode(in));
         }
     }
@@ -146,12 +146,12 @@ public abstract class Codecs {
         }
 
         @Override
-        public IN encode(T val, IN in) throws Exception {
-            return core.stringCodec().encode(encode.apply(val), in);
+        public OUT encode(T val, OUT out) {
+            return core.stringCodec().encode(encode.apply(val), out);
         }
 
         @Override
-        public T decode(IN in) throws Exception {
+        public T decode(IN in) {
             return decode.apply(core.stringCodec().decode(in));
         }
     }

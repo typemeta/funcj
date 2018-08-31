@@ -29,7 +29,8 @@ public interface TypeConstructor<T> {
                         .map(ctor -> (Constructor<T>)ctor)
                         .collect(toList());
 
-        // Select the accessible ctor if there is only one, otherwise just the first one.
+        // Select the accessible ctor if there is only one, otherwise just use
+        // the first one.
         final Constructor<T> defCtor;
         switch (ctors.size()) {
             case 0:
@@ -63,7 +64,7 @@ public interface TypeConstructor<T> {
             try {
                 return accCtor.apply();
             } catch (ReflectiveOperationException ex) {
-                throw new CodecException("Unable to construct object of type '" + clazz.getName() + "'", ex);
+                throw new CodecRuntimeException("Unable to construct object of type '" + clazz.getName() + "'", ex);
             }
         };
     }
@@ -73,5 +74,5 @@ public interface TypeConstructor<T> {
      * @return          newly constructed value
      * @throws          CodecException typically thrown by {@link java.lang.reflect.Constructor#newInstance(Object[])}
      */
-    T construct() throws CodecException;
+    T construct() throws CodecRuntimeException;
 }

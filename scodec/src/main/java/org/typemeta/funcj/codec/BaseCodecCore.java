@@ -85,17 +85,17 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
     }
 
     @Override
-    public <T> IN encode(T val, IN enc) throws Exception {
-        return encode((Class<T>)val.getClass(), val, enc);
+    public <T> OUT encode(T val, OUT out) {
+        return encode((Class<T>)val.getClass(), val, out);
     }
 
     @Override
-    public <T> IN encode(Class<T> type, T val, IN enc) throws Exception {
-        return dynamicCodec(type).encode(val, enc);
+    public <T> OUT encode(Class<T> type, T val, OUT out) {
+        return dynamicCodec(type).encode(val, out);
     }
 
     @Override
-    public <T> T decode(Class<T> type, IN enc) throws Exception {
+    public <T> T decode(Class<T> type, IN enc) {
         return dynamicCodec(type).decode(enc);
     }
 
@@ -121,11 +121,11 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
     }
 
     @Override
-    public <T> Class<T> nameToClass(String name) throws CodecException {
+    public <T> Class<T> nameToClass(String name) {
         try {
             return (Class<T>) Class.forName(name);
         } catch (ClassNotFoundException ex) {
-            throw new CodecException("Cannot create class from class name '" + name + "'", ex);
+            throw new CodecRuntimeException("Cannot create class from class name '" + name + "'", ex);
         }
     }
 
@@ -142,16 +142,16 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
         final Codec.NullCodec<IN, OUT> nullCodec = nullCodec();
         return new Codec<T, IN, OUT>() {
             @Override
-            public IN encode(T val, IN enc) throws Exception {
+            public OUT encode(T val, OUT out) {
                 if (val == null) {
-                    return nullCodec.encode(null, enc);
+                    return nullCodec.encode(null, out);
                 } else {
-                    return codec.encode(val, enc);
+                    return codec.encode(val, out);
                 }
             }
 
             @Override
-            public T decode(Class<T> dynType, IN enc) throws Exception {
+            public T decode(Class<T> dynType, IN enc) {
                 if (nullCodec.isNull(enc)) {
                     return (T)nullCodec.decode(enc);
                 } else {
@@ -160,7 +160,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
             }
 
             @Override
-            public T decode(IN enc) throws Exception {
+            public T decode(IN enc) {
                 if (nullCodec.isNull(enc)) {
                     return (T)nullCodec.decode(enc);
                 } else {
@@ -365,7 +365,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
 
     @Override
     public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> type) {
-        final Map<String, FieldCodec<IN>> fieldCodecs = new LinkedHashMap<>();
+        final Map<String, FieldCodec<IN, OUT>> fieldCodecs = new LinkedHashMap<>();
         Class<?> clazz = type;
         for (int depth = 0; !clazz.equals(Object.class); depth++) {
             final Field[] fields = clazz.getDeclaredFields();
@@ -383,11 +383,11 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
     }
 
     @Override
-    public <T> Codec<T, IN, OUT> createObjectCodec(Map<String, FieldCodec<IN>> fieldCodecs) {
+    public <T> Codec<T, IN, OUT> createObjectCodec(Map<String, FieldCodec<IN, OUT>> fieldCodecs) {
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final T val;
 
-            ResultAccumlatorImpl(Class<T> type) throws CodecException {
+            ResultAccumlatorImpl(Class<T> type) {
                 this.val = getTypeConstructor(type).construct();
             }
 
@@ -397,39 +397,39 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
             }
         }
 
-        final List<ObjectMeta.Field<T, IN, ResultAccumlatorImpl>> fieldMetas =
+        final List<ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>> fieldMetas =
                 fieldCodecs.entrySet().stream()
                         .map(en -> {
                             final String name = en.getKey();
                             final FieldCodec<IN, OUT> codec = en.getValue();
-                            return (ObjectMeta.Field<T, IN, ResultAccumlatorImpl>)new ObjectMeta.Field<T, IN, ResultAccumlatorImpl>() {
+                            return (ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>)new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
                                 @Override
                                 public String name() {
                                     return name;
                                 }
 
                                 @Override
-                                public IN encodeField(T val, IN enc) throws Exception {
-                                    return codec.encodeField(val, enc);
+                                public OUT encodeField(T val, OUT out) {
+                                    return codec.encodeField(val, out);
                                 }
 
                                 @Override
-                                public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN enc) throws Exception {
+                                public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN enc) {
                                     codec.decodeField(acc.val, enc);
                                     return acc;
                                 }
                             };
                         }).collect(toList());
 
-        return createObjectCodec(new ObjectMeta<T, IN, ResultAccumlatorImpl>() {
+        return createObjectCodec(new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
 
             @Override
-            public Iterator<Field<T, IN, ResultAccumlatorImpl>> iterator() {
+            public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
                 return fieldMetas.iterator();
             }
 
             @Override
-            public ResultAccumlatorImpl startDecode(Class<T> type) throws CodecException {
+            public ResultAccumlatorImpl startDecode(Class<T> type) {
                 return new ResultAccumlatorImpl(type);
             }
 
@@ -458,7 +458,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
 
     @Override
     public <T> Codec<T, IN, OUT> createObjectCodec(
-            Map<String, ObjectCodecBuilder.FieldCodec<T, IN>> fieldCodecs,
+            Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
             Functions.F<Object[], T> ctor) {
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final Object[] ctorArgs;
@@ -474,23 +474,23 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
             }
         }
 
-        final List<ObjectMeta.Field<T, IN, ResultAccumlatorImpl>> fieldMetas = fieldCodecs.entrySet().stream()
+        final List<ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>> fieldMetas = fieldCodecs.entrySet().stream()
                 .map(en -> {
                     final String name = en.getKey();
                     final ObjectCodecBuilder.FieldCodec<T, IN, OUT> codec = en.getValue();
-                    return (ObjectMeta.Field<T, IN, ResultAccumlatorImpl>)new ObjectMeta.Field<T, IN, ResultAccumlatorImpl>() {
+                    return (ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>)new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
                         @Override
                         public String name() {
                             return name;
                         }
 
                         @Override
-                        public IN encodeField(T val, IN enc) throws Exception {
-                            return codec.encodeField(val, enc);
+                        public OUT encodeField(T val, OUT out) {
+                            return codec.encodeField(val, out);
                         }
 
                         @Override
-                        public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN enc) throws Exception {
+                        public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN enc) {
                             acc.ctorArgs[acc.i++] = codec.decodeField(enc);
                             return acc;
                         }
@@ -498,10 +498,10 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                 }).collect(toList());
 
 
-        return createObjectCodec(new ObjectMeta<T, IN, ResultAccumlatorImpl>() {
+        return createObjectCodec(new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
 
             @Override
-            public Iterator<Field<T, IN, ResultAccumlatorImpl>> iterator() {
+            public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
                 return fieldMetas.iterator();
             }
 
