@@ -548,7 +548,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
                 if (!typeMatch) {
                     stringCodec().encode(classToName(dynType), out);
                 }
-                return encode2(ByteCodecCoreImpl.this.getNullUnsafeCodec(dynType), val, out);
+                return encode2(ByteCodecCoreImpl.this.getNullUnsafeCodecDyn(dynType), val, out);
             }
 
             protected <S extends T> ByteIO.Output encode2(Codec<S, ByteIO.Input, ByteIO.Output> codec, T val, ByteIO.Output out) {
@@ -567,7 +567,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
                     dynType = nameToClass(typeName);
                 }
 
-                final Codec<T, ByteIO.Input, ByteIO.Output> codec = ByteCodecCoreImpl.this.getNullUnsafeCodec(dynType);
+                final Codec<T, ByteIO.Input, ByteIO.Output> codec = ByteCodecCoreImpl.this.getNullUnsafeCodecDyn(dynType);
                 return codec.decode(dynType, in);
             }
         };

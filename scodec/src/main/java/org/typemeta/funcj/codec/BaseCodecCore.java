@@ -188,24 +188,31 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
     }
 
     @Override
-    public <T> Codec<T, IN, OUT> getNullSafeCodec(Class<T> type) {
-        return makeNullSafeCodec(getNullUnsafeCodec(type));
+    public <T> Codec<T, IN, OUT> getNullSafeCodecDyn(Class<T> dynType) {
+        return makeNullSafeCodec(getNullUnsafeCodecDyn(dynType));
+    }
+
+    @Override
+    public <T> Codec<T, IN, OUT> getNullUnsafeCodecDyn(Class<T> dynType) {
+        final Class<T> dynType2 = remapType(dynType);
+        final String name = classToName(dynType2);
+        return getCodec(name, () -> createNullUnsafeCodecDyn(dynType2));
     }
 
     /**
      * Lookup a {@code Codec} for a name, and, if one doesn't exist,
-     * then use the {@code codecSupp} to create a new one.
+     * then use the {@code codecCreator} to create a new one.
      * <p>
      * This is slightly tricky as it needs to be re-entrant in case the
      * type in question is recursive.
-     * I.e. {@code codecSupp}, when invoked, may call this method again for the same type.
+     * I.e. {@code codecCreator}, when invoked, may call this method again for the same type.
      * @param name      the type name
-     * @param codecSupp a supplier of the {@code Codec} value
+     * @param codecCreator a supplier of the {@code Codec} value
      * @param <T>       the raw type to be encoded/decoded
      * @return          the {@code Codec} for the specified name
      */
     @Override
-    public <T> Codec<T, IN, OUT> getCodec(String name, Functions.F0<Codec<T, IN, OUT>> codecSupp) {
+    public <T> Codec<T, IN, OUT> getCodec(String name, Functions.F0<Codec<T, IN, OUT>> codecCreator) {
         // First attempt, without locking.
         if (codecRegistry.containsKey(name)) {
             return (Codec<T, IN, OUT>)codecRegistry.get(name);
@@ -223,46 +230,39 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
             }
 
             // Initialise the CodecRef, and overwrite the registry entry with the real Codec.
-            codecRegistry.put(name, codecRef.setIfUninitialised(codecSupp));
+            codecRegistry.put(name, codecRef.setIfUninitialised(codecCreator));
 
             return (Codec<T, IN, OUT>)codecRegistry.get(name);
         }
     }
 
     @Override
-    public <T> Codec<T, IN, OUT> getNullUnsafeCodec(Class<T> type) {
-        final Class<T> type2 = remapType(type);
-        final String name = classToName(type2);
-        return getCodec(name, () -> getNullUnsafeCodecImplDyn(type2));
-    }
-
-    @Override
-    public <T> Codec<T, IN, OUT> getNullUnsafeCodecImplDyn(Class<T> dynType) {
-        final Codec<T, IN, OUT> codec = getNullUnsafeCodecImpl(dynType);
-        if (codec == null) {
-            return createObjectCodec(dynType);
-        } else {
+    public <T> Codec<T, IN, OUT> createNullUnsafeCodecDyn(Class<T> dynType) {
+        final Codec<T, IN, OUT> codec = createNullUnsafeCodec(dynType);
+        if (codec != null) {
             return codec;
+        } else {
+            return createObjectCodec(dynType);
         }
     }
 
     @Override
-    public <T> Codec<T, IN, OUT> getNullUnsafeCodecImplStc(Class<T> stcType) {
-        final Codec<T, IN, OUT> codec = getNullUnsafeCodecImpl(stcType);
-        if (codec == null) {
+    public <T> Codec<T, IN, OUT> createNullUnsafeCodecStc(Class<T> stcType) {
+        final Codec<T, IN, OUT> codec = createNullUnsafeCodec(stcType);
+        if (codec != null) {
+            return codec;
+        } else {
             if (Modifier.isFinal(stcType.getModifiers())) {
                 final String name = classToName(stcType);
                 return getCodec(name, () -> createObjectCodec(stcType));
             } else {
                 return dynamicCodec(stcType);
             }
-        } else {
-            return codec;
         }
     }
 
     @Override
-    public <T> Codec<T, IN, OUT> getNullUnsafeCodecImpl(Class<T> type) {
+    public <T> Codec<T, IN, OUT> createNullUnsafeCodec(Class<T> type) {
         if (type.isPrimitive()) {
             if (type.equals(boolean.class)) {
                 return (Codec<T, IN, OUT>)booleanCodec();
@@ -374,7 +374,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                 final int fm = field.getModifiers();
                 if (!Modifier.isStatic(fm) && !Modifier.isTransient(fm)) {
                     final String fieldName = getFieldName(field, depth, fieldCodecs.keySet());
-                    fieldCodecs.put(fieldName, getFieldCodec(field));
+                    fieldCodecs.put(fieldName, createFieldCodec(field));
                 }
             }
             clazz = clazz.getSuperclass();
@@ -423,7 +423,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                         }).collect(toList());
 
         return createObjectCodec(new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
-
             @Override
             public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
                 return fieldMetas.iterator();
@@ -498,9 +497,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                     };
                 }).collect(toList());
 
-
         return createObjectCodec(new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
-
             @Override
             public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
                 return fieldMetas.iterator();
@@ -528,7 +525,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
     }
 
     @Override
-    public <T> FieldCodec<IN, OUT> getFieldCodec(Field field) {
+    public <T> FieldCodec<IN, OUT> createFieldCodec(Field field) {
         final Class<T> stcType = (Class<T>)field.getType();
         if (stcType.isPrimitive()) {
             if (stcType.equals(boolean.class)) {
@@ -554,31 +551,31 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
             if (stcType.isArray()) {
                 final Class<?> elemType = stcType.getComponentType();
                 if (elemType.equals(boolean.class)) {
-                    final Codec<boolean[], IN, OUT> codec = getNullSafeCodec((Class<boolean[]>)stcType);
+                    final Codec<boolean[], IN, OUT> codec = getNullSafeCodecDyn((Class<boolean[]>)stcType);
                     return new FieldCodec.BooleanArrayFieldCodec<IN, OUT>(field, codec);
                 } else if (elemType.equals(byte.class)) {
-                    final Codec<byte[], IN, OUT> codec = getNullSafeCodec((Class<byte[]>)stcType);
+                    final Codec<byte[], IN, OUT> codec = getNullSafeCodecDyn((Class<byte[]>)stcType);
                     return new FieldCodec.ByteArrayFieldCodec<IN, OUT>(field, codec);
                 } else if (elemType.equals(char.class)) {
-                    final Codec<char[], IN, OUT> codec = getNullSafeCodec((Class<char[]>)stcType);
+                    final Codec<char[], IN, OUT> codec = getNullSafeCodecDyn((Class<char[]>)stcType);
                     return new FieldCodec.CharArrayFieldCodec<IN, OUT>(field, codec);
                 } else if (elemType.equals(short.class)) {
-                    final Codec<short[], IN, OUT> codec = getNullSafeCodec((Class<short[]>)stcType);
+                    final Codec<short[], IN, OUT> codec = getNullSafeCodecDyn((Class<short[]>)stcType);
                     return new FieldCodec.ShortArrayFieldCodec<IN, OUT>(field, codec);
                 } else if (elemType.equals(int.class)) {
-                    final Codec<int[], IN, OUT> codec = getNullSafeCodec((Class<int[]>)stcType);
+                    final Codec<int[], IN, OUT> codec = getNullSafeCodecDyn((Class<int[]>)stcType);
                     return new FieldCodec.IntegerArrayFieldCodec<IN, OUT>(field, codec);
                 } else if (elemType.equals(long.class)) {
-                    final Codec<long[], IN, OUT> codec = getNullSafeCodec((Class<long[]>)stcType);
+                    final Codec<long[], IN, OUT> codec = getNullSafeCodecDyn((Class<long[]>)stcType);
                     return new FieldCodec.LongArrayFieldCodec<IN, OUT>(field, codec);
                 } else if (elemType.equals(float.class)) {
-                    final Codec<float[], IN, OUT> codec = getNullSafeCodec((Class<float[]>)stcType);
+                    final Codec<float[], IN, OUT> codec = getNullSafeCodecDyn((Class<float[]>)stcType);
                     return new FieldCodec.FloatArrayFieldCodec<IN, OUT>(field, codec);
                 } else if (elemType.equals(double.class)) {
-                    final Codec<double[], IN, OUT> codec = getNullSafeCodec((Class<double[]>)stcType);
+                    final Codec<double[], IN, OUT> codec = getNullSafeCodecDyn((Class<double[]>)stcType);
                     return new FieldCodec.DoubleArrayFieldCodec<IN, OUT>(field, codec);
                 } else {
-                    final Codec<T[], IN, OUT> codec = getNullSafeCodec((Class<T[]>)stcType);
+                    final Codec<T[], IN, OUT> codec = getNullSafeCodecDyn((Class<T[]>)stcType);
                     return new FieldCodec.ObjectArrayFieldCodec<>(field, codec);
                 }
             } else {
@@ -594,12 +591,12 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                         stcType.equals(Float.class) ||
                         stcType.equals(Double.class) ||
                         stcType.equals(String.class)) {
-                    codec = getNullSafeCodec(stcType);
+                    codec = getNullSafeCodecDyn(stcType);
                 } else if (Collection.class.isAssignableFrom(stcType)) {
                     final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Collection.class);
                     if (typeArgs.size() == 1) {
                         final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
-                        final Codec<Object, IN, OUT> elemCodec = makeNullSafeCodec(getNullUnsafeCodecImplStc(elemType));
+                        final Codec<Object, IN, OUT> elemCodec = makeNullSafeCodec(createNullUnsafeCodecStc(elemType));
                         final Codec<Collection<Object>, IN, OUT> collCodec = collCodec(elemType, elemCodec);
                         codec = makeNullSafeCodec(dynamicCheck((Codec) collCodec, stcType));
                     }
@@ -612,7 +609,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                 }
 
                 if (codec == null) {
-                    codec = makeNullSafeCodec(getNullUnsafeCodecImplStc(stcType));
+                    codec = makeNullSafeCodec(createNullUnsafeCodecStc(stcType));
                 }
 
                 return new FieldCodec.ObjectFieldCodec<>(field, codec);

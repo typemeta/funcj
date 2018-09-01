@@ -54,11 +54,11 @@ public class ObjectCodecBuilder<T, IN, OUT> {
     }
 
     private <X> Codec<X, IN, OUT> getNullSafeCodec(Class<X> stcType) {
-        return core.makeNullSafeCodec(core.dynamicCodec(core.getNullUnsafeCodec(stcType), stcType));
+        return core.makeNullSafeCodec(core.dynamicCodec(core.getNullUnsafeCodecDyn(stcType), stcType));
     }
 
     private <X> Codec<X, IN, OUT> getNullUnsafeCodec(Class<X> stcType) {
-        return core.dynamicCodec(core.getNullUnsafeCodec(stcType), stcType);
+        return core.dynamicCodec(core.getNullUnsafeCodecDyn(stcType), stcType);
     }
 
     <A> _1<A> field(String name, Functions.F<T, A> getter, Codec<A, IN, OUT> codec) {

@@ -534,7 +534,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue, JsValue> implement
             public JsValue encode(T val, JsValue enc) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
                 if (dynType.equals(stcType)) {
-                    return JsonCodecCoreImpl.this.getNullUnsafeCodec(stcType).encode(val, enc);
+                    return JsonCodecCoreImpl.this.getNullUnsafeCodecDyn(stcType).encode(val, enc);
                 } else {
                     return JSAPI.obj(
                             JSAPI.field(
@@ -542,7 +542,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue, JsValue> implement
                                     JSAPI.str(classToName(dynType))),
                             JSAPI.field(
                                     valueFieldName(),
-                                    encode2(JsonCodecCoreImpl.this.getNullUnsafeCodec(dynType), val, enc))
+                                    encode2(JsonCodecCoreImpl.this.getNullUnsafeCodecDyn(dynType), val, enc))
                     );
                 }
             }
@@ -566,12 +566,12 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue, JsValue> implement
                     }
                 }
 
-                final Codec<T, JsValue, JsValue> codec = JsonCodecCoreImpl.this.getNullUnsafeCodec(stcType);
+                final Codec<T, JsValue, JsValue> codec = JsonCodecCoreImpl.this.getNullUnsafeCodecDyn(stcType);
                 return codec.decode(stcType, enc);
             }
 
             protected <S extends T> S decode2(JsValue in, Class<S> dynType) {
-                final Codec<S, JsValue, JsValue> codec = JsonCodecCoreImpl.this.getNullUnsafeCodec(dynType);
+                final Codec<S, JsValue, JsValue> codec = JsonCodecCoreImpl.this.getNullUnsafeCodecDyn(dynType);
                 return codec.decode(dynType, in);
             }
         };

@@ -83,17 +83,17 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
     <T> Codec<T, IN, OUT> dynamicCodec(Codec<T, IN, OUT> codec, Class<T> stcType);
 
-    <T> Codec<T, IN, OUT> getNullSafeCodec(Class<T> type);
+    <T> Codec<T, IN, OUT> getNullSafeCodecDyn(Class<T> type);
 
     <T> Codec<T, IN, OUT> getCodec(String name, Functions.F0<Codec<T, IN, OUT>> codecSupp);
 
-    <T> Codec<T, IN, OUT> getNullUnsafeCodec(Class<T> type);
+    <T> Codec<T, IN, OUT> getNullUnsafeCodecDyn(Class<T> type);
 
-    <T> Codec<T, IN, OUT> getNullUnsafeCodecImplDyn(Class<T> dynType);
+    <T> Codec<T, IN, OUT> createNullUnsafeCodecDyn(Class<T> dynType);
 
-    <T> Codec<T, IN, OUT> getNullUnsafeCodecImplStc(Class<T> stcType);
+    <T> Codec<T, IN, OUT> createNullUnsafeCodecStc(Class<T> stcType);
 
-    <T> Codec<T, IN, OUT> getNullUnsafeCodecImpl(Class<T> type);
+    <T> Codec<T, IN, OUT> createNullUnsafeCodec(Class<T> type);
 
     <T> Codec<T, IN, OUT> createObjectCodec(Class<T> type);
 
@@ -111,7 +111,7 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
     String getFieldName(Field field, int depth, Set<String> existingNames);
 
-    <T> FieldCodec<IN, OUT> getFieldCodec(Field field);
+    <T> FieldCodec<IN, OUT> createFieldCodec(Field field);
 
     <T> Codec<T, IN, OUT> dynamicCheck(Codec<T, IN, OUT> codec, Class<T> stcType);
 

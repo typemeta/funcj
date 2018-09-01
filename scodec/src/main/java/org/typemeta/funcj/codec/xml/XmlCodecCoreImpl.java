@@ -630,7 +630,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
                 if (!dynType.equals(stcType)) {
                     XmlUtils.setAttrValue(enc, typeAttrName(), classToName(dynType));
                 }
-                return encode2(XmlCodecCoreImpl.this.getNullUnsafeCodec(dynType), val, enc);
+                return encode2(XmlCodecCoreImpl.this.getNullUnsafeCodecDyn(dynType), val, enc);
             }
 
             protected <S extends T> Element encode2(Codec<S, Element, Element> codec, T val, Element enc) {
@@ -647,7 +647,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements
                     dynType = nameToClass(typeName);
                 }
 
-                final Codec<T, Element, Element> codec = XmlCodecCoreImpl.this.getNullUnsafeCodec(dynType);
+                final Codec<T, Element, Element> codec = XmlCodecCoreImpl.this.getNullUnsafeCodecDyn(dynType);
                 return codec.decode(dynType, enc);
             }
         };

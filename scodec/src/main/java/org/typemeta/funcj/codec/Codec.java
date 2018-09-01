@@ -4,7 +4,7 @@ import org.typemeta.funcj.codec.utils.OperationNotImplementedException;
 
 /**
  * Interface for classes that encapsulates the logic for encoding a value of type {@code T}
- * into a value of type {@code IN} and vice versa.
+ * into an encoded value and vice versa.
  * @param <T>       the raw type to be encoded/decoded
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
