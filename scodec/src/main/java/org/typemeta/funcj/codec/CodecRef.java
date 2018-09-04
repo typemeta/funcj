@@ -9,7 +9,8 @@ import java.util.Objects;
  * {@code CodecRef} implements the {@link Codec} interface.
  * Used when looking up a codec for a recursive type.
  * @param <T>       the raw type to be encoded/decoded
- * @param <IN, OUT>       the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
 
@@ -17,17 +18,17 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
         INSTANCE;
 
         @Override
-        public Object encode(Object val, Object in) throws Exception {
+        public Object encode(Object val, Object in) {
             throw error();
         }
 
         @Override
-        public Object decode(Class<Object> dynType, Object in) throws Exception {
+        public Object decode(Class<Object> dynType, Object in) {
             throw error();
         }
 
         @Override
-        public Object decode(Object in) throws Exception {
+        public Object decode(Object in) {
             throw error();
         }
 
@@ -43,7 +44,7 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
 
     private Codec<T, IN, OUT> impl;
 
-    CodecRef(Codec<T, IN, OUT> p) {
+    CodecRef(Codec<T, IN, OUT> impl) {
         this.impl = Objects.requireNonNull(impl);
     }
 
@@ -77,17 +78,17 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
     }
 
     @Override
-    public IN encode(T val, IN in) throws Exception {
-        return impl.encode(val, in);
+    public OUT encode(T val, OUT out) {
+        return impl.encode(val, out);
     }
 
     @Override
-    public T decode(Class<T> dynType, IN in) throws Exception {
+    public T decode(Class<T> dynType, IN in) {
         return impl.decode(dynType, in);
     }
 
     @Override
-    public T decode(IN in) throws Exception {
+    public T decode(IN in) {
         return impl.decode(in);
     }
 }

@@ -8,7 +8,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
-public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodecCore {
+public class XmlCodecCoreImpl extends BaseCodecCore<Element, Element> implements XmlCodecCore {
 
     public XmlCodecCoreImpl() {
     }
@@ -42,7 +42,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         return XmlUtils.addElement(parent, entryElemName());
     }
 
-    protected final Codec.NullCodec<Element> nullCodec = new Codec.NullCodec<Element>() {
+    protected final Codec.NullCodec<Element, Element> nullCodec = new Codec.NullCodec<Element, Element>() {
 
         private static final String nullAttrVal = "null";
 
@@ -57,7 +57,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         }
 
         @Override
-        public Object decode(Element enc) throws Exception {
+        public Object decode(Element enc) {
             if (isNull(enc)) {
                 return null;
             } else {
@@ -67,11 +67,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec.NullCodec<Element> nullCodec() {
+    public Codec.NullCodec<Element, Element> nullCodec() {
         return nullCodec;
     }
 
-    protected final Codec.BooleanCodec<Element> booleanCodec = new Codec.BooleanCodec<Element>() {
+    protected final Codec.BooleanCodec<Element, Element> booleanCodec = new Codec.BooleanCodec<Element, Element>() {
 
         @Override
         public Element encodePrim(boolean val, Element enc) {
@@ -85,14 +85,14 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec.BooleanCodec<Element> booleanCodec() {
+    public Codec.BooleanCodec<Element, Element> booleanCodec() {
         return booleanCodec;
     }
 
-    protected final Codec<boolean[], Element> booleanArrayCodec = new Codec<boolean[], Element>() {
+    protected final Codec<boolean[], Element, Element> booleanArrayCodec = new Codec<boolean[], Element, Element>() {
 
         @Override
-        public Element encode(boolean[] vals, Element enc) throws Exception {
+        public Element encode(boolean[] vals, Element enc) {
             for (boolean val : vals) {
                 booleanCodec().encode(val, addEntryElement(enc));
             }
@@ -101,7 +101,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         }
 
         @Override
-        public boolean[] decode(Element enc) throws Exception {
+        public boolean[] decode(Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
             final boolean[] vals = new boolean[l];
@@ -121,11 +121,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec<boolean[], Element> booleanArrayCodec() {
+    public Codec<boolean[], Element, Element> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
-    protected final Codec.ByteCodec<Element> byteCodec = new Codec.ByteCodec<Element>() {
+    protected final Codec.ByteCodec<Element, Element> byteCodec = new Codec.ByteCodec<Element, Element>() {
 
         @Override
         public Element encodePrim(byte val, Element enc) {
@@ -139,14 +139,14 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec.ByteCodec<Element> byteCodec() {
+    public Codec.ByteCodec<Element, Element> byteCodec() {
         return byteCodec;
     }
 
-    protected final Codec<byte[], Element> byteArrayCodec = new Codec<byte[], Element>() {
+    protected final Codec<byte[], Element, Element> byteArrayCodec = new Codec<byte[], Element, Element>() {
 
         @Override
-        public Element encode(byte[] vals, Element enc) throws Exception {
+        public Element encode(byte[] vals, Element enc) {
             for (byte val : vals) {
                 byteCodec().encode(val, addEntryElement(enc));
             }
@@ -155,7 +155,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         }
 
         @Override
-        public byte[] decode(Element enc) throws Exception {
+        public byte[] decode(Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
             final byte[] vals = new byte[l];
@@ -175,11 +175,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec<byte[], Element> byteArrayCodec() {
+    public Codec<byte[], Element, Element> byteArrayCodec() {
         return byteArrayCodec;
     }
 
-    protected final Codec.CharCodec<Element> charCodec = new Codec.CharCodec<Element>() {
+    protected final Codec.CharCodec<Element, Element> charCodec = new Codec.CharCodec<Element, Element>() {
 
         @Override
         public Element encodePrim(char val, Element enc) {
@@ -193,14 +193,14 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec.CharCodec<Element> charCodec() {
+    public Codec.CharCodec<Element, Element> charCodec() {
         return charCodec;
     }
 
-    protected final Codec<char[], Element> charArrayCodec = new Codec<char[], Element>() {
+    protected final Codec<char[], Element, Element> charArrayCodec = new Codec<char[], Element, Element>() {
 
         @Override
-        public Element encode(char[] vals, Element enc) throws Exception {
+        public Element encode(char[] vals, Element enc) {
             for (char val : vals) {
                 charCodec().encode(val, addEntryElement(enc));
             }
@@ -209,7 +209,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         }
 
         @Override
-        public char[] decode(Element enc) throws Exception {
+        public char[] decode(Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
             final char[] vals = new char[l];
@@ -229,11 +229,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec<char[], Element> charArrayCodec() {
+    public Codec<char[], Element, Element> charArrayCodec() {
         return charArrayCodec;
     }
 
-    protected final Codec.ShortCodec<Element> shortCodec = new Codec.ShortCodec<Element>() {
+    protected final Codec.ShortCodec<Element, Element> shortCodec = new Codec.ShortCodec<Element, Element>() {
 
         @Override
         public Element encodePrim(short val, Element enc) {
@@ -247,14 +247,14 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec.ShortCodec<Element> shortCodec() {
+    public Codec.ShortCodec<Element, Element> shortCodec() {
         return shortCodec;
     }
 
-    protected final Codec<short[], Element> shortArrayCodec = new Codec<short[], Element>() {
+    protected final Codec<short[], Element, Element> shortArrayCodec = new Codec<short[], Element, Element>() {
 
         @Override
-        public Element encode(short[] vals, Element enc) throws Exception {
+        public Element encode(short[] vals, Element enc) {
             for (short val : vals) {
                 shortCodec().encode(val, addEntryElement(enc));
             }
@@ -263,7 +263,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         }
 
         @Override
-        public short[] decode(Element enc) throws Exception {
+        public short[] decode(Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
             final short[] vals = new short[l];
@@ -283,11 +283,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec<short[], Element> shortArrayCodec() {
+    public Codec<short[], Element, Element> shortArrayCodec() {
         return shortArrayCodec;
     }
 
-    protected final Codec.IntCodec<Element> intCodec = new Codec.IntCodec<Element>() {
+    protected final Codec.IntCodec<Element, Element> intCodec = new Codec.IntCodec<Element, Element>() {
 
         @Override
         public Element encodePrim(int val, Element enc) {
@@ -301,14 +301,14 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec.IntCodec<Element> intCodec() {
+    public Codec.IntCodec<Element, Element> intCodec() {
         return intCodec;
     }
 
-    protected final Codec<int[], Element> intArrayCodec = new Codec<int[], Element>() {
+    protected final Codec<int[], Element, Element> intArrayCodec = new Codec<int[], Element, Element>() {
 
         @Override
-        public Element encode(int[] vals, Element enc) throws Exception {
+        public Element encode(int[] vals, Element enc) {
             for (int val : vals) {
                 intCodec().encode(val, addEntryElement(enc));
             }
@@ -317,7 +317,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         }
 
         @Override
-        public int[] decode(Element enc) throws Exception {
+        public int[] decode(Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
             final int[] vals = new int[l];
@@ -337,11 +337,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec<int[], Element> intArrayCodec() {
+    public Codec<int[], Element, Element> intArrayCodec() {
         return intArrayCodec;
     }
 
-    protected final Codec.LongCodec<Element> longCodec = new Codec.LongCodec<Element>() {
+    protected final Codec.LongCodec<Element, Element> longCodec = new Codec.LongCodec<Element, Element>() {
 
         @Override
         public Element encodePrim(long val, Element enc) {
@@ -355,14 +355,14 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec.LongCodec<Element> longCodec() {
+    public Codec.LongCodec<Element, Element> longCodec() {
         return longCodec;
     }
 
-    protected final Codec<long[], Element> longArrayCodec = new Codec<long[], Element>() {
+    protected final Codec<long[], Element, Element> longArrayCodec = new Codec<long[], Element, Element>() {
 
         @Override
-        public Element encode(long[] vals, Element enc) throws Exception {
+        public Element encode(long[] vals, Element enc) {
             for (long val : vals) {
                 longCodec().encode(val, addEntryElement(enc));
             }
@@ -371,7 +371,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         }
 
         @Override
-        public long[] decode(Element enc) throws Exception {
+        public long[] decode(Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
             final long[] vals = new long[l];
@@ -391,11 +391,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec<long[], Element> longArrayCodec() {
+    public Codec<long[], Element, Element> longArrayCodec() {
         return longArrayCodec;
     }
 
-    protected final Codec.FloatCodec<Element> floatCodec = new Codec.FloatCodec<Element>() {
+    protected final Codec.FloatCodec<Element, Element> floatCodec = new Codec.FloatCodec<Element, Element>() {
 
         @Override
         public Element encodePrim(float val, Element enc) {
@@ -409,14 +409,14 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec.FloatCodec<Element> floatCodec() {
+    public Codec.FloatCodec<Element, Element> floatCodec() {
         return floatCodec;
     }
 
-    protected final Codec<float[], Element> floatArrayCodec = new Codec<float[], Element>() {
+    protected final Codec<float[], Element, Element> floatArrayCodec = new Codec<float[], Element, Element>() {
 
         @Override
-        public Element encode(float[] vals, Element enc) throws Exception {
+        public Element encode(float[] vals, Element enc) {
             for (float val : vals) {
                 floatCodec().encode(val, addEntryElement(enc));
             }
@@ -425,7 +425,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         }
 
         @Override
-        public float[] decode(Element enc) throws Exception {
+        public float[] decode(Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
             final float[] vals = new float[l];
@@ -445,11 +445,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec<float[], Element> floatArrayCodec() {
+    public Codec<float[], Element, Element> floatArrayCodec() {
         return floatArrayCodec;
     }
 
-    protected final Codec.DoubleCodec<Element> doubleCodec = new Codec.DoubleCodec<Element>() {
+    protected final Codec.DoubleCodec<Element, Element> doubleCodec = new Codec.DoubleCodec<Element, Element>() {
 
         @Override
         public Element encodePrim(double val, Element enc) {
@@ -463,14 +463,14 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec.DoubleCodec<Element> doubleCodec() {
+    public Codec.DoubleCodec<Element, Element> doubleCodec() {
         return doubleCodec;
     }
 
-    protected final Codec<double[], Element> doubleArrayCodec = new Codec<double[], Element>() {
+    protected final Codec<double[], Element, Element> doubleArrayCodec = new Codec<double[], Element, Element>() {
 
         @Override
-        public Element encode(double[] vals, Element enc) throws Exception {
+        public Element encode(double[] vals, Element enc) {
             for (double val : vals) {
                 doubleCodec().encode(val, addEntryElement(enc));
             }
@@ -479,7 +479,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
         }
 
         @Override
-        public double[] decode(Element enc) throws Exception {
+        public double[] decode(Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
             final double[] vals = new double[l];
@@ -499,37 +499,37 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     };
 
     @Override
-    public Codec<double[], Element> doubleArrayCodec() {
+    public Codec<double[], Element, Element> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
-    protected final Codec<String, Element> stringCodec = new Codec<String, Element>() {
+    protected final Codec<String, Element, Element> stringCodec = new Codec<String, Element, Element>() {
         @Override
-        public Element encode(String val, Element enc) throws Exception {
+        public Element encode(String val, Element enc) {
             return XmlUtils.addTextElement(enc, String.valueOf(val));
         }
 
         @Override
-        public String decode(Element enc) throws Exception {
+        public String decode(Element enc) {
             return XmlUtils.firstChildText(enc).getWholeText();
         }
     };
 
     @Override
-    public Codec<String, Element> stringCodec() {
+    public Codec<String, Element, Element> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    public <EM extends Enum<EM>> Codec<EM, Element> enumCodec(Class<? super EM> enumType) {
-        return new Codec<EM, Element>() {
+    public <EM extends Enum<EM>> Codec<EM, Element, Element> enumCodec(Class<? super EM> enumType) {
+        return new Codec<EM, Element, Element>() {
             @Override
-            public Element encode(EM val, Element enc) throws Exception {
+            public Element encode(EM val, Element enc) {
                 return XmlUtils.addTextElement(enc, val.name());
             }
 
             @Override
-            public EM decode(Class<EM> dynType, Element enc) throws Exception {
+            public EM decode(Class<EM> dynType, Element enc) {
                 Class<EM> type = dynType != null ? dynType : (Class<EM>)enumType;
                 return EM.valueOf(type, XmlUtils.firstChildText(enc).getWholeText());
             }
@@ -537,20 +537,20 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     }
 
     @Override
-    public <V> Codec<Map<String, V>, Element> mapCodec(Codec<V, Element> valueCodec) {
+    public <V> Codec<Map<String, V>, Element, Element> mapCodec(Codec<V, Element, Element> valueCodec) {
         return new XmlMapCodecs.StringMapCodec<V>(this, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, Element> mapCodec(Codec<K, Element> keyCodec, Codec<V, Element> valueCodec) {
+    public <K, V> Codec<Map<K, V>, Element, Element> mapCodec(Codec<K, Element, Element> keyCodec, Codec<V, Element, Element> valueCodec) {
         return new XmlMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
     }
 
     @Override
-    public <T> Codec<Collection<T>, Element> collCodec(Class<T> elemType, Codec<T, Element> elemCodec) {
-        return new Codec<Collection<T>, Element>() {
+    public <T> Codec<Collection<T>, Element, Element> collCodec(Class<T> elemType, Codec<T, Element, Element> elemCodec) {
+        return new Codec<Collection<T>, Element, Element>() {
             @Override
-            public Element encode(Collection<T> vals, Element enc) throws Exception {
+            public Element encode(Collection<T> vals, Element enc) {
                 for (T val : vals) {
                     elemCodec.encode(val, addEntryElement(enc));
                 }
@@ -559,7 +559,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
             }
 
             @Override
-            public Collection<T> decode(Class<Collection<T>> dynType, Element enc) throws Exception {
+            public Collection<T> decode(Class<Collection<T>> dynType, Element enc) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
 
                 final NodeList nodes = enc.getChildNodes();
@@ -586,10 +586,10 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     }
 
     @Override
-    public <T> Codec<T[], Element> objectArrayCodec(Class<T> elemType, Codec<T, Element> elemCodec) {
-        return new Codec<T[], Element>() {
+    public <T> Codec<T[], Element, Element> objectArrayCodec(Class<T> elemType, Codec<T, Element, Element> elemCodec) {
+        return new Codec<T[], Element, Element>() {
             @Override
-            public Element encode(T[] vals, Element enc) throws Exception {
+            public Element encode(T[] vals, Element enc) {
                 for (T val : vals) {
                     elemCodec.encode(val, addEntryElement(enc));
                 }
@@ -598,7 +598,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
             }
 
             @Override
-            public T[] decode(Class<T[]> dynType, Element enc) throws Exception {
+            public T[] decode(Class<T[]> dynType, Element enc) {
                 final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
 
                 final NodeList nodes = enc.getChildNodes();
@@ -622,23 +622,23 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     }
 
     @Override
-    public <T> Codec<T, Element> dynamicCodec(Class<T> stcType) {
-        return new Codec<T, Element>() {
+    public <T> Codec<T, Element, Element> dynamicCodec(Class<T> stcType) {
+        return new Codec<T, Element, Element>() {
             @Override
-            public Element encode(T val, Element enc) throws Exception {
+            public Element encode(T val, Element enc) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
                 if (!dynType.equals(stcType)) {
                     XmlUtils.setAttrValue(enc, typeAttrName(), classToName(dynType));
                 }
-                return encode2(XmlCodecCoreImpl.this.getNullUnsafeCodec(dynType), val, enc);
+                return encode2(XmlCodecCoreImpl.this.getNullUnsafeCodecDyn(dynType), val, enc);
             }
 
-            protected <S extends T> Element encode2(Codec<S, Element> codec, T val, Element enc) throws Exception {
+            protected <S extends T> Element encode2(Codec<S, Element, Element> codec, T val, Element enc) {
                 return codec.encode((S)val, enc);
             }
 
             @Override
-            public T decode(Element enc) throws Exception {
+            public T decode(Element enc) {
                 final String typeName = XmlUtils.getAttrValue(enc, typeAttrName());
                 final Class<T> dynType;
                 if (typeName.isEmpty()) {
@@ -647,17 +647,17 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
                     dynType = nameToClass(typeName);
                 }
 
-                final Codec<T, Element> codec = XmlCodecCoreImpl.this.getNullUnsafeCodec(dynType);
+                final Codec<T, Element, Element> codec = XmlCodecCoreImpl.this.getNullUnsafeCodecDyn(dynType);
                 return codec.decode(dynType, enc);
             }
         };
     }
 
     @Override
-    public <T> Codec<T, Element> dynamicCodec(Codec<T, Element> codec, Class<T> stcType) {
-        return new Codec<T, Element>() {
+    public <T> Codec<T, Element, Element> dynamicCodec(Codec<T, Element, Element> codec, Class<T> stcType) {
+        return new Codec<T, Element, Element>() {
             @Override
-            public Element encode(T val, Element enc) throws Exception {
+            public Element encode(T val, Element enc) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
                 if (!dynType.equals(stcType)) {
                     XmlUtils.setAttrValue(enc, typeAttrName(), classToName(dynType));
@@ -666,7 +666,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
             }
 
             @Override
-            public T decode(Element enc) throws Exception {
+            public T decode(Element enc) {
                 final String typeName = XmlUtils.getAttrValue(enc, typeAttrName());
                 final Class<T> dynType;
                 if (typeName.isEmpty()) {
@@ -681,18 +681,18 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Element> implements XmlCodec
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, Element> createObjectCodec(ObjectMeta<T, Element, RA> objMeta) {
-        return new Codec<T, Element>() {
+    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, Element, Element> createObjectCodec(ObjectMeta<T, Element, Element, RA> objMeta) {
+        return new Codec<T, Element, Element>() {
             @Override
-            public Element encode(T val, Element enc) throws Exception {
-                for (ObjectMeta.Field<T, Element, RA> field : objMeta) {
+            public Element encode(T val, Element enc) {
+                for (ObjectMeta.Field<T, Element, Element, RA> field : objMeta) {
                     field.encodeField(val, XmlUtils.addElement(enc, field.name()));
                 }
                 return enc;
             }
 
             @Override
-            public T decode(Class<T> dynType, Element enc) throws Exception {
+            public T decode(Class<T> dynType, Element enc) {
                 return FoldsGenEx.foldLeft(
                         (acc, field) -> field.decodeField(acc, XmlUtils.firstChildElement(enc, field.name())),
                         objMeta.startDecode(dynType),

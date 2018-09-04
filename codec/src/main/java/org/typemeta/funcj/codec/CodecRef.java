@@ -43,7 +43,7 @@ public class CodecRef<T, E> implements Codec<T, E> {
 
     private Codec<T, E> impl;
 
-    CodecRef(Codec<T, E> p) {
+    CodecRef(Codec<T, E> impl) {
         this.impl = Objects.requireNonNull(impl);
     }
 

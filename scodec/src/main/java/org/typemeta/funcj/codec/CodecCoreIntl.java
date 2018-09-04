@@ -8,7 +8,8 @@ import java.util.stream.*;
 
 /**
  * Internal interface for {@link CodecCore} implementations.
- * @param <IN, OUT>       the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
@@ -16,7 +17,7 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
     <X> Class<X> remapType(Class<X> type);
 
-    <T> Class<T> nameToClass(String name) throws CodecException;
+    <T> Class<T> nameToClass(String name);
 
     <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz);
 
@@ -82,17 +83,17 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
     <T> Codec<T, IN, OUT> dynamicCodec(Codec<T, IN, OUT> codec, Class<T> stcType);
 
-    <T> Codec<T, IN, OUT> getNullSafeCodec(Class<T> type);
+    <T> Codec<T, IN, OUT> getNullSafeCodecDyn(Class<T> type);
 
     <T> Codec<T, IN, OUT> getCodec(String name, Functions.F0<Codec<T, IN, OUT>> codecSupp);
 
-    <T> Codec<T, IN, OUT> getNullUnsafeCodec(Class<T> type);
+    <T> Codec<T, IN, OUT> getNullUnsafeCodecDyn(Class<T> type);
 
-    <T> Codec<T, IN, OUT> getNullUnsafeCodecImplDyn(Class<T> dynType);
+    <T> Codec<T, IN, OUT> createNullUnsafeCodecDyn(Class<T> dynType);
 
-    <T> Codec<T, IN, OUT> getNullUnsafeCodecImplStc(Class<T> stcType);
+    <T> Codec<T, IN, OUT> createNullUnsafeCodecStc(Class<T> stcType);
 
-    <T> Codec<T, IN, OUT> getNullUnsafeCodecImpl(Class<T> type);
+    <T> Codec<T, IN, OUT> createNullUnsafeCodec(Class<T> type);
 
     <T> Codec<T, IN, OUT> createObjectCodec(Class<T> type);
 
@@ -106,29 +107,29 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
             Functions.F<Object[], T> ctor);
 
-    <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(ObjectMeta<T, IN, RA> objMeta);
+    <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(ObjectMeta<T, IN, OUT, RA> objMeta);
 
     String getFieldName(Field field, int depth, Set<String> existingNames);
 
-    <T> FieldCodec<IN, OUT> getFieldCodec(Field field);
+    <T> FieldCodec<IN, OUT> createFieldCodec(Field field);
 
     <T> Codec<T, IN, OUT> dynamicCheck(Codec<T, IN, OUT> codec, Class<T> stcType);
 
-    abstract class ObjectMeta<T, E, RA extends CodecCoreIntl.ObjectMeta.ResultAccumlator<T>>
-            implements Iterable<CodecCoreIntl.ObjectMeta.Field<T, E, RA>> {
+    abstract class ObjectMeta<T, IN, OUT, RA extends CodecCoreIntl.ObjectMeta.ResultAccumlator<T>>
+            implements Iterable<CodecCoreIntl.ObjectMeta.Field<T, IN, OUT, RA>> {
         public interface ResultAccumlator<T> {
             T construct();
         }
 
-        public interface Field<T, E, RA> {
+        public interface Field<T, IN, OUT, RA> {
             String name();
-            E encodeField(T val, E in) throws Exception;
-            RA decodeField(RA acc, E in) throws Exception;
+            OUT encodeField(T val, OUT out);
+            RA decodeField(RA acc, IN in);
         }
 
-        public abstract RA startDecode(Class<T> type) throws CodecException;
+        public abstract RA startDecode(Class<T> type);
 
-        public Stream<BaseCodecCore.ObjectMeta.Field<T, E, RA>> stream() {
+        public Stream<BaseCodecCore.ObjectMeta.Field<T, IN, OUT, RA>> stream() {
             return StreamSupport.stream(spliterator(), false);
         }
 

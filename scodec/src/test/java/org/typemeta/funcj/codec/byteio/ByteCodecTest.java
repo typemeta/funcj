@@ -27,13 +27,13 @@ public class ByteCodecTest extends TestBase {
     protected <T> void roundTrip(T val, Class<T> clazz) throws Exception {
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ByteIO byteOut = ByteIO.ofOutputStream(baos);
+        final ByteIO.Output byteOut = ByteIO.ofOutputStream(baos);
 
         codec.encode(clazz, val, byteOut);
 
         final byte[] ba = baos.toByteArray();
         final ByteArrayInputStream bais = new ByteArrayInputStream(ba);
-        final ByteIO byteIn = ByteIO.ofInputStream(bais);
+        final ByteIO.Input byteIn = ByteIO.ofInputStream(bais);
         final T val2 = codec.decode(clazz, byteIn);
 
         if (printData || !val.equals(val2)) {

@@ -3,10 +3,11 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.functions.Functions;
 
 /**
- * Interface for classes which providing an encoding into a specific target type {@code E}.
+ * Interface for classes which providing an encoding into a specific target type.
  * Unlike {@link Codec}, which can only encode a single type,
  * {@code CodecCore} implementations will handle any type.
- * @param <IN, OUT>       the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 public interface CodecCore<IN, OUT> {
 
@@ -78,31 +79,28 @@ public interface CodecCore<IN, OUT> {
     /**
      * Encode a non-null value of type {@code T} into encoded form {@code E}
      * @param val       the value to encode
-     * @param enc       the encoded parent (may be null for certain encodings)
+     * @param out       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
      * @return          the encoded value
-     * @throws Exception the exception
      */
-    <T> IN encode(T val, IN enc) throws Exception;
+    <T> OUT encode(T val, OUT out);
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.
      * @param type      the class of the decoded value
      * @param val       the value to encode
-     * @param enc       the encoded parent (may be null for certain encodings)
+     * @param out       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
      * @return          the encoded value
-     * @throws Exception the exception
      */
-    <T> IN encode(Class<T> type, T val, IN enc) throws Exception;
+    <T> OUT encode(Class<T> type, T val, OUT out);
 
     /**
      * Decode a value of type {@code T} from encoded value of type {@code E}.
      * @param type      the type of the decoded value
-     * @param enc       the value to decode
+     * @param in        the value to decode
      * @param <T>       the decoded value type
      * @return          the decoded value
-     * @throws Exception the exception
      */
-    <T> T decode(Class<T> type, IN enc) throws Exception;
+    <T> T decode(Class<T> type, IN in);
 }

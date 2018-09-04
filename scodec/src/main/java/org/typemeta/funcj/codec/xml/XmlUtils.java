@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.typemeta.funcj.codec.CodecException;
+import org.typemeta.funcj.codec.*;
 import org.w3c.dom.*;
 
 import javax.xml.transform.*;
@@ -10,7 +10,7 @@ import java.io.*;
 import java.util.Optional;
 
 public abstract class XmlUtils {
-    public static String nodeToString(Node node, boolean pretty) throws CodecException {
+    public static String nodeToString(Node node, boolean pretty) {
         try {
             final Transformer tf = TransformerFactory.newInstance().newTransformer();
             tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -41,7 +41,7 @@ public abstract class XmlUtils {
         return parent;
     }
 
-    public static Element firstChildElement(Node node, String name) throws CodecException {
+    public static Element firstChildElement(Node node, String name)  {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() == Node.ELEMENT_NODE && name.equals(child.getNodeName())) {
                 return (Element) child;
@@ -59,7 +59,7 @@ public abstract class XmlUtils {
         return Optional.empty();
     }
 
-    public static Text firstChildText(Node node) throws CodecException {
+    public static Text firstChildText(Node node) {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() == Node.TEXT_NODE) {
                 return (Text) child;

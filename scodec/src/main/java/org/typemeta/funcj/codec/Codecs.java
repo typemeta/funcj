@@ -12,14 +12,14 @@ import java.time.*;
  */
 public abstract class Codecs {
 
-//    /**
-//     * Construct and return a new instance of a {@link JsonCodecCore}.
-//     * @return the new {@code JsonCodecCore}
-//     */
-//    public static JsonCodecCore jsonCodec() {
-//        final JsonCodecCoreImpl codec = new JsonCodecCoreImpl();
-//        return JsonCodecs.registerAll(codec);
-//    }
+    /**
+     * Construct and return a new instance of a {@link JsonCodecCore}.
+     * @return the new {@code JsonCodecCore}
+     */
+    public static JsonCodecCore jsonCodec() {
+        final JsonCodecCoreImpl codec = new JsonCodecCoreImpl();
+        return JsonCodecs.registerAll(codec);
+    }
 
     /**
      * Construct and return a new instance of a {@link XmlCodecCore}.
@@ -92,8 +92,9 @@ public abstract class Codecs {
 
     /**
      * Base class for {@code Codec}s.
-     * @param <T> the raw type to be encoded/decoded
-     * @param <E> the encoded type
+     * @param <T>       the raw type to be encoded/decoded
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     public static abstract class CodecBase<T, IN, OUT> implements Codec<T, IN, OUT> {
 
@@ -106,7 +107,8 @@ public abstract class Codecs {
 
     /**
      * A {@code Codec} for the {@link Class} type.
-     * @param <IN, OUT> the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     public static class ClassCodec<IN, OUT> extends CodecBase<Class, IN, OUT> {
 
@@ -115,12 +117,12 @@ public abstract class Codecs {
         }
 
         @Override
-        public IN encode(Class val, IN in) throws Exception {
-            return core.stringCodec().encode(core.classToName(val), in);
+        public OUT encode(Class val, OUT out) {
+            return core.stringCodec().encode(core.classToName(val), out);
         }
 
         @Override
-        public Class decode(IN in) throws Exception {
+        public Class decode(IN in) {
             return core.nameToClass(core.stringCodec().decode(in));
         }
     }
@@ -129,7 +131,8 @@ public abstract class Codecs {
      * Utility class for creating a {@code Codec} that encodes a type
      * as a {@code String}.
      * @param <T> the raw type to be encoded/decoded
-     * @param <IN> the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
     public static class StringProxyCodec<T, IN, OUT> extends CodecBase<T, IN, OUT> {
 
@@ -146,12 +149,12 @@ public abstract class Codecs {
         }
 
         @Override
-        public IN encode(T val, IN in) throws Exception {
-            return core.stringCodec().encode(encode.apply(val), in);
+        public OUT encode(T val, OUT out) {
+            return core.stringCodec().encode(encode.apply(val), out);
         }
 
         @Override
-        public T decode(IN in) throws Exception {
+        public T decode(IN in) {
             return decode.apply(core.stringCodec().decode(in));
         }
     }

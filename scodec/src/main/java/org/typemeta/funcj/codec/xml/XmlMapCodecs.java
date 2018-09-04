@@ -7,22 +7,22 @@ import java.util.Map;
 
 public abstract class XmlMapCodecs {
 
-    public static class MapCodec<K, V> implements Codec<Map<K, V>, Element> {
+    public static class MapCodec<K, V> implements Codec<Map<K, V>, Element, Element> {
         private final XmlCodecCoreImpl core;
-        private final Codec<K, Element> keyCodec;
-        private final Codec<V, Element> valueCodec;
+        private final Codec<K, Element, Element> keyCodec;
+        private final Codec<V, Element, Element> valueCodec;
 
         public MapCodec(
                 XmlCodecCoreImpl core,
-                Codec<K, Element> keyCodec,
-                Codec<V, Element> valueCodec) {
+                Codec<K, Element, Element> keyCodec,
+                Codec<V, Element, Element> valueCodec) {
             this.core = core;
             this.keyCodec = keyCodec;
             this.valueCodec = valueCodec;
         }
 
         @Override
-        public Element encode(Map<K, V> map, Element enc) throws Exception {
+        public Element encode(Map<K, V> map, Element enc) {
             int i = 0;
             for (Map.Entry<K, V> entry : map.entrySet()) {
                 final Element elem = core.addEntryElement(enc);
@@ -38,7 +38,7 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Map<K, V> decode(Class<Map<K, V>> dynType, Element enc) throws Exception {
+        public Map<K, V> decode(Class<Map<K, V>> dynType, Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
 
@@ -55,17 +55,17 @@ public abstract class XmlMapCodecs {
         }
     }
 
-    public static class StringMapCodec<V> implements Codec<Map<String, V>, Element> {
+    public static class StringMapCodec<V> implements Codec<Map<String, V>, Element, Element> {
         private final XmlCodecCoreImpl core;
-        private final Codec<V, Element> valueCodec;
+        private final Codec<V, Element, Element> valueCodec;
 
-        public StringMapCodec(XmlCodecCoreImpl core, Codec<V, Element> valueCodec) {
+        public StringMapCodec(XmlCodecCoreImpl core, Codec<V, Element, Element> valueCodec) {
             this.core = core;
             this.valueCodec = valueCodec;
         }
 
         @Override
-        public Element encode(Map<String, V> map, Element enc) throws Exception {
+        public Element encode(Map<String, V> map, Element enc) {
             int i = 0;
             for (Map.Entry<String, V> entry : map.entrySet()) {
                 final Element elem = core.addEntryElement(enc);
@@ -77,7 +77,7 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Map<String, V> decode(Class<Map<String, V>> dynType, Element enc) throws Exception {
+        public Map<String, V> decode(Class<Map<String, V>> dynType, Element enc) {
             final NodeList nodes = enc.getChildNodes();
             final int l = nodes.getLength();
 

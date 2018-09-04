@@ -10,26 +10,26 @@ public class ByteCodecs {
         core.registerCodec(Optional.class, new OptionalCodec(core));
         return Codecs.registerAll(core);
     }
-    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, ByteIO> {
+    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, ByteIO.Input, ByteIO.Output> {
 
-        protected OptionalCodec(CodecCoreIntl<ByteIO> core) {
+        protected OptionalCodec(CodecCoreIntl<ByteIO.Input, ByteIO.Output> core) {
             super(core);
         }
 
         @Override
-        public ByteIO encode(Optional<T> val, ByteIO enc) throws Exception {
-            core.booleanCodec().encode(val.isPresent(), enc);
+        public ByteIO.Output encode(Optional<T> val, ByteIO.Output out) {
+            core.booleanCodec().encode(val.isPresent(), out);
             if (val.isPresent()) {
-                return core.dynamicCodec().encode(val.get(), enc);
+                return core.dynamicCodec().encode(val.get(), out);
             } else {
-                return enc;
+                return out;
             }
         }
 
         @Override
-        public Optional<T> decode(ByteIO enc) throws Exception {
-            if (core.booleanCodec().decode(enc)) {
-                return Optional.of((T)core.dynamicCodec().decode(enc));
+        public Optional<T> decode(ByteIO.Input in) {
+            if (core.booleanCodec().decode(in)) {
+                return Optional.of((T)core.dynamicCodec().decode(in));
             } else {
                 return Optional.empty();
             }
