@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.json;
+package org.typemeta.funcj.codec.old;
 
 public abstract class JsonGen {
 

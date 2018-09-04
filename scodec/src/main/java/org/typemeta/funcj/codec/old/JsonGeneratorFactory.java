@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.json;
+package org.typemeta.funcj.codec.old;
 
 import org.typemeta.funcj.codec.CodecException;
 
