@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.jsons;
+package org.typemeta.funcj.codec.old;
 
 public interface JsonEvent {
     enum Enum implements JsonEvent {
@@ -6,17 +6,11 @@ public interface JsonEvent {
         TRUE,
         FALSE,
         ARRAY_START,
+        COMMA,
         ARRAY_EMD,
         OBJECT_START,
+        COLON,
         OBJECT_END
-    }
-
-    class JName implements JsonEvent {
-        public final String value;
-
-        public JName(String value) {
-            this.value = value;
-        }
     }
 
     class JString implements JsonEvent {
