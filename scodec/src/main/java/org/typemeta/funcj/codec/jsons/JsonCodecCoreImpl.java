@@ -673,9 +673,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
                 out.startObject();
 
             objMeta.forEach(field -> {
-                    out.writeField(field.name());
-                    field.encodeField(val, out);
-                });
+                out.writeField(field.name());
+                field.encodeField(val, out);
+            });
 
                 return out.endObject();
             }
