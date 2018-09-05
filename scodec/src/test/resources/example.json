@@ -1,0 +1,16 @@
+{
+    "knum7": 1e-23,
+    "knum0": 0,
+    "knum1": 1,
+    "knum2": -12,
+    "knum3": 12.3,
+    "knum4": 0.12,
+    "knum5": -1.2,
+    "knum6": 1e2,
+    "ktrue": true,
+    "kfalse": false,
+    "knull": null,
+    "karray": ["a", true, 0, 1, 0.1, null],
+    "kstring": "test"
+
+}

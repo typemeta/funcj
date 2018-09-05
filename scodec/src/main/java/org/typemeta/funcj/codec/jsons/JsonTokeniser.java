@@ -27,6 +27,11 @@ public class JsonTokeniser {
             public JString(String value) {
                 this.value = value;
             }
+
+            @Override
+            public String toString() {
+                return "JString{" + value + "}";
+            }
         }
 
         class JNumber implements Event {
@@ -35,11 +40,17 @@ public class JsonTokeniser {
             public JNumber(String value) {
                 this.value = value;
             }
+
+            @Override
+            public String toString() {
+                return "JNumber{" + value + "}";
+            }
         }
     }
 
     private static final class Buffer {
         private static final int DEFAULT_SIZE = 64;
+        private static final int MAX_SIZE = 1024;
 
         private char[] buffer;
         private int size = 0;
@@ -50,7 +61,11 @@ public class JsonTokeniser {
 
         void add(char c) {
             if (size == buffer.length) {
-                buffer = Arrays.copyOf(buffer, buffer.length * 2);
+                if (buffer.length >= MAX_SIZE) {
+                    throw new IllegalStateException("Buffer too large");
+                } else {
+                    buffer = Arrays.copyOf(buffer, buffer.length * 2);
+                }
             }
 
             buffer[size++] = c;
@@ -76,7 +91,10 @@ public class JsonTokeniser {
     private static final char[] FALSE = "false".toCharArray();
     private static final char[] NULL = "null".toCharArray();
 
+    private static final int EMPTY = Integer.MIN_VALUE;
+
     private Reader rdr;
+    private int nextChar = EMPTY;
     private long pos = 0;
     private final Buffer buffer;
 
@@ -90,27 +108,41 @@ public class JsonTokeniser {
     }
 
     private int nextChar() throws IOException {
-        int ic = rdr.read();
-        ++pos;
-        return ic;
+        int nc;
+        if (nextChar == EMPTY) {
+            nc = rdr.read();
+            ++pos;
+        } else {
+            nc = nextChar;
+            nextChar = EMPTY;
+        }
+        return nc;
     }
 
     private char nextCharOrThrow(Supplier<String> msg) throws IOException {
-        int ic = rdr.read();
-        if (ic == -1) {
+        int nc = nextChar();
+
+        if (nc == -1) {
             raiseError(msg);
         }
-        ++pos;
-        return (char)ic;
+
+        return (char)nc;
+    }
+
+    private void pushChar(char c) throws IOException {
+        if (nextChar != EMPTY) {
+            throw new CodecException("Internal error -tried to push twice at position " + pos);
+        } else {
+            nextChar = c;
+        }
+    }
+
+    private void clearNextChar() {
+        nextChar = EMPTY;
     }
 
     private char nextCharOrThrow() throws IOException {
-        int ic = rdr.read();
-        if (ic == -1) {
-            raiseError(() -> "Unexpected end-of-input");
-        }
-        ++pos;
-        return (char)ic;
+        return nextCharOrThrow(() -> "Unexpected end-of-input");
     }
 
     private void parseSymbol(char[] s) throws IOException {
@@ -135,7 +167,7 @@ public class JsonTokeniser {
             int ic = nextChar();
             char nc = (char)ic;
             while (ic != -1 && Character.isWhitespace(nc)) {
-                ic = rdr.read();
+                ic = nextChar();
                 nc = (char)ic;
             }
 
@@ -145,12 +177,18 @@ public class JsonTokeniser {
             } else {
                 final char c = nc;
                 switch (c) {
-                    case '{': return Event.Enum.OBJECT_START;
-                    case '}': return Event.Enum.OBJECT_END;
-                    case '[': return Event.Enum.ARRAY_START;
-                    case ']': return Event.Enum.ARRAY_EMD;
-                    case ',': return Event.Enum.COMMA;
-                    case ':': return Event.Enum.COLON;
+                    case '{':
+                        return Event.Enum.OBJECT_START;
+                    case '}':
+                        return Event.Enum.OBJECT_END;
+                    case '[':
+                        return Event.Enum.ARRAY_START;
+                    case ']':
+                        return Event.Enum.ARRAY_EMD;
+                    case ',':
+                        return Event.Enum.COMMA;
+                    case ':':
+                        return Event.Enum.COLON;
                     case '"': {
                         while (true) {
                             char c2 = nextCharOrThrow(() -> "Unexpected end-of-input while parsing a string");
@@ -173,6 +211,7 @@ public class JsonTokeniser {
                         return Event.Enum.NULL;
                     }
                     case '0':
+                        buffer.add(c);
                         return parseNumber(NumState.B);
                     case '1':
                     case '2':
@@ -183,9 +222,11 @@ public class JsonTokeniser {
                     case '7':
                     case '8':
                     case '9':
+                        buffer.add(c);
                         return parseNumber(NumState.C);
                     case '-':
                     case '+':
+                        buffer.add(c);
                         return parseNumber(NumState.A);
                     default:
                         raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
@@ -199,8 +240,8 @@ public class JsonTokeniser {
     }
 
     private Event.JNumber parseNumber(NumState state) throws IOException {
-        int ic = nextChar();
-        while (ic != -1 && state != NumState.Z) {
+        int ic;
+        while ((ic = nextChar()) != -1 && state != NumState.Z) {
             char c = (char)ic;
             switch (state) {
                 case A:
@@ -277,8 +318,10 @@ public class JsonTokeniser {
                         case '0': case '1': case '2': case '3': case '4':
                         case '5': case '6': case '7': case '8': case '9':
                             break;
-                        default:
-                            raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
+                        default: {
+                            state = NumState.Z;
+                            break;
+                        }
                     }
                     break;
                 case F:
