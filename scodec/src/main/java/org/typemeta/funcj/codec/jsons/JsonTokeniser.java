@@ -363,6 +363,7 @@ public class JsonTokeniser {
                             break;
                         }
                     }
+                    break;
                 case I:
                     switch (c) {
                         case '0': case '1': case '2': case '3': case '4':
@@ -374,7 +375,7 @@ public class JsonTokeniser {
                             break;
                         }
                     }
-
+                    break;
                 case Z:
                     break;
             }
@@ -389,9 +390,8 @@ public class JsonTokeniser {
             case F:
             case G:
                 raiseError(() -> "Unexpected end-of-input while parsing a number");
-            default:
-                return new Event.JNumber(buffer.release());
+                break;
         }
+        return new Event.JNumber(buffer.release());
     }
-
 }
