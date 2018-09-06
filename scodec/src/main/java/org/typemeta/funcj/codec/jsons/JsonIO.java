@@ -8,14 +8,15 @@ public abstract class JsonIO {
         enum Type {
             ARRAY_END,
             ARRAY_START,
-            BOOL_FALSE,
-            BOOL_TRUE,
+            EOF,
+            FALSE,
             FIELD_NAME,
+            NULL,
+            NUMBER,
             OBJECT_END,
             OBJECT_START,
-            NUMBER,
-            NULL,
-            STRING
+            STRING,
+            TRUE
         };
 
         boolean hasNext();

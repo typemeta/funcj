@@ -4,6 +4,7 @@ import org.typemeta.funcj.codec.CodecException;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class JsonTokeniser {
@@ -14,36 +15,70 @@ public class JsonTokeniser {
             TRUE,
             FALSE,
             ARRAY_START,
-            ARRAY_EMD,
+            ARRAY_END,
             OBJECT_START,
             OBJECT_END,
             COMMA,
             COLON
         }
 
-        class JString implements Event {
+        final class JString implements Event {
             public final String value;
 
             public JString(String value) {
-                this.value = value;
+                this.value = Objects.requireNonNull(value);
             }
 
             @Override
             public String toString() {
                 return "JString{" + value + "}";
             }
+
+            @Override
+            public boolean equals(Object rhs) {
+                if (this == rhs) {
+                    return true;
+                } else if (rhs == null || getClass() != rhs.getClass()) {
+                    return false;
+                } else {
+                    JString rhsJS = (JString) rhs;
+                    return value.equals(rhsJS.value);
+                }
+            }
+
+            @Override
+            public int hashCode() {
+                return value.hashCode();
+            }
         }
 
-        class JNumber implements Event {
+        final class JNumber implements Event {
             public final String value;
 
             public JNumber(String value) {
-                this.value = value;
+                this.value = Objects.requireNonNull(value);
             }
 
             @Override
             public String toString() {
                 return "JNumber{" + value + "}";
+            }
+
+            @Override
+            public boolean equals(Object rhs) {
+                if (this == rhs) {
+                    return true;
+                } else if (rhs == null || getClass() != rhs.getClass()) {
+                    return false;
+                } else {
+                    JNumber rhsJN = (JNumber) rhs;
+                    return value.equals(rhsJN.value);
+                }
+            }
+
+            @Override
+            public int hashCode() {
+                return value.hashCode();
             }
         }
     }
@@ -129,18 +164,6 @@ public class JsonTokeniser {
         return (char)nc;
     }
 
-    private void pushChar(char c) throws IOException {
-        if (nextChar != EMPTY) {
-            throw new CodecException("Internal error -tried to push twice at position " + pos);
-        } else {
-            nextChar = c;
-        }
-    }
-
-    private void clearNextChar() {
-        nextChar = EMPTY;
-    }
-
     private char nextCharOrThrow() throws IOException {
         return nextCharOrThrow(() -> "Unexpected end-of-input");
     }
@@ -184,7 +207,7 @@ public class JsonTokeniser {
                     case '[':
                         return Event.Enum.ARRAY_START;
                     case ']':
-                        return Event.Enum.ARRAY_EMD;
+                        return Event.Enum.ARRAY_END;
                     case ',':
                         return Event.Enum.COMMA;
                     case ':':
