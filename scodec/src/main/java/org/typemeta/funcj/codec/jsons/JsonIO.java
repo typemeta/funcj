@@ -19,9 +19,9 @@ public abstract class JsonIO {
             TRUE
         };
 
-        boolean hasNext();
+        boolean notEOF();
 
-        Type nextType();
+        Type currentEventType();
 
         Void readNull();
 

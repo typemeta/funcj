@@ -9,8 +9,8 @@ public class JsonTokeniserTest {
                 .map(JsonTokeniser::new)
                 .map(jt -> {
                     JsonTokeniser.Event ev;
-                    while ((ev = jt.getNextEvent()) != JsonTokeniser.Event.Enum.EOF) {
-                        System.out.println(ev);
+                    while ((ev = jt.getNextEvent()) != JsonTokeniser.Event.Type.EOF) {
+                        //System.out.println(ev);
                     }
                     return 0;
                 }).getOrThrow();

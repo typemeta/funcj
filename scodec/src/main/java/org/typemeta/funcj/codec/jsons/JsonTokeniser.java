@@ -9,17 +9,26 @@ import java.util.function.Supplier;
 
 public class JsonTokeniser {
     public interface Event {
-        enum Enum implements Event {
-            EOF,
-            NULL,
-            TRUE,
-            FALSE,
-            ARRAY_START,
+        Type type();
+
+        enum Type implements Event {
             ARRAY_END,
-            OBJECT_START,
-            OBJECT_END,
+            ARRAY_START,
             COMMA,
-            COLON
+            COLON,
+            EOF,
+            FALSE,
+            NULL,
+            NUMBER,
+            OBJECT_END,
+            OBJECT_START,
+            STRING,
+            TRUE;
+
+            @Override
+            public Type type() {
+                return this;
+            }
         }
 
         final class JString implements Event {
@@ -27,6 +36,11 @@ public class JsonTokeniser {
 
             public JString(String value) {
                 this.value = Objects.requireNonNull(value);
+            }
+
+            @Override
+            public Type type() {
+                return Type.STRING;
             }
 
             @Override
@@ -57,6 +71,11 @@ public class JsonTokeniser {
 
             public JNumber(String value) {
                 this.value = Objects.requireNonNull(value);
+            }
+
+            @Override
+            public Type type() {
+                return Type.NUMBER;
             }
 
             @Override
@@ -138,6 +157,10 @@ public class JsonTokeniser {
         this.buffer = new Buffer();
     }
 
+    public long position() {
+        return pos;
+    }
+
     private void raiseError(Supplier<String> msg) {
         throw new CodecException(msg.get() + " at position " + pos);
     }
@@ -183,7 +206,7 @@ public class JsonTokeniser {
 
     public Event getNextEvent() {
         if (rdr == null) {
-            return Event.Enum.EOF;
+            return Event.Type.EOF;
         }
 
         try {
@@ -196,22 +219,22 @@ public class JsonTokeniser {
 
             if (ic == -1) {
                 rdr = null;
-                return Event.Enum.EOF;
+                return Event.Type.EOF;
             } else {
                 final char c = nc;
                 switch (c) {
                     case '{':
-                        return Event.Enum.OBJECT_START;
+                        return Event.Type.OBJECT_START;
                     case '}':
-                        return Event.Enum.OBJECT_END;
+                        return Event.Type.OBJECT_END;
                     case '[':
-                        return Event.Enum.ARRAY_START;
+                        return Event.Type.ARRAY_START;
                     case ']':
-                        return Event.Enum.ARRAY_END;
+                        return Event.Type.ARRAY_END;
                     case ',':
-                        return Event.Enum.COMMA;
+                        return Event.Type.COMMA;
                     case ':':
-                        return Event.Enum.COLON;
+                        return Event.Type.COLON;
                     case '"': {
                         while (true) {
                             char c2 = nextCharOrThrow(() -> "Unexpected end-of-input while parsing a string");
@@ -223,15 +246,15 @@ public class JsonTokeniser {
                     }
                     case 't': {
                         parseSymbol(TRUE);
-                        return Event.Enum.TRUE;
+                        return Event.Type.TRUE;
                     }
                     case 'f': {
                         parseSymbol(FALSE);
-                        return Event.Enum.FALSE;
+                        return Event.Type.FALSE;
                     }
                     case 'n': {
                         parseSymbol(NULL);
-                        return Event.Enum.NULL;
+                        return Event.Type.NULL;
                     }
                     case '0':
                         buffer.add(c);
@@ -263,8 +286,8 @@ public class JsonTokeniser {
     }
 
     private Event.JNumber parseNumber(NumState state) throws IOException {
-        int ic;
-        while ((ic = nextChar()) != -1 && state != NumState.Z) {
+        int ic = EMPTY;
+        while (state != NumState.Z && (ic = nextChar()) != -1) {
             char c = (char)ic;
             switch (state) {
                 case A:
@@ -405,6 +428,10 @@ public class JsonTokeniser {
             if (state != NumState.Z) {
                 buffer.add(c);
             }
+        }
+
+        if (ic != EMPTY) {
+            nextChar = ic;
         }
 
         switch (state) {
