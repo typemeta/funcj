@@ -62,6 +62,7 @@ public abstract class JsonIO {
         Output writeNum(long value);
         Output writeNum(float value);
         Output writeNum(double value);
+        Output writeNum(Number value);
         Output writeNum(BigDecimal value);
         Output writeNum(String value);
 
@@ -71,5 +72,7 @@ public abstract class JsonIO {
 
         Output startArray();
         Output endArray();
+
+        void close();
     }
 }

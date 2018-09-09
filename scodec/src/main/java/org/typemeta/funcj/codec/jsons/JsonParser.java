@@ -211,7 +211,12 @@ public class JsonParser implements JsonIO.Input {
             case OBJECT_START:
                 return Type.OBJECT_START;
             case STRING:
-                return Type.STRING;
+                switch (state) {
+                    case OBJECT_VALUE:
+                        return Type.FIELD_NAME;
+                    default:
+                        return Type.STRING;
+                }
             case TRUE:
                 return Type.TRUE;
             default:
@@ -220,7 +225,7 @@ public class JsonParser implements JsonIO.Input {
     }
 
     private void checkTokenType(JsonTokeniser.Event.Type type) {
-        if (currEvent().type().equals(type)) {
+        if (!currEvent().type().equals(type)) {
             throw new CodecException("Expecting " + type + " token but found " + currEvent().type());
         }
     }
@@ -249,78 +254,80 @@ public class JsonParser implements JsonIO.Input {
     @Override
     public String readStr() {
         checkTokenType(JsonTokeniser.Event.Type.STRING);
+        final String result = ((JsonTokeniser.Event.JString)currEvent()).value;
         next();
-        return ((JsonTokeniser.Event.JString)currEvent()).value;
+        return result;
     }
 
     @Override
     public char readChar() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
+        checkTokenType(JsonTokeniser.Event.Type.STRING);
+        final char result = ((JsonTokeniser.Event.JString)currEvent()).value.charAt(0);
         next();
-        return ((JsonTokeniser.Event.JString)currEvent()).value.charAt(0);
+        return result;
     }
 
     @Override
     public byte readByte() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
-        next();
+        checkTokenType(JsonTokeniser.Event.Type.NUMBER);
         final String value = ((JsonTokeniser.Event.JNumber)currEvent()).value;
+        next();
         return Byte.parseByte(value);
     }
 
     @Override
     public short readShort() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
-        next();
+        checkTokenType(JsonTokeniser.Event.Type.NUMBER);
         final String value = ((JsonTokeniser.Event.JNumber)currEvent()).value;
+        next();
         return Short.parseShort(value);
     }
 
     @Override
     public int readInt() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
-        next();
+        checkTokenType(JsonTokeniser.Event.Type.NUMBER);
         final String value = ((JsonTokeniser.Event.JNumber)currEvent()).value;
+        next();
         return Integer.parseInt(value);
     }
 
     @Override
     public long readLong() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
-        next();
+        checkTokenType(JsonTokeniser.Event.Type.NUMBER);next();
         final String value = ((JsonTokeniser.Event.JNumber)currEvent()).value;
+        next();
         return Long.parseLong(value);
     }
 
     @Override
     public float readFloat() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
-        next();
+        checkTokenType(JsonTokeniser.Event.Type.NUMBER);
         final String value = ((JsonTokeniser.Event.JNumber)currEvent()).value;
+        next();
         return Float.parseFloat(value);
     }
 
     @Override
     public double readDbl() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
-        next();
+        checkTokenType(JsonTokeniser.Event.Type.NUMBER);
         final String value = ((JsonTokeniser.Event.JNumber)currEvent()).value;
+        next();
         return Double.parseDouble(value);
     }
 
     @Override
     public BigDecimal readBigDec() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
-        next();
+        checkTokenType(JsonTokeniser.Event.Type.NUMBER);
         final String value = ((JsonTokeniser.Event.JNumber)currEvent()).value;
+        next();
         return new BigDecimal(value);
     }
 
     @Override
     public Number readNumber() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
-        next();
+        checkTokenType(JsonTokeniser.Event.Type.NUMBER);
         final String value = ((JsonTokeniser.Event.JNumber)currEvent()).value;
+        next();
         try {
             return NumberFormat.getInstance().parse(value);
         } catch (ParseException ex) {
@@ -330,32 +337,33 @@ public class JsonParser implements JsonIO.Input {
 
     @Override
     public void startObject() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
+        checkTokenType(JsonTokeniser.Event.Type.OBJECT_START);
         next();
     }
 
     @Override
     public String readFieldName() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
+        checkTokenType(JsonTokeniser.Event.Type.STRING);
+        final String result = ((JsonTokeniser.Event.JString)currEvent()).value;
         next();
-        return ((JsonTokeniser.Event.JString)currEvent()).value;
+        return result;
     }
 
     @Override
     public void endObject() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
+        checkTokenType(JsonTokeniser.Event.Type.OBJECT_END);
         next();
     }
 
     @Override
     public void startArray() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
+        checkTokenType(JsonTokeniser.Event.Type.ARRAY_START);
         next();
     }
 
     @Override
     public void endArray() {
-        checkTokenType(JsonTokeniser.Event.Type.NULL);
+        checkTokenType(JsonTokeniser.Event.Type.ARRAY_END);
         next();
     }
 }
