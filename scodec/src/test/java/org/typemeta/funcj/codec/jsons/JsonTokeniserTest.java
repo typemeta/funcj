@@ -8,8 +8,8 @@ public class JsonTokeniserTest {
         FileUtils.openResource("/example.json")
                 .map(JsonTokeniser::new)
                 .map(jt -> {
-                    JsonTokeniser.Event ev;
-                    while ((ev = jt.getNextEvent()) != JsonTokeniser.Event.Type.EOF) {
+                    JsonIO.Input.Event ev;
+                    while ((ev = jt.getNextEvent()) != JsonIO.Input.Event.Type.EOF) {
                         //System.out.println(ev);
                     }
                     return 0;

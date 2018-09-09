@@ -10,7 +10,7 @@ public class JsonParserTest {
                 .map(jp -> {
                     while (jp.notEOF()) {
                         System.out.println(jp.currEvent());
-                        jp.next();
+                        jp.stepNext();
                     }
                     return 0;
                 }).getOrThrow();

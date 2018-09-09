@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.byteio.*;
-import org.typemeta.funcj.codec.json.*;
 import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.functions.Functions.F;
 
@@ -13,12 +12,19 @@ import java.time.*;
 public abstract class Codecs {
 
     /**
-     * Construct and return a new instance of a {@link JsonCodecCore}.
+     * Construct and return a new instance of a {@link org.typemeta.funcj.codec.json.JsonCodecCore}.
      * @return the new {@code JsonCodecCore}
      */
-    public static JsonCodecCore jsonCodec() {
-        final JsonCodecCoreImpl codec = new JsonCodecCoreImpl();
-        return JsonCodecs.registerAll(codec);
+    public static org.typemeta.funcj.codec.json.JsonCodecCore jsonCodec() {
+        return org.typemeta.funcj.codec.json.JsonCodecs.registerAll(new org.typemeta.funcj.codec.json.JsonCodecCoreImpl());
+    }
+
+    /**
+     * Construct and return a new instance of a {@link org.typemeta.funcj.codec.jsons.JsonCodecCore}.
+     * @return the new {@code JsonCodecCore}
+     */
+    public static org.typemeta.funcj.codec.jsons.JsonCodecCore jsonsCodec() {
+        return org.typemeta.funcj.codec.jsons.JsonCodecs.registerAll(new org.typemeta.funcj.codec.jsons.JsonCodecCoreImpl());
     }
 
     /**

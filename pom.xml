@@ -18,7 +18,7 @@
         <module>parser</module>
         <module>json</module>
         <module>codec</module>
-        <module>scodec</module>
+        <!--<module>scodec</module>-->
     </modules>
 
     <scm>

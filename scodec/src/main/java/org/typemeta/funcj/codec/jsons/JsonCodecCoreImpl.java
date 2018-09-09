@@ -32,7 +32,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     private final Codec.NullCodec<JsonIO.Input, JsonIO.Output> nullCodec = new Codec.NullCodec<JsonIO.Input, JsonIO.Output>() {
         @Override
         public boolean isNull(JsonIO.Input in) {
-            return in.currentEventType().equals(JsonIO.Input.Type.NULL);
+            return in.currentEventType().equals(JsonIO.Input.Event.Type.NULL);
         }
 
         @Override
@@ -93,7 +93,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             boolean[] arr = new boolean[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -143,7 +143,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             byte[] arr = new byte[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -193,7 +193,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             char[] arr = new char[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -243,7 +243,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             short[] arr = new short[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -293,7 +293,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             int[] arr = new int[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -343,7 +343,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             long[] arr = new long[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -393,7 +393,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             float[] arr = new float[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -443,7 +443,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             double[] arr = new double[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -526,7 +526,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
 
                 in.startArray();
 
-                while(in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+                while(in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                     vals.add(elemCodec.decode(dynElemType, in));
                 }
 
@@ -558,7 +558,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
 
                 in.startArray();
                 int i = 0;
-                while (in.notEOF() && in.currentEventType() != JsonIO.Input.Type.ARRAY_END) {
+                while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
                     if (i == arr.length) {
                         arr = Arrays.copyOf(arr, arr.length * 2);
                     }
@@ -573,19 +573,25 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
 
     @Override
     public <T> Codec<T, JsonIO.Input, JsonIO.Output> dynamicCodec(Class<T> stcType) {
+        final String typeFieldName = typeFieldName();
+        final JsonIO.Input.Event.FieldName typeField = new JsonIO.Input.Event.FieldName(typeFieldName);
+        final String valueFieldName = valueFieldName();
+        final JsonIO.Input.Event.FieldName valueField = new JsonIO.Input.Event.FieldName(valueFieldName);
         return new Codec<T, JsonIO.Input, JsonIO.Output>() {
             @Override
             public JsonIO.Output encode(T val, JsonIO.Output out) {
                 final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
                 if (dynType.equals(stcType)) {
-                    return JsonCodecCoreImpl.this.createNullUnsafeCodecStc(stcType).encode(val, out);
+                    return JsonCodecCoreImpl.this.getNullUnsafeCodecDyn(stcType).encode(val, out);
                 } else {
-                    out.startArray();
+                    out.startObject();
 
-                    out.writeStr(classToName(dynType));
+                    out.writeField(typeFieldName)
+                            .writeStr(classToName(dynType));
+                    out.writeField(valueFieldName);
                     encode2(JsonCodecCoreImpl.this.createNullUnsafeCodecDyn(dynType), val, out);
 
-                    return out.endArray();
+                    return out.endObject();
                 }
             }
 
@@ -598,22 +604,28 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
 
             @Override
             public T decode(JsonIO.Input in) {
-                if (in.notEOF() && in.currentEventType() == JsonIO.Input.Type.ARRAY_START) {
-                    // TODO: fix this.
-                    final String typeFieldName = typeFieldName();
-                    final String valueFieldName = valueFieldName();
+                if (in.notEOF() && in.currentEventType() == JsonIO.Input.Event.Type.OBJECT_START) {
+                    final JsonIO.Input.Event next = in.event(1);
+                    if (next.equals(typeField)) {
+                        in.startObject();
 
-                    in.startArray();
+                        in.readFieldName();
+                        final String type = in.readStr();
 
-                    final String type = in.readStr();
+                        final String field2 = in.readFieldName();
+                        if (!field2.equals(valueFieldName)) {
+                            throw new CodecException("Was expecting field '" + valueFieldName + "' but got '" + field2 + "'");
+                        }
 
-                    final T val = decode2(in, nameToClass(type));
-                    in.endArray();
+                        final T val = decode2(in, nameToClass(type));
+                        in.endObject();
 
-                    return val;
+                        return val;
+                    }
+                    // TODO: valuefield
                 }
 
-                final Codec<T, JsonIO.Input, JsonIO.Output> codec = JsonCodecCoreImpl.this.createNullUnsafeCodecStc(stcType);
+                final Codec<T, JsonIO.Input, JsonIO.Output> codec = JsonCodecCoreImpl.this.getNullUnsafeCodecDyn(stcType);
                 return codec.decode(stcType, in);
             }
 
@@ -628,6 +640,10 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     public <T> Codec<T, JsonIO.Input, JsonIO.Output> dynamicCodec(
             Codec<T, JsonIO.Input, JsonIO.Output> codec,
             Class<T> stcType) {
+        final String typeFieldName = typeFieldName();
+        final JsonIO.Input.Event.FieldName typeField = new JsonIO.Input.Event.FieldName(typeFieldName);
+        final String valueFieldName = valueFieldName();
+        final JsonIO.Input.Event.FieldName valueField = new JsonIO.Input.Event.FieldName(valueFieldName);
         return new Codec<T, JsonIO.Input, JsonIO.Output>() {
             @Override
             public JsonIO.Output encode(T val, JsonIO.Output out) {
@@ -635,26 +651,38 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
                 if (dynType.equals(stcType)) {
                     return codec.encode(val, out);
                 } else {
-                    out.startArray();
+                    out.startObject();
 
-                    out.writeStr(classToName(dynType));
+                    out.writeField(typeFieldName)
+                            .writeStr(classToName(dynType));
+                    out.writeField(valueFieldName);
                     codec.encode(val, out);
 
-                    return out.endArray();
+                    return out.endObject();
                 }
+                // TODO: valuefield
             }
 
             @Override
             public T decode(JsonIO.Input in) {
-                if (in.currentEventType() == JsonIO.Input.Type.ARRAY_START) {
-                    in.startArray();
+                if (in.notEOF() && in.currentEventType() == JsonIO.Input.Event.Type.OBJECT_START) {
+                    final JsonIO.Input.Event next = in.event(1);
+                    if (next.equals(typeField)) {
+                        in.startObject();
 
-                    final String type = in.readStr();
-                    final T val = codec.decode(nameToClass(type), in);
+                        in.readFieldName();
+                        final String type = in.readStr();
 
-                    in.endArray();
+                        final String field2 = in.readFieldName();
+                        if (!field2.equals(valueFieldName)) {
+                            throw new CodecException("Was expecting field '" + valueFieldName + "' but got '" + field2 + "'");
+                        }
 
-                    return val;
+                        final T val = codec.decode(nameToClass(type), in);
+                        in.endObject();
+
+                        return val;
+                    }
                 }
 
                 return codec.decode(stcType, in);
@@ -664,16 +692,17 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
 
     @Override
     public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, JsonIO.Input, JsonIO.Output> createObjectCodec(
-            ObjectMeta<T, JsonIO.Input, JsonIO.Output, RA> objMeta) {
+            ObjectMeta<T, JsonIO.Input,
+                    JsonIO.Output, RA> objMeta) {
         return new Codec<T, JsonIO.Input, JsonIO.Output>() {
             @Override
             public JsonIO.Output encode(T val, JsonIO.Output out) {
                 out.startObject();
 
-            objMeta.forEach(field -> {
-                out.writeField(field.name());
-                field.encodeField(val, out);
-            });
+                objMeta.forEach(field -> {
+                    out.writeField(field.name());
+                    field.encodeField(val, out);
+                });
 
                 return out.endObject();
             }
@@ -692,7 +721,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
 
                 final RA ra = objMeta.startDecode(dynType);
 
-                while(in.notEOF() && in.currentEventType() != JsonIO.Input.Type.OBJECT_END) {
+                while(in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.OBJECT_END) {
                     final String name = in.readFieldName();
                     fields.get(name).decodeField(ra, in);
                 }

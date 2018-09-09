@@ -1,106 +1,13 @@
 package org.typemeta.funcj.codec.jsons;
 
 import org.typemeta.funcj.codec.CodecException;
+import org.typemeta.funcj.codec.jsons.JsonIO.Input.Event;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public class JsonTokeniser {
-    public interface Event {
-        Type type();
-
-        enum Type implements Event {
-            ARRAY_END,
-            ARRAY_START,
-            COMMA,
-            COLON,
-            EOF,
-            FALSE,
-            NULL,
-            NUMBER,
-            OBJECT_END,
-            OBJECT_START,
-            STRING,
-            TRUE;
-
-            @Override
-            public Type type() {
-                return this;
-            }
-        }
-
-        final class JString implements Event {
-            public final String value;
-
-            public JString(String value) {
-                this.value = Objects.requireNonNull(value);
-            }
-
-            @Override
-            public Type type() {
-                return Type.STRING;
-            }
-
-            @Override
-            public String toString() {
-                return "JString{" + value + "}";
-            }
-
-            @Override
-            public boolean equals(Object rhs) {
-                if (this == rhs) {
-                    return true;
-                } else if (rhs == null || getClass() != rhs.getClass()) {
-                    return false;
-                } else {
-                    JString rhsJS = (JString) rhs;
-                    return value.equals(rhsJS.value);
-                }
-            }
-
-            @Override
-            public int hashCode() {
-                return value.hashCode();
-            }
-        }
-
-        final class JNumber implements Event {
-            public final String value;
-
-            public JNumber(String value) {
-                this.value = Objects.requireNonNull(value);
-            }
-
-            @Override
-            public Type type() {
-                return Type.NUMBER;
-            }
-
-            @Override
-            public String toString() {
-                return "JNumber{" + value + "}";
-            }
-
-            @Override
-            public boolean equals(Object rhs) {
-                if (this == rhs) {
-                    return true;
-                } else if (rhs == null || getClass() != rhs.getClass()) {
-                    return false;
-                } else {
-                    JNumber rhsJN = (JNumber) rhs;
-                    return value.equals(rhsJN.value);
-                }
-            }
-
-            @Override
-            public int hashCode() {
-                return value.hashCode();
-            }
-        }
-    }
 
     private static final class Buffer {
         private static final int DEFAULT_SIZE = 64;

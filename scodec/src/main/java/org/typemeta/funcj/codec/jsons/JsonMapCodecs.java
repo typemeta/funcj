@@ -46,7 +46,7 @@ public abstract class JsonMapCodecs {
 
             in.startArray();
 
-            while(in.notEOF() && in.currentEventType() == JsonIO.Input.Type.OBJECT_START) {
+            while(in.notEOF() && in.currentEventType() == JsonIO.Input.Event.Type.OBJECT_START) {
                 K key = null;
                 V val = null;
 
@@ -107,7 +107,7 @@ public abstract class JsonMapCodecs {
 
             final Map<String, V> map = core.getTypeConstructor(dynType).construct();
 
-            while(in.notEOF() && in.currentEventType() == JsonIO.Input.Type.FIELD_NAME) {
+            while(in.notEOF() && in.currentEventType() == JsonIO.Input.Event.Type.FIELD_NAME) {
                 final String key = in.readFieldName();
                 final V val = valueCodec.decode(in);
                 map.put(key, val);
