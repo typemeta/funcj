@@ -23,13 +23,15 @@ public class JsonCodecs {
         @Override
         public JsonIO.Output encode(Optional<T> val, JsonIO.Output out) {
             return val.map(t -> core.dynamicCodec().encode(t, out))
-                    .orElseGet(out::writeNull);
+                    .orElseGet(() -> out.startObject().endObject());
         }
 
         @Override
         public Optional<T> decode(JsonIO.Input in) {
-            if (in.currentEventType().equals(JsonIO.Input.Event.Type.NULL)) {
-                in.readNull();
+            if (in.currentEventType().equals(JsonIO.Input.Event.Type.OBJECT_START) &&
+                    in.event(1).type().equals(JsonIO.Input.Event.Type.OBJECT_END)) {
+                in.startObject();
+                in.endObject();
                 return Optional.empty();
             } else {
                 return Optional.of((T)core.dynamicCodec().decode(in));
