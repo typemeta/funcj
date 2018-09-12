@@ -4,7 +4,7 @@ import org.typemeta.funcj.codec.CodecException;
 import org.typemeta.funcj.codec.jsons.JsonIO.Input.Event;
 
 import java.io.*;
-import java.util.Arrays;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class JsonTokeniser {
@@ -54,10 +54,18 @@ public class JsonTokeniser {
 
     private static final int EMPTY = Integer.MIN_VALUE;
 
+    enum State {
+        OBJECT_NAME,
+        OBJECT_VALUE,
+        OTHER
+    }
+
     private Reader rdr;
     private int nextChar = EMPTY;
     private long pos = 0;
     private final Buffer buffer;
+    private State state = State.OTHER;
+    private final List<State> stateStack = new ArrayList<>();
 
     public JsonTokeniser(Reader rdr) {
         this.rdr = rdr;
@@ -70,6 +78,19 @@ public class JsonTokeniser {
 
     private void raiseError(Supplier<String> msg) {
         throw new CodecException(msg.get() + " at position " + pos);
+    }
+
+    private void pushState(State newState) {
+        stateStack.add(state);
+        state = newState;
+    }
+
+    private void popState() {
+        if (stateStack.isEmpty()) {
+            throw new CodecException("Can't pop empty state stack");
+        } else {
+            state = stateStack.remove(stateStack.size() - 1);
+        }
     }
 
     private int nextChar() throws IOException {
@@ -131,22 +152,32 @@ public class JsonTokeniser {
                 final char c = nc;
                 switch (c) {
                     case '{':
+                        pushState(State.OBJECT_NAME);
                         return Event.Type.OBJECT_START;
                     case '}':
+                        popState();
                         return Event.Type.OBJECT_END;
                     case '[':
+                        pushState(State.OTHER);
                         return Event.Type.ARRAY_START;
                     case ']':
+                        popState();
                         return Event.Type.ARRAY_END;
                     case ',':
+                        if (state == State.OBJECT_VALUE) {
+                            state = State.OBJECT_NAME;
+                        }
                         return Event.Type.COMMA;
                     case ':':
+                        state = State.OBJECT_VALUE;
                         return Event.Type.COLON;
                     case '"': {
                         while (true) {
                             char c2 = nextCharOrThrow(() -> "Unexpected end-of-input while parsing a string");
                             if (c2 == '"') {
-                                return new Event.JString(buffer.release());
+                                return (state == State.OBJECT_NAME) ?
+                                        new Event.FieldName(buffer.release()) :
+                                        new Event.JString(buffer.release());
                             }
                             buffer.add(c2);
                         }

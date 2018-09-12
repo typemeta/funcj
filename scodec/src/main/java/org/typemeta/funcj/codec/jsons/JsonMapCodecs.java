@@ -25,6 +25,8 @@ public abstract class JsonMapCodecs {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
+            out.startArray();
+
             map.forEach((k, v) -> {
                 out.startObject();
                 out.writeField(keyFieldName);
@@ -34,7 +36,7 @@ public abstract class JsonMapCodecs {
                 out.endObject();
             });
 
-            return out;
+            return out.endArray();
         }
 
         @Override

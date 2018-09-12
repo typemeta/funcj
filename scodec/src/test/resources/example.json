@@ -1,5 +1,8 @@
 {
-    "test": null,
+    "test": [{
+        "a": true,
+        "b": 1
+    }],
     "knum0": 0,"knum1":1,
     "knums": [-12, 12.3, 0.12,-1.2, 1e2, -12e23, 1e-23, -12e-34] ,
     "ktrue": true,

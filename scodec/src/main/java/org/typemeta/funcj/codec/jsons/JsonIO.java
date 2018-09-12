@@ -140,7 +140,6 @@ public abstract class JsonIO {
 
         Event.Type currentEventType();
 
-        Event.Type eventType(int lookahead);
         Event event(int lookahead);
 
         Void readNull();

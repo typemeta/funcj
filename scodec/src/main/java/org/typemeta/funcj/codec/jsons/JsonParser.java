@@ -11,9 +11,10 @@ import java.util.List;
 public class JsonParser implements JsonIO.Input {
     enum State {
         OBJECT_NAME,
-        OBJECT_FIRST_NAME,
+        OBJECT_COLON,
+        OBJECT_COMMA,
         OBJECT_VALUE,
-        ARRAY_FIRST_VALUE,
+        ARRAY_COMMA,
         ARRAY_VALUE,
         END
     }
@@ -54,282 +55,315 @@ public class JsonParser implements JsonIO.Input {
         return new CodecException("Unexpected token " + event.type() + " at position " + tokeniser.position());
     }
 
-    public Event currEvent() {
-        return currEvent(bufferPos);
+    public Event currentEvent() {
+        if (eventBuffer[bufferPos] == null) {
+            pullEventsIntoBuffer(0);
+        }
+
+        return eventBuffer[bufferPos];
     }
 
-    public Event currEvent(int pos) {
-        if (eventBuffer[pos] == null) {
-            Event event = tokeniser.getNextEvent();
-            if (state == null) {
-                switch (event.type()) {
-                    case ARRAY_START:
-                        pushState(State.ARRAY_FIRST_VALUE);
-                        break;
-                    case EOF:
-                    case FALSE:
-                    case NULL:
-                    case NUMBER:
-                    case STRING:
-                    case TRUE:
-                        state = State.END;
-                        break;
-                    case OBJECT_START:
-                        pushState(State.OBJECT_FIRST_NAME);
-                        break;
-                    default:
-                        throw unexpectedToken(event);
+    private Event pullEventsIntoBuffer(int ahead) {
+        if (ahead > eventBuffer.length) {
+            throw new CodecException("Lookahead of " + ahead + " not supported, max is " + eventBuffer.length);
+        } else {
+            int pos = bufferPos;
+            while(true) {
+                if (eventBuffer[pos] == null) {
+                    eventBuffer[pos] = tokeniser.getNextEvent();
                 }
-            } else {
-                switch (state) {
-                    case OBJECT_NAME:
-                        switch (event.type()) {
-                            case COMMA:
-                                event = tokeniser.getNextEvent();
-                                break;
-                            case OBJECT_END:
-                                break;
-                            default:
-                                throw unexpectedToken(event);
-                        }
-                    case OBJECT_FIRST_NAME:
-                        switch (event.type()) {
-                            case STRING:
-                                event = new Event.FieldName(((Event.JString)event).value);
-                                state = State.OBJECT_VALUE;
-                                break;
-                            case OBJECT_END:
-                                eventBuffer[pos] = event;
-                                popState();
-                                break;
-                            default:
-                                throw unexpectedToken(event);
-                        }
-                        break;
-                    case OBJECT_VALUE:
-                        if (!event.type().equals(Event.Type.COLON)) {
-                            throw unexpectedToken(event);
-                        } else {
-                            event = tokeniser.getNextEvent();
-                            switch (event.type()) {
-                                case FALSE:
-                                case NULL:
-                                case NUMBER:
-                                case STRING:
-                                case TRUE:
-                                    state = State.OBJECT_NAME;
-                                    break;
-                                case ARRAY_START:
-                                    state = State.OBJECT_NAME;
-                                    pushState(State.ARRAY_FIRST_VALUE);
-                                    break;
-                                case OBJECT_START:
-                                    state = State.OBJECT_NAME;
-                                    pushState(State.OBJECT_FIRST_NAME);
-                                    break;
-                                case OBJECT_END:
-                                    popState();
-                                    break;
-                                default:
-                                    throw unexpectedToken(event);
-                            }
-                        }
-                        break;
-                    case ARRAY_VALUE:
-                        switch (event.type()) {
-                            case COMMA:
-                                event = tokeniser.getNextEvent();
-                                break;
-                            case ARRAY_END:
-                                break;
-                            default:
-                                throw unexpectedToken(event);
-                        }
-                    case ARRAY_FIRST_VALUE:
-                        switch (event.type()) {
-                            case FALSE:
-                            case NULL:
-                            case NUMBER:
-                            case STRING:
-                            case TRUE:
-                                state = State.ARRAY_VALUE;
-                                break;
-                            case ARRAY_START:
-                                state = State.ARRAY_VALUE;
-                                pushState(State.ARRAY_FIRST_VALUE);
-                                break;
-                            case OBJECT_START:
-                                state = State.ARRAY_VALUE;
-                                pushState(State.OBJECT_FIRST_NAME);
-                                break;
-                            case ARRAY_END:
-                                popState();
-                                break;
-                            default:
-                                throw unexpectedToken(event);
-                        }
-
-                        break;
+                if (ahead-- == 0) {
+                    return eventBuffer[pos];
+                }
+                if (++pos == eventBuffer.length) {
+                    pos = 0;
                 }
             }
-            eventBuffer[pos] = event;
         }
-        return eventBuffer[pos];
     }
 
-
-    public void stepNext() {
+    public Event skipToNextEvent() {
         eventBuffer[bufferPos] = null;
         ++bufferPos;
         if (bufferPos == eventBuffer.length) {
             bufferPos = 0;
         }
-    }
-
-    private int nextPos() {
-        return nextPos(bufferPos);
-    }
-
-    private int nextPos(int pos) {
-        ++pos;
-        if (++pos == eventBuffer.length) {
-            return 0;
-        } else {
-            return pos;
-        }
+        return pullEventsIntoBuffer(0);
     }
 
     @Override
     public boolean notEOF() {
-        return !currEvent().equals(Event.Type.EOF);
+        return !currentEvent().equals(Event.Type.EOF);
     }
 
     @Override
     public Event.Type currentEventType() {
-        return currEvent().type();
+        return currentEvent().type();
     }
 
     @Override
-    public Event.Type eventType(int lookahead) {
-        return event(lookahead).type();
-    }
-
-    @Override
-    public Event event(int lookahead) {
-        if (lookahead > eventBuffer.length) {
-            throw new CodecException("Lookahead of " + lookahead + " not supported, max is " + eventBuffer.length);
-        } else {
-            for (int i = 0; i < lookahead; ++i) {
-                currEvent(i);
-            }
-            return currEvent(lookahead);
-        }
+    public Event event(int ahead) {
+        return pullEventsIntoBuffer(ahead);
     }
 
     private void checkTokenType(Event.Type type) {
-        if (!currEvent().type().equals(type)) {
-            throw new CodecException("Expecting " + type + " token but found " + currEvent().type() + " at position " + tokeniser.position());
+        if (!currentEvent().type().equals(type)) {
+            throw new CodecException(
+                    "Expecting " + type + " token but found " + currentEvent().type() +
+                            " at position " + tokeniser.position()
+            );
+        }
+    }
+
+    public void processCurrentEvent() {
+        Event event = eventBuffer[bufferPos];
+
+        if (state == null) {
+            switch (event.type()) {
+                case ARRAY_START:
+                    pushState(State.ARRAY_VALUE);
+                    break;
+                case EOF:
+                case FALSE:
+                case NULL:
+                case NUMBER:
+                case STRING:
+                case TRUE:
+                    state = State.END;
+                    break;
+                case OBJECT_START:
+                    pushState(State.OBJECT_NAME);
+                    break;
+                default:
+                    throw unexpectedToken(event);
+            }
+        } else {
+            switch (state) {
+                case OBJECT_NAME:
+                    switch (event.type()) {
+                        case FIELD_NAME:
+                            state = State.OBJECT_COLON;
+                            break;
+                        case OBJECT_END:
+                            popState();
+                            break;
+                        default:
+                            throw unexpectedToken(event);
+                    }
+                    break;
+                case OBJECT_COLON:
+                    switch (event.type()) {
+                        case COLON:
+                            state = State.OBJECT_VALUE;
+                            break;
+                        default:
+                            throw unexpectedToken(event);
+                    }
+                    break;
+                case OBJECT_VALUE:
+                    switch (event.type()) {
+                        case FALSE:
+                        case NULL:
+                        case NUMBER:
+                        case STRING:
+                        case TRUE:
+                            state = State.OBJECT_COMMA;
+                            break;
+                        case ARRAY_START:
+                            state = State.OBJECT_COMMA;
+                            pushState(State.ARRAY_VALUE);
+                            break;
+                        case OBJECT_START:
+                            state = State.OBJECT_COMMA;
+                            pushState(State.OBJECT_NAME);
+                            break;
+                        default:
+                            throw unexpectedToken(event);
+                    }
+                    break;
+                case OBJECT_COMMA:
+                    switch (event.type()) {
+                        case COMMA:
+                            state = State.OBJECT_NAME;
+                            break;
+                        case OBJECT_END:
+                            popState();
+                            break;
+                        default:
+                            throw unexpectedToken(event);
+                    }
+                    break;
+                case ARRAY_VALUE:
+                    switch (event.type()) {
+                        case FALSE:
+                        case NULL:
+                        case NUMBER:
+                        case STRING:
+                        case TRUE:
+                            state = State.ARRAY_COMMA;
+                            break;
+                        case ARRAY_START:
+                            state = State.ARRAY_COMMA;
+                            pushState(State.ARRAY_VALUE);
+                            break;
+                        case OBJECT_START:
+                            state = State.ARRAY_COMMA;
+                            pushState(State.OBJECT_NAME);
+                            break;
+                        default:
+                            throw unexpectedToken(event);
+                    }
+                    break;
+                case ARRAY_COMMA:
+                    switch (event.type()) {
+                        case COMMA:
+                            state = State.ARRAY_VALUE;
+                            break;
+                        case ARRAY_END:
+                            popState();
+                            break;
+                        default:
+                            throw unexpectedToken(event);
+                    }
+                    break;
+            }
+        }
+
+        eventBuffer[bufferPos++] = null;
+        if (bufferPos == eventBuffer.length) {
+            bufferPos = 0;
+        }
+        if (eventBuffer[bufferPos] == null) {
+            pullEventsIntoBuffer(0);
+        }
+
+        event = eventBuffer[bufferPos];
+
+        switch (event.type()) {
+            case COMMA:
+                switch (state) {
+                    case ARRAY_COMMA:
+                        state = State.ARRAY_VALUE;
+                        break;
+                    case OBJECT_COMMA:
+                        state = State.OBJECT_NAME;
+                        break;
+                    default:
+                        throw unexpectedToken(event);
+                }
+                skipToNextEvent();
+                break;
+            case COLON:
+                switch (state) {
+                    case OBJECT_COLON:
+                        state = State.OBJECT_VALUE;
+                        break;
+                    default:
+                        throw unexpectedToken(event);
+                }
+                skipToNextEvent();
+                break;
         }
     }
 
     @Override
     public Void readNull() {
         checkTokenType(Event.Type.NULL);
-        stepNext();
+        processCurrentEvent();
         return null;
     }
 
     @Override
     public boolean readBool() {
-        final Event.Type currType = currEvent().type();
+        final Event.Type currType = currentEvent().type();
         if (currType.equals(Event.Type.FALSE)) {
-            stepNext();
+            processCurrentEvent();
             return false;
         } else if (currType.equals(Event.Type.TRUE)) {
-            stepNext();
+            processCurrentEvent();
             return true;
         } else {
-            throw new CodecException("Expecting boolean token but found " + currEvent().type() + " at position " + tokeniser.position());
+            throw new CodecException("Expecting boolean token but found " + currentEvent().type() + " at position " + tokeniser.position());
         }
     }
 
     @Override
     public String readStr() {
         checkTokenType(Event.Type.STRING);
-        final String result = ((Event.JString)currEvent()).value;
-        stepNext();
+        final String result = ((Event.JString) currentEvent()).value;
+        processCurrentEvent();
         return result;
     }
 
     @Override
     public char readChar() {
         checkTokenType(Event.Type.STRING);
-        final char result = ((Event.JString)currEvent()).value.charAt(0);
-        stepNext();
+        final char result = ((Event.JString) currentEvent()).value.charAt(0);
+        processCurrentEvent();
         return result;
     }
 
     @Override
     public byte readByte() {
         checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber)currEvent()).value;
-        stepNext();
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
         return Byte.parseByte(value);
     }
 
     @Override
     public short readShort() {
         checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber)currEvent()).value;
-        stepNext();
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
         return Short.parseShort(value);
     }
 
     @Override
     public int readInt() {
         checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber)currEvent()).value;
-        stepNext();
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
         return Integer.parseInt(value);
     }
 
     @Override
     public long readLong() {
         checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber)currEvent()).value;
-        stepNext();
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
         return Long.parseLong(value);
     }
 
     @Override
     public float readFloat() {
         checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber)currEvent()).value;
-        stepNext();
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
         return Float.parseFloat(value);
     }
 
     @Override
     public double readDbl() {
         checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber)currEvent()).value;
-        stepNext();
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
         return Double.parseDouble(value);
     }
 
     @Override
     public BigDecimal readBigDec() {
         checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber)currEvent()).value;
-        stepNext();
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
         return new BigDecimal(value);
     }
 
     @Override
     public Number readNumber() {
         checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber)currEvent()).value;
-        stepNext();
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
         try {
             return NumberFormat.getInstance().parse(value);
         } catch (ParseException ex) {
@@ -340,32 +374,32 @@ public class JsonParser implements JsonIO.Input {
     @Override
     public void startObject() {
         checkTokenType(Event.Type.OBJECT_START);
-        stepNext();
+        processCurrentEvent();
     }
 
     @Override
     public String readFieldName() {
         checkTokenType(Event.Type.FIELD_NAME);
-        final String result = ((Event.FieldName)currEvent()).value;
-        stepNext();
+        final String result = ((Event.FieldName) currentEvent()).value;
+        processCurrentEvent();
         return result;
     }
 
     @Override
     public void endObject() {
         checkTokenType(Event.Type.OBJECT_END);
-        stepNext();
+        processCurrentEvent();
     }
 
     @Override
     public void startArray() {
         checkTokenType(Event.Type.ARRAY_START);
-        stepNext();
+        processCurrentEvent();
     }
 
     @Override
     public void endArray() {
         checkTokenType(Event.Type.ARRAY_END);
-        stepNext();
+        processCurrentEvent();
     }
 }

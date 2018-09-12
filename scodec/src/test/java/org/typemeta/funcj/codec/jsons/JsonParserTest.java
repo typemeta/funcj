@@ -9,8 +9,8 @@ public class JsonParserTest {
                 .map(JsonParser::new)
                 .map(jp -> {
                     while (jp.notEOF()) {
-                        System.out.println(jp.currEvent());
-                        jp.stepNext();
+                        System.out.println(jp.currentEvent());
+                        jp.processCurrentEvent();
                     }
                     return 0;
                 }).getOrThrow();
