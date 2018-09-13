@@ -76,8 +76,8 @@ public class JsonTokeniser {
         return pos;
     }
 
-    private void raiseError(Supplier<String> msg) {
-        throw new CodecException(msg.get() + " at position " + pos);
+    private CodecException raiseError(Supplier<String> msg) {
+        return new CodecException(msg.get() + " at position " + pos);
     }
 
     private void pushState(State newState) {
@@ -109,7 +109,7 @@ public class JsonTokeniser {
         int nc = nextChar();
 
         if (nc == -1) {
-            raiseError(msg);
+            throw raiseError(msg);
         }
 
         return (char)nc;
@@ -123,7 +123,7 @@ public class JsonTokeniser {
         for (int i = 1; i < s.length; ++i) {
             final char c = nextCharOrThrow();
             if (c != s[i]) {
-                raiseError(() -> ("Unexpected input '" + c + "' while parsing '" + s + "'"));
+                throw raiseError(() -> ("Unexpected input '" + c + "' while parsing '" + s + "'"));
             }
         }
     }
@@ -173,13 +173,51 @@ public class JsonTokeniser {
                         return Event.Type.COLON;
                     case '"': {
                         while (true) {
-                            char c2 = nextCharOrThrow(() -> "Unexpected end-of-input while parsing a string");
-                            if (c2 == '"') {
-                                return (state == State.OBJECT_NAME) ?
-                                        new Event.FieldName(buffer.release()) :
-                                        new Event.JString(buffer.release());
+                            final char c2 = nextStringChar();
+                            switch (c2) {
+                                case '"':
+                                    return (state == State.OBJECT_NAME) ?
+                                            new Event.FieldName(buffer.release()) :
+                                            new Event.JString(buffer.release());
+                                case '\\': {
+                                    final char esc0 = nextStringChar();
+                                    switch (esc0) {
+                                        case 'u':
+                                            final byte esc1 = nextStringUniChar();
+                                            final byte esc2 = nextStringUniChar();
+                                            final byte esc3 = nextStringUniChar();
+                                            final byte esc4 = nextStringUniChar();
+                                            final int hc = (esc1 << 12) | (esc2 << 8) | (esc3 << 4) | (esc4);
+                                            buffer.add((char)hc);
+                                            break;
+                                        case '\\':
+                                            buffer.add('\\');
+                                            break;
+                                        case '/':
+                                            buffer.add('/');
+                                            break;
+                                        case 'b':
+                                            buffer.add('\b');
+                                            break;
+                                        case 'f':
+                                            buffer.add('\f');
+                                            break;
+                                        case 'n':
+                                            buffer.add('\n');
+                                            break;
+                                        case 'r':
+                                            buffer.add('\r');
+                                            break;
+                                        case 't':
+                                            buffer.add('\t');
+                                            break;
+                                    }
+                                    break;
+                                }
+                                default:
+                                    buffer.add(c2);
+                                    break;
                             }
-                            buffer.add(c2);
                         }
                     }
                     case 't': {
@@ -213,14 +251,56 @@ public class JsonTokeniser {
                         buffer.add(c);
                         return parseNumber(NumState.A);
                     default:
-                        raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
+                        int i = 0;
+                        throw raiseError(() -> "Unexpected input '" + c + "'");
                 }
             }
         } catch (IOException ex) {
             throw new CodecException(ex);
         }
+    }
 
-        throw new CodecException("Illegal state (internal error)");
+    private char nextStringChar() throws IOException {
+        return nextCharOrThrow(() -> "Unexpected end-of-input while parsing a string");
+    }
+
+    private byte nextStringUniChar() throws IOException {
+        final char c = nextCharOrThrow(() ->
+                "Unexpected end-of-input while parsing an escape unicode char within a string"
+        );
+
+        switch (c) {
+            case '0': return 0;
+            case '1': return 1;
+            case '2': return 2;
+            case '3': return 3;
+            case '4': return 4;
+            case '5': return 5;
+            case '6': return 6;
+            case '7': return 7;
+            case '8': return 8;
+            case '9': return 9;
+            case 'a':
+            case 'A':
+                return 10;
+            case 'b':
+            case 'B':
+                return 11;
+            case 'c':
+            case 'C':
+                return 12;
+            case 'd':
+            case 'D':
+                return 13;
+            case 'e':
+            case 'E':
+                return 14;
+            case 'f':
+            case 'F':
+                return 15;
+            default:
+                throw raiseError(() -> "Unexpected non-digit '" + c + "' while parsing a string escape unicode char");
+        }
     }
 
     private Event.JNumber parseNumber(NumState state) throws IOException {
@@ -240,7 +320,7 @@ public class JsonTokeniser {
                             break;
                         }
                         default:
-                            raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
+                            throw raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
                     }
                     break;
                 case B:
@@ -289,7 +369,7 @@ public class JsonTokeniser {
                             break;
                         }
                         default:
-                            raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
+                            throw raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
                     }
                     break;
                 case E:
@@ -321,7 +401,7 @@ public class JsonTokeniser {
                             break;
                         }
                         default:
-                            raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
+                            throw raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
                     }
                     break;
                 case G:
@@ -332,7 +412,7 @@ public class JsonTokeniser {
                             break;
                         }
                         default:
-                            raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
+                            throw raiseError(() -> "Unexpected input '" + c + "' while parsing a number");
                     }
                     break;
                 case H:
@@ -377,9 +457,9 @@ public class JsonTokeniser {
             case D:
             case F:
             case G:
-                raiseError(() -> "Unexpected end-of-input while parsing a number");
-                break;
+                throw raiseError(() -> "Unexpected end-of-input while parsing a number");
+            default:
+                return new Event.JNumber(buffer.release());
         }
-        return new Event.JNumber(buffer.release());
     }
 }

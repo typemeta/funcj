@@ -4,7 +4,6 @@ import org.typemeta.funcj.codec.CodecException;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.BitSet;
 
 public class JsonGenerator implements JsonIO.Output {
     private final Writer writer;
@@ -43,7 +42,7 @@ public class JsonGenerator implements JsonIO.Output {
 
     private JsonGenerator writeString(String value) {
         try {
-            writer.append('"').append(value).append('"');
+            JsonGeneratorUtils.format(value, writer);
             return this;
         } catch (IOException ex) {
             throw new CodecException("Failed to write to output stream", ex);
@@ -52,7 +51,7 @@ public class JsonGenerator implements JsonIO.Output {
 
     private JsonGenerator writeString(char value) {
         try {
-            writer.append('"').append(value).append('"');
+            JsonGeneratorUtils.format(value, writer);
             return this;
         } catch (IOException ex) {
             throw new CodecException("Failed to write to output stream", ex);
@@ -63,17 +62,6 @@ public class JsonGenerator implements JsonIO.Output {
         write(',');
         pendingComma = false;
     }
-//
-//    private void push() {
-//        firstValStack.set(firstValStack.size(), firstVal);
-//        ++depth;
-//        firstVal = true;
-//    }
-//
-//    private void pop() {
-//        firstVal = firstValStack.get(firstValStack.size()-1);
-//        --depth;
-//    }
 
     @Override
     public JsonIO.Output writeNull() {
@@ -227,5 +215,68 @@ public class JsonGenerator implements JsonIO.Output {
     public JsonIO.Output endArray() {
         pendingComma = true;
         return write(']');
+    }
+}
+
+abstract class JsonGeneratorUtils {
+
+    static Writer format(String s, Writer wtr) throws IOException {
+        wtr.append('"');
+        escape(s, wtr);
+        return wtr.append('"');
+    }
+
+    static Writer format(char c, Writer wtr) throws IOException {
+        wtr.append('"');
+        escape(c, wtr);
+        return wtr.append('"');
+    }
+
+    static Writer escape(String s, Writer wtr) throws IOException {
+        final int len = s.length();
+        for (int i = 0; i < len; ++i) {
+            escape(s.charAt(i), wtr);
+        }
+
+        return wtr;
+    }
+
+    static Writer escape(char c, Writer wtr) throws IOException {
+        switch(c) {
+            case '\"':
+                wtr.append("\\\"");
+                break;
+            case '\\':
+                wtr.append("\\\\");
+                break;
+            //                case '/':
+            //                    wtr.append("\\/");
+            //                    break;
+            case '\b':
+                wtr.append("\\b");
+                break;
+            case '\f':
+                wtr.append("\\f");
+                break;
+            case '\n':
+                wtr.append("\\n");
+                break;
+            case '\r':
+                wtr.append("\\r");
+                break;
+            case '\t':
+                wtr.append("\\t");
+                break;
+            default:
+                if (c <= '\u001F' ||
+                        c >= '\u007F' && c <= '\u009F' ||
+                        c >= '\u00ff') {
+                    wtr.append("\\u").append(Integer.toHexString(c | 0x10000).substring(1));
+                } else {
+                    wtr.append(c);
+                }
+        }
+
+        return wtr;
     }
 }

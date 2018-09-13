@@ -116,7 +116,7 @@ public class JsonParser implements JsonIO.Input {
     }
 
     public void processCurrentEvent() {
-        Event event = eventBuffer[bufferPos];
+        final Event event = eventBuffer[bufferPos];
 
         if (state == null) {
             switch (event.type()) {
@@ -237,9 +237,9 @@ public class JsonParser implements JsonIO.Input {
             pullEventsIntoBuffer(0);
         }
 
-        event = eventBuffer[bufferPos];
+        final Event event2 = eventBuffer[bufferPos];
 
-        switch (event.type()) {
+        switch (event2.type()) {
             case COMMA:
                 switch (state) {
                     case ARRAY_COMMA:
@@ -249,7 +249,7 @@ public class JsonParser implements JsonIO.Input {
                         state = State.OBJECT_NAME;
                         break;
                     default:
-                        throw unexpectedToken(event);
+                        throw unexpectedToken(event2);
                 }
                 skipToNextEvent();
                 break;
@@ -259,7 +259,7 @@ public class JsonParser implements JsonIO.Input {
                         state = State.OBJECT_VALUE;
                         break;
                     default:
-                        throw unexpectedToken(event);
+                        throw unexpectedToken(event2);
                 }
                 skipToNextEvent();
                 break;
