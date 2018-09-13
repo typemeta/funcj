@@ -4,7 +4,6 @@ import org.junit.*;
 import org.typemeta.funcj.codec.*;
 
 import java.io.*;
-import java.util.*;
 
 public class JsonCodecTest extends TestBase {
 
@@ -30,14 +29,5 @@ public class JsonCodecTest extends TestBase {
         }
 
         Assert.assertEquals(val, val2);
-    }
-
-    @Test
-    public void test() {
-        Map<Object, Object> map = new HashMap<>();
-        map.put(12, "12");
-        //map.put(34, "34");
-
-        roundTrip(map, Map.class);
     }
 }

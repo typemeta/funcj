@@ -55,6 +55,5 @@ public class JsonBridge {
                     break;
             }
         }
-        output.close();
     }
 }

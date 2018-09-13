@@ -1,11 +1,8 @@
 package org.typemeta.funcj.codec.jsons;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.json.model.*;
 
 import java.util.Optional;
-
-import static org.typemeta.funcj.util.Exceptions.*;
 
 @SuppressWarnings("unchecked")
 public class JsonCodecs {

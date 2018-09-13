@@ -2,17 +2,20 @@ package org.typemeta.funcj.codec.jsons;
 
 import org.junit.Test;
 
-import java.io.PrintWriter;
+import java.io.*;
 
 public class JsonBridgeTest {
     @Test
     public void test() throws Exception {
+        final StringWriter wtr = new StringWriter();
         FileUtils.openResource("/example.json")
-                .map(br -> {
-                    new JsonBridge(br, new PrintWriter(System.out))
-                            .run();
+                .map(br -> new JsonBridge(br, wtr))
+                .map(jb -> {
+                    jb.run();
                     return 0;
                 });
-        System.out.println();
+
+        wtr.close();
+        //System.out.println(wtr);
     }
 }
