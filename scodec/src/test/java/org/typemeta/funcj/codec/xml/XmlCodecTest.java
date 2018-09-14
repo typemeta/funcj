@@ -3,9 +3,11 @@ package org.typemeta.funcj.codec.xml;
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.util.Exceptions;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import javax.xml.parsers.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class XmlCodecTest extends TestBase {
     final static XmlCodecCore codec = Codecs.xmlCodec();

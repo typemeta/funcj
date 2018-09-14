@@ -4,9 +4,11 @@ import org.typemeta.funcj.codec.CodecException;
 
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.text.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class JsonParser implements JsonIO.Input {
     enum State {
@@ -38,6 +40,18 @@ public class JsonParser implements JsonIO.Input {
         this(new JsonTokeniser(reader), 3);
     }
 
+    private CodecException raiseError(String msg) {
+        return new CodecException(msg + " at position " + tokeniser.position());
+    }
+
+    private CodecException raiseError(Supplier<String> msg) {
+        return new CodecException(msg.get() + " at position " + tokeniser.position());
+    }
+
+    private CodecException unexpectedToken(Event event) {
+        return raiseError("Unexpected token " + event.type());
+    }
+
     private void pushState(State newState) {
         stateStack.add(state);
         state = newState;
@@ -45,14 +59,10 @@ public class JsonParser implements JsonIO.Input {
 
     private void popState() {
         if (stateStack.isEmpty()) {
-            throw new CodecException("Can't pop empty state stack");
+            throw raiseError("Attempting to pop empty stack due to mis-match closing brace/bracket");
         } else {
             state = stateStack.remove(stateStack.size() - 1);
         }
-    }
-
-    private CodecException unexpectedToken(Event event) {
-        return new CodecException("Unexpected token " + event.type() + " at position " + tokeniser.position());
     }
 
     public Event currentEvent() {
@@ -65,7 +75,7 @@ public class JsonParser implements JsonIO.Input {
 
     private Event pullEventsIntoBuffer(int ahead) {
         if (ahead > eventBuffer.length) {
-            throw new CodecException("Lookahead of " + ahead + " not supported, max is " + eventBuffer.length);
+            throw raiseError("Lookahead of " + ahead + " not supported, max is " + eventBuffer.length + ",");
         } else {
             int pos = bufferPos;
             while(true) {
@@ -108,10 +118,7 @@ public class JsonParser implements JsonIO.Input {
 
     private void checkTokenType(Event.Type type) {
         if (!currentEvent().type().equals(type)) {
-            throw new CodecException(
-                    "Expecting " + type + " token but found " + currentEvent().type() +
-                            " at position " + tokeniser.position()
-            );
+            throw raiseError("Expecting " + type + " token but found " + currentEvent().type());
         }
     }
 
@@ -283,7 +290,7 @@ public class JsonParser implements JsonIO.Input {
             processCurrentEvent();
             return true;
         } else {
-            throw new CodecException("Expecting boolean token but found " + currentEvent().type() + " at position " + tokeniser.position());
+            throw raiseError("Expecting boolean token but found " + currentEvent().type());
         }
     }
 
@@ -367,7 +374,8 @@ public class JsonParser implements JsonIO.Input {
         try {
             return NumberFormat.getInstance().parse(value);
         } catch (ParseException ex) {
-            throw new CodecException("Number token not a valid number", ex);
+            final String excerpt = value.length() > 16 ? value.substring(0, 16) + "..." : value;
+            throw raiseError("Number token '" + excerpt + "' is not a valid number");
         }
     }
 

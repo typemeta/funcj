@@ -3,9 +3,11 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static java.util.stream.Collectors.toList;
 
@@ -103,8 +105,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
     /**
      * Map a class to a class name.
      * This method exists primarily to allow it to be overridden in one place.
-     * @param clazz the class
-     * @return the class name
+     * @param clazz     the class
+     * @return          the class name
      */
     @Override
     public String classToName(Class<?> clazz) {
@@ -403,7 +405,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                         .map(en -> {
                             final String name = en.getKey();
                             final FieldCodec<IN, OUT> codec = en.getValue();
-                            return (ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>)new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
+                            return new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
                                 @Override
                                 public String name() {
                                     return name;
@@ -478,7 +480,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
                 .map(en -> {
                     final String name = en.getKey();
                     final ObjectCodecBuilder.FieldCodec<T, IN, OUT> codec = en.getValue();
-                    return (ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>)new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
+                    return new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
                         @Override
                         public String name() {
                             return name;

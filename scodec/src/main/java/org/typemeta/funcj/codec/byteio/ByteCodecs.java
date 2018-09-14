@@ -1,6 +1,9 @@
 package org.typemeta.funcj.codec.byteio;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecCoreIntl;
+import org.typemeta.funcj.codec.Codecs;
+import org.typemeta.funcj.codec.byteio.ByteIO.Input;
+import org.typemeta.funcj.codec.byteio.ByteIO.Output;
 
 import java.util.Optional;
 
@@ -10,14 +13,14 @@ public class ByteCodecs {
         core.registerCodec(Optional.class, new OptionalCodec(core));
         return Codecs.registerAll(core);
     }
-    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, ByteIO.Input, ByteIO.Output> {
+    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, Input, Output> {
 
-        protected OptionalCodec(CodecCoreIntl<ByteIO.Input, ByteIO.Output> core) {
+        protected OptionalCodec(CodecCoreIntl<Input, Output> core) {
             super(core);
         }
 
         @Override
-        public ByteIO.Output encode(Optional<T> val, ByteIO.Output out) {
+        public Output encode(Optional<T> val, Output out) {
             core.booleanCodec().encode(val.isPresent(), out);
             if (val.isPresent()) {
                 return core.dynamicCodec().encode(val.get(), out);
@@ -27,7 +30,7 @@ public class ByteCodecs {
         }
 
         @Override
-        public Optional<T> decode(ByteIO.Input in) {
+        public Optional<T> decode(Input in) {
             if (core.booleanCodec().decode(in)) {
                 return Optional.of((T)core.dynamicCodec().decode(in));
             } else {

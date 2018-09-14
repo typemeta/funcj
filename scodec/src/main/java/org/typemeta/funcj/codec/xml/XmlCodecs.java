@@ -5,8 +5,6 @@ import org.w3c.dom.Element;
 
 import java.util.Optional;
 
-import static org.typemeta.funcj.util.Exceptions.*;
-
 @SuppressWarnings("unchecked")
 public class XmlCodecs {
     public static XmlCodecCoreImpl registerAll(XmlCodecCoreImpl core) {

@@ -5,9 +5,12 @@ import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.util.Exceptions;
 
 import javax.xml.bind.DatatypeConverter;
-import javax.xml.parsers.*;
-import java.io.*;
-import java.util.zip.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class GzipByteCodecTest extends TestBase {
     final static ByteCodecCore codec = Codecs.byteCodec();

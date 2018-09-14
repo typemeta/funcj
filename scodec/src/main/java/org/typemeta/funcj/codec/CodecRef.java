@@ -53,7 +53,7 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
     }
 
     /**
-     * Initialise this reference
+     * Initialise this reference.
      * @param impl      the codec
      * @return          this codec
      */

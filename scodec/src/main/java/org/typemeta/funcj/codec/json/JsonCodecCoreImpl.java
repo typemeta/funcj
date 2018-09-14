@@ -2,7 +2,8 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.json.model.*;
-import org.typemeta.funcj.util.*;
+import org.typemeta.funcj.util.FoldsGenEx;
+import org.typemeta.funcj.util.FunctorsGenEx;
 
 import java.lang.reflect.Array;
 import java.util.*;

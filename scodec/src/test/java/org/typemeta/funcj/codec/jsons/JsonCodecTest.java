@@ -1,9 +1,10 @@
 package org.typemeta.funcj.codec.jsons;
 
-import org.junit.*;
+import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
 
-import java.io.*;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 public class JsonCodecTest extends TestBase {
 
@@ -18,8 +19,6 @@ public class JsonCodecTest extends TestBase {
     protected <T> void roundTrip(T val, Class<T> clazz) {
         final StringWriter sw = new StringWriter();
         codec.encode(clazz, val, sw);
-
-        System.out.println(sw);
 
         final StringReader sr = new StringReader(sw.toString());
         final T val2 = codec.decode(clazz, sr);

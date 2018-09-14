@@ -88,7 +88,7 @@ public abstract class JsonIO {
                     } else if (rhs == null || getClass() != rhs.getClass()) {
                         return false;
                     } else {
-                        JString rhsJS = (JString) rhs;
+                        final JString rhsJS = (JString) rhs;
                         return value.equals(rhsJS.value);
                     }
                 }
@@ -123,7 +123,7 @@ public abstract class JsonIO {
                     } else if (rhs == null || getClass() != rhs.getClass()) {
                         return false;
                     } else {
-                        JNumber rhsJN = (JNumber) rhs;
+                        final JNumber rhsJN = (JNumber) rhs;
                         return value.equals(rhsJN.value);
                     }
                 }

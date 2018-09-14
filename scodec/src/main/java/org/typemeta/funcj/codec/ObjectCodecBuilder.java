@@ -1,9 +1,10 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.functions.*;
+import org.typemeta.funcj.functions.Functions;
 
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Provides a builder interface for building an object {@link Codec},

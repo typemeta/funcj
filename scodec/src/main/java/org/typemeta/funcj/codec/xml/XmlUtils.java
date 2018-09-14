@@ -1,12 +1,13 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecException;
 import org.w3c.dom.*;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Optional;
 
 public abstract class XmlUtils {

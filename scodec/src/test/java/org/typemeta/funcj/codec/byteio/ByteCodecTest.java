@@ -5,8 +5,10 @@ import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.util.Exceptions;
 
 import javax.xml.bind.DatatypeConverter;
-import javax.xml.parsers.*;
-import java.io.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 public class ByteCodecTest extends TestBase {
     final static ByteCodecCore codec = Codecs.byteCodec();
@@ -24,7 +26,7 @@ public class ByteCodecTest extends TestBase {
     }
 
     @Override
-    protected <T> void roundTrip(T val, Class<T> clazz) throws Exception {
+    protected <T> void roundTrip(T val, Class<T> clazz) {
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ByteIO.Output byteOut = ByteIO.ofOutputStream(baos);

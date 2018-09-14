@@ -1,6 +1,8 @@
 package org.typemeta.funcj.codec.jsons;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.jsons.JsonIO.Input;
+import org.typemeta.funcj.codec.jsons.JsonIO.Output;
 
 import java.util.Optional;
 
@@ -11,22 +13,22 @@ public class JsonCodecs {
         return Codecs.registerAll(core);
     }
 
-    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, JsonIO.Input, JsonIO.Output> {
+    public static class OptionalCodec<T> extends Codecs.CodecBase<Optional<T>, Input, Output> {
 
-        protected OptionalCodec(CodecCoreIntl<JsonIO.Input, JsonIO.Output> core) {
+        protected OptionalCodec(CodecCoreIntl<Input, Output> core) {
             super(core);
         }
 
         @Override
-        public JsonIO.Output encode(Optional<T> val, JsonIO.Output out) {
+        public Output encode(Optional<T> val, Output out) {
             return val.map(t -> core.dynamicCodec().encode(t, out))
                     .orElseGet(() -> out.startObject().endObject());
         }
 
         @Override
-        public Optional<T> decode(JsonIO.Input in) {
-            if (in.currentEventType().equals(JsonIO.Input.Event.Type.OBJECT_START) &&
-                    in.event(1).type().equals(JsonIO.Input.Event.Type.OBJECT_END)) {
+        public Optional<T> decode(Input in) {
+            if (in.currentEventType().equals(Input.Event.Type.OBJECT_START) &&
+                    in.event(1).type().equals(Input.Event.Type.OBJECT_END)) {
                 in.startObject();
                 in.endObject();
                 return Optional.empty();

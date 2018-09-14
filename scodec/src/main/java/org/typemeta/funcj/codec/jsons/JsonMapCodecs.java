@@ -1,27 +1,30 @@
 package org.typemeta.funcj.codec.jsons;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codec;
+import org.typemeta.funcj.codec.CodecException;
+import org.typemeta.funcj.codec.jsons.JsonIO.Input;
+import org.typemeta.funcj.codec.jsons.JsonIO.Output;
 
-import java.util.*;
+import java.util.Map;
 
 public abstract class JsonMapCodecs {
 
-    public static class MapCodec<K, V> implements Codec<Map<K, V>, JsonIO.Input, JsonIO.Output> {
+    public static class MapCodec<K, V> implements Codec<Map<K, V>, Input, Output> {
         private final JsonCodecCoreImpl core;
-        private final Codec<K, JsonIO.Input, JsonIO.Output> keyCodec;
-        private final Codec<V, JsonIO.Input, JsonIO.Output> valueCodec;
+        private final Codec<K, Input, Output> keyCodec;
+        private final Codec<V, Input, Output> valueCodec;
 
         public MapCodec(
                 JsonCodecCoreImpl core,
-                Codec<K, JsonIO.Input, JsonIO.Output> keyCodec,
-                Codec<V, JsonIO.Input, JsonIO.Output> valueCodec) {
+                Codec<K, Input, Output> keyCodec,
+                Codec<V, Input, Output> valueCodec) {
             this.core = core;
             this.keyCodec = keyCodec;
             this.valueCodec = valueCodec;
         }
 
         @Override
-        public JsonIO.Output encode(Map<K, V> map, JsonIO.Output out) {
+        public Output encode(Map<K, V> map, Output out) {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
@@ -40,7 +43,7 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Map<K, V> decode(Class<Map<K, V>> dynType, JsonIO.Input in) {
+        public Map<K, V> decode(Class<Map<K, V>> dynType, Input in) {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
@@ -48,7 +51,7 @@ public abstract class JsonMapCodecs {
 
             in.startArray();
 
-            while(in.notEOF() && in.currentEventType() == JsonIO.Input.Event.Type.OBJECT_START) {
+            while(in.notEOF() && in.currentEventType() == Input.Event.Type.OBJECT_START) {
                 K key = null;
                 V val = null;
 
@@ -82,17 +85,17 @@ public abstract class JsonMapCodecs {
         }
     }
 
-    public static class StringMapCodec<V> implements Codec<Map<String, V>, JsonIO.Input, JsonIO.Output> {
+    public static class StringMapCodec<V> implements Codec<Map<String, V>, Input, Output> {
         private final JsonCodecCoreImpl core;
-        private final Codec<V, JsonIO.Input, JsonIO.Output> valueCodec;
+        private final Codec<V, Input, Output> valueCodec;
 
-        public StringMapCodec(JsonCodecCoreImpl core, Codec<V, JsonIO.Input, JsonIO.Output> valueCodec) {
+        public StringMapCodec(JsonCodecCoreImpl core, Codec<V, Input, Output> valueCodec) {
             this.core = core;
             this.valueCodec = valueCodec;
         }
 
         @Override
-        public JsonIO.Output encode(Map<String, V> map, JsonIO.Output out) {
+        public Output encode(Map<String, V> map, Output out) {
             out.startObject();
 
             map.forEach((key, val) -> {
@@ -104,12 +107,12 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Map<String, V> decode(Class<Map<String, V>> dynType, JsonIO.Input in) {
+        public Map<String, V> decode(Class<Map<String, V>> dynType, Input in) {
             in.startObject();
 
             final Map<String, V> map = core.getTypeConstructor(dynType).construct();
 
-            while(in.notEOF() && in.currentEventType() == JsonIO.Input.Event.Type.FIELD_NAME) {
+            while(in.notEOF() && in.currentEventType() == Input.Event.Type.FIELD_NAME) {
                 final String key = in.readFieldName();
                 final V val = valueCodec.decode(in);
                 map.put(key, val);

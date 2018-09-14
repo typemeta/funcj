@@ -2,8 +2,10 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.functions.FunctionsGenEx.F0;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 

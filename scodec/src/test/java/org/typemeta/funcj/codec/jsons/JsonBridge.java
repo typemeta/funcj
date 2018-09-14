@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.jsons;
 
-import java.io.*;
+import java.io.Reader;
+import java.io.Writer;
 
 public class JsonBridge {
     private final JsonIO.Input input;
@@ -14,7 +15,7 @@ public class JsonBridge {
     public JsonBridge(Reader reader, Writer writer) {
         this(new JsonParser(reader), new JsonGenerator(writer));
     }
-    
+
     void run() {
         while (input.notEOF()) {
             switch (input.currentEventType()) {

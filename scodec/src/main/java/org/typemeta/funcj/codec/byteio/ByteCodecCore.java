@@ -1,12 +1,14 @@
 package org.typemeta.funcj.codec.byteio;
 
 import org.typemeta.funcj.codec.CodecCoreIntl;
+import org.typemeta.funcj.codec.byteio.ByteIO.Input;
+import org.typemeta.funcj.codec.byteio.ByteIO.Output;
 
 /**
  * Interface for classes which implement an encoding into a byte stream.
  */
 @SuppressWarnings("unchecked")
-public interface ByteCodecCore extends CodecCoreIntl<ByteIO.Input, ByteIO.Output> {
+public interface ByteCodecCore extends CodecCoreIntl<Input, Output> {
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.
@@ -15,7 +17,7 @@ public interface ByteCodecCore extends CodecCoreIntl<ByteIO.Input, ByteIO.Output
      * @return      the encoded value
      * @throws Exception if the operation fails
      */
-    default <T> ByteIO.Output encode(T val) throws Exception {
+    default <T> Output encode(T val) {
         return encode((Class<T>)val.getClass(), val);
     }
 
@@ -27,7 +29,7 @@ public interface ByteCodecCore extends CodecCoreIntl<ByteIO.Input, ByteIO.Output
      * @return      the encoded value
      * @throws Exception if the operation fails
      */
-    default <T> ByteIO.Output encode(Class<T> type, T val) throws Exception {
+    default <T> Output encode(Class<T> type, T val) {
         return encode(type, val, null);
     }
 }

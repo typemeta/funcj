@@ -2,7 +2,8 @@ package org.typemeta.funcj.codec.jsons;
 
 import org.typemeta.funcj.codec.CodecException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 
 public class JsonGenerator implements JsonIO.Output {

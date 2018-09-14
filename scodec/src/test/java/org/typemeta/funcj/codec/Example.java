@@ -1,9 +1,11 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.json.JsonCodecCore;
-import org.typemeta.funcj.codec.xml.*;
+import org.typemeta.funcj.codec.xml.XmlCodecCore;
+import org.typemeta.funcj.codec.xml.XmlUtils;
 import org.typemeta.funcj.json.model.*;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.time.*;

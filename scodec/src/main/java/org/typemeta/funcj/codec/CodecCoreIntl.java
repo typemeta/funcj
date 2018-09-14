@@ -4,7 +4,8 @@ import org.typemeta.funcj.functions.Functions;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Internal interface for {@link CodecCore} implementations.

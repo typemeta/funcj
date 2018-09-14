@@ -1,7 +1,8 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.Codec;
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import java.util.Map;
 
