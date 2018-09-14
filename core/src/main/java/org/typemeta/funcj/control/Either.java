@@ -315,6 +315,14 @@ public interface Either<E, S> {
     <T> Either<E, T> flatMap(F<? super S, Either<E, T>> f);
 
     /**
+     * Apply a side-effect operation to this value
+     * If this value is a {@code Right} then apply the function to the value,
+     * otherwise do nothing.
+     * @param f         the function to be applied
+     */
+    void foreach(SideEffect.F<? super S> f);
+
+    /**
      * Builder API for chaining together n {@code Either}s,
      * and applying an n-ary function at the end.
      * @param eb        the next {@code Either} value to chain
@@ -407,6 +415,10 @@ public interface Either<E, S> {
             return cast();
         }
 
+        @Override
+        public void foreach(SideEffect.F<? super S> f) {
+        }
+
         @SuppressWarnings("unchecked")
         private <C> Either<E, C> cast() {
             return (Either<E, C>) this;
@@ -458,7 +470,7 @@ public interface Either<E, S> {
         }
 
         @Override
-        public S getOrThrow() throws Exception {
+        public S getOrThrow() {
             return value;
         }
 
@@ -491,6 +503,11 @@ public interface Either<E, S> {
         @Override
         public <T> Either<E, T> flatMap(F<? super S, Either<E, T>> f) {
             return f.apply(value);
+        }
+
+        @Override
+        public void foreach(SideEffect.F<? super S> f) {
+            f.apply(value);
         }
     }
 

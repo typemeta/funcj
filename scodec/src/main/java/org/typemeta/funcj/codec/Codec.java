@@ -129,7 +129,7 @@ public interface Codec<T, IN, OUT> {
         }
 
         public abstract OUT encodePrim(short val, OUT out);
-        
+
         public abstract short decodePrim(IN in);
     }
 
@@ -208,7 +208,7 @@ public interface Codec<T, IN, OUT> {
         public Float decode(IN in) {
             return decodePrim(in);
         }
-        
+
         public abstract OUT encodePrim(float val, OUT out);
 
         public abstract float decodePrim(IN in);
@@ -242,7 +242,7 @@ public interface Codec<T, IN, OUT> {
     }
 
     /**
-     * Encode a value of type {@code T} into nd encoded value of type {@code IN}.
+     * Encode a value of type {@code T} into an encoded value of type {@code OUT}.
      * @param val       the unencoded value
      * @param out       the encoded parent value
      * @return          the encoded value

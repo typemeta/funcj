@@ -332,6 +332,14 @@ public interface Option<T> {
     }
 
     /**
+     * Apply a side-effect operation to this value
+     * If this value is a {@code Some} then apply the function to the value,
+     * otherwise do nothing.
+     * @param f         the function to be applied
+     */
+    void foreach(SideEffect.F<? super T> f);
+
+    /**
      * Builder API for chaining together n {@code Option}s,
      * and applying an n-ary function at the end.
      * @param tb        the next {@code Option} value to chain
@@ -427,6 +435,11 @@ public interface Option<T> {
         }
 
         @Override
+        public void foreach(SideEffect.F<? super T> f) {
+            f.apply(value);
+        }
+
+        @Override
         public Optional<T> asOptional() {
             return Optional.of(value);
         }
@@ -510,6 +523,10 @@ public interface Option<T> {
         @Override
         public <U> Option<U> flatMap(F<? super T, Option<U>> f) {
             return cast();
+        }
+
+        @Override
+        public void foreach(SideEffect.F<? super T> f) {
         }
 
         @Override

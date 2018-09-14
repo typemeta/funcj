@@ -285,6 +285,14 @@ public interface Validated<E, T> {
     <U> Validated<E, U> andThen(F<T, Validated<E, U>> f);
 
     /**
+     * Apply a side-effect operation to this value
+     * If this value is a {@code Success} then apply the function to the value,
+     * otherwise do nothing.
+     * @param f         the function to be applied
+     */
+    void foreach(SideEffect.F<? super T> f);
+
+    /**
      * Builder API for chaining together n {@code Validated}s,
      * and applying an n-ary function at the end.
      * @param vb        the next {@code Validated} value to chain
@@ -360,6 +368,11 @@ public interface Validated<E, T> {
         }
 
         @Override
+        public void foreach(SideEffect.F<? super T> f) {
+            f.apply(value);
+        }
+
+        @Override
         public T getOrElse(T defaultValue) {
             return value;
         }
@@ -432,6 +445,10 @@ public interface Validated<E, T> {
         @Override
         public <U> Validated<E, U> andThen(F<T, Validated<E, U>> f) {
             return cast();
+        }
+
+        @Override
+        public void foreach(SideEffect.F<? super T> f) {
         }
 
         @Override

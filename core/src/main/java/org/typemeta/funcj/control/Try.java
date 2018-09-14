@@ -327,6 +327,14 @@ public interface Try<T> {
     }
 
     /**
+     * Apply a side-effect operation to this value
+     * If this value is a {@code Success} then apply the function to the value,
+     * otherwise do nothing.
+     * @param f         the function to be applied
+     */
+    void foreach(SideEffect.F<? super T> f);
+
+    /**
      * Builder API for chaining together n {@code Try}s,
      * and applying an n-ary function at the end.
      * @param tb        the next {@code Try} value to chain
@@ -414,6 +422,11 @@ public interface Try<T> {
         @Override
         public <U> Try<U> flatMap(F<? super T, Try<U>> f) {
             return f.apply(value);
+        }
+
+        @Override
+        public void foreach(SideEffect.F<? super T> f) {
+            f.apply(value);
         }
     }
 
@@ -507,6 +520,10 @@ public interface Try<T> {
         @Override
         public <U> Try<U> flatMap(F<? super T, Try<U>> f) {
             return cast();
+        }
+
+        @Override
+        public void foreach(SideEffect.F<? super T> f) {
         }
 
         @SuppressWarnings("unchecked")

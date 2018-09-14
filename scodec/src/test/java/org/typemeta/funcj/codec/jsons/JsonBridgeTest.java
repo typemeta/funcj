@@ -8,13 +8,9 @@ public class JsonBridgeTest {
     @Test
     public void test() throws Exception {
         final StringWriter wtr = new StringWriter();
-        FileUtils.openResource("/example.json")
-                .map(br -> new JsonBridge(br, wtr))
-                .map(jb -> {
-                    jb.run();
-                    return 0;
-                });
-
+        final BufferedReader br = FileUtils.openResource("/example.json").getOrThrow();
+        final JsonBridge jb = new JsonBridge(br, wtr);
+        jb.run();
         wtr.close();
         //System.out.println(wtr);
     }
