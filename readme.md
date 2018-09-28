@@ -8,7 +8,7 @@ A collection of functional-oriented data structures, algorithms and libraries, f
 
 funcj is a collection of functional-oriented data structures, algorithms and libraries.
 
-At present the project consists of three sub-libraries:
+At present the project consists of the following sub-libraries:
 
 * [core](https://github.com/typemeta/funcj/tree/master/core) - primarily data and control structures.
 * [parser](https://github.com/typemeta/funcj/tree/master/parser) - a combinator parser framework.
