@@ -8,17 +8,6 @@ import org.typemeta.funcj.functions.Functions.F;
  */
 @SuppressWarnings("unchecked")
 public abstract class Exceptions {
-    /**
-     * An unchecked exception type.
-     * Used to allow checked exceptions to tunnel under methods that don't allow exceptions
-     */
-    private static class WrappedException extends RuntimeException {
-        private final Exception source;
-
-        private WrappedException(Exception source) {
-            this.source = source;
-        }
-    }
 
     private static <X extends Exception, T> T throwUnchecked(Exception ex) throws X {
         throw (X) ex;
@@ -73,8 +62,7 @@ public abstract class Exceptions {
      * @param <R>       return type of function
      * @return          a function which throws an unchecked exception
      */
-    public static <T, R>
-    F<T, R> wrap(FunctionsEx.F<T, R> thrower) {
+    public static <T, R> F<T, R> wrap(FunctionsEx.F<T, R> thrower) {
         return t -> {
             try {
                 return thrower.apply(t);
@@ -106,24 +94,24 @@ public abstract class Exceptions {
     }
 
     /**
-     * Undo the effect of {@code wrap} by catching the {@link WrappedException},
+     * Undo the effect of {@code wrap} by catching the exception,
      * and rethrowing the original checked exception.
-     * @param thrower   the function that may throw a {@code WrappedException}
+     * @param thrower   the function that may throw an exception
      * @param <X>       the original exception type
      * @throws X        the original exception
      */
     public static <X extends Exception> void unwrap(SideEffectGenEx.F0<X> thrower) throws X {
         try {
             thrower.apply();
-        } catch  (Exception ex) {
+        } catch (Exception ex) {
             throw (X)ex;
         }
     }
 
     /**
-     * Undo the effect of {@code wrap} by catching the {@link WrappedException},
+     * Undo the effect of {@code wrap} by catching the exception,
      * and rethrowing the original checked exception.
-     * @param thrower  the function that may throw a {@code WrappedException}
+     * @param thrower  the function that may throw an exception
      * @param <R>       the return type of the function
      * @param <X>       the original exception type
      * @return          the function value, if it doesn't throw
