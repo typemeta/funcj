@@ -85,11 +85,11 @@ This can be translated into the following parser:
 Parser<Chr, Integer> sum = intr.andL(chr('+')).and(intr).map(Integer::sum);
 ```
 
-The parser is constructed by taking the `intr` parser for integers,
+The above parser is constructed by taking the `intr` parser for integers,
 the `chr` parser for single characters,
-and combining them using `and`, `andL` and `map`.
+and combining them with `and`, `andL` and `map`.
 
-The parser can be used as follows:
+This parser can be used as follows:
 
 ```java
 int i = sum.parse(Input.of("1+2")).getOrThrow();
@@ -387,7 +387,7 @@ enum BinOp {
 };
 ```
 
-The grammar is as then follows:
+The parser is as then follows:
 
 ```java
 Ref<Chr, Op<Integer>> expr = Parser.ref();
