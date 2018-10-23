@@ -22,9 +22,23 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
     <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz);
 
-    <T> Codec<T, IN, OUT> makeNullSafeCodec(Codec<T, IN, OUT> codec);
+    <T> boolean encodeNull(T val, OUT out);
 
-    Codec.NullCodec<IN, OUT> nullCodec();
+    boolean decodeNull(IN in);
+
+    <T> boolean encodeDynamicType(
+            Codec<T, IN, OUT> codec,
+            T val,
+            OUT out,
+            Functions.F<Class<T>, Codec<T, IN, OUT>> getDynCodec);
+
+    default <T> boolean encodeDynamicType(Codec<T, IN, OUT> codec, T val, OUT out) {
+        return encodeDynamicType(codec, val, out, this::getCodec);
+    }
+
+    <T> T decodeDynamicType(IN in, Functions.F<String, T> decoder);
+
+    <T> T decodeDynamicType(IN in);
 
     Codec.BooleanCodec<IN, OUT> booleanCodec();
 
@@ -60,61 +74,57 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
     Codec<String, IN, OUT> stringCodec();
 
-    <EM extends Enum<EM>> Codec<EM, IN, OUT> enumCodec(Class<? super EM> enumType);
-
-    <K, V> Codec<Map<K, V>, IN, OUT> mapCodec(Class<K> keyType, Class<V> valType);
-
-    <V> Codec<Map<String, V>, IN, OUT> mapCodec(Codec<V, IN, OUT> valueCodec);
+    <EM extends Enum<EM>> Codec<EM, IN, OUT> enumCodec(Class<EM> enumType);
 
     <K, V> Codec<Map<K, V>, IN, OUT> mapCodec(
+            Class<Map<K, V>> mapType,
+            Class<K> keyType,
+            Class<V> valType);
+
+    <V> Codec<Map<String, V>, IN, OUT> mapCodec(
+            Class<Map<String, V>> type,
+            Codec<V, IN, OUT> valueCodec);
+
+    <K, V> Codec<Map<K, V>, IN, OUT> mapCodec(
+            Class<Map<K, V>> type,
             Codec<K, IN, OUT> keyCodec,
             Codec<V, IN, OUT> valueCodec);
 
     <T> Codec<Collection<T>, IN, OUT> collCodec(
-            Class<T> elemType,
+            Class<Collection<T>> collType,
             Codec<T, IN, OUT> elemCodec);
 
     <T> Codec<T[], IN, OUT> objectArrayCodec(
+            Class<T[]> arrType,
             Class<T> elemType,
             Codec<T, IN, OUT> elemCodec);
 
-    Codec<Object, IN, OUT> dynamicCodec();
+    <T> Codec<T, IN, OUT> getCodec(Class<T> type);
 
-    <T> Codec<T, IN, OUT> dynamicCodec(Class<T> stcType);
+    <T> Codec<T, IN, OUT> createCodec(Class<T> type);
 
-    <T> Codec<T, IN, OUT> dynamicCodec(Codec<T, IN, OUT> codec, Class<T> stcType);
+    <T> Codec<T, IN, OUT> createObjectCodec(
+            Class<T> type,
+            Map<String, FieldCodec<IN, OUT>> fieldCodecs);
 
-    <T> Codec<T, IN, OUT> getNullSafeCodecDyn(Class<T> type);
+    <T> ObjectCodecBuilder<T, IN, OUT> objectCodec(Class<T> type);
 
-    <T> Codec<T, IN, OUT> getCodec(String name, Functions.F0<Codec<T, IN, OUT>> codecSupp);
-
-    <T> Codec<T, IN, OUT> getNullUnsafeCodecDyn(Class<T> type);
-
-    <T> Codec<T, IN, OUT> createNullUnsafeCodecDyn(Class<T> dynType);
-
-    <T> Codec<T, IN, OUT> createNullUnsafeCodecStc(Class<T> stcType);
-
-    <T> Codec<T, IN, OUT> createNullUnsafeCodec(Class<T> type);
+    <T> ObjectCodecBuilder<T, IN, OUT> objectCodecDeferredRegister(Class<T> type);
 
     <T> Codec<T, IN, OUT> createObjectCodec(Class<T> type);
 
-    <T> Codec<T, IN, OUT> createObjectCodec(Map<String, FieldCodec<IN, OUT>> fieldCodecs);
-
-    <T> ObjectCodecBuilder<T, IN, OUT> objectCodec(Class<T> clazz);
-
-    <T> ObjectCodecBuilder<T, IN, OUT> objectCodecDeferredRegister(Class<T> clazz);
-
     <T> Codec<T, IN, OUT> createObjectCodec(
+            Class<T> type,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
             Functions.F<Object[], T> ctor);
 
-    <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(ObjectMeta<T, IN, OUT, RA> objMeta);
+    <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(
+            Class<T> type,
+            ObjectMeta<T, IN, OUT, RA> objMeta);
 
     String getFieldName(Field field, int depth, Set<String> existingNames);
 
     <T> FieldCodec<IN, OUT> createFieldCodec(Field field);
-
-    <T> Codec<T, IN, OUT> dynamicCheck(Codec<T, IN, OUT> codec, Class<T> stcType);
 
     abstract class ObjectMeta<T, IN, OUT, RA extends CodecCoreIntl.ObjectMeta.ResultAccumlator<T>>
             implements Iterable<CodecCoreIntl.ObjectMeta.Field<T, IN, OUT, RA>> {
@@ -128,7 +138,7 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
             RA decodeField(RA acc, IN in);
         }
 
-        public abstract RA startDecode(Class<T> type);
+        public abstract RA startDecode();
 
         public Stream<BaseCodecCore.ObjectMeta.Field<T, IN, OUT, RA>> stream() {
             return StreamSupport.stream(spliterator(), false);

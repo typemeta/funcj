@@ -77,15 +77,6 @@ public interface CodecCore<IN, OUT> {
             TypeConstructor<T> typeCtor);
 
     /**
-     * Encode a non-null value of type {@code T} into encoded form {@code E}
-     * @param val       the value to encode
-     * @param out       the encoded parent (may be null for certain encodings)
-     * @param <T>       the decoded value type
-     * @return          the encoded value
-     */
-    <T> OUT encode(T val, OUT out);
-
-    /**
      * Encode a value of type {@code T} into encoded form {@code E}.
      * @param type      the class of the decoded value
      * @param val       the value to encode

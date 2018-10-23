@@ -295,7 +295,7 @@ public abstract class TestTypes {
         final Map<String, Character> mapStrVal;
 
         public CharData() {
-            this.val = 0;
+            this.val = '0';
             this.valArr = null;
             this.valArrArr = null;
             this.listVal = null;
@@ -474,7 +474,7 @@ public abstract class TestTypes {
                     "} " + super.toString();
         }
     }
-    
+
     public static class LongData extends Base<Long> {
 
         final long val;
@@ -658,7 +658,7 @@ public abstract class TestTypes {
                     "val=" + val +
                     ", valArr=" + Arrays.toString(valArr) +
                     ", valArrArr=" + Arrays.deepToString(valArrArr) +
-                    ", listVal=" + listVal + 
+                    ", listVal=" + listVal +
                     ", mapStrVal=" + mapStrVal +
                     "} " + super.toString();
         }

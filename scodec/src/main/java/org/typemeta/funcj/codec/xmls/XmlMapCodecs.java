@@ -1,22 +1,23 @@
-package org.typemeta.funcj.codec.jsons;
+package org.typemeta.funcj.codec.xmls;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.jsons.JsonIO.Input;
-import org.typemeta.funcj.codec.jsons.JsonIO.Output;
+import org.typemeta.funcj.codec.xmls.io.XmlIO;
+import org.typemeta.funcj.codec.xmls.io.XmlIO.Input;
+import org.typemeta.funcj.codec.xmls.io.XmlIO.Output;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class JsonMapCodecs {
+public abstract class XmlMapCodecs {
 
     public static class MapCodec<K, V> implements Codec<Map<K, V>, Input, Output> {
-        private final JsonCodecCoreImpl core;
+        private final XmlCodecCoreImpl core;
         private final Class<Map<K, V>> type;
         private final Codec<K, Input, Output> keyCodec;
         private final Codec<V, Input, Output> valueCodec;
 
         public MapCodec(
-                JsonCodecCoreImpl core,
+                XmlCodecCoreImpl core,
                 Class<Map<K, V>> type,
                 Codec<K, Input, Output> keyCodec,
                 Codec<V, Input, Output> valueCodec) {
@@ -42,61 +43,40 @@ public abstract class JsonMapCodecs {
 
         @Override
         public Output encode(Map<K, V> map, Output out) {
-            final String keyFieldName = core.keyFieldName();
-            final String valueFieldName = core.valueFieldName();
-
-            out.startArray();
 
             map.forEach((k, v) -> {
-                out.startObject();
-                out.writeField(keyFieldName);
+                out.startElement(core.entryElemName());
+                out.startElement(core.keyElemName());
                 keyCodec.encodeWithCheck(k, out);
-                out.writeField(valueFieldName);
+                out.endElement();
+                out.startElement(core.valueElemName());
                 valueCodec.encodeWithCheck(v, out);
-                out.endObject();
+                out.endElement();
+                out.endElement();
             });
 
-            return out.endArray();
+            return out;
         }
 
         @Override
         public Map<K, V> decode(Input in) {
-            final String keyFieldName = core.keyFieldName();
-            final String valueFieldName = core.valueFieldName();
-
             final Map<K, V> map = core.getTypeConstructor(type).construct();
 
-            in.startArray();
-
-            while(in.notEOF() && in.currentEventType() == Input.Event.Type.OBJECT_START) {
-                K key = null;
-                V val = null;
-
-                in.startObject();
-
-                while (key == null || val == null) {
-                    final String name = in.readFieldName();
-                    if (name.equals(keyFieldName)) {
-                        if (key == null) {
-                            key = keyCodec.decodeWithCheck(in);
-                        } else {
-                            throw new CodecException("Duplicate fields called " + keyFieldName);
-                        }
-                    } else if (name.equals(valueFieldName)) {
-                        if (val == null) {
-                            val = valueCodec.decodeWithCheck(in);
-                        } else {
-                            throw new CodecException("Duplicate fields called " + valueFieldName);
-                        }
-                    }
+            while(in.hasNext()) {
+                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                    break;
                 }
 
+                in.startElement(core.entryElemName());
+                in.startElement(core.keyElemName());
+                final K key = keyCodec.decodeWithCheck(in);
+                in.endElement();
+                in.startElement(core.valueElemName());
+                final V val = valueCodec.decodeWithCheck(in);
+                in.endElement();
+                in.endElement();
                 map.put(key, val);
-
-                in.endObject();
             }
-
-            in.endArray();
 
             return map;
         }
@@ -130,12 +110,12 @@ public abstract class JsonMapCodecs {
     }
 
     public static class StringMapCodec<V> implements Codec<Map<String, V>, Input, Output> {
-        private final JsonCodecCoreImpl core;
+        private final XmlCodecCoreImpl core;
         private final Class<Map<String, V>> type;
         private final Codec<V, Input, Output> valueCodec;
 
         public StringMapCodec(
-                JsonCodecCoreImpl core,
+                XmlCodecCoreImpl core,
                 Class<Map<String, V>> type,
                 Codec<V, Input, Output> valueCodec) {
             this.core = core;
@@ -159,29 +139,28 @@ public abstract class JsonMapCodecs {
 
         @Override
         public Output encode(Map<String, V> map, Output out) {
-            out.startObject();
-
-            map.forEach((key, val) -> {
-                out.writeField(key);
-                valueCodec.encodeWithCheck(val, out);
+           map.forEach((key, val) -> {
+                valueCodec.encodeWithCheck(val, out.startElement(key));
+                out.endElement();
             });
 
-            return out.endObject();
+            return out;
         }
 
         @Override
         public Map<String, V> decode(Input in) {
-            in.startObject();
-
             final Map<String, V> map = core.getTypeConstructor(type).construct();
 
-            while(in.notEOF() && in.currentEventType() == Input.Event.Type.FIELD_NAME) {
-                final String key = in.readFieldName();
+            while(in.hasNext()) {
+                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                    break;
+                }
+
+                final String key = in.startElement();
                 final V val = valueCodec.decodeWithCheck(in);
+                in.endElement();
                 map.put(key, val);
             }
-
-            in.endObject();
 
             return map;
         }

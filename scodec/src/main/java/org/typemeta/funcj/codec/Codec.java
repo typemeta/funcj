@@ -1,6 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.utils.OperationNotImplementedException;
 
 /**
  * Interface for classes that encapsulates the logic for encoding a value of type {@code T}
@@ -11,18 +10,38 @@ import org.typemeta.funcj.codec.utils.OperationNotImplementedException;
  */
 public interface Codec<T, IN, OUT> {
 
-    /**
-     * Codec for null values.
-     * @param <IN>      the encoded input type
-     * @param <OUT>     the encoded output type
-     */
-    interface NullCodec<IN, OUT> extends Codec<Object, IN, OUT> {
-        /**
-         * Check whether an encoded value represents a null value.
-         * @param in        encoded value
-         * @return          true if encoded value represents a null value
-         */
-        boolean isNull(IN in);
+    abstract class Base<T, IN, OUT> implements Codec<T, IN, OUT> {
+        protected final CodecCoreIntl<IN, OUT> core;
+
+        protected Base(CodecCoreIntl<IN, OUT> core) {
+            this.core = core;
+        }
+
+        @Override
+        public CodecCoreIntl<IN, OUT> core() {
+            return core;
+        }
+    }
+
+    interface FinalCodec<T, IN, OUT> extends Codec<T, IN, OUT> {
+
+        @Override
+        default OUT encodeWithCheck(T val, OUT out) {
+            if (core().encodeNull(val, out)) {
+                return out;
+            } else {
+                return encode(val, out);
+            }
+        }
+
+        @Override
+        default T decodeWithCheck(IN in) {
+            if (core().decodeNull(in)) {
+                return null;
+            } else {
+                return decode(in);
+            }
+        }
     }
 
     /**
@@ -30,26 +49,26 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    abstract class BooleanCodec<IN, OUT> implements Codec<Boolean, IN, OUT> {
+    interface BooleanCodec<IN, OUT> extends FinalCodec<Boolean, IN, OUT> {
 
         @Override
-        public OUT encode(Boolean val, OUT out) {
+        default Class<Boolean> type() {
+            return Boolean.class;
+        }
+
+        @Override
+        default OUT encode(Boolean val, OUT out) {
             return encodePrim(val, out);
         }
 
         @Override
-        public Boolean decode(Class<Boolean> dynType, IN in) {
+        default Boolean decode(IN in) {
             return decodePrim(in);
         }
 
-        @Override
-        public Boolean decode(IN in) {
-            return decodePrim(in);
-        }
+        OUT encodePrim(boolean val, OUT out);
 
-        public abstract OUT encodePrim(boolean val, OUT out);
-
-        public abstract boolean decodePrim(IN in);
+        boolean decodePrim(IN in);
     }
 
     /**
@@ -57,26 +76,26 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    abstract class ByteCodec<IN, OUT> implements Codec<Byte, IN, OUT> {
+    interface ByteCodec<IN, OUT> extends FinalCodec<Byte, IN, OUT> {
 
         @Override
-        public OUT encode(Byte val, OUT out) {
+        default Class<Byte> type() {
+            return Byte.class;
+        }
+
+        @Override
+        default OUT encode(Byte val, OUT out) {
             return encodePrim(val, out);
         }
 
         @Override
-        public Byte decode(Class<Byte> dynType, IN in) {
+        default Byte decode(IN in) {
             return decodePrim(in);
         }
 
-        @Override
-        public Byte decode(IN in) {
-            return decodePrim(in);
-        }
+        OUT encodePrim(byte val, OUT out);
 
-        public abstract OUT encodePrim(byte val, OUT out);
-
-        public abstract byte decodePrim(IN in);
+        byte decodePrim(IN in);
     }
 
     /**
@@ -84,26 +103,26 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    abstract class CharCodec<IN, OUT> implements Codec<Character, IN, OUT> {
+    interface CharCodec<IN, OUT> extends FinalCodec<Character, IN, OUT> {
 
         @Override
-        public OUT encode(Character val, OUT out) {
+        default Class<Character> type() {
+            return Character.class;
+        }
+
+        @Override
+        default OUT encode(Character val, OUT out) {
             return encodePrim(val, out);
         }
 
         @Override
-        public Character decode(Class<Character> dynType, IN in) {
+        default Character decode(IN in) {
             return decodePrim(in);
         }
 
-        @Override
-        public Character decode(IN in) {
-            return decodePrim(in);
-        }
+        OUT encodePrim(char val, OUT out);
 
-        public abstract OUT encodePrim(char val, OUT out);
-
-        public abstract char decodePrim(IN in);
+        char decodePrim(IN in);
     }
 
     /**
@@ -111,26 +130,26 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    abstract class ShortCodec<IN, OUT> implements Codec<Short, IN, OUT> {
+    interface ShortCodec<IN, OUT> extends FinalCodec<Short, IN, OUT> {
 
         @Override
-        public OUT encode(Short val, OUT out) {
+        default Class<Short> type() {
+            return Short.class;
+        }
+
+        @Override
+        default OUT encode(Short val, OUT out) {
             return encodePrim(val, out);
         }
 
         @Override
-        public Short decode(Class<Short> dynType, IN in) {
+        default Short decode(IN in) {
             return decodePrim(in);
         }
 
-        @Override
-        public Short decode(IN in) {
-            return decodePrim(in);
-        }
+        OUT encodePrim(short val, OUT out);
 
-        public abstract OUT encodePrim(short val, OUT out);
-
-        public abstract short decodePrim(IN in);
+        short decodePrim(IN in);
     }
 
     /**
@@ -138,26 +157,26 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    abstract class IntCodec<IN, OUT> implements Codec<Integer, IN, OUT> {
+    interface IntCodec<IN, OUT> extends FinalCodec<Integer, IN, OUT> {
 
         @Override
-        public OUT encode(Integer val, OUT out) {
+        default Class<Integer> type() {
+            return Integer.class;
+        }
+
+        @Override
+        default OUT encode(Integer val, OUT out) {
             return encodePrim(val, out);
         }
 
         @Override
-        public Integer decode(Class<Integer> dynType, IN in) {
+        default Integer decode(IN in) {
             return decodePrim(in);
         }
 
-        @Override
-        public Integer decode(IN in) {
-            return decodePrim(in);
-        }
+        OUT encodePrim(int val, OUT out);
 
-        public abstract OUT encodePrim(int val, OUT out);
-
-        public abstract int decodePrim(IN in);
+        int decodePrim(IN in);
     }
 
     /**
@@ -165,26 +184,26 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    abstract class LongCodec<IN, OUT> implements Codec<Long, IN, OUT> {
+    interface LongCodec<IN, OUT> extends FinalCodec<Long, IN, OUT> {
 
         @Override
-        public OUT encode(Long val, OUT out) {
+        default Class<Long> type() {
+            return Long.class;
+        }
+
+        @Override
+        default OUT encode(Long val, OUT out) {
             return encodePrim(val, out);
         }
 
         @Override
-        public Long decode(Class<Long> dynType, IN in) {
+        default Long decode(IN in) {
             return decodePrim(in);
         }
 
-        @Override
-        public Long decode(IN in) {
-            return decodePrim(in);
-        }
+        OUT encodePrim(long val, OUT out);
 
-        public abstract OUT encodePrim(long val, OUT out);
-
-        public abstract long decodePrim(IN in);
+        long decodePrim(IN in);
     }
 
     /**
@@ -192,26 +211,26 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    abstract class FloatCodec<IN, OUT> implements Codec<Float, IN, OUT> {
+    interface FloatCodec<IN, OUT> extends FinalCodec<Float, IN, OUT> {
 
         @Override
-        public OUT encode(Float val, OUT out) {
+        default Class<Float> type() {
+            return Float.class;
+        }
+
+        @Override
+        default OUT encode(Float val, OUT out) {
             return encodePrim(val, out);
         }
 
         @Override
-        public Float decode(Class<Float> dynType, IN in) {
+        default Float decode(IN in) {
             return decodePrim(in);
         }
 
-        @Override
-        public Float decode(IN in) {
-            return decodePrim(in);
-        }
+        OUT encodePrim(float val, OUT out);
 
-        public abstract OUT encodePrim(float val, OUT out);
-
-        public abstract float decodePrim(IN in);
+        float decodePrim(IN in);
     }
 
     /**
@@ -219,27 +238,31 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    abstract class DoubleCodec<IN, OUT> implements Codec<Double, IN, OUT> {
+    interface DoubleCodec<IN, OUT> extends FinalCodec<Double, IN, OUT> {
 
         @Override
-        public OUT encode(Double val, OUT out) {
+        default Class<Double> type() {
+            return Double.class;
+        }
+
+        @Override
+        default OUT encode(Double val, OUT out) {
             return encodePrim(val, out);
         }
 
         @Override
-        public Double decode(Class<Double> dynType, IN in) {
+        default Double decode(IN in) {
             return decodePrim(in);
         }
 
-        @Override
-        public Double decode(IN in) {
-            return decodePrim(in);
-        }
+        OUT encodePrim(double val, OUT out);
 
-        public abstract OUT encodePrim(double val, OUT out);
-
-        public abstract double decodePrim(IN in);
+        double decodePrim(IN in);
     }
+
+    CodecCoreIntl<IN, OUT> core();
+
+    Class<T> type();
 
     /**
      * Encode a value of type {@code T} into an encoded value of type {@code OUT}.
@@ -250,23 +273,35 @@ public interface Codec<T, IN, OUT> {
     OUT encode(T val, OUT out);
 
     /**
-     * Decode a value of type {@code IN} back into a value of type {@code T}.
-     * One of the two {@code decode} methods must be implemented by sub-classes.
-     * @param dynType   the dynamic type to decode into.
-     * @param in        the encoded value
-     * @return          the decoded value
-     */
-    default T decode(Class<T> dynType, IN in) {
-        return decode(in);
-    }
-
-    /**
      * Decode an encoded value of type {@code IN} back into a value of type {@code T}.
      * One of the two {@code decode} methods must be implemented by sub-classes.
      * @param in        the encoded value
      * @return          the decoded value
      */
-    default T decode(IN in) {
-        throw new OperationNotImplementedException();
+    T decode(IN in);
+
+    default OUT encodeWithCheck(T val, OUT out) {
+        if (core().encodeNull(val, out)) {
+            return out;
+        } else {
+            if (!core().encodeDynamicType(this, val, out)) {
+                return encode(val, out);
+            } else {
+                return out;
+            }
+        }
+    }
+
+    default T decodeWithCheck(IN in) {
+        if (core().decodeNull(in)) {
+            return null;
+        } else {
+            final T val = core().decodeDynamicType(in);
+            if (val != null) {
+                return val;
+            } else {
+                return decode(in);
+            }
+        }
     }
 }

@@ -274,7 +274,7 @@ public class JsonParser implements JsonIO.Input {
     }
 
     @Override
-    public Void readNull() {
+    public <T> T readNull() {
         checkTokenType(Event.Type.NULL);
         processCurrentEvent();
         return null;

@@ -61,7 +61,6 @@ public class JsonGenerator implements JsonIO.Output {
 
     private void writeComma() {
         write(',');
-        pendingComma = false;
     }
 
     @Override
@@ -185,6 +184,7 @@ public class JsonGenerator implements JsonIO.Output {
     public JsonIO.Output startObject() {
         if (pendingComma) {
             writeComma();
+            pendingComma = false;
         }
         return write('{');
     }
@@ -193,6 +193,7 @@ public class JsonGenerator implements JsonIO.Output {
     public JsonIO.Output writeField(String name) {
         if (pendingComma) {
             writeComma();
+            pendingComma = false;
         }
         return writeString(name)
                 .write(':');
@@ -208,6 +209,7 @@ public class JsonGenerator implements JsonIO.Output {
     public JsonIO.Output startArray() {
         if (pendingComma) {
             writeComma();
+            pendingComma = false;
         }
         return write('[');
     }

@@ -1,7 +1,8 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.byteio.*;
-import org.typemeta.funcj.codec.xml.*;
+//import org.typemeta.funcj.codec.byteio.*;
+//import org.typemeta.funcj.codec.xml.*;
+import org.typemeta.funcj.codec.xmls.*;
 import org.typemeta.funcj.functions.Functions.F;
 
 import java.time.*;
@@ -11,13 +12,13 @@ import java.time.*;
  */
 public abstract class Codecs {
 
-    /**
-     * Construct and return a new instance of a {@link org.typemeta.funcj.codec.json.JsonCodecCore}.
-     * @return the new {@code JsonCodecCore}
-     */
-    public static org.typemeta.funcj.codec.json.JsonCodecCore jsonCodec() {
-        return org.typemeta.funcj.codec.json.JsonCodecs.registerAll(new org.typemeta.funcj.codec.json.JsonCodecCoreImpl());
-    }
+//    /**
+//     * Construct and return a new instance of a {@link org.typemeta.funcj.codec.json.JsonCodecCore}.
+//     * @return the new {@code JsonCodecCore}
+//     */
+//    public static org.typemeta.funcj.codec.json.JsonCodecCore jsonCodec() {
+//        return org.typemeta.funcj.codec.json.JsonCodecs.registerAll(new org.typemeta.funcj.codec.json.JsonCodecCoreImpl());
+//    }
 
     /**
      * Construct and return a new instance of a {@link org.typemeta.funcj.codec.jsons.JsonCodecCore}.
@@ -35,19 +36,24 @@ public abstract class Codecs {
         final XmlCodecCoreImpl codec = new XmlCodecCoreImpl();
         return XmlCodecs.registerAll(codec);
     }
-
-    /**
-     * Construct and return a new instance of a {@link ByteCodecCore}.
-     * @return the new {@code ByteCodecCore}
-     */
-    public static ByteCodecCore byteCodec() {
-        final ByteCodecCoreImpl codec = new ByteCodecCoreImpl();
-        return ByteCodecs.registerAll(codec);
-    }
+//
+//    /**
+//     * Construct and return a new instance of a {@link ByteCodecCore}.
+//     * @return the new {@code ByteCodecCore}
+//     */
+//    public static ByteCodecCore byteCodec() {
+//        final ByteCodecCoreImpl codec = new ByteCodecCoreImpl();
+//        return ByteCodecs.registerAll(codec);
+//    }
 
     public static <IN, OUT, C extends CodecCoreIntl<IN, OUT>> C registerAll(C core) {
 
-        core.registerCodec(Class.class, new ClassCodec<IN, OUT>(core));
+        //core.registerCodec(Class.class, new ClassCodec<IN, OUT>(core));
+        core.registerStringProxyCodec(
+                Class.class,
+                core::classToName,
+                core::nameToClass
+        );
 
         core.registerTypeProxy("java.time.ZoneRegion", ZoneId.class);
 
@@ -109,29 +115,40 @@ public abstract class Codecs {
         protected CodecBase(CodecCoreIntl<IN, OUT> core) {
             this.core = core;
         }
-    }
-
-    /**
-     * A {@code Codec} for the {@link Class} type.
-     * @param <IN>      the encoded input type
-     * @param <OUT>     the encoded output type
-     */
-    public static class ClassCodec<IN, OUT> extends CodecBase<Class, IN, OUT> {
-
-        protected ClassCodec(CodecCoreIntl<IN, OUT> core) {
-            super(core);
-        }
 
         @Override
-        public OUT encode(Class val, OUT out) {
-            return core.stringCodec().encode(core.classToName(val), out);
+        public CodecCoreIntl<IN, OUT> core() {
+            return core;
         }
 
-        @Override
-        public Class decode(IN in) {
-            return core.nameToClass(core.stringCodec().decode(in));
-        }
     }
+//
+//    /**
+//     * A {@code Codec} for the {@link Class} type.
+//     * @param <IN>      the encoded input type
+//     * @param <OUT>     the encoded output type
+//     */
+//    public static class ClassCodec<IN, OUT> extends CodecBase<Class, IN, OUT> {
+//
+//        protected ClassCodec(CodecCoreIntl<IN, OUT> core) {
+//            super(core);
+//        }
+//
+//        @Override
+//        public Class<Class> type() {
+//            return Class.class;
+//        }
+//
+//        @Override
+//        public OUT encode(Class val, OUT out) {
+//            return core.stringCodec().encode(core.classToName(val), out);
+//        }
+//
+//        @Override
+//        public Class decode(IN in) {
+//            return core.nameToClass(core.stringCodec().decode(in));
+//        }
+//    }
 
     /**
      * Utility class for creating a {@code Codec} that encodes a type
@@ -142,16 +159,24 @@ public abstract class Codecs {
      */
     public static class StringProxyCodec<T, IN, OUT> extends CodecBase<T, IN, OUT> {
 
+        protected final Class<T> type;
         protected final F<T, String> encode;
         protected final F<String, T> decode;
 
         public StringProxyCodec(
                 CodecCoreIntl<IN, OUT> core,
+                Class<T> type,
                 F<T, String> encode,
                 F<String, T> decode) {
             super(core);
+            this.type = type;
             this.encode = encode;
             this.decode = decode;
+        }
+
+        @Override
+        public Class<T> type() {
+            return type;
         }
 
         @Override

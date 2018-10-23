@@ -18,12 +18,17 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
         INSTANCE;
 
         @Override
-        public Object encode(Object val, Object in) {
+        public CodecCoreIntl<Object, Object> core() {
             throw error();
         }
 
         @Override
-        public Object decode(Class<Object> dynType, Object in) {
+        public Class<Object> type() {
+            throw error();
+        }
+
+        @Override
+        public Object encode(Object val, Object in) {
             throw error();
         }
 
@@ -78,13 +83,18 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
     }
 
     @Override
-    public OUT encode(T val, OUT out) {
-        return impl.encode(val, out);
+    public CodecCoreIntl<IN, OUT> core() {
+        return impl.core();
     }
 
     @Override
-    public T decode(Class<T> dynType, IN in) {
-        return impl.decode(dynType, in);
+    public Class<T> type() {
+        return impl.type();
+    }
+
+    @Override
+    public OUT encode(T val, OUT out) {
+        return impl.encode(val, out);
     }
 
     @Override

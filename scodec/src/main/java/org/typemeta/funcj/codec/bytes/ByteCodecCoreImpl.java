@@ -1,6 +1,8 @@
-package org.typemeta.funcj.codec.jsons;
+package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.jsons.JsonIO;
+import org.typemeta.funcj.codec.jsons.JsonMapCodecs;
 import org.typemeta.funcj.functions.Functions;
 
 import java.lang.reflect.Array;
@@ -10,9 +12,9 @@ import java.util.*;
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 
 @SuppressWarnings("unchecked")
-public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output> implements JsonCodecCore {
+public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output> implements ByteCodecCore {
 
-    public JsonCodecCoreImpl() {
+    public ByteCodecCoreImpl() {
     }
 
     public String typeFieldName() {
@@ -32,56 +34,68 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     }
 
     @Override
-    public <T> boolean encodeNull(T val, JsonIO.Output out) {
+    public ByteIO.Output encodeNull(ByteIO.Output out) {
+        return out.writeBoolean(true);
+    }
+
+    @Override
+    public boolean isNull(ByteIO.Input in) {
+        return in.readBoolean();
+    }
+
+    @Override
+    public <T> T decodeNull(ByteIO.Input in) {
+        return null;
+    }
+
+    @Override
+    public <T> ByteIO.Output encodeWithCheck(Codec<T, ByteIO.Input, ByteIO.Output> codec, T val, ByteIO.Output out) {
         if (val == null) {
-            out.writeNull();
-            return true;
+            return encodeNull(out);
         } else {
-            return false;
+            final Class<T> dynType = (Class<T>) val.getClass();
+            if (dynType.equals(codec.type())) {
+                return codec.encode(val, out);
+            } else {
+                return encodeDynamicType(getCodec(dynType), val, out);
+            }
         }
     }
 
     @Override
-    public boolean decodeNull(JsonIO.Input in) {
-        if (in.currentEventType().equals(JsonIO.Input.Event.Type.NULL)) {
-            in.readNull();
-            return true;
+    public <T> T decodeWithCheck(Codec<T, ByteIO.Input, ByteIO.Output> codec, ByteIO.Input in) {
+        if (isNull(in)) {
+            return decodeNull(in);
         } else {
-            return false;
+            final T val = decodeDynamicType(in);
+            if (val != null) {
+                return val;
+            } else {
+                return codec.decode(in);
+            }
         }
     }
 
     @Override
-    public <T> boolean encodeDynamicType(
-            Codec<T, JsonIO.Input, JsonIO.Output> codec,
-            T val,
-            JsonIO.Output out,
-            Functions.F<Class<T>, Codec<T, JsonIO.Input, JsonIO.Output>> getDynCodec) {
-        final Class<T> dynType = (Class<T>) val.getClass();
-        if (dynType.equals(codec.type())) {
-            return false;
-        } else {
-            final Codec<T, JsonIO.Input, JsonIO.Output> dynCodec = getDynCodec.apply(dynType);
-            out.startObject();
+    public <T> ByteIO.Output encodeDynamicType(Codec<T, ByteIO.Input, ByteIO.Output> codec, T val, ByteIO.Output out) {
+        out.writeBoolean(true);
 
-            out.writeField(typeFieldName())
-                    .writeStr(classToName(dynType));
-            out.writeField(valueFieldName());
-            dynCodec.encode(val, out);
+        out.writeField(typeFieldName())
+                .writeStr(classToName(codec.type()));
+        out.writeField(valueFieldName());
+        codec.encode(val, out);
 
-            out.endObject();
-            return true;
-        }
+        return out.endObject();
     }
 
     @Override
-    public <T> T decodeDynamicType(JsonIO.Input in, Functions.F<String, T> decoder) {
-        if (in.notEOF() && in.currentEventType() == JsonIO.Input.Event.Type.OBJECT_START) {
+    public <T> T decodeDynamicType(ByteIO.Input in, Functions.F<String, T> decoder) {
+        if (in.notEOF() && in.currentEventType() == ByteIO.Input.Event.Type.OBJECT_START) {
             final String typeFieldName = typeFieldName();
-            final JsonIO.Input.Event.FieldName typeField = new JsonIO.Input.Event.FieldName(typeFieldName);
+            final ByteIO.Input.Event.FieldName typeField = new ByteIO.Input.Event.FieldName(typeFieldName);
             final String valueFieldName = valueFieldName();
 
-            final JsonIO.Input.Event next = in.event(1);
+            final ByteIO.Input.Event next = in.event(1);
             if (next.equals(typeField)) {
                 in.startObject();
 
@@ -104,36 +118,36 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     }
 
     @Override
-    public <T> T decodeDynamicType(JsonIO.Input in) {
+    public <T> T decodeDynamicType(ByteIO.Input in) {
         return decodeDynamicType(in, name -> getCodec(this.<T>nameToClass(name)).decode(in));
     }
 
-    protected final Codec.BooleanCodec<JsonIO.Input, JsonIO.Output> booleanCodec =
-            new Codec.BooleanCodec<JsonIO.Input, JsonIO.Output>() {
+    protected final Codec.BooleanCodec<ByteIO.Input, ByteIO.Output> booleanCodec =
+            new Codec.BooleanCodec<ByteIO.Input, ByteIO.Output>() {
 
         @Override
-        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
-            return JsonCodecCoreImpl.this;
+        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+            return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public JsonIO.Output encodePrim(boolean val, JsonIO.Output out) {
+        public ByteIO.Output encodePrim(boolean val, ByteIO.Output out) {
             return out.writeBool(val);
         }
 
         @Override
-        public boolean decodePrim(JsonIO.Input in) {
+        public boolean decodePrim(ByteIO.Input in) {
             return in.readBool();
         }
     };
 
     @Override
-    public Codec.BooleanCodec<JsonIO.Input, JsonIO.Output> booleanCodec() {
+    public Codec.BooleanCodec<ByteIO.Input, ByteIO.Output> booleanCodec() {
         return booleanCodec;
     }
 
-    protected final Codec<boolean[], JsonIO.Input, JsonIO.Output> booleanArrayCodec =
-            new Codec.Base<boolean[], JsonIO.Input, JsonIO.Output>(this) {
+    protected final Codec<boolean[], ByteIO.Input, ByteIO.Output> booleanArrayCodec =
+            new Codec.Base<boolean[], ByteIO.Input, ByteIO.Output>(this) {
 
         @Override
         public Class<boolean[]> type() {
@@ -141,7 +155,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(boolean[] vals, JsonIO.Output out) {
+        public ByteIO.Output encode(boolean[] vals, ByteIO.Output out) {
             out.startArray();
             for (boolean val : vals) {
                 booleanCodec().encode(val, out);
@@ -150,11 +164,11 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public boolean[] decode(JsonIO.Input in) {
+        public boolean[] decode(ByteIO.Input in) {
             boolean[] arr = new boolean[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -166,36 +180,36 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     };
 
     @Override
-    public Codec<boolean[], JsonIO.Input, JsonIO.Output> booleanArrayCodec() {
+    public Codec<boolean[], ByteIO.Input, ByteIO.Output> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
-    protected final Codec.ByteCodec<JsonIO.Input, JsonIO.Output> byteCodec =
-            new Codec.ByteCodec<JsonIO.Input, JsonIO.Output>() {
+    protected final Codec.ByteCodec<ByteIO.Input, ByteIO.Output> byteCodec =
+            new Codec.ByteCodec<ByteIO.Input, ByteIO.Output>() {
 
         @Override
-        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
-            return JsonCodecCoreImpl.this;
+        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+            return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public JsonIO.Output encodePrim(byte val, JsonIO.Output out) {
+        public ByteIO.Output encodePrim(byte val, ByteIO.Output out) {
             return out.writeNum(val);
         }
 
         @Override
-        public byte decodePrim(JsonIO.Input in) {
+        public byte decodePrim(ByteIO.Input in) {
             return in.readByte();
         }
     };
 
     @Override
-    public Codec.ByteCodec<JsonIO.Input, JsonIO.Output> byteCodec() {
+    public Codec.ByteCodec<ByteIO.Input, ByteIO.Output> byteCodec() {
         return byteCodec;
     }
 
-    protected final Codec<byte[], JsonIO.Input, JsonIO.Output> byteArrayCodec =
-            new Codec.Base<byte[], JsonIO.Input, JsonIO.Output>(this) {
+    protected final Codec<byte[], ByteIO.Input, ByteIO.Output> byteArrayCodec =
+            new Codec.Base<byte[], ByteIO.Input, ByteIO.Output>(this) {
 
         @Override
         public Class<byte[]> type() {
@@ -203,7 +217,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(byte[] vals, JsonIO.Output out) {
+        public ByteIO.Output encode(byte[] vals, ByteIO.Output out) {
             out.startArray();
             for (byte val : vals) {
                 byteCodec().encode(val, out);
@@ -212,11 +226,11 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public byte[] decode(JsonIO.Input in) {
+        public byte[] decode(ByteIO.Input in) {
             byte[] arr = new byte[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -228,36 +242,36 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     };
 
     @Override
-    public Codec<byte[], JsonIO.Input, JsonIO.Output> byteArrayCodec() {
+    public Codec<byte[], ByteIO.Input, ByteIO.Output> byteArrayCodec() {
         return byteArrayCodec;
     }
 
-    protected final Codec.CharCodec<JsonIO.Input, JsonIO.Output> charCodec =
-            new Codec.CharCodec<JsonIO.Input, JsonIO.Output>() {
+    protected final Codec.CharCodec<ByteIO.Input, ByteIO.Output> charCodec =
+            new Codec.CharCodec<ByteIO.Input, ByteIO.Output>() {
 
         @Override
-        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
-            return JsonCodecCoreImpl.this;
+        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+            return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public JsonIO.Output encodePrim(char val, JsonIO.Output out) {
+        public ByteIO.Output encodePrim(char val, ByteIO.Output out) {
             return out.writeChar(val);
         }
 
         @Override
-        public char decodePrim(JsonIO.Input in ) {
+        public char decodePrim(ByteIO.Input in ) {
             return in.readChar();
         }
     };
 
     @Override
-    public Codec.CharCodec<JsonIO.Input, JsonIO.Output> charCodec() {
+    public Codec.CharCodec<ByteIO.Input, ByteIO.Output> charCodec() {
         return charCodec;
     }
 
-    protected final Codec<char[], JsonIO.Input, JsonIO.Output> charArrayCodec =
-            new Codec.Base<char[], JsonIO.Input, JsonIO.Output>(this) {
+    protected final Codec<char[], ByteIO.Input, ByteIO.Output> charArrayCodec =
+            new Codec.Base<char[], ByteIO.Input, ByteIO.Output>(this) {
 
         @Override
         public Class<char[]> type() {
@@ -265,7 +279,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(char[] vals, JsonIO.Output out) {
+        public ByteIO.Output encode(char[] vals, ByteIO.Output out) {
             out.startArray();
             for (char val : vals) {
                 charCodec().encode(val, out);
@@ -274,11 +288,11 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public char[] decode(JsonIO.Input in) {
+        public char[] decode(ByteIO.Input in) {
             char[] arr = new char[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -290,36 +304,36 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     };
 
     @Override
-    public Codec<char[], JsonIO.Input, JsonIO.Output> charArrayCodec() {
+    public Codec<char[], ByteIO.Input, ByteIO.Output> charArrayCodec() {
         return charArrayCodec;
     }
 
-    protected final Codec.ShortCodec<JsonIO.Input, JsonIO.Output> shortCodec =
-            new Codec.ShortCodec<JsonIO.Input, JsonIO.Output>() {
+    protected final Codec.ShortCodec<ByteIO.Input, ByteIO.Output> shortCodec =
+            new Codec.ShortCodec<ByteIO.Input, ByteIO.Output>() {
 
         @Override
-        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
-            return JsonCodecCoreImpl.this;
+        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+            return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public JsonIO.Output encodePrim(short val, JsonIO.Output out) {
+        public ByteIO.Output encodePrim(short val, ByteIO.Output out) {
             return out.writeNum(val);
         }
 
         @Override
-        public short decodePrim(JsonIO.Input in ) {
+        public short decodePrim(ByteIO.Input in ) {
             return in.readShort();
         }
     };
 
     @Override
-    public Codec.ShortCodec<JsonIO.Input, JsonIO.Output> shortCodec() {
+    public Codec.ShortCodec<ByteIO.Input, ByteIO.Output> shortCodec() {
         return shortCodec;
     }
 
-    protected final Codec<short[], JsonIO.Input, JsonIO.Output> shortArrayCodec =
-            new Codec.Base<short[], JsonIO.Input, JsonIO.Output>(this) {
+    protected final Codec<short[], ByteIO.Input, ByteIO.Output> shortArrayCodec =
+            new Codec.Base<short[], ByteIO.Input, ByteIO.Output>(this) {
 
         @Override
         public Class<short[]> type() {
@@ -327,7 +341,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(short[] vals, JsonIO.Output out) {
+        public ByteIO.Output encode(short[] vals, ByteIO.Output out) {
             out.startArray();
             for (short val : vals) {
                 shortCodec().encode(val, out);
@@ -336,11 +350,11 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public short[] decode(JsonIO.Input in) {
+        public short[] decode(ByteIO.Input in) {
             short[] arr = new short[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -352,36 +366,36 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     };
 
     @Override
-    public Codec<short[], JsonIO.Input, JsonIO.Output> shortArrayCodec() {
+    public Codec<short[], ByteIO.Input, ByteIO.Output> shortArrayCodec() {
         return shortArrayCodec;
     }
 
-    protected final Codec.IntCodec<JsonIO.Input, JsonIO.Output> intCodec =
-            new Codec.IntCodec<JsonIO.Input, JsonIO.Output>() {
+    protected final Codec.IntCodec<ByteIO.Input, ByteIO.Output> intCodec =
+            new Codec.IntCodec<ByteIO.Input, ByteIO.Output>() {
 
         @Override
-        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
-            return JsonCodecCoreImpl.this;
+        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+            return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public JsonIO.Output encodePrim(int val, JsonIO.Output out) {
+        public ByteIO.Output encodePrim(int val, ByteIO.Output out) {
             return out.writeNum(val);
         }
 
         @Override
-        public int decodePrim(JsonIO.Input in ) {
+        public int decodePrim(ByteIO.Input in ) {
             return in.readInt();
         }
     };
 
     @Override
-    public Codec.IntCodec<JsonIO.Input, JsonIO.Output> intCodec() {
+    public Codec.IntCodec<ByteIO.Input, ByteIO.Output> intCodec() {
         return intCodec;
     }
 
-    protected final Codec<int[], JsonIO.Input, JsonIO.Output> intArrayCodec =
-            new Codec.Base<int[], JsonIO.Input, JsonIO.Output>(this) {
+    protected final Codec<int[], ByteIO.Input, ByteIO.Output> intArrayCodec =
+            new Codec.Base<int[], ByteIO.Input, ByteIO.Output>(this) {
 
         @Override
         public Class<int[]> type() {
@@ -389,7 +403,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(int[] vals, JsonIO.Output out) {
+        public ByteIO.Output encode(int[] vals, ByteIO.Output out) {
             out.startArray();
             for (int val : vals) {
                 intCodec().encode(val, out);
@@ -398,11 +412,11 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public int[] decode(JsonIO.Input in) {
+        public int[] decode(ByteIO.Input in) {
             int[] arr = new int[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -414,36 +428,36 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     };
 
     @Override
-    public Codec<int[], JsonIO.Input, JsonIO.Output> intArrayCodec() {
+    public Codec<int[], ByteIO.Input, ByteIO.Output> intArrayCodec() {
         return intArrayCodec;
     }
 
-    protected final Codec.LongCodec<JsonIO.Input, JsonIO.Output> longCodec =
-            new Codec.LongCodec<JsonIO.Input, JsonIO.Output>() {
+    protected final Codec.LongCodec<ByteIO.Input, ByteIO.Output> longCodec =
+            new Codec.LongCodec<ByteIO.Input, ByteIO.Output>() {
 
         @Override
-        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
-            return JsonCodecCoreImpl.this;
+        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+            return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public JsonIO.Output encodePrim(long val, JsonIO.Output out) {
+        public ByteIO.Output encodePrim(long val, ByteIO.Output out) {
             return out.writeNum(val);
         }
 
         @Override
-        public long decodePrim(JsonIO.Input in) {
+        public long decodePrim(ByteIO.Input in) {
             return in.readLong();
         }
     };
 
     @Override
-    public Codec.LongCodec<JsonIO.Input, JsonIO.Output> longCodec() {
+    public Codec.LongCodec<ByteIO.Input, ByteIO.Output> longCodec() {
         return longCodec;
     }
 
-    protected final Codec<long[], JsonIO.Input, JsonIO.Output> longArrayCodec =
-            new Codec.Base<long[], JsonIO.Input, JsonIO.Output>(this) {
+    protected final Codec<long[], ByteIO.Input, ByteIO.Output> longArrayCodec =
+            new Codec.Base<long[], ByteIO.Input, ByteIO.Output>(this) {
 
         @Override
         public Class<long[]> type() {
@@ -451,7 +465,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(long[] vals, JsonIO.Output out) {
+        public ByteIO.Output encode(long[] vals, ByteIO.Output out) {
             out.startArray();
             for (long val : vals) {
                 longCodec().encode(val, out);
@@ -460,11 +474,11 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public long[] decode(JsonIO.Input in) {
+        public long[] decode(ByteIO.Input in) {
             long[] arr = new long[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -476,36 +490,36 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     };
 
     @Override
-    public Codec<long[], JsonIO.Input, JsonIO.Output> longArrayCodec() {
+    public Codec<long[], ByteIO.Input, ByteIO.Output> longArrayCodec() {
         return longArrayCodec;
     }
 
-    protected final Codec.FloatCodec<JsonIO.Input, JsonIO.Output> floatCodec =
-            new Codec.FloatCodec<JsonIO.Input, JsonIO.Output>() {
+    protected final Codec.FloatCodec<ByteIO.Input, ByteIO.Output> floatCodec =
+            new Codec.FloatCodec<ByteIO.Input, ByteIO.Output>() {
 
         @Override
-        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
-            return JsonCodecCoreImpl.this;
+        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+            return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public JsonIO.Output encodePrim(float val, JsonIO.Output out) {
+        public ByteIO.Output encodePrim(float val, ByteIO.Output out) {
             return out.writeNum(val);
         }
 
         @Override
-        public float decodePrim(JsonIO.Input in ) {
+        public float decodePrim(ByteIO.Input in ) {
             return in.readFloat();
         }
     };
 
     @Override
-    public Codec.FloatCodec<JsonIO.Input, JsonIO.Output> floatCodec() {
+    public Codec.FloatCodec<ByteIO.Input, ByteIO.Output> floatCodec() {
         return floatCodec;
     }
 
-    protected final Codec<float[], JsonIO.Input, JsonIO.Output> floatArrayCodec =
-            new Codec.Base<float[], JsonIO.Input, JsonIO.Output>(this) {
+    protected final Codec<float[], ByteIO.Input, ByteIO.Output> floatArrayCodec =
+            new Codec.Base<float[], ByteIO.Input, ByteIO.Output>(this) {
 
         @Override
         public Class<float[]> type() {
@@ -513,7 +527,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(float[] vals, JsonIO.Output out) {
+        public ByteIO.Output encode(float[] vals, ByteIO.Output out) {
             out.startArray();
             for (float val : vals) {
                 floatCodec().encode(val, out);
@@ -522,11 +536,11 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public float[] decode(JsonIO.Input in) {
+        public float[] decode(ByteIO.Input in) {
             float[] arr = new float[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -538,36 +552,36 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     };
 
     @Override
-    public Codec<float[], JsonIO.Input, JsonIO.Output> floatArrayCodec() {
+    public Codec<float[], ByteIO.Input, ByteIO.Output> floatArrayCodec() {
         return floatArrayCodec;
     }
 
-    protected final Codec.DoubleCodec<JsonIO.Input, JsonIO.Output> doubleCodec =
-            new Codec.DoubleCodec<JsonIO.Input, JsonIO.Output>() {
+    protected final Codec.DoubleCodec<ByteIO.Input, ByteIO.Output> doubleCodec =
+            new Codec.DoubleCodec<ByteIO.Input, ByteIO.Output>() {
 
         @Override
-        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
-            return JsonCodecCoreImpl.this;
+        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+            return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public JsonIO.Output encodePrim(double val, JsonIO.Output out) {
+        public ByteIO.Output encodePrim(double val, ByteIO.Output out) {
             return out.writeNum(val);
         }
 
         @Override
-        public double decodePrim(JsonIO.Input in ) {
+        public double decodePrim(ByteIO.Input in ) {
             return in.readDbl();
         }
     };
 
     @Override
-    public Codec.DoubleCodec<JsonIO.Input, JsonIO.Output> doubleCodec() {
+    public Codec.DoubleCodec<ByteIO.Input, ByteIO.Output> doubleCodec() {
         return doubleCodec;
     }
 
-    protected final Codec<double[], JsonIO.Input, JsonIO.Output> doubleArrayCodec =
-            new Codec.Base<double[], JsonIO.Input, JsonIO.Output>(this) {
+    protected final Codec<double[], ByteIO.Input, ByteIO.Output> doubleArrayCodec =
+            new Codec.Base<double[], ByteIO.Input, ByteIO.Output>(this) {
 
         @Override
         public Class<double[]> type() {
@@ -575,7 +589,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(double[] vals, JsonIO.Output out) {
+        public ByteIO.Output encode(double[] vals, ByteIO.Output out) {
             out.startArray();
             for (double val : vals) {
                 doubleCodec().encode(val, out);
@@ -584,11 +598,11 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public double[] decode(JsonIO.Input in) {
+        public double[] decode(ByteIO.Input in) {
             double[] arr = new double[defaultArrSize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
@@ -600,12 +614,12 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     };
 
     @Override
-    public Codec<double[], JsonIO.Input, JsonIO.Output> doubleArrayCodec() {
+    public Codec<double[], ByteIO.Input, ByteIO.Output> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
-    protected final Codec<String, JsonIO.Input, JsonIO.Output> stringCodec =
-            new Codec.Base<String, JsonIO.Input, JsonIO.Output>(this) {
+    protected final Codec<String, ByteIO.Input, ByteIO.Output> stringCodec =
+            new Codec.Base<String, ByteIO.Input, ByteIO.Output>(this) {
 
         @Override
         public Class<String> type() {
@@ -613,62 +627,62 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(String val, JsonIO.Output out) {
+        public ByteIO.Output encode(String val, ByteIO.Output out) {
             return out.writeStr(val);
         }
 
         @Override
-        public String decode(JsonIO.Input in) {
+        public String decode(ByteIO.Input in) {
             return in.readStr();
         }
     };
 
     @Override
-    public Codec<String, JsonIO.Input, JsonIO.Output> stringCodec() {
+    public Codec<String, ByteIO.Input, ByteIO.Output> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    public <EM extends Enum<EM>> Codec<EM, JsonIO.Input, JsonIO.Output> enumCodec(Class<EM> enumType) {
-        return new Codec.Base<EM, JsonIO.Input, JsonIO.Output>(this) {
+    public <EM extends Enum<EM>> Codec<EM, ByteIO.Input, ByteIO.Output> enumCodec(Class<EM> enumType) {
+        return new Codec.Base<EM, ByteIO.Input, ByteIO.Output>(this) {
             @Override
             public Class<EM> type() {
                 return enumType;
             }
 
             @Override
-            public JsonIO.Output encode(EM val, JsonIO.Output out) {
+            public ByteIO.Output encode(EM val, ByteIO.Output out) {
                 return out.writeStr(val.name());
             }
 
             @Override
-            public EM decode(JsonIO.Input in) {
+            public EM decode(ByteIO.Input in) {
                 return EM.valueOf(type(), in.readStr());
             }
         };
     }
 
     @Override
-    public <V> Codec<Map<String, V>, JsonIO.Input, JsonIO.Output> mapCodec(
+    public <V> Codec<Map<String, V>, ByteIO.Input, ByteIO.Output> mapCodec(
             Class<Map<String, V>> type,
-            Codec<V, JsonIO.Input, JsonIO.Output> valueCodec) {
+            Codec<V, ByteIO.Input, ByteIO.Output> valueCodec) {
         return new JsonMapCodecs.StringMapCodec<V>(this, type, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, JsonIO.Input, JsonIO.Output> mapCodec(
+    public <K, V> Codec<Map<K, V>, ByteIO.Input, ByteIO.Output> mapCodec(
             Class<Map<K, V>> type,
-            Codec<K, JsonIO.Input, JsonIO.Output> keyCodec,
-            Codec<V, JsonIO.Input, JsonIO.Output> valueCodec) {
+            Codec<K, ByteIO.Input, ByteIO.Output> keyCodec,
+            Codec<V, ByteIO.Input, ByteIO.Output> valueCodec) {
         return new JsonMapCodecs.MapCodec<K, V>(this, type, keyCodec, valueCodec);
     }
 
     @Override
-    public <T> Codec<Collection<T>, JsonIO.Input, JsonIO.Output> collCodec(
+    public <T> Codec<Collection<T>, ByteIO.Input, ByteIO.Output> collCodec(
             Class<Collection<T>> collType,
-            Codec<T, JsonIO.Input, JsonIO.Output> elemCodec) {
-        return new CollectionCodec<T, JsonIO.Input, JsonIO.Output>(
-            JsonCodecCoreImpl.this,
+            Codec<T, ByteIO.Input, ByteIO.Output> elemCodec) {
+        return new CollectionCodec<T, ByteIO.Input, ByteIO.Output>(
+            ByteCodecCoreImpl.this,
                 elemCodec) {
             @Override
             public Class<Collection<T>> type() {
@@ -676,7 +690,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             }
 
             @Override
-            public JsonIO.Output encode(Collection<T> vals, JsonIO.Output out) {
+            public ByteIO.Output encode(Collection<T> vals, ByteIO.Output out) {
                 out.startArray();
                 for (T val : vals) {
                     elemCodec.encodeWithCheck(val, out);
@@ -685,12 +699,12 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             }
 
             @Override
-            public Collection<T> decode(JsonIO.Input in) {
+            public Collection<T> decode(ByteIO.Input in) {
                 final Collection<T> vals = getTypeConstructor(collType).construct();
 
                 in.startArray();
 
-                while(in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                while(in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                     vals.add(elemCodec.decodeWithCheck(in));
                 }
 
@@ -702,14 +716,14 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     }
 
     @Override
-    public <T> Codec<T[], JsonIO.Input, JsonIO.Output> objectArrayCodec(
+    public <T> Codec<T[], ByteIO.Input, ByteIO.Output> objectArrayCodec(
             Class<T[]> arrType,
             Class<T> elemType,
-            Codec<T, JsonIO.Input, JsonIO.Output> elemCodec) {
-        return new Codec<T[], JsonIO.Input, JsonIO.Output>() {
+            Codec<T, ByteIO.Input, ByteIO.Output> elemCodec) {
+        return new Codec<T[], ByteIO.Input, ByteIO.Output>() {
             @Override
-            public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
-                return JsonCodecCoreImpl.this;
+            public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+                return ByteCodecCoreImpl.this;
             }
 
             @Override
@@ -718,7 +732,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             }
 
             @Override
-            public JsonIO.Output encode(T[] vals, JsonIO.Output out) {
+            public ByteIO.Output encode(T[] vals, ByteIO.Output out) {
                 out.startArray();
                 for (T val : vals) {
                     elemCodec.encodeWithCheck(val, out);
@@ -727,12 +741,12 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
             }
 
             @Override
-            public T[] decode(JsonIO.Input in) {
+            public T[] decode(ByteIO.Input in) {
                 T[] arr = (T[]) Array.newInstance(elemType, defaultArrSize());
 
                 in.startArray();
                 int i = 0;
-                while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
                     if (i == arr.length) {
                         arr = Arrays.copyOf(arr, arr.length * 2);
                     }
@@ -746,9 +760,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, JsonIO.Input, JsonIO.Output> createObjectCodec(
+    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, ByteIO.Input, ByteIO.Output> createObjectCodec(
             Class<T> type,
-            ObjectMeta<T, JsonIO.Input, JsonIO.Output, RA> objMeta) {
+            ObjectMeta<T, ByteIO.Input, ByteIO.Output, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
             return new FinalObjectCodec<T, RA>(this, type, objMeta);
         } else {
@@ -757,16 +771,16 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
     }
 
     private static class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
-            extends Codec.Base<T, JsonIO.Input, JsonIO.Output> {
+            extends Codec.Base<T, ByteIO.Input, ByteIO.Output> {
 
         private final Class<T> type;
-        private final ObjectMeta<T, JsonIO.Input, JsonIO.Output, RA> objMeta;
-        private final Map<String, ObjectMeta.Field<T, JsonIO.Input, JsonIO.Output, RA>> fields;
+        private final ObjectMeta<T, ByteIO.Input, ByteIO.Output, RA> objMeta;
+        private final Map<String, ObjectMeta.Field<T, ByteIO.Input, ByteIO.Output, RA>> fields;
 
         private ObjectCodec(
-                CodecCoreIntl<JsonIO.Input, JsonIO.Output> core,
+                CodecCoreIntl<ByteIO.Input, ByteIO.Output> core,
                 Class<T> type,
-                ObjectMeta<T, JsonIO.Input, JsonIO.Output, RA> objMeta) {
+                ObjectMeta<T, ByteIO.Input, ByteIO.Output, RA> objMeta) {
             super(core);
             this.type = type;
             this.objMeta = objMeta;
@@ -783,7 +797,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public JsonIO.Output encode(T val, JsonIO.Output out) {
+        public ByteIO.Output encode(T val, ByteIO.Output out) {
             out.startObject();
 
             fields.forEach((name, field) -> {
@@ -795,16 +809,16 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
         }
 
         @Override
-        public T decode(JsonIO.Input in) {
+        public T decode(ByteIO.Input in) {
             in.startObject();
 
             final Set<String> expKeys = fields.keySet();
             final Set<String> setFields = new HashSet<>();
             final RA ra = objMeta.startDecode();
 
-            while(in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.OBJECT_END) {
+            while(in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.OBJECT_END) {
                 final String name = in.readFieldName();
-                if (!expKeys.contains(name)) {
+                if (expKeys.contains(name)) {
                     throw new CodecException("Field name '" + name + "' unexpected for type " + type);
                 } else if (setFields.contains(name)) {
                     throw new CodecException("Duplicate field name '" + name + "' for type " + type);
@@ -826,12 +840,12 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
 
     private static class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
             extends ObjectCodec<T, RA>
-            implements Codec.FinalCodec<T, JsonIO.Input, JsonIO.Output> {
+            implements Codec.FinalCodec<T, ByteIO.Input, ByteIO.Output> {
 
         private FinalObjectCodec(
-                CodecCoreIntl<JsonIO.Input, JsonIO.Output> core,
+                CodecCoreIntl<ByteIO.Input, ByteIO.Output> core,
                 Class<T> type,
-                ObjectMeta<T, JsonIO.Input, JsonIO.Output, RA> objMeta) {
+                ObjectMeta<T, ByteIO.Input, ByteIO.Output, RA> objMeta) {
             super(core, type, objMeta);
         }
     }

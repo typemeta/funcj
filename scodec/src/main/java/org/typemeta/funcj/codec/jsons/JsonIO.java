@@ -142,7 +142,7 @@ public abstract class JsonIO {
 
         Event event(int lookahead);
 
-        Void readNull();
+        <T> T readNull();
 
         boolean readBool();
 
