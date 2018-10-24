@@ -114,26 +114,23 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(boolean[] vals, ByteIO.Output out) {
-            out.startArray();
+            out.writeInt(vals.length);
             for (boolean val : vals) {
                 booleanCodec().encode(val, out);
             }
-            return out.endArray();
+            return out;
         }
 
         @Override
         public boolean[] decode(ByteIO.Input in) {
-            boolean[] arr = new boolean[defaultArrSize()];
-            in.startArray();
-            int i = 0;
-            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, arr.length * 2);
-                }
-                arr[i++] = booleanCodec().decode(in);
+            final int l = in.readInt();
+            final boolean[] vals = new boolean[l];
+
+            for (int i = 0; i < l; ++i) {
+                vals[i] = booleanCodec().decode(in);
             }
-            in.endArray();
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -152,7 +149,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(byte val, ByteIO.Output out) {
-            return out.writeNum(val);
+            return out.writeByte(val);
         }
 
         @Override
@@ -176,26 +173,23 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(byte[] vals, ByteIO.Output out) {
-            out.startArray();
+            out.writeInt(vals.length);
             for (byte val : vals) {
                 byteCodec().encode(val, out);
             }
-            return out.endArray();
+            return out;
         }
 
         @Override
         public byte[] decode(ByteIO.Input in) {
-            byte[] arr = new byte[defaultArrSize()];
-            in.startArray();
-            int i = 0;
-            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, arr.length * 2);
-                }
-                arr[i++] = byteCodec().decode(in);
+            final int l = in.readInt();
+            final byte[] vals = new byte[l];
+
+            for (int i = 0; i < l; ++i) {
+                vals[i] = byteCodec().decode(in);
             }
-            in.endArray();
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -238,26 +232,23 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(char[] vals, ByteIO.Output out) {
-            out.startArray();
+            out.writeInt(vals.length);
             for (char val : vals) {
                 charCodec().encode(val, out);
             }
-            return out.endArray();
+            return out;
         }
 
         @Override
         public char[] decode(ByteIO.Input in) {
-            char[] arr = new char[defaultArrSize()];
-            in.startArray();
-            int i = 0;
-            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, arr.length * 2);
-                }
-                arr[i++] = charCodec().decode(in);
+            final int l = in.readInt();
+            final char[] vals = new char[l];
+
+            for (int i = 0; i < l; ++i) {
+                vals[i] = charCodec().decode(in);
             }
-            in.endArray();
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -276,7 +267,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(short val, ByteIO.Output out) {
-            return out.writeNum(val);
+            return out.writeShort(val);
         }
 
         @Override
@@ -300,26 +291,23 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(short[] vals, ByteIO.Output out) {
-            out.startArray();
+            out.writeInt(vals.length);
             for (short val : vals) {
                 shortCodec().encode(val, out);
             }
-            return out.endArray();
+            return out;
         }
 
         @Override
         public short[] decode(ByteIO.Input in) {
-            short[] arr = new short[defaultArrSize()];
-            in.startArray();
-            int i = 0;
-            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, arr.length * 2);
-                }
-                arr[i++] = shortCodec().decode(in);
+            final int l = in.readInt();
+            final short[] vals = new short[l];
+
+            for (int i = 0; i < l; ++i) {
+                vals[i] = shortCodec().decode(in);
             }
-            in.endArray();
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -338,7 +326,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(int val, ByteIO.Output out) {
-            return out.writeNum(val);
+            return out.writeInt(val);
         }
 
         @Override
@@ -362,26 +350,23 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(int[] vals, ByteIO.Output out) {
-            out.startArray();
+            out.writeInt(vals.length);
             for (int val : vals) {
                 intCodec().encode(val, out);
             }
-            return out.endArray();
+            return out;
         }
 
         @Override
         public int[] decode(ByteIO.Input in) {
-            int[] arr = new int[defaultArrSize()];
-            in.startArray();
-            int i = 0;
-            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, arr.length * 2);
-                }
-                arr[i++] = intCodec().decode(in);
+            final int l = in.readInt();
+            final int[] vals = new int[l];
+
+            for (int i = 0; i < l; ++i) {
+                vals[i] = intCodec().decode(in);
             }
-            in.endArray();
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -400,7 +385,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(long val, ByteIO.Output out) {
-            return out.writeNum(val);
+            return out.writeLong(val);
         }
 
         @Override
@@ -424,26 +409,23 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(long[] vals, ByteIO.Output out) {
-            out.startArray();
+            out.writeInt(vals.length);
             for (long val : vals) {
                 longCodec().encode(val, out);
             }
-            return out.endArray();
+            return out;
         }
 
         @Override
         public long[] decode(ByteIO.Input in) {
-            long[] arr = new long[defaultArrSize()];
-            in.startArray();
-            int i = 0;
-            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, arr.length * 2);
-                }
-                arr[i++] = longCodec().decode(in);
+            final int l = in.readInt();
+            final long[] vals = new long[l];
+
+            for (int i = 0; i < l; ++i) {
+                vals[i] = longCodec().decode(in);
             }
-            in.endArray();
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -462,7 +444,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(float val, ByteIO.Output out) {
-            return out.writeNum(val);
+            return out.writeFloat(val);
         }
 
         @Override
@@ -486,26 +468,23 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(float[] vals, ByteIO.Output out) {
-            out.startArray();
+            out.writeInt(vals.length);
             for (float val : vals) {
                 floatCodec().encode(val, out);
             }
-            return out.endArray();
+            return out;
         }
 
         @Override
         public float[] decode(ByteIO.Input in) {
-            float[] arr = new float[defaultArrSize()];
-            in.startArray();
-            int i = 0;
-            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, arr.length * 2);
-                }
-                arr[i++] = floatCodec().decode(in);
+            final int l = in.readInt();
+            final float[] vals = new float[l];
+
+            for (int i = 0; i < l; ++i) {
+                vals[i] = floatCodec().decode(in);
             }
-            in.endArray();
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -524,12 +503,12 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(double val, ByteIO.Output out) {
-            return out.writeNum(val);
+            return out.writeDouble(val);
         }
 
         @Override
         public double decodePrim(ByteIO.Input in ) {
-            return in.readDbl();
+            return in.readDouble();
         }
     };
 
@@ -548,26 +527,23 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(double[] vals, ByteIO.Output out) {
-            out.startArray();
+            out.writeInt(vals.length);
             for (double val : vals) {
                 doubleCodec().encode(val, out);
             }
-            return out.endArray();
+            return out;
         }
 
         @Override
         public double[] decode(ByteIO.Input in) {
-            double[] arr = new double[defaultArrSize()];
-            in.startArray();
-            int i = 0;
-            while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, arr.length * 2);
-                }
-                arr[i++] = doubleCodec().decode(in);
+            final int l = in.readInt();
+            final double[] vals = new double[l];
+
+            for (int i = 0; i < l; ++i) {
+                vals[i] = doubleCodec().decode(in);
             }
-            in.endArray();
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -586,12 +562,12 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(String val, ByteIO.Output out) {
-            return out.writeStr(val);
+            return out.writeString(val);
         }
 
         @Override
         public String decode(ByteIO.Input in) {
-            return in.readStr();
+            return in.readString();
         }
     };
 
@@ -610,12 +586,12 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
             @Override
             public ByteIO.Output encode(EM val, ByteIO.Output out) {
-                return out.writeStr(val.name());
+                return out.writeString(val.name());
             }
 
             @Override
             public EM decode(ByteIO.Input in) {
-                return EM.valueOf(type(), in.readStr());
+                return EM.valueOf(type(), in.readString());
             }
         };
     }
@@ -624,7 +600,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     public <V> Codec<Map<String, V>, ByteIO.Input, ByteIO.Output> mapCodec(
             Class<Map<String, V>> type,
             Codec<V, ByteIO.Input, ByteIO.Output> valueCodec) {
-        return new JsonMapCodecs.StringMapCodec<V>(this, type, valueCodec);
+        return new ByteMapCodecs.StringMapCodec<V>(this, type, valueCodec);
     }
 
     @Override
@@ -632,7 +608,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
             Class<Map<K, V>> type,
             Codec<K, ByteIO.Input, ByteIO.Output> keyCodec,
             Codec<V, ByteIO.Input, ByteIO.Output> valueCodec) {
-        return new JsonMapCodecs.MapCodec<K, V>(this, type, keyCodec, valueCodec);
+        return new ByteMapCodecs.MapCodec<K, V>(this, type, keyCodec, valueCodec);
     }
 
     @Override
@@ -649,24 +625,21 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
             @Override
             public ByteIO.Output encode(Collection<T> vals, ByteIO.Output out) {
-                out.startArray();
+                out.writeInt(vals.size());
                 for (T val : vals) {
                     elemCodec.encodeWithCheck(val, out);
                 }
-                return out.endArray();
+                return out;
             }
 
             @Override
             public Collection<T> decode(ByteIO.Input in) {
+                final int l = in.readInt();
                 final Collection<T> vals = getTypeConstructor(collType).construct();
 
-                in.startArray();
-
-                while(in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
+                for (int i = 0; i < l; ++i) {
                     vals.add(elemCodec.decodeWithCheck(in));
                 }
-
-                in.endArray();
 
                 return vals;
             }
@@ -691,28 +664,23 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
             @Override
             public ByteIO.Output encode(T[] vals, ByteIO.Output out) {
-                out.startArray();
+                out.writeInt(vals.length);
                 for (T val : vals) {
                     elemCodec.encodeWithCheck(val, out);
                 }
-                return out.endArray();
+                return out;
             }
 
             @Override
             public T[] decode(ByteIO.Input in) {
-                T[] arr = (T[]) Array.newInstance(elemType, defaultArrSize());
+                final int l = in.readInt();
+                final T[] vals = (T[]) Array.newInstance(elemType, l);
 
-                in.startArray();
-                int i = 0;
-                while (in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.ARRAY_END) {
-                    if (i == arr.length) {
-                        arr = Arrays.copyOf(arr, arr.length * 2);
-                    }
-                    arr[i++] = elemCodec.decodeWithCheck(in);
+                for (int i = 0; i < l; ++i) {
+                    vals[i] = elemCodec.decodeWithCheck(in);
                 }
-                in.endArray();
 
-                return Arrays.copyOf(arr, i);
+                return vals;
             }
         };
     }
