@@ -48,6 +48,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
             out.writeBoolean(true);
             final Codec<T, ByteIO.Input, ByteIO.Output> dynCodec = getDynCodec.apply(dynType);
             out.writeString(classToName(dynType));
+            dynCodec.encode(val, out);
             return true;
         }
     }

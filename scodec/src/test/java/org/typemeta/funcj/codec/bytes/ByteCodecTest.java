@@ -23,6 +23,7 @@ public class ByteCodecTest extends TestBase {
         codec.encode(clazz, val, baos);
 
         final byte[] ba = baos.toByteArray();
+        System.out.println(DatatypeConverter.printHexBinary(ba));
         final ByteArrayInputStream bais = new ByteArrayInputStream(ba);
         final T val2 = codec.decode(clazz, bais);
 
