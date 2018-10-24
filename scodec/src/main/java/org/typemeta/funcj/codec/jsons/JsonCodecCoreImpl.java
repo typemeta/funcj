@@ -86,14 +86,14 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output
                 in.startObject();
 
                 in.readFieldName();
-                final String type = in.readStr();
+                final String typeName = in.readStr();
 
                 final String field2 = in.readFieldName();
                 if (!field2.equals(valueFieldName)) {
                     throw new CodecException("Was expecting field '" + valueFieldName + "' but got '" + field2 + "'");
                 }
 
-                final T val = decoder.apply(type);
+                final T val = decoder.apply(typeName);
 
                 in.endObject();
 

@@ -7,7 +7,7 @@ import java.io.*;
 /**
  * Interface for classes which implement an encoding into JSON.
  */
-public interface ByteCodecCore extends CodecCoreIntl<DataInput, DataOutput> {
+public interface ByteCodecCore extends CodecCoreIntl<ByteIO.Input, ByteIO.Output> {
     default <T> void encode(
             Class<T> type,
             T value,

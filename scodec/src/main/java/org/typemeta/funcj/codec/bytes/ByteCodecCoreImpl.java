@@ -5,6 +5,8 @@ import org.typemeta.funcj.codec.jsons.JsonIO;
 import org.typemeta.funcj.codec.jsons.JsonMapCodecs;
 import org.typemeta.funcj.functions.Functions;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -34,87 +36,43 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     }
 
     @Override
-    public ByteIO.Output encodeNull(ByteIO.Output out) {
-        return out.writeBoolean(true);
+    public <T> boolean encodeNull(T val, ByteIO.Output out) {
+        final boolean isNull = val == null;
+        out.writeBoolean(isNull);
+        return isNull;
     }
 
     @Override
-    public boolean isNull(ByteIO.Input in) {
+    public boolean decodeNull(ByteIO.Input in) {
         return in.readBoolean();
     }
 
     @Override
-    public <T> T decodeNull(ByteIO.Input in) {
-        return null;
-    }
-
-    @Override
-    public <T> ByteIO.Output encodeWithCheck(Codec<T, ByteIO.Input, ByteIO.Output> codec, T val, ByteIO.Output out) {
-        if (val == null) {
-            return encodeNull(out);
+    public <T> boolean encodeDynamicType(
+            Codec<T, ByteIO.Input, ByteIO.Output> codec,
+            T val,
+            ByteIO.Output out,
+            Functions.F<Class<T>, Codec<T, ByteIO.Input, ByteIO.Output>> getDynCodec) {
+        final Class<T> dynType = (Class<T>) val.getClass();
+        if (dynType.equals(codec.type())) {
+            out.writeBoolean(false);
+            return false;
         } else {
-            final Class<T> dynType = (Class<T>) val.getClass();
-            if (dynType.equals(codec.type())) {
-                return codec.encode(val, out);
-            } else {
-                return encodeDynamicType(getCodec(dynType), val, out);
-            }
+            out.writeBoolean(true);
+            final Codec<T, ByteIO.Input, ByteIO.Output> dynCodec = getDynCodec.apply(dynType);
+            out.writeString(classToName(dynType));
+            return true;
         }
-    }
-
-    @Override
-    public <T> T decodeWithCheck(Codec<T, ByteIO.Input, ByteIO.Output> codec, ByteIO.Input in) {
-        if (isNull(in)) {
-            return decodeNull(in);
-        } else {
-            final T val = decodeDynamicType(in);
-            if (val != null) {
-                return val;
-            } else {
-                return codec.decode(in);
-            }
-        }
-    }
-
-    @Override
-    public <T> ByteIO.Output encodeDynamicType(Codec<T, ByteIO.Input, ByteIO.Output> codec, T val, ByteIO.Output out) {
-        out.writeBoolean(true);
-
-        out.writeField(typeFieldName())
-                .writeStr(classToName(codec.type()));
-        out.writeField(valueFieldName());
-        codec.encode(val, out);
-
-        return out.endObject();
     }
 
     @Override
     public <T> T decodeDynamicType(ByteIO.Input in, Functions.F<String, T> decoder) {
-        if (in.notEOF() && in.currentEventType() == ByteIO.Input.Event.Type.OBJECT_START) {
-            final String typeFieldName = typeFieldName();
-            final ByteIO.Input.Event.FieldName typeField = new ByteIO.Input.Event.FieldName(typeFieldName);
-            final String valueFieldName = valueFieldName();
-
-            final ByteIO.Input.Event next = in.event(1);
-            if (next.equals(typeField)) {
-                in.startObject();
-
-                in.readFieldName();
-                final String type = in.readStr();
-
-                final String field2 = in.readFieldName();
-                if (!field2.equals(valueFieldName)) {
-                    throw new CodecException("Was expecting field '" + valueFieldName + "' but got '" + field2 + "'");
-                }
-
-                final T val = decoder.apply(type);
-
-                in.endObject();
-
-                return val;
-            }
+        if (in.readBoolean()) {
+            final String typeName = in.readString();
+            return decoder.apply(typeName);
+        } else {
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -132,12 +90,12 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encodePrim(boolean val, ByteIO.Output out) {
-            return out.writeBool(val);
+            return out.writeBoolean(val);
         }
 
         @Override
         public boolean decodePrim(ByteIO.Input in) {
-            return in.readBool();
+            return in.readBoolean();
         }
     };
 
