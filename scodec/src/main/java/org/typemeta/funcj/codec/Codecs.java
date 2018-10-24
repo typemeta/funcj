@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec;
 
-//import org.typemeta.funcj.codec.byteio.*;
-//import org.typemeta.funcj.codec.xml.*;
+import org.typemeta.funcj.codec.bytes.*;
 import org.typemeta.funcj.codec.xmls.*;
 import org.typemeta.funcj.functions.Functions.F;
 
@@ -11,14 +10,6 @@ import java.time.*;
  * Factory methods for creating CodecCore instances.
  */
 public abstract class Codecs {
-
-//    /**
-//     * Construct and return a new instance of a {@link org.typemeta.funcj.codec.json.JsonCodecCore}.
-//     * @return the new {@code JsonCodecCore}
-//     */
-//    public static org.typemeta.funcj.codec.json.JsonCodecCore jsonCodec() {
-//        return org.typemeta.funcj.codec.json.JsonCodecs.registerAll(new org.typemeta.funcj.codec.json.JsonCodecCoreImpl());
-//    }
 
     /**
      * Construct and return a new instance of a {@link org.typemeta.funcj.codec.jsons.JsonCodecCore}.
@@ -36,19 +27,18 @@ public abstract class Codecs {
         final XmlCodecCoreImpl codec = new XmlCodecCoreImpl();
         return XmlCodecs.registerAll(codec);
     }
-//
-//    /**
-//     * Construct and return a new instance of a {@link ByteCodecCore}.
-//     * @return the new {@code ByteCodecCore}
-//     */
-//    public static ByteCodecCore byteCodec() {
-//        final ByteCodecCoreImpl codec = new ByteCodecCoreImpl();
-//        return ByteCodecs.registerAll(codec);
-//    }
+
+    /**
+     * Construct and return a new instance of a {@link ByteCodecCore}.
+     * @return the new {@code ByteCodecCore}
+     */
+    public static ByteCodecCore byteCodec() {
+        final ByteCodecCoreImpl codec = new ByteCodecCoreImpl();
+        return ByteCodecs.registerAll(codec);
+    }
 
     public static <IN, OUT, C extends CodecCoreIntl<IN, OUT>> C registerAll(C core) {
 
-        //core.registerCodec(Class.class, new ClassCodec<IN, OUT>(core));
         core.registerStringProxyCodec(
                 Class.class,
                 core::classToName,

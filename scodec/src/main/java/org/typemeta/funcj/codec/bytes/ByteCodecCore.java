@@ -12,12 +12,12 @@ public interface ByteCodecCore extends CodecCoreIntl<ByteIO.Input, ByteIO.Output
             Class<T> type,
             T value,
             OutputStream os) {
-        encode(type, value, new DataOutputStream(os));
+        encode(type, value, ByteIO.ofOutputStream(os));
     }
 
     default <T> T decode(
             Class<T> type,
             InputStream is) {
-        return decode(type, new DataInputStream(is));
+        return decode(type, ByteIO.ofInputStream(is));
     }
 }

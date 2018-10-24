@@ -4,9 +4,8 @@ import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.jsons.JsonIO;
 import org.typemeta.funcj.codec.jsons.JsonMapCodecs;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.util.Folds;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -17,18 +16,6 @@ import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output> implements ByteCodecCore {
 
     public ByteCodecCoreImpl() {
-    }
-
-    public String typeFieldName() {
-        return "@type";
-    }
-
-    public String keyFieldName() {
-        return "@key";
-    }
-
-    public String valueFieldName() {
-        return "@value";
     }
 
     protected int defaultArrSize() {
@@ -724,43 +711,19 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
         @Override
         public ByteIO.Output encode(T val, ByteIO.Output out) {
-            out.startObject();
-
-            fields.forEach((name, field) -> {
-                out.writeField(field.name());
-                field.encodeField(val, out);
-            });
-
-            return out.endObject();
+            objMeta.forEach(field ->
+                    field.encodeField(val, out)
+            );
+            return out;
         }
 
         @Override
         public T decode(ByteIO.Input in) {
-            in.startObject();
-
-            final Set<String> expKeys = fields.keySet();
-            final Set<String> setFields = new HashSet<>();
-            final RA ra = objMeta.startDecode();
-
-            while(in.notEOF() && in.currentEventType() != ByteIO.Input.Event.Type.OBJECT_END) {
-                final String name = in.readFieldName();
-                if (expKeys.contains(name)) {
-                    throw new CodecException("Field name '" + name + "' unexpected for type " + type);
-                } else if (setFields.contains(name)) {
-                    throw new CodecException("Duplicate field name '" + name + "' for type " + type);
-                }
-                setFields.add(name);
-                fields.get(name).decodeField(ra, in);
-            }
-
-            if (!setFields.equals(expKeys)) {
-                // TODO more informative error message.
-                throw new CodecException("Encountered fields differs to expected fields for type " + type);
-            }
-
-            in.endObject();
-
-            return ra.construct();
+            return Folds.foldLeft(
+                    (acc, field) -> field.decodeField(acc, in),
+                    objMeta.startDecode(),
+                    objMeta
+            ).construct();
         }
     }
 
