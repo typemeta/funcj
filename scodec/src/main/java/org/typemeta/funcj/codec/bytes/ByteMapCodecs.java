@@ -32,8 +32,8 @@ public abstract class ByteMapCodecs {
             core.intCodec().encodePrim(map.size(), out);
 
             for (Map.Entry<K, V> entry : map.entrySet()) {
-                keyCodec.encode(entry.getKey(), out);
-                valueCodec.encode(entry.getValue(), out);
+                keyCodec.encodeWithCheck(entry.getKey(), out);
+                valueCodec.encodeWithCheck(entry.getValue(), out);
             }
 
             return out;
@@ -46,8 +46,8 @@ public abstract class ByteMapCodecs {
             final Map<K, V> map = core.getTypeConstructor(type).construct();
 
             for (int i = 0; i < l; ++i) {
-                final K key = keyCodec.decode(in);
-                final V value = valueCodec.decode(in);
+                final K key = keyCodec.decodeWithCheck(in);
+                final V value = valueCodec.decodeWithCheck(in);
                 map.put(key, value);
             }
 
@@ -77,7 +77,7 @@ public abstract class ByteMapCodecs {
 
             for (Map.Entry<String, V> entry : map.entrySet()) {
                 core.stringCodec().encode(entry.getKey(), out);
-                valueCodec.encode(entry.getValue(), out);
+                valueCodec.encodeWithCheck(entry.getValue(), out);
             }
 
             return out;
@@ -91,7 +91,7 @@ public abstract class ByteMapCodecs {
 
             for (int i = 0; i < l; ++i) {
                 final String key = core.stringCodec().decode(in);
-                final V value = valueCodec.decode(in);
+                final V value = valueCodec.decodeWithCheck(in);
                 map.put(key, value);
             }
 
