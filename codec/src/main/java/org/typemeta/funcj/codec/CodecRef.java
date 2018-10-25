@@ -9,25 +9,31 @@ import java.util.Objects;
  * {@code CodecRef} implements the {@link Codec} interface.
  * Used when looking up a codec for a recursive type.
  * @param <T>       the raw type to be encoded/decoded
- * @param <E>       the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
-public class CodecRef<T, E> implements Codec<T, E> {
+public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
 
-    private enum Uninitialised implements Codec<Object, Object> {
+    private enum Uninitialised implements Codec<Object, Object, Object> {
         INSTANCE;
 
         @Override
-        public Object encode(Object val, Object enc) throws Exception {
+        public CodecCoreIntl<Object, Object> core() {
             throw error();
         }
 
         @Override
-        public Object decode(Class<Object> dynType, Object enc) throws Exception {
+        public Class<Object> type() {
             throw error();
         }
 
         @Override
-        public Object decode(Object enc) throws Exception {
+        public Object encode(Object val, Object in) {
+            throw error();
+        }
+
+        @Override
+        public Object decode(Object in) {
             throw error();
         }
 
@@ -36,14 +42,14 @@ public class CodecRef<T, E> implements Codec<T, E> {
         }
 
         @SuppressWarnings("unchecked")
-        static <T, E> Codec<T, E> of() {
-            return (Codec<T, E>) INSTANCE;
+        static <T, IN, OUT> Codec<T, IN, OUT> of() {
+            return (Codec<T, IN, OUT>) INSTANCE;
         }
     }
 
-    private Codec<T, E> impl;
+    private Codec<T, IN, OUT> impl;
 
-    CodecRef(Codec<T, E> impl) {
+    CodecRef(Codec<T, IN, OUT> impl) {
         this.impl = Objects.requireNonNull(impl);
     }
 
@@ -52,11 +58,11 @@ public class CodecRef<T, E> implements Codec<T, E> {
     }
 
     /**
-     * Initialise this reference
+     * Initialise this reference.
      * @param impl      the codec
      * @return          this codec
      */
-    public Codec<T, E> set(Codec<T, E> impl) {
+    public Codec<T, IN, OUT> set(Codec<T, IN, OUT> impl) {
         if (this.impl != Uninitialised.INSTANCE) {
             throw new IllegalStateException("CodecRef is already initialised");
         } else {
@@ -65,29 +71,34 @@ public class CodecRef<T, E> implements Codec<T, E> {
         }
     }
 
-    public synchronized Codec<T, E> setIfUninitialised(Functions.F0<Codec<T, E>> implSupp) {
+    public synchronized Codec<T, IN, OUT> setIfUninitialised(Functions.F0<Codec<T, IN, OUT>> implSupp) {
         if (this.impl == Uninitialised.INSTANCE) {
             this.impl = Objects.requireNonNull(implSupp.apply());
         }
         return impl;
     }
 
-    public Codec<T, E> get() {
+    public Codec<T, IN, OUT> get() {
         return impl;
     }
 
     @Override
-    public E encode(T val, E enc) throws Exception {
-        return impl.encode(val, enc);
+    public CodecCoreIntl<IN, OUT> core() {
+        return impl.core();
     }
 
     @Override
-    public T decode(Class<T> dynType, E enc) throws Exception {
-        return impl.decode(dynType, enc);
+    public Class<T> type() {
+        return impl.type();
     }
 
     @Override
-    public T decode(E enc) throws Exception {
-        return impl.decode(enc);
+    public OUT encode(T val, OUT out) {
+        return impl.encode(val, out);
+    }
+
+    @Override
+    public T decode(IN in) {
+        return impl.decode(in);
     }
 }

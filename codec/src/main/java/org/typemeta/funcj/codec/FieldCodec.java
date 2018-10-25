@@ -1,17 +1,19 @@
 package org.typemeta.funcj.codec;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 /**
  * A {@code FieldCodec} encapsulates encoding a field
- * to an encoded type {@code E}, and vice-versa.
- * @param <E>       the encoded type
+ * to an encoded type {@code OUT}, and vice-versa from encoded type {@code IN}.
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
 @SuppressWarnings("unchecked")
-public interface FieldCodec<E> {
+public interface FieldCodec<IN, OUT> {
 
-    abstract class Impl<E> implements FieldCodec<E> {
+    abstract class Impl<IN, OUT> implements FieldCodec<IN, OUT> {
 
         protected final Field field;
 
@@ -30,489 +32,488 @@ public interface FieldCodec<E> {
         }
     }
 
-    class BooleanFieldCodec<E> extends Impl<E> {
+    class BooleanFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec.BooleanCodec<E> codec;
+        protected final Codec.BooleanCodec<IN, OUT> codec;
 
-        BooleanFieldCodec(Field field, Codec.BooleanCodec<E> codec) {
+        BooleanFieldCodec(Field field, Codec.BooleanCodec<IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final boolean fieldVal = field.getBoolean(obj);
+            final boolean fieldVal = CodecException.wrap(() -> field.getBoolean(obj));
             setAccessible(false);
-            return codec.encodePrim(fieldVal, enc);
+            return codec.encodePrim(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final boolean fieldVal = codec.decodePrim(enc);
+        public void decodeField(Object obj, IN in) {
+            final boolean fieldVal = codec.decodePrim(in);
             setAccessible(true);
-            field.setBoolean(obj, fieldVal);
+            CodecException.wrap(() -> field.setBoolean(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class BooleanArrayFieldCodec<E> extends Impl<E> {
+    class BooleanArrayFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<boolean[], E> codec;
+        protected final Codec<boolean[], IN, OUT> codec;
 
-        BooleanArrayFieldCodec(Field field, Codec<boolean[], E> codec) {
+        BooleanArrayFieldCodec(Field field, Codec<boolean[], IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final boolean[] fieldVal = (boolean[]) field.get(obj);
+            final boolean[] fieldVal = CodecException.wrap(() -> (boolean[]) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final boolean[] fieldVal = codec.decode(enc);
+        public void decodeField(Object obj, IN in) {
+            final boolean[] fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class ByteFieldCodec<E> extends Impl<E> {
+    class ByteFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec.ByteCodec<E> codec;
+        protected final Codec.ByteCodec<IN, OUT> codec;
 
-        ByteFieldCodec(Field field, Codec.ByteCodec<E> codec) {
+        ByteFieldCodec(Field field, Codec.ByteCodec<IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final byte fieldVal = field.getByte(obj);
+            final byte fieldVal = CodecException.wrap(() -> field.getByte(obj));
             setAccessible(false);
-            return codec.encodePrim(fieldVal, enc);
+            return codec.encodePrim(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final byte fieldVal = codec.decodePrim(enc);
+        public void decodeField(Object obj, IN in) {
+            final byte fieldVal = codec.decodePrim(in);
             setAccessible(true);
-            field.setByte(obj, fieldVal);
+            CodecException.wrap(() -> field.setByte(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class ByteArrayFieldCodec<E> extends Impl<E> {
+    class ByteArrayFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<byte[], E> codec;
+        protected final Codec<byte[], IN, OUT> codec;
 
-        ByteArrayFieldCodec(Field field, Codec<byte[], E> codec) {
+        ByteArrayFieldCodec(Field field, Codec<byte[], IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final byte[] fieldVal = (byte[]) field.get(obj);
+            final byte[] fieldVal = CodecException.wrap(() -> (byte[]) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final byte[] fieldVal = codec.decode(enc);
+        public void decodeField(Object obj, IN in) {
+            final byte[] fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class CharFieldCodec<E> extends Impl<E> {
+    class CharFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec.CharCodec<E> codec;
+        protected final Codec.CharCodec<IN, OUT> codec;
 
-        CharFieldCodec(Field field, Codec.CharCodec<E> codec) {
+        CharFieldCodec(Field field, Codec.CharCodec<IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final char fieldVal = field.getChar(obj);
+            final char fieldVal = CodecException.wrap(() -> field.getChar(obj));
             setAccessible(false);
-            return codec.encodePrim(fieldVal, enc);
+            return codec.encodePrim(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final char fieldVal = codec.decodePrim(enc);
+        public void decodeField(Object obj, IN in) {
+            final char fieldVal = codec.decodePrim(in);
             setAccessible(true);
-            field.setChar(obj, fieldVal);
+            CodecException.wrap(() -> field.setChar(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class CharArrayFieldCodec<E> extends Impl<E> {
+    class CharArrayFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<char[], E> codec;
+        protected final Codec<char[], IN, OUT> codec;
 
-        CharArrayFieldCodec(Field field, Codec<char[], E> codec) {
+        CharArrayFieldCodec(Field field, Codec<char[], IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final char[] fieldVal = (char[]) field.get(obj);
+            final char[] fieldVal = CodecException.wrap(() -> (char[]) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final char[] fieldVal = codec.decode(enc);
+        public void decodeField(Object obj, IN in) {
+            final char[] fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class ShortFieldCodec<E> extends Impl<E> {
+    class ShortFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec.ShortCodec<E> codec;
+        protected final Codec.ShortCodec<IN, OUT> codec;
 
-        ShortFieldCodec(Field field, Codec.ShortCodec<E> codec) {
+        ShortFieldCodec(Field field, Codec.ShortCodec<IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final short fieldVal = field.getShort(obj);
+            final short fieldVal = CodecException.wrap(() -> field.getShort(obj));
             setAccessible(false);
-            return codec.encodePrim(fieldVal, enc);
+            return codec.encodePrim(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final short fieldVal = codec.decodePrim(enc);
+        public void decodeField(Object obj, IN in) {
+            final short fieldVal = codec.decodePrim(in);
             setAccessible(true);
-            field.setShort(obj, fieldVal);
+            CodecException.wrap(() -> field.setShort(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class ShortArrayFieldCodec<E> extends Impl<E> {
+    class ShortArrayFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<short[], E> codec;
+        protected final Codec<short[], IN, OUT> codec;
 
-        ShortArrayFieldCodec(Field field, Codec<short[], E> codec) {
+        ShortArrayFieldCodec(Field field, Codec<short[], IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final short[] fieldVal = (short[]) field.get(obj);
+            final short[] fieldVal = CodecException.wrap(() -> (short[]) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final short[] fieldVal = codec.decode(enc);
+        public void decodeField(Object obj, IN in) {
+            final short[] fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class IntegerFieldCodec<E> extends Impl<E> {
+    class IntegerFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec.IntCodec<E> codec;
+        protected final Codec.IntCodec<IN, OUT> codec;
 
-        IntegerFieldCodec(Field field, Codec.IntCodec<E> codec) {
+        IntegerFieldCodec(Field field, Codec.IntCodec<IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final int fieldVal = field.getInt(obj);
+            final int fieldVal = CodecException.wrap(() -> field.getInt(obj));
             setAccessible(false);
-            return codec.encodePrim(fieldVal, enc);
+            return codec.encodePrim(fieldVal, out);
         }
 
-        public void decodeField(Object obj, E enc) throws Exception {
-            final int fieldVal = codec.decodePrim(enc);
+        public void decodeField(Object obj, IN in) {
+            final int fieldVal = codec.decodePrim(in);
             setAccessible(true);
-            field.setInt(obj, fieldVal);
+            CodecException.wrap(() -> field.setInt(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class IntegerArrayFieldCodec<E> extends Impl<E> {
+    class IntegerArrayFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<int[], E> codec;
+        protected final Codec<int[], IN, OUT> codec;
 
-        IntegerArrayFieldCodec(Field field, Codec<int[], E> codec) {
+        IntegerArrayFieldCodec(Field field, Codec<int[], IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final int[] fieldVal = (int[]) field.get(obj);
+            final int[] fieldVal = CodecException.wrap(() -> (int[]) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final int[] fieldVal = codec.decode(enc);
+        public void decodeField(Object obj, IN in) {
+            final int[] fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class LongFieldCodec<E> extends Impl<E> {
+    class LongFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec.LongCodec<E> codec;
+        protected final Codec.LongCodec<IN, OUT> codec;
 
-        LongFieldCodec(Field field, Codec.LongCodec<E> codec) {
+        LongFieldCodec(Field field, Codec.LongCodec<IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final long fieldVal = field.getLong(obj);
+            final long fieldVal = CodecException.wrap(() -> field.getLong(obj));
             setAccessible(false);
-            return codec.encodePrim(fieldVal, enc);
+            return codec.encodePrim(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final long fieldVal = codec.decodePrim(enc);
+        public void decodeField(Object obj, IN in) {
+            final long fieldVal = codec.decodePrim(in);
             setAccessible(true);
-            field.setLong(obj, fieldVal);
+            CodecException.wrap(() -> field.setLong(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class LongArrayFieldCodec<E> extends Impl<E> {
+    class LongArrayFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<long[], E> codec;
+        protected final Codec<long[], IN, OUT> codec;
 
-        LongArrayFieldCodec(Field field, Codec<long[], E> codec) {
+        LongArrayFieldCodec(Field field, Codec<long[], IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final long[] fieldVal = (long[]) field.get(obj);
+            final long[] fieldVal = CodecException.wrap(() -> (long[]) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final long[] fieldVal = codec.decode(enc);
+        public void decodeField(Object obj, IN in) {
+            final long[] fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class FloatFieldCodec<E> extends Impl<E> {
+    class FloatFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec.FloatCodec<E> codec;
+        protected final Codec.FloatCodec<IN, OUT> codec;
 
-        FloatFieldCodec(Field field, Codec.FloatCodec<E> codec) {
+        FloatFieldCodec(Field field, Codec.FloatCodec<IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final float fieldVal = field.getFloat(obj);
+            final float fieldVal = CodecException.wrap(() -> field.getFloat(obj));
             setAccessible(false);
-            return codec.encodePrim(fieldVal, enc);
+            return codec.encodePrim(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final float fieldVal = codec.decodePrim(enc);
+        public void decodeField(Object obj, IN in) {
+            final float fieldVal = codec.decodePrim(in);
             setAccessible(true);
-            field.setFloat(obj, fieldVal);
+            CodecException.wrap(() -> field.setFloat(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class FloatArrayFieldCodec<E> extends Impl<E> {
+    class FloatArrayFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<float[], E> codec;
+        protected final Codec<float[], IN, OUT> codec;
 
-        FloatArrayFieldCodec(Field field, Codec<float[], E> codec) {
+        FloatArrayFieldCodec(Field field, Codec<float[], IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final float[] fieldVal = (float[]) field.get(obj);
+            final float[] fieldVal = CodecException.wrap(() -> (float[]) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final float[] fieldVal = codec.decode(enc);
+        public void decodeField(Object obj, IN in) {
+            final float[] fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class DoubleFieldCodec<E> extends Impl<E> {
+    class DoubleFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec.DoubleCodec<E> codec;
+        protected final Codec.DoubleCodec<IN, OUT> codec;
 
-        DoubleFieldCodec(Field field, Codec.DoubleCodec<E> codec) {
+        DoubleFieldCodec(Field field, Codec.DoubleCodec<IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final double fieldVal = field.getDouble(obj);
+            final double fieldVal = CodecException.wrap(() -> field.getDouble(obj));
             setAccessible(false);
-            return codec.encodePrim(fieldVal, enc);
+            return codec.encodePrim(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final double fieldVal = codec.decodePrim(enc);
+        public void decodeField(Object obj, IN in) {
+            final double fieldVal = codec.decodePrim(in);
             setAccessible(true);
-            field.setDouble(obj, fieldVal);
+            CodecException.wrap(() -> field.setDouble(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class DoubleArrayFieldCodec<E> extends Impl<E> {
+    class DoubleArrayFieldCodec<IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<double[], E> codec;
+        protected final Codec<double[], IN, OUT> codec;
 
-        DoubleArrayFieldCodec(Field field, Codec<double[], E> codec) {
+        DoubleArrayFieldCodec(Field field, Codec<double[], IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final double[] fieldVal = (double[]) field.get(obj);
+            final double[] fieldVal = CodecException.wrap(() -> (double[]) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
-            final double[] fieldVal = codec.decode(enc);
+        public void decodeField(Object obj, IN in) {
+            final double[] fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class ObjectFieldCodec<T, E> extends Impl<E> {
+    class ObjectFieldCodec<T, IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<T, E> codec;
+        protected final Codec<T, IN, OUT> codec;
 
-        protected ObjectFieldCodec(Field field, Codec<T, E> codec) {
+        protected ObjectFieldCodec(Field field, Codec<T, IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final T fieldVal = (T) field.get(obj);
+            final T fieldVal = CodecException.wrap(() -> (T) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
+        public void decodeField(Object obj, IN in) {
             final T fieldVal;
-            fieldVal = codec.decode((Class<T>) field.getType(), enc);
+            fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
-    class ObjectArrayFieldCodec<T, E> extends Impl<E> {
+    class ObjectArrayFieldCodec<T, IN, OUT> extends Impl<IN, OUT> {
 
-        protected final Codec<T[], E> codec;
+        protected final Codec<T[], IN, OUT> codec;
 
-        protected ObjectArrayFieldCodec(Field field, Codec<T[], E> codec) {
+        protected ObjectArrayFieldCodec(Field field, Codec<T[], IN, OUT> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
 
         @Override
-        public E encodeField(Object obj, E enc) throws Exception {
+        public OUT encodeField(Object obj, OUT out) {
             setAccessible(true);
-            final T[] fieldVal = (T[]) field.get(obj);
+            final T[] fieldVal;
+            fieldVal = CodecException.wrap(() -> (T[]) field.get(obj));
             setAccessible(false);
-            return codec.encode(fieldVal, enc);
+            return codec.encodeWithCheck(fieldVal, out);
         }
 
         @Override
-        public void decodeField(Object obj, E enc) throws Exception {
+        public void decodeField(Object obj, IN in) {
             final T[] fieldVal;
-            fieldVal = codec.decode((Class<T[]>) field.getType(), enc);
+            fieldVal = codec.decodeWithCheck(in);
             setAccessible(true);
-            field.set(obj, fieldVal);
+            CodecException.wrap(() -> field.set(obj, fieldVal));
             setAccessible(false);
         }
     }
 
     /**
-     * Encode a field with an object into an encoded type {@code E}.
+     * Encode a field within an object into an encoded type {@code OUT}.
      * @param obj       the object to which the field belongs
-     * @param enc       the encoded parent value
+     * @param out       the encoded parent value
      * @return          the encoded value
-     * @throws Exception if the operation fails
      */
-    E encodeField(Object obj, E enc) throws Exception;
+    OUT encodeField(Object obj, OUT out);
 
     /**
-     * One of the two {@code decode} methods must be implemented by sub-classes.
+     * Decode a field with an encoded type {@code IN} back into a value of type {@code T}.
      * @param obj       object to which the field belongs
-     * @param enc       the encoded value
-     * @throws Exception if the operation fails
+     * @param in        the encoded value
      */
-    void decodeField(Object obj, E enc) throws Exception;
+    void decodeField(Object obj, IN in);
 }

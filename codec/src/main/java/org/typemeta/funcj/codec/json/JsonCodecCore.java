@@ -1,35 +1,21 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.CodecCoreIntl;
-import org.typemeta.funcj.json.model.JsValue;
+import org.typemeta.funcj.codec.json.JsonIO.Input;
+import org.typemeta.funcj.codec.json.JsonIO.Output;
+
+import java.io.Reader;
+import java.io.Writer;
 
 /**
- * Interface for classes which implement an encoding into JSON,
- * via the {@link JsValue} representation for JSON values.
+ * Interface for classes which implement an encoding into JSON.
  */
-@SuppressWarnings("unchecked")
-public interface JsonCodecCore extends CodecCoreIntl<JsValue> {
-
-    /**
-     * Encode a value of type {@code T} into encoded form {@code E}.
-     * @param val   the value to encode
-     * @param <T>   the decoded value type
-     * @return      the encoded value
-     * @throws Exception if the operation fails
-     */
-    default <T> JsValue encode(T val) throws Exception {
-        return encode((Class<T>)val.getClass(), val);
+public interface JsonCodecCore extends CodecCoreIntl<Input, Output> {
+    default <T> void encode(Class<T> type, T value, Writer writer) {
+        encode(type, value, new JsonGenerator(writer));
     }
 
-    /**
-     * Encode a value of type {@code T} into encoded form {@code E}.
-     * @param type  the class of the decoded value
-     * @param val   the value to encode
-     * @param <T>   the decoded value type
-     * @return      the encoded value
-     * @throws Exception if the operation fails
-     */
-    default <T> JsValue encode(Class<T> type, T val) throws Exception {
-        return encode(type, val, null);
+    default <T> T decode(Class<T> type, Reader reader) {
+        return decode(type, new JsonParser(reader));
     }
 }

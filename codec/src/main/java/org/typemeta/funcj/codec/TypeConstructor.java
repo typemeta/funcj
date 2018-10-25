@@ -2,8 +2,10 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.functions.FunctionsGenEx.F0;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
@@ -15,13 +17,13 @@ import static java.util.stream.Collectors.toList;
 public interface TypeConstructor<T> {
     /**
      * Create a {@code TypeConstructor} for the specified class.
-     * @param clazz type descriptor which conveys the type argument
+     * @param clazz     type descriptor which conveys the type argument
      * @param <T>       the type we want a {@code TypeConstructor} for
      * @return          a {@code TypeConstructor}
-     * @throws CodecRuntimeException if type has no constructors
+     * @throws CodecException if type has no constructors
      */
     static <T> TypeConstructor<T> create(Class<T> clazz)
-            throws CodecRuntimeException {
+            throws CodecException {
         // Get the empty-arg constructors.
         final List<Constructor<T>> ctors =
                 Arrays.stream(clazz.getDeclaredConstructors())
@@ -29,11 +31,12 @@ public interface TypeConstructor<T> {
                         .map(ctor -> (Constructor<T>)ctor)
                         .collect(toList());
 
-        // Select the accessible ctor if there is only one, otherwise just the first one.
+        // Select the accessible ctor if there is only one, otherwise just use
+        // the first one.
         final Constructor<T> defCtor;
         switch (ctors.size()) {
             case 0:
-                throw new CodecRuntimeException(clazz.getName() + " has no default constructor");
+                throw new CodecException(clazz.getName() + " has no default constructor");
             case 1:
                 defCtor = ctors.get(0);
                 break;
@@ -71,7 +74,6 @@ public interface TypeConstructor<T> {
     /**
      * Construct a value of type {@code T}.
      * @return          newly constructed value
-     * @throws          CodecException typically thrown by {@link java.lang.reflect.Constructor#newInstance(Object[])}
      */
-    T construct() throws CodecException;
+    T construct();
 }

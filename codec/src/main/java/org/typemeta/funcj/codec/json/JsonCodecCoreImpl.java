@@ -1,14 +1,16 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.json.model.*;
-import org.typemeta.funcj.util.*;
+import org.typemeta.funcj.functions.Functions;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
+import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
+
 @SuppressWarnings("unchecked")
-public class JsonCodecCoreImpl extends BaseCodecCore<JsValue> implements JsonCodecCore {
+public class JsonCodecCoreImpl extends BaseCodecCore<JsonIO.Input, JsonIO.Output> implements JsonCodecCore {
 
     public JsonCodecCoreImpl() {
     }
@@ -25,618 +27,812 @@ public class JsonCodecCoreImpl extends BaseCodecCore<JsValue> implements JsonCod
         return "@value";
     }
 
-    private final Codec.NullCodec<JsValue> nullCodec = new Codec.NullCodec<JsValue>() {
-        @Override
-        public boolean isNull(JsValue enc) {
-            return enc.isNull();
-        }
-
-        @Override
-        public JsValue encode(Object val, JsValue enc) throws Exception {
-            return JSAPI.nul();
-        }
-
-        @Override
-        public Object decode(JsValue enc) throws Exception {
-            enc.asNull();
-            return null;
-        }
-    };
-
-    public <T> JsValue encode(T val) throws Exception {
-        return encode((Class<T>)val.getClass(), val);
-    }
-
-    public <T> JsValue encode(Class<T> type, T val) throws Exception {
-        return super.encode(type, val, null);
+    protected int defaultArrSize() {
+        return 16;
     }
 
     @Override
-    public Codec.NullCodec<JsValue> nullCodec() {
-        return nullCodec;
+    public <T> boolean encodeNull(T val, JsonIO.Output out) {
+        if (val == null) {
+            out.writeNull();
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    protected final Codec.BooleanCodec<JsValue> booleanCodec = new Codec.BooleanCodec<JsValue>() {
+    @Override
+    public boolean decodeNull(JsonIO.Input in) {
+        if (in.currentEventType().equals(JsonIO.Input.Event.Type.NULL)) {
+            in.readNull();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public <T> boolean encodeDynamicType(
+            Codec<T, JsonIO.Input, JsonIO.Output> codec,
+            T val,
+            JsonIO.Output out,
+            Functions.F<Class<T>, Codec<T, JsonIO.Input, JsonIO.Output>> getDynCodec) {
+        final Class<T> dynType = (Class<T>) val.getClass();
+        if (dynType.equals(codec.type())) {
+            return false;
+        } else {
+            final Codec<T, JsonIO.Input, JsonIO.Output> dynCodec = getDynCodec.apply(dynType);
+            out.startObject();
+
+            out.writeField(typeFieldName())
+                    .writeStr(classToName(dynType));
+            out.writeField(valueFieldName());
+            dynCodec.encode(val, out);
+
+            out.endObject();
+            return true;
+        }
+    }
+
+    @Override
+    public <T> T decodeDynamicType(JsonIO.Input in, Functions.F<String, T> decoder) {
+        if (in.notEOF() && in.currentEventType() == JsonIO.Input.Event.Type.OBJECT_START) {
+            final String typeFieldName = typeFieldName();
+            final JsonIO.Input.Event.FieldName typeField = new JsonIO.Input.Event.FieldName(typeFieldName);
+            final String valueFieldName = valueFieldName();
+
+            final JsonIO.Input.Event next = in.event(1);
+            if (next.equals(typeField)) {
+                in.startObject();
+
+                in.readFieldName();
+                final String typeName = in.readStr();
+
+                final String field2 = in.readFieldName();
+                if (!field2.equals(valueFieldName)) {
+                    throw new CodecException("Was expecting field '" + valueFieldName + "' but got '" + field2 + "'");
+                }
+
+                final T val = decoder.apply(typeName);
+
+                in.endObject();
+
+                return val;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public <T> T decodeDynamicType(JsonIO.Input in) {
+        return decodeDynamicType(in, name -> getCodec(this.<T>nameToClass(name)).decode(in));
+    }
+
+    protected final Codec.BooleanCodec<JsonIO.Input, JsonIO.Output> booleanCodec =
+            new Codec.BooleanCodec<JsonIO.Input, JsonIO.Output>() {
 
         @Override
-        public JsValue encodePrim(boolean val) {
-            return JSAPI.bool(val);
+        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
+            return JsonCodecCoreImpl.this;
         }
 
         @Override
-        public boolean decodePrim(JsValue enc) {
-            return enc.asBool().getValue();
+        public JsonIO.Output encodePrim(boolean val, JsonIO.Output out) {
+            return out.writeBool(val);
+        }
+
+        @Override
+        public boolean decodePrim(JsonIO.Input in) {
+            return in.readBool();
         }
     };
 
     @Override
-    public Codec.BooleanCodec<JsValue> booleanCodec() {
+    public Codec.BooleanCodec<JsonIO.Input, JsonIO.Output> booleanCodec() {
         return booleanCodec;
     }
 
-    protected final Codec<boolean[], JsValue> booleanArrayCodec = new Codec<boolean[], JsValue>() {
+    protected final Codec<boolean[], JsonIO.Input, JsonIO.Output> booleanArrayCodec =
+            new Codec.Base<boolean[], JsonIO.Input, JsonIO.Output>(this) {
 
         @Override
-        public JsValue encode(boolean[] vals, JsValue enc) throws Exception {
-            final List<JsValue> nodes = new ArrayList<>(vals.length);
-            for (boolean val : vals) {
-                nodes.add(booleanCodec().encode(val, enc));
-            }
-            return JSAPI.arr(nodes);
+        public Class<boolean[]> type() {
+            return boolean[].class;
         }
 
         @Override
-        public boolean[] decode(JsValue enc) throws Exception {
-            final JsArray arrNode = enc.asArray();
-            final boolean[] vals = new boolean[arrNode.size()];
-            int i = 0;
-            for (JsValue node : arrNode) {
-                vals[i++] = booleanCodec().decode(node);
+        public JsonIO.Output encode(boolean[] vals, JsonIO.Output out) {
+            out.startArray();
+            for (boolean val : vals) {
+                booleanCodec().encode(val, out);
             }
-            return vals;
+            return out.endArray();
+        }
+
+        @Override
+        public boolean[] decode(JsonIO.Input in) {
+            boolean[] arr = new boolean[defaultArrSize()];
+            in.startArray();
+            int i = 0;
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                if (i == arr.length) {
+                    arr = Arrays.copyOf(arr, arr.length * 2);
+                }
+                arr[i++] = booleanCodec().decode(in);
+            }
+            in.endArray();
+            return Arrays.copyOf(arr, i);
         }
     };
 
     @Override
-    public Codec<boolean[], JsValue> booleanArrayCodec() {
+    public Codec<boolean[], JsonIO.Input, JsonIO.Output> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
-    protected final Codec.ByteCodec<JsValue> byteCodec = new Codec.ByteCodec<JsValue>() {
+    protected final Codec.ByteCodec<JsonIO.Input, JsonIO.Output> byteCodec =
+            new Codec.ByteCodec<JsonIO.Input, JsonIO.Output>() {
 
         @Override
-        public JsValue encodePrim(byte val) {
-            return JSAPI.num(val);
+        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
+            return JsonCodecCoreImpl.this;
         }
 
         @Override
-        public byte decodePrim(JsValue enc) {
-            return (byte)enc.asNumber().getValue();
+        public JsonIO.Output encodePrim(byte val, JsonIO.Output out) {
+            return out.writeNum(val);
+        }
+
+        @Override
+        public byte decodePrim(JsonIO.Input in) {
+            return in.readByte();
         }
     };
 
     @Override
-    public Codec.ByteCodec<JsValue> byteCodec() {
+    public Codec.ByteCodec<JsonIO.Input, JsonIO.Output> byteCodec() {
         return byteCodec;
     }
 
-    protected final Codec<byte[], JsValue> byteArrayCodec = new Codec<byte[], JsValue>() {
+    protected final Codec<byte[], JsonIO.Input, JsonIO.Output> byteArrayCodec =
+            new Codec.Base<byte[], JsonIO.Input, JsonIO.Output>(this) {
 
         @Override
-        public JsValue encode(byte[] vals, JsValue enc) throws Exception {
-            final List<JsValue> nodes = new ArrayList<>(vals.length);
-            for (byte val : vals) {
-                nodes.add(byteCodec().encode(val, enc));
-            }
-            return JSAPI.arr(nodes);
+        public Class<byte[]> type() {
+            return byte[].class;
         }
 
         @Override
-        public byte[] decode(JsValue enc) throws Exception {
-            final JsArray arrNode = enc.asArray();
-            final byte[] vals = new byte[arrNode.size()];
-            int i = 0;
-            for (JsValue node : arrNode) {
-                vals[i++] = byteCodec().decode(node);
+        public JsonIO.Output encode(byte[] vals, JsonIO.Output out) {
+            out.startArray();
+            for (byte val : vals) {
+                byteCodec().encode(val, out);
             }
-            return vals;
+            return out.endArray();
+        }
+
+        @Override
+        public byte[] decode(JsonIO.Input in) {
+            byte[] arr = new byte[defaultArrSize()];
+            in.startArray();
+            int i = 0;
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                if (i == arr.length) {
+                    arr = Arrays.copyOf(arr, arr.length * 2);
+                }
+                arr[i++] = byteCodec().decode(in);
+            }
+            in.endArray();
+            return Arrays.copyOf(arr, i);
         }
     };
 
     @Override
-    public Codec<byte[], JsValue> byteArrayCodec() {
+    public Codec<byte[], JsonIO.Input, JsonIO.Output> byteArrayCodec() {
         return byteArrayCodec;
     }
 
-    protected final Codec.CharCodec<JsValue> charCodec = new Codec.CharCodec<JsValue>() {
+    protected final Codec.CharCodec<JsonIO.Input, JsonIO.Output> charCodec =
+            new Codec.CharCodec<JsonIO.Input, JsonIO.Output>() {
 
         @Override
-        public JsValue encodePrim(char val) {
-            return JSAPI.str(String.valueOf(val));
+        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
+            return JsonCodecCoreImpl.this;
         }
 
         @Override
-        public char decodePrim(JsValue enc) throws Exception {
-            final String s = enc.asString().getValue();
-            if (s.length() == 1) {
-                return s.charAt(0);
-            } else {
-                throw new CodecException(
-                        "Unexpected String of length " + s.length() + " when decoding a char");
-            }
+        public JsonIO.Output encodePrim(char val, JsonIO.Output out) {
+            return out.writeChar(val);
+        }
+
+        @Override
+        public char decodePrim(JsonIO.Input in ) {
+            return in.readChar();
         }
     };
 
     @Override
-    public Codec.CharCodec<JsValue> charCodec() {
+    public Codec.CharCodec<JsonIO.Input, JsonIO.Output> charCodec() {
         return charCodec;
     }
 
-    protected final Codec<char[], JsValue> charArrayCodec = new Codec<char[], JsValue>() {
+    protected final Codec<char[], JsonIO.Input, JsonIO.Output> charArrayCodec =
+            new Codec.Base<char[], JsonIO.Input, JsonIO.Output>(this) {
 
         @Override
-        public JsValue encode(char[] vals, JsValue enc) throws Exception {
-            final List<JsValue> nodes = new ArrayList<>(vals.length);
-            for (char val : vals) {
-                nodes.add(charCodec().encode(val, enc));
-            }
-            return JSAPI.arr(nodes);
+        public Class<char[]> type() {
+            return char[].class;
         }
 
         @Override
-        public char[] decode(JsValue enc) throws Exception {
-            final JsArray arrNode = enc.asArray();
-            final char[] vals = new char[arrNode.size()];
-            int i = 0;
-            for (JsValue node : arrNode) {
-                vals[i++] = charCodec().decode(node);
+        public JsonIO.Output encode(char[] vals, JsonIO.Output out) {
+            out.startArray();
+            for (char val : vals) {
+                charCodec().encode(val, out);
             }
-            return vals;
+            return out.endArray();
+        }
+
+        @Override
+        public char[] decode(JsonIO.Input in) {
+            char[] arr = new char[defaultArrSize()];
+            in.startArray();
+            int i = 0;
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                if (i == arr.length) {
+                    arr = Arrays.copyOf(arr, arr.length * 2);
+                }
+                arr[i++] = charCodec().decode(in);
+            }
+            in.endArray();
+            return Arrays.copyOf(arr, i);
         }
     };
 
     @Override
-    public Codec<char[], JsValue> charArrayCodec() {
+    public Codec<char[], JsonIO.Input, JsonIO.Output> charArrayCodec() {
         return charArrayCodec;
     }
 
-    protected final Codec.ShortCodec<JsValue> shortCodec = new Codec.ShortCodec<JsValue>() {
+    protected final Codec.ShortCodec<JsonIO.Input, JsonIO.Output> shortCodec =
+            new Codec.ShortCodec<JsonIO.Input, JsonIO.Output>() {
 
         @Override
-        public JsValue encodePrim(short val) {
-            return JSAPI.num(val);
+        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
+            return JsonCodecCoreImpl.this;
         }
 
         @Override
-        public short decodePrim(JsValue enc) {
-            return (short)enc.asNumber().getValue();
+        public JsonIO.Output encodePrim(short val, JsonIO.Output out) {
+            return out.writeNum(val);
+        }
+
+        @Override
+        public short decodePrim(JsonIO.Input in ) {
+            return in.readShort();
         }
     };
 
     @Override
-    public Codec.ShortCodec<JsValue> shortCodec() {
+    public Codec.ShortCodec<JsonIO.Input, JsonIO.Output> shortCodec() {
         return shortCodec;
     }
 
-    protected final Codec<short[], JsValue> shortArrayCodec = new Codec<short[], JsValue>() {
+    protected final Codec<short[], JsonIO.Input, JsonIO.Output> shortArrayCodec =
+            new Codec.Base<short[], JsonIO.Input, JsonIO.Output>(this) {
 
         @Override
-        public JsValue encode(short[] vals, JsValue enc) throws Exception {
-            final List<JsValue> nodes = new ArrayList<>(vals.length);
-            for (short val : vals) {
-                nodes.add(shortCodec().encode(val, enc));
-            }
-            return JSAPI.arr(nodes);
+        public Class<short[]> type() {
+            return short[].class;
         }
 
         @Override
-        public short[] decode(JsValue enc) throws Exception {
-            final JsArray arrNode = enc.asArray();
-            final short[] vals = new short[arrNode.size()];
-            int i = 0;
-            for (JsValue node : arrNode) {
-                vals[i++] = shortCodec().decode(node);
+        public JsonIO.Output encode(short[] vals, JsonIO.Output out) {
+            out.startArray();
+            for (short val : vals) {
+                shortCodec().encode(val, out);
             }
-            return vals;
+            return out.endArray();
+        }
+
+        @Override
+        public short[] decode(JsonIO.Input in) {
+            short[] arr = new short[defaultArrSize()];
+            in.startArray();
+            int i = 0;
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                if (i == arr.length) {
+                    arr = Arrays.copyOf(arr, arr.length * 2);
+                }
+                arr[i++] = shortCodec().decode(in);
+            }
+            in.endArray();
+            return Arrays.copyOf(arr, i);
         }
     };
 
     @Override
-    public Codec<short[], JsValue> shortArrayCodec() {
+    public Codec<short[], JsonIO.Input, JsonIO.Output> shortArrayCodec() {
         return shortArrayCodec;
     }
 
-    protected final Codec.IntCodec<JsValue> intCodec = new Codec.IntCodec<JsValue>() {
+    protected final Codec.IntCodec<JsonIO.Input, JsonIO.Output> intCodec =
+            new Codec.IntCodec<JsonIO.Input, JsonIO.Output>() {
 
         @Override
-        public JsValue encodePrim(int val) {
-            return JSAPI.num(val);
+        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
+            return JsonCodecCoreImpl.this;
         }
 
         @Override
-        public int decodePrim(JsValue enc) {
-            return (int)enc.asNumber().getValue();
+        public JsonIO.Output encodePrim(int val, JsonIO.Output out) {
+            return out.writeNum(val);
+        }
+
+        @Override
+        public int decodePrim(JsonIO.Input in ) {
+            return in.readInt();
         }
     };
 
     @Override
-    public Codec.IntCodec<JsValue> intCodec() {
+    public Codec.IntCodec<JsonIO.Input, JsonIO.Output> intCodec() {
         return intCodec;
     }
 
-    protected final Codec<int[], JsValue> intArrayCodec = new Codec<int[], JsValue>() {
+    protected final Codec<int[], JsonIO.Input, JsonIO.Output> intArrayCodec =
+            new Codec.Base<int[], JsonIO.Input, JsonIO.Output>(this) {
 
         @Override
-        public JsValue encode(int[] vals, JsValue enc) throws Exception {
-            final List<JsValue> nodes = new ArrayList<>(vals.length);
-            for (int val : vals) {
-                nodes.add(intCodec().encode(val, enc));
-            }
-            return JSAPI.arr(nodes);
+        public Class<int[]> type() {
+            return int[].class;
         }
 
         @Override
-        public int[] decode(JsValue enc) throws Exception {
-            final JsArray arrNode = enc.asArray();
-            final int[] vals = new int[arrNode.size()];
-            int i = 0;
-            for (JsValue node : arrNode) {
-                vals[i++] = intCodec().decode(node);
+        public JsonIO.Output encode(int[] vals, JsonIO.Output out) {
+            out.startArray();
+            for (int val : vals) {
+                intCodec().encode(val, out);
             }
-            return vals;
+            return out.endArray();
+        }
+
+        @Override
+        public int[] decode(JsonIO.Input in) {
+            int[] arr = new int[defaultArrSize()];
+            in.startArray();
+            int i = 0;
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                if (i == arr.length) {
+                    arr = Arrays.copyOf(arr, arr.length * 2);
+                }
+                arr[i++] = intCodec().decode(in);
+            }
+            in.endArray();
+            return Arrays.copyOf(arr, i);
         }
     };
 
     @Override
-    public Codec<int[], JsValue> intArrayCodec() {
+    public Codec<int[], JsonIO.Input, JsonIO.Output> intArrayCodec() {
         return intArrayCodec;
     }
 
-    protected final Codec.LongCodec<JsValue> longCodec = new Codec.LongCodec<JsValue>() {
+    protected final Codec.LongCodec<JsonIO.Input, JsonIO.Output> longCodec =
+            new Codec.LongCodec<JsonIO.Input, JsonIO.Output>() {
 
         @Override
-        public JsValue encodePrim(long val) {
-            return JSAPI.num(val);
+        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
+            return JsonCodecCoreImpl.this;
         }
 
         @Override
-        public long decodePrim(JsValue enc) {
-            return (long)enc.asNumber().getValue();
+        public JsonIO.Output encodePrim(long val, JsonIO.Output out) {
+            return out.writeNum(val);
+        }
+
+        @Override
+        public long decodePrim(JsonIO.Input in) {
+            return in.readLong();
         }
     };
 
     @Override
-    public Codec.LongCodec<JsValue> longCodec() {
+    public Codec.LongCodec<JsonIO.Input, JsonIO.Output> longCodec() {
         return longCodec;
     }
 
-    protected final Codec<long[], JsValue> longArrayCodec = new Codec<long[], JsValue>() {
+    protected final Codec<long[], JsonIO.Input, JsonIO.Output> longArrayCodec =
+            new Codec.Base<long[], JsonIO.Input, JsonIO.Output>(this) {
 
         @Override
-        public JsValue encode(long[] vals, JsValue enc) throws Exception {
-            final List<JsValue> nodes = new ArrayList<>(vals.length);
-            for (long val : vals) {
-                nodes.add(longCodec().encode(val, enc));
-            }
-            return JSAPI.arr(nodes);
+        public Class<long[]> type() {
+            return long[].class;
         }
 
         @Override
-        public long[] decode(JsValue enc) throws Exception {
-            final JsArray arrNode = enc.asArray();
-            final long[] vals = new long[arrNode.size()];
-            int i = 0;
-            for (JsValue node : arrNode) {
-                vals[i++] = longCodec().decode(node);
+        public JsonIO.Output encode(long[] vals, JsonIO.Output out) {
+            out.startArray();
+            for (long val : vals) {
+                longCodec().encode(val, out);
             }
-            return vals;
+            return out.endArray();
+        }
+
+        @Override
+        public long[] decode(JsonIO.Input in) {
+            long[] arr = new long[defaultArrSize()];
+            in.startArray();
+            int i = 0;
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                if (i == arr.length) {
+                    arr = Arrays.copyOf(arr, arr.length * 2);
+                }
+                arr[i++] = longCodec().decode(in);
+            }
+            in.endArray();
+            return Arrays.copyOf(arr, i);
         }
     };
 
     @Override
-    public Codec<long[], JsValue> longArrayCodec() {
+    public Codec<long[], JsonIO.Input, JsonIO.Output> longArrayCodec() {
         return longArrayCodec;
     }
 
-    protected final Codec.FloatCodec<JsValue> floatCodec = new Codec.FloatCodec<JsValue>() {
+    protected final Codec.FloatCodec<JsonIO.Input, JsonIO.Output> floatCodec =
+            new Codec.FloatCodec<JsonIO.Input, JsonIO.Output>() {
 
         @Override
-        public JsValue encodePrim(float val) {
-            return JSAPI.num(val);
+        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
+            return JsonCodecCoreImpl.this;
         }
 
         @Override
-        public float decodePrim(JsValue enc) {
-            return (float)enc.asNumber().getValue();
+        public JsonIO.Output encodePrim(float val, JsonIO.Output out) {
+            return out.writeNum(val);
+        }
+
+        @Override
+        public float decodePrim(JsonIO.Input in ) {
+            return in.readFloat();
         }
     };
 
     @Override
-    public Codec.FloatCodec<JsValue> floatCodec() {
+    public Codec.FloatCodec<JsonIO.Input, JsonIO.Output> floatCodec() {
         return floatCodec;
     }
 
-    protected final Codec<float[], JsValue> floatArrayCodec = new Codec<float[], JsValue>() {
+    protected final Codec<float[], JsonIO.Input, JsonIO.Output> floatArrayCodec =
+            new Codec.Base<float[], JsonIO.Input, JsonIO.Output>(this) {
 
         @Override
-        public JsValue encode(float[] vals, JsValue enc) throws Exception {
-            final List<JsValue> nodes = new ArrayList<>(vals.length);
-            for (float val : vals) {
-                nodes.add(floatCodec().encode(val, enc));
-            }
-            return JSAPI.arr(nodes);
+        public Class<float[]> type() {
+            return float[].class;
         }
 
         @Override
-        public float[] decode(JsValue enc) throws Exception {
-            final JsArray arrNode = enc.asArray();
-            final float[] vals = new float[arrNode.size()];
-            int i = 0;
-            for (JsValue node : arrNode) {
-                vals[i++] = floatCodec().decode(node);
+        public JsonIO.Output encode(float[] vals, JsonIO.Output out) {
+            out.startArray();
+            for (float val : vals) {
+                floatCodec().encode(val, out);
             }
-            return vals;
+            return out.endArray();
+        }
+
+        @Override
+        public float[] decode(JsonIO.Input in) {
+            float[] arr = new float[defaultArrSize()];
+            in.startArray();
+            int i = 0;
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                if (i == arr.length) {
+                    arr = Arrays.copyOf(arr, arr.length * 2);
+                }
+                arr[i++] = floatCodec().decode(in);
+            }
+            in.endArray();
+            return Arrays.copyOf(arr, i);
         }
     };
 
     @Override
-    public Codec<float[], JsValue> floatArrayCodec() {
+    public Codec<float[], JsonIO.Input, JsonIO.Output> floatArrayCodec() {
         return floatArrayCodec;
     }
 
-    protected final Codec.DoubleCodec<JsValue> doubleCodec = new Codec.DoubleCodec<JsValue>() {
+    protected final Codec.DoubleCodec<JsonIO.Input, JsonIO.Output> doubleCodec =
+            new Codec.DoubleCodec<JsonIO.Input, JsonIO.Output>() {
 
         @Override
-        public JsValue encodePrim(double val) {
-            return JSAPI.num(val);
+        public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
+            return JsonCodecCoreImpl.this;
         }
 
         @Override
-        public double decodePrim(JsValue enc) {
-            return enc.asNumber().getValue();
+        public JsonIO.Output encodePrim(double val, JsonIO.Output out) {
+            return out.writeNum(val);
+        }
+
+        @Override
+        public double decodePrim(JsonIO.Input in ) {
+            return in.readDbl();
         }
     };
 
     @Override
-    public Codec.DoubleCodec<JsValue> doubleCodec() {
+    public Codec.DoubleCodec<JsonIO.Input, JsonIO.Output> doubleCodec() {
         return doubleCodec;
     }
 
-    protected final Codec<double[], JsValue> doubleArrayCodec = new Codec<double[], JsValue>() {
+    protected final Codec<double[], JsonIO.Input, JsonIO.Output> doubleArrayCodec =
+            new Codec.Base<double[], JsonIO.Input, JsonIO.Output>(this) {
 
         @Override
-        public JsValue encode(double[] vals, JsValue enc) throws Exception {
-            final List<JsValue> nodes = new ArrayList<>(vals.length);
-            for (double val : vals) {
-                nodes.add(doubleCodec().encode(val, enc));
-            }
-            return JSAPI.arr(nodes);
+        public Class<double[]> type() {
+            return double[].class;
         }
 
         @Override
-        public double[] decode(JsValue enc) throws Exception {
-            final JsArray arrNode = enc.asArray();
-            final double[] vals = new double[arrNode.size()];
-            int i = 0;
-            for (JsValue node : arrNode) {
-                vals[i++] = doubleCodec().decode(node);
+        public JsonIO.Output encode(double[] vals, JsonIO.Output out) {
+            out.startArray();
+            for (double val : vals) {
+                doubleCodec().encode(val, out);
             }
-            return vals;
+            return out.endArray();
+        }
+
+        @Override
+        public double[] decode(JsonIO.Input in) {
+            double[] arr = new double[defaultArrSize()];
+            in.startArray();
+            int i = 0;
+            while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                if (i == arr.length) {
+                    arr = Arrays.copyOf(arr, arr.length * 2);
+                }
+                arr[i++] = doubleCodec().decode(in);
+            }
+            in.endArray();
+            return Arrays.copyOf(arr, i);
         }
     };
 
     @Override
-    public Codec<double[], JsValue> doubleArrayCodec() {
+    public Codec<double[], JsonIO.Input, JsonIO.Output> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
-    protected final Codec<String, JsValue> stringCodec = new Codec<String, JsValue>() {
+    protected final Codec<String, JsonIO.Input, JsonIO.Output> stringCodec =
+            new Codec.Base<String, JsonIO.Input, JsonIO.Output>(this) {
+
         @Override
-        public JsValue encode(String val, JsValue enc) throws Exception {
-            return JSAPI.str(val);
+        public Class<String> type() {
+            return String.class;
         }
 
         @Override
-        public String decode(JsValue enc) throws Exception {
-            return enc.asString().getValue();
+        public JsonIO.Output encode(String val, JsonIO.Output out) {
+            return out.writeStr(val);
+        }
+
+        @Override
+        public String decode(JsonIO.Input in) {
+            return in.readStr();
         }
     };
 
     @Override
-    public Codec<String, JsValue> stringCodec() {
+    public Codec<String, JsonIO.Input, JsonIO.Output> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    public <EM extends Enum<EM>> Codec<EM, JsValue> enumCodec(Class<? super EM> enumType) {
-        return new Codec<EM, JsValue>() {
+    public <EM extends Enum<EM>> Codec<EM, JsonIO.Input, JsonIO.Output> enumCodec(Class<EM> enumType) {
+        return new Codec.Base<EM, JsonIO.Input, JsonIO.Output>(this) {
             @Override
-            public JsValue encode(EM val, JsValue enc) throws Exception {
-                return JSAPI.str(val.name());
+            public Class<EM> type() {
+                return enumType;
             }
 
             @Override
-            public EM decode(Class<EM> dynType, JsValue enc) throws Exception {
-                final Class<EM> type = dynType != null ? dynType : (Class<EM>)enumType;
-                return EM.valueOf(type, enc.asString().getValue());
+            public JsonIO.Output encode(EM val, JsonIO.Output out) {
+                return out.writeStr(val.name());
+            }
+
+            @Override
+            public EM decode(JsonIO.Input in) {
+                return EM.valueOf(type(), in.readStr());
             }
         };
     }
 
     @Override
-    public <V> Codec<Map<String, V>, JsValue> mapCodec(Codec<V, JsValue> valueCodec) {
-        return new JsonMapCodecs.StringMapCodec<V>(this, valueCodec);
+    public <V> Codec<Map<String, V>, JsonIO.Input, JsonIO.Output> mapCodec(
+            Class<Map<String, V>> type,
+            Codec<V, JsonIO.Input, JsonIO.Output> valueCodec) {
+        return new JsonMapCodecs.StringMapCodec<V>(this, type, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, JsValue> mapCodec(Codec<K, JsValue> keyCodec, Codec<V, JsValue> valueCodec) {
-        return new JsonMapCodecs.MapCodec<K, V>(this, keyCodec, valueCodec);
+    public <K, V> Codec<Map<K, V>, JsonIO.Input, JsonIO.Output> mapCodec(
+            Class<Map<K, V>> type,
+            Codec<K, JsonIO.Input, JsonIO.Output> keyCodec,
+            Codec<V, JsonIO.Input, JsonIO.Output> valueCodec) {
+        return new JsonMapCodecs.MapCodec<K, V>(this, type, keyCodec, valueCodec);
     }
 
     @Override
-    public <T> Codec<Collection<T>, JsValue> collCodec(Class<T> elemType, Codec<T, JsValue> elemCodec) {
-        return new Codec<Collection<T>, JsValue>() {
+    public <T> Codec<Collection<T>, JsonIO.Input, JsonIO.Output> collCodec(
+            Class<Collection<T>> collType,
+            Codec<T, JsonIO.Input, JsonIO.Output> elemCodec) {
+        return new CollectionCodec<T, JsonIO.Input, JsonIO.Output>(
+            JsonCodecCoreImpl.this,
+                elemCodec) {
             @Override
-            public JsValue encode(Collection<T> vals, JsValue enc) throws Exception {
-                final List<JsValue> nodes = new ArrayList<>(vals.size());
-                for (T val : vals) {
-                    nodes.add(elemCodec.encode(val, enc));
-                }
-                return JSAPI.arr(nodes);
+            public Class<Collection<T>> type() {
+                return collType;
             }
 
             @Override
-            public Collection<T> decode(Class<Collection<T>> dynType, JsValue enc) throws Exception {
-                final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
-                final JsArray arrNode = enc.asArray();
-                final Collection<T> vals = getTypeConstructor(dynType).construct();
-
-                for (JsValue node : arrNode) {
-                    vals.add(elemCodec.decode(dynElemType, node));
+            public JsonIO.Output encode(Collection<T> vals, JsonIO.Output out) {
+                out.startArray();
+                for (T val : vals) {
+                    elemCodec.encodeWithCheck(val, out);
                 }
+                return out.endArray();
+            }
+
+            @Override
+            public Collection<T> decode(JsonIO.Input in) {
+                final Collection<T> vals = getTypeConstructor(collType).construct();
+
+                in.startArray();
+
+                while(in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                    vals.add(elemCodec.decodeWithCheck(in));
+                }
+
+                in.endArray();
 
                 return vals;
-
             }
         };
     }
 
     @Override
-    public <T> Codec<T[], JsValue> objectArrayCodec(Class<T> elemType, Codec<T, JsValue> elemCodec) {
-        return new Codec<T[], JsValue>() {
+    public <T> Codec<T[], JsonIO.Input, JsonIO.Output> objectArrayCodec(
+            Class<T[]> arrType,
+            Class<T> elemType,
+            Codec<T, JsonIO.Input, JsonIO.Output> elemCodec) {
+        return new Codec<T[], JsonIO.Input, JsonIO.Output>() {
             @Override
-            public JsValue encode(T[] vals, JsValue enc) throws Exception {
-                final List<JsValue> nodes = new ArrayList<>(vals.length);
-                for (T val : vals) {
-                    nodes.add(elemCodec.encode(val, enc));
-                }
-                return JSAPI.arr(nodes);
+            public CodecCoreIntl<JsonIO.Input, JsonIO.Output> core() {
+                return JsonCodecCoreImpl.this;
             }
 
             @Override
-            public T[] decode(Class<T[]> dynType, JsValue enc) throws Exception {
-                final Class<T> dynElemType = (Class<T>)dynType.getComponentType();
-                final JsArray arrNode = enc.asArray();
-                final T[] vals = (T[]) Array.newInstance(elemType, arrNode.size());
+            public Class<T[]> type() {
+                return arrType;
+            }
+
+            @Override
+            public JsonIO.Output encode(T[] vals, JsonIO.Output out) {
+                out.startArray();
+                for (T val : vals) {
+                    elemCodec.encodeWithCheck(val, out);
+                }
+                return out.endArray();
+            }
+
+            @Override
+            public T[] decode(JsonIO.Input in) {
+                T[] arr = (T[]) Array.newInstance(elemType, defaultArrSize());
+
+                in.startArray();
                 int i = 0;
-                for (JsValue node : arrNode) {
-                    vals[i++] = elemCodec.decode(dynElemType, node);
-                }
-                return vals;
-            }
-        };
-    }
-
-    @Override
-    public <T> Codec<T, JsValue> dynamicCodec(Class<T> stcType) {
-        return new Codec<T, JsValue>() {
-            @Override
-            public JsValue encode(T val, JsValue enc) throws Exception {
-                final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
-                if (dynType.equals(stcType)) {
-                    return JsonCodecCoreImpl.this.getNullUnsafeCodec(stcType).encode(val, enc);
-                } else {
-                    return JSAPI.obj(
-                            JSAPI.field(
-                                    typeFieldName(),
-                                    JSAPI.str(classToName(dynType))),
-                            JSAPI.field(
-                                    valueFieldName(),
-                                    encode2(JsonCodecCoreImpl.this.getNullUnsafeCodec(dynType), val, enc))
-                    );
-                }
-            }
-
-            protected <S extends T> JsValue encode2(Codec<S, JsValue> codec, T val, JsValue enc) throws Exception {
-                return codec.encode((S)val, enc);
-            }
-
-            @Override
-            public T decode(JsValue enc) throws Exception {
-                if (enc.isObject()) {
-                    final JsObject objNode = enc.asObject();
-                    final String typeFieldName = typeFieldName();
-                    final String valueFieldName = valueFieldName();
-                    if (objNode.size() == 2 &&
-                            objNode.containsName(typeFieldName) &&
-                            objNode.containsName(valueFieldName)) {
-                        final JsValue typeNode = objNode.get(typeFieldName());
-                        final JsValue valueNode = objNode.get(valueFieldName());
-                        return decode2(valueNode, nameToClass(typeNode.asString().getValue()));
+                while (in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.ARRAY_END) {
+                    if (i == arr.length) {
+                        arr = Arrays.copyOf(arr, arr.length * 2);
                     }
+                    arr[i++] = elemCodec.decodeWithCheck(in);
                 }
+                in.endArray();
 
-                final Codec<T, JsValue> codec = JsonCodecCoreImpl.this.getNullUnsafeCodec(stcType);
-                return codec.decode(stcType, enc);
-            }
-
-            protected <S extends T> S decode2(JsValue in, Class<S> dynType) throws Exception {
-                final Codec<S, JsValue> codec = JsonCodecCoreImpl.this.getNullUnsafeCodec(dynType);
-                return codec.decode(dynType, in);
+                return Arrays.copyOf(arr, i);
             }
         };
     }
 
     @Override
-    public <T> Codec<T, JsValue> dynamicCodec(Codec<T, JsValue> codec, Class<T> stcType) {
-        return new Codec<T, JsValue>() {
-            @Override
-            public JsValue encode(T val, JsValue enc) throws Exception {
-                final Class<? extends T> dynType = (Class<? extends T>)val.getClass();
-                if (dynType.equals(stcType)) {
-                    return codec.encode(val, enc);
-                } else {
-                    return JSAPI.obj(
-                            JSAPI.field(typeFieldName(), JSAPI.str(classToName(dynType))),
-                            JSAPI.field(valueFieldName(), codec.encode(val, enc))
-                    );
-                }
-            }
-
-            @Override
-            public T decode(JsValue enc) throws Exception {
-                if (enc.isObject()) {
-                    final JsObject objNode = enc.asObject();
-                    final String typeFieldName = typeFieldName();
-                    final String valueFieldName = valueFieldName();
-                    if (objNode.size() == 2 &&
-                            objNode.containsName(typeFieldName) &&
-                            objNode.containsName(valueFieldName)) {
-                        final JsValue typeNode = objNode.get(typeFieldName());
-                        final Class<?> dynType = nameToClass(typeNode.asString().getValue());
-                        final JsValue valueNode = objNode.get(valueFieldName());
-                        return codec.decode((Class<T>) dynType, valueNode);
-                    }
-                }
-
-                return codec.decode(stcType, enc);
-            }
-        };
+    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, JsonIO.Input, JsonIO.Output> createObjectCodec(
+            Class<T> type,
+            ObjectMeta<T, JsonIO.Input, JsonIO.Output, RA> objMeta) {
+        if (Modifier.isFinal(type.getModifiers())) {
+            return new FinalObjectCodec<T, RA>(this, type, objMeta);
+        } else {
+            return new ObjectCodec<T, RA>(this, type, objMeta);
+        }
     }
 
-    @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, JsValue> createObjectCodec(
-            ObjectMeta<T, JsValue, RA> objMeta) {
-        return new Codec<T, JsValue>() {
-            @Override
-            public JsValue encode(T val, JsValue enc) throws Exception {
-                final List<JsObject.Field> fields =
-                        FunctorsGenEx.map(
-                                field -> JSAPI.field(field.name(), field.encodeField(val, enc)),
-                                objMeta
-                        );
-                return JSAPI.obj(fields);
+    private static class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+            extends Codec.Base<T, JsonIO.Input, JsonIO.Output> {
+
+        private final Class<T> type;
+        private final ObjectMeta<T, JsonIO.Input, JsonIO.Output, RA> objMeta;
+        private final Map<String, ObjectMeta.Field<T, JsonIO.Input, JsonIO.Output, RA>> fields;
+
+        private ObjectCodec(
+                CodecCoreIntl<JsonIO.Input, JsonIO.Output> core,
+                Class<T> type,
+                ObjectMeta<T, JsonIO.Input, JsonIO.Output, RA> objMeta) {
+            super(core);
+            this.type = type;
+            this.objMeta = objMeta;
+            this.fields = objMeta.stream()
+                    .collect(toLinkedHashMap(
+                            ObjectMeta.Field::name,
+                            f -> f
+                    ));
+        }
+
+        @Override
+        public Class<T> type() {
+            return type;
+        }
+
+        @Override
+        public JsonIO.Output encode(T val, JsonIO.Output out) {
+            out.startObject();
+
+            fields.forEach((name, field) -> {
+                out.writeField(field.name());
+                field.encodeField(val, out);
+            });
+
+            return out.endObject();
+        }
+
+        @Override
+        public T decode(JsonIO.Input in) {
+            in.startObject();
+
+            final Set<String> expKeys = fields.keySet();
+            final Set<String> setFields = new HashSet<>();
+            final RA ra = objMeta.startDecode();
+
+            while(in.notEOF() && in.currentEventType() != JsonIO.Input.Event.Type.OBJECT_END) {
+                final String name = in.readFieldName();
+                if (!expKeys.contains(name)) {
+                    throw new CodecException("Field name '" + name + "' unexpected for type " + type);
+                } else if (setFields.contains(name)) {
+                    throw new CodecException("Duplicate field name '" + name + "' for type " + type);
+                }
+                setFields.add(name);
+                fields.get(name).decodeField(ra, in);
             }
 
-            @Override
-            public T decode(Class<T> dynType, JsValue enc) throws Exception {
-                final JsObject objNode = enc.asObject();
-                return FoldsGenEx.foldLeft(
-                        (acc, field) -> field.decodeField(acc, objNode.get(field.name())),
-                        objMeta.startDecode(dynType),
-                        objMeta
-                ).construct();
+            if (!setFields.equals(expKeys)) {
+                // TODO more informative error message.
+                throw new CodecException("Encountered fields differs to expected fields for type " + type);
             }
-        };
+
+            in.endObject();
+
+            return ra.construct();
+        }
+    }
+
+    private static class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+            extends ObjectCodec<T, RA>
+            implements Codec.FinalCodec<T, JsonIO.Input, JsonIO.Output> {
+
+        private FinalObjectCodec(
+                CodecCoreIntl<JsonIO.Input, JsonIO.Output> core,
+                Class<T> type,
+                ObjectMeta<T, JsonIO.Input, JsonIO.Output, RA> objMeta) {
+            super(core, type, objMeta);
+        }
     }
 }

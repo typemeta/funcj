@@ -1,105 +1,134 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.functions.*;
-import org.typemeta.funcj.json.model.*;
+import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.MapCodecs.*;
+import org.typemeta.funcj.codec.json.JsonIO.Input;
+import org.typemeta.funcj.codec.json.JsonIO.Output;
 
-import java.util.*;
-
-import static java.util.stream.Collectors.toList;
-import static org.typemeta.funcj.util.Exceptions.*;
+import java.util.Map;
 
 public abstract class JsonMapCodecs {
 
-    public static class MapCodec<K, V> implements Codec<Map<K, V>, JsValue> {
+    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Input, Output> {
         private final JsonCodecCoreImpl core;
-        private final Codec<K, JsValue> keyCodec;
-        private final Codec<V, JsValue> valueCodec;
 
         public MapCodec(
                 JsonCodecCoreImpl core,
-                Codec<K, JsValue> keyCodec,
-                Codec<V, JsValue> valueCodec) {
+                Class<Map<K, V>> type,
+                Codec<K, Input, Output> keyCodec,
+                Codec<V, Input, Output> valueCodec) {
+            super(type, keyCodec, valueCodec);
             this.core = core;
-            this.keyCodec = keyCodec;
-            this.valueCodec = valueCodec;
         }
 
         @Override
-        public JsValue encode(Map<K, V> map, JsValue enc) throws Exception {
-            final String keyFieldName = core.keyFieldName();
-            final String valueFieldName = core.valueFieldName();
-
-            final List<JsValue> nodes = unwrap(() ->
-                    map.entrySet().stream()
-                            .map(en -> wrap(() ->
-                                JSAPI.obj(
-                                        JSAPI.field(keyFieldName, keyCodec.encode(en.getKey(), enc)),
-                                        JSAPI.field(valueFieldName, valueCodec.encode(en.getValue(), enc))
-                                )
-                            )).collect(toList())
-            );
-
-            return JSAPI.arr(nodes);
+        public CodecCoreIntl<Input, Output> core() {
+            return core;
         }
 
         @Override
-        public Map<K, V> decode(Class<Map<K, V>> dynType, JsValue enc) throws Exception {
+        public Output encode(Map<K, V> map, Output out) {
             final String keyFieldName = core.keyFieldName();
             final String valueFieldName = core.valueFieldName();
 
-            final Functions.F<Map<K, V>, SideEffectEx.F<JsValue>> decodeF = m -> elemNode -> {
-                final JsObject elemObj = elemNode.asObject();
-                final K key = keyCodec.decode(elemObj.get(keyFieldName));
-                final V val = valueCodec.decode(elemObj.get(valueFieldName));
-                m.put(key, val);
-            };
+            out.startArray();
 
-            final Map<K, V> map = core.getTypeConstructor(dynType).construct();
+            map.forEach((k, v) -> {
+                out.startObject();
+                out.writeField(keyFieldName);
+                keyCodec.encodeWithCheck(k, out);
+                out.writeField(valueFieldName);
+                valueCodec.encodeWithCheck(v, out);
+                out.endObject();
+            });
 
-            final JsArray jsArr = enc.asArray();
-            final SideEffectEx.F<JsValue> decode = decodeF.apply(map);
-            unwrap(() -> jsArr.forEach(wrap(decode)::apply));
+            return out.endArray();
+        }
+
+        @Override
+        public Map<K, V> decode(Input in) {
+            final String keyFieldName = core.keyFieldName();
+            final String valueFieldName = core.valueFieldName();
+
+            final Map<K, V> map = core.getTypeConstructor(type).construct();
+
+            in.startArray();
+
+            while(in.notEOF() && in.currentEventType() == Input.Event.Type.OBJECT_START) {
+                K key = null;
+                V val = null;
+
+                in.startObject();
+
+                while (key == null || val == null) {
+                    final String name = in.readFieldName();
+                    if (name.equals(keyFieldName)) {
+                        if (key == null) {
+                            key = keyCodec.decodeWithCheck(in);
+                        } else {
+                            throw new CodecException("Duplicate fields called " + keyFieldName);
+                        }
+                    } else if (name.equals(valueFieldName)) {
+                        if (val == null) {
+                            val = valueCodec.decodeWithCheck(in);
+                        } else {
+                            throw new CodecException("Duplicate fields called " + valueFieldName);
+                        }
+                    }
+                }
+
+                map.put(key, val);
+
+                in.endObject();
+            }
+
+            in.endArray();
 
             return map;
         }
     }
 
-    public static class StringMapCodec<V> implements Codec<Map<String, V>, JsValue> {
+    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, Input, Output> {
         private final JsonCodecCoreImpl core;
-        private final Codec<V, JsValue> valueCodec;
 
-        public StringMapCodec(JsonCodecCoreImpl core, Codec<V, JsValue> valueCodec) {
+        public StringMapCodec(
+                JsonCodecCoreImpl core,
+                Class<Map<String, V>> type,
+                Codec<V, Input, Output> valueCodec) {
+            super(type, valueCodec);
             this.core = core;
-            this.valueCodec = valueCodec;
         }
 
         @Override
-        public JsValue encode(Map<String, V> map, JsValue enc) throws Exception {
-            final List<JsObject.Field> fields = new ArrayList<>(map.size());
-
-            unwrap(() ->
-                    map.forEach((k, v) -> {
-                            final JsValue value = wrap(() -> valueCodec.encode(v, enc));
-                            fields.add(JSAPI.field(k, value));
-                    })
-            );
-
-            return JSAPI.obj(fields);
+        public CodecCoreIntl<Input, Output> core() {
+            return core;
         }
 
         @Override
-        public Map<String, V> decode(Class<Map<String, V>> dynType, JsValue enc) throws Exception {
-            final JsObject objNode = enc.asObject();
+        public Output encode(Map<String, V> map, Output out) {
+            out.startObject();
 
-            final Map<String, V> map = core.getTypeConstructor(dynType).construct();
+            map.forEach((key, val) -> {
+                out.writeField(key);
+                valueCodec.encodeWithCheck(val, out);
+            });
 
-            unwrap(() ->
-                    objNode.forEach(field -> {
-                            final V value = wrap(() -> valueCodec.decode(field.getValue()));
-                            map.put(field.getName(), value);
-                    })
-            );
+            return out.endObject();
+        }
+
+        @Override
+        public Map<String, V> decode(Input in) {
+            in.startObject();
+
+            final Map<String, V> map = core.getTypeConstructor(type).construct();
+
+            while(in.notEOF() && in.currentEventType() == Input.Event.Type.FIELD_NAME) {
+                final String key = in.readFieldName();
+                final V val = valueCodec.decodeWithCheck(in);
+                map.put(key, val);
+            }
+
+            in.endObject();
 
             return map;
         }

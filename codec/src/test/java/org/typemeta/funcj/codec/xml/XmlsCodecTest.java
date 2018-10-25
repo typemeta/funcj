@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.json;
+package org.typemeta.funcj.codec.xml;
 
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
@@ -6,9 +6,10 @@ import org.typemeta.funcj.codec.*;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-public class JsonCodecTest extends TestBase {
+public class XmlsCodecTest extends TestBase {
+    final static XmlCodecCore codec = Codecs.xmlCodec();
 
-    final static JsonCodecCore codec = Codecs.jsonsCodec();
+    public static final String rootElemName = "root";
 
     static {
         codec.registerTypeConstructor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
@@ -18,7 +19,7 @@ public class JsonCodecTest extends TestBase {
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
         final StringWriter sw = new StringWriter();
-        codec.encode(clazz, val, sw);
+        codec.encode(clazz, val, sw, rootElemName);
 
         final StringReader sr = new StringReader(sw.toString());
 
@@ -26,7 +27,7 @@ public class JsonCodecTest extends TestBase {
             System.out.println(sw);
         }
 
-        final T val2 = codec.decode(clazz, sr);
+        final T val2 = codec.decode(clazz, sr, rootElemName);
 
         if (!printData && !val.equals(val2)) {
             System.out.println(sw);

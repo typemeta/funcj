@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.byteio.*;
-import org.typemeta.funcj.codec.json.*;
+import org.typemeta.funcj.codec.bytes.*;
 import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.functions.Functions.F;
 
@@ -13,12 +12,11 @@ import java.time.*;
 public abstract class Codecs {
 
     /**
-     * Construct and return a new instance of a {@link JsonCodecCore}.
+     * Construct and return a new instance of a {@link org.typemeta.funcj.codec.json.JsonCodecCore}.
      * @return the new {@code JsonCodecCore}
      */
-    public static JsonCodecCore jsonCodec() {
-        final JsonCodecCoreImpl codec = new JsonCodecCoreImpl();
-        return JsonCodecs.registerAll(codec);
+    public static org.typemeta.funcj.codec.json.JsonCodecCore jsonsCodec() {
+        return org.typemeta.funcj.codec.json.JsonCodecs.registerAll(new org.typemeta.funcj.codec.json.JsonCodecCoreImpl());
     }
 
     /**
@@ -39,9 +37,13 @@ public abstract class Codecs {
         return ByteCodecs.registerAll(codec);
     }
 
-    public static <E, C extends CodecCoreIntl<E>> C registerAll(C core) {
+    public static <IN, OUT, C extends CodecCoreIntl<IN, OUT>> C registerAll(C core) {
 
-        core.registerCodec(Class.class, new ClassCodec<E>(core));
+        core.registerStringProxyCodec(
+                Class.class,
+                core::classToName,
+                core::nameToClass
+        );
 
         core.registerTypeProxy("java.time.ZoneRegion", ZoneId.class);
 
@@ -92,67 +94,62 @@ public abstract class Codecs {
 
     /**
      * Base class for {@code Codec}s.
-     * @param <T> the raw type to be encoded/decoded
-     * @param <E> the encoded type
+     * @param <T>       the raw type to be encoded/decoded
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
-    public static abstract class CodecBase<T, E> implements Codec<T, E> {
+    public static abstract class CodecBase<T, IN, OUT> implements Codec<T, IN, OUT> {
 
-        protected final CodecCoreIntl<E> core;
+        protected final CodecCoreIntl<IN, OUT> core;
 
-        protected CodecBase(CodecCoreIntl<E> core) {
+        protected CodecBase(CodecCoreIntl<IN, OUT> core) {
             this.core = core;
         }
-    }
-
-    /**
-     * A {@code Codec} for the {@link Class} type.
-     * @param <E> the encoded type
-     */
-    public static class ClassCodec<E> extends CodecBase<Class, E> {
-
-        protected ClassCodec(CodecCoreIntl<E> core) {
-            super(core);
-        }
 
         @Override
-        public E encode(Class val, E enc) throws Exception {
-            return core.stringCodec().encode(core.classToName(val), enc);
+        public CodecCoreIntl<IN, OUT> core() {
+            return core;
         }
 
-        @Override
-        public Class decode(E enc) throws Exception {
-            return core.nameToClass(core.stringCodec().decode(enc));
-        }
     }
 
     /**
      * Utility class for creating a {@code Codec} that encodes a type
      * as a {@code String}.
      * @param <T> the raw type to be encoded/decoded
-     * @param <E> the encoded type
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
      */
-    public static class StringProxyCodec<T, E> extends CodecBase<T, E> {
+    public static class StringProxyCodec<T, IN, OUT> extends CodecBase<T, IN, OUT> {
 
+        protected final Class<T> type;
         protected final F<T, String> encode;
         protected final F<String, T> decode;
 
         public StringProxyCodec(
-                CodecCoreIntl<E> core,
+                CodecCoreIntl<IN, OUT> core,
+                Class<T> type,
                 F<T, String> encode,
                 F<String, T> decode) {
             super(core);
+            this.type = type;
             this.encode = encode;
             this.decode = decode;
         }
 
         @Override
-        public E encode(T val, E enc) throws Exception {
-            return core.stringCodec().encode(encode.apply(val), enc);
+        public Class<T> type() {
+            return type;
         }
 
         @Override
-        public T decode(E enc) throws Exception {
-            return decode.apply(core.stringCodec().decode(enc));
+        public OUT encode(T val, OUT out) {
+            return core.stringCodec().encode(encode.apply(val), out);
+        }
+
+        @Override
+        public T decode(IN in) {
+            return decode.apply(core.stringCodec().decode(in));
         }
     }
 }

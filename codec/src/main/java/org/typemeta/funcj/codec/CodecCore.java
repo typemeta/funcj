@@ -3,12 +3,13 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.functions.Functions;
 
 /**
- * Interface for classes which providing an encoding into a specific target type {@code E}.
+ * Interface for classes which providing an encoding into a specific target type.
  * Unlike {@link Codec}, which can only encode a single type,
  * {@code CodecCore} implementations will handle any type.
- * @param <E>       the encoded type
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
  */
-public interface CodecCore<E> {
+public interface CodecCore<IN, OUT> {
 
     /**
      * Register a {@code Codec} for a class.
@@ -16,7 +17,7 @@ public interface CodecCore<E> {
      * @param codec     the codec
      * @param <T>       the codec value type
      */
-    <T> void registerCodec(Class<? extends T> clazz, Codec<T, E> codec);
+    <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec);
 
     /**
      * Register a {@code Codec} for a class.
@@ -24,7 +25,7 @@ public interface CodecCore<E> {
      * @param codec     the codec
      * @param <T>       the codec value type
      */
-    <T> void registerCodec(String name, Codec<T, E> codec);
+    <T> void registerCodec(String name, Codec<T, IN, OUT> codec);
 
     /**
      * Create a {@code ObjectCodecBuilder} for the specified class.
@@ -35,7 +36,7 @@ public interface CodecCore<E> {
      * @param <T>       the codec value type
      * @return          an {@code ObjectCodecBuilder}
      */
-    <T> ObjectCodecBuilder<T, E> registerCodec(Class<T> clazz);
+    <T> ObjectCodecBuilder<T, IN, OUT> registerCodec(Class<T> clazz);
 
     /**
      * Create and register a {@link Codecs.StringProxyCodec} for a class.
@@ -76,33 +77,21 @@ public interface CodecCore<E> {
             TypeConstructor<T> typeCtor);
 
     /**
-     * Encode a non-null value of type {@code T} into encoded form {@code E}
-     * @param val       the value to encode
-     * @param enc       the encoded parent (may be null for certain encodings)
-     * @param <T>       the decoded value type
-     * @return          the encoded value
-     * @throws Exception the exception
-     */
-    <T> E encode(T val, E enc) throws Exception;
-
-    /**
      * Encode a value of type {@code T} into encoded form {@code E}.
      * @param type      the class of the decoded value
      * @param val       the value to encode
-     * @param enc       the encoded parent (may be null for certain encodings)
+     * @param out       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
      * @return          the encoded value
-     * @throws Exception the exception
      */
-    <T> E encode(Class<T> type, T val, E enc) throws Exception;
+    <T> OUT encode(Class<T> type, T val, OUT out);
 
     /**
      * Decode a value of type {@code T} from encoded value of type {@code E}.
      * @param type      the type of the decoded value
-     * @param enc       the value to decode
+     * @param in        the value to decode
      * @param <T>       the decoded value type
      * @return          the decoded value
-     * @throws Exception the exception
      */
-    <T> T decode(Class<T> type, E enc) throws Exception;
+    <T> T decode(Class<T> type, IN in);
 }

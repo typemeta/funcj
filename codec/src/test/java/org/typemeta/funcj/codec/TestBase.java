@@ -121,12 +121,12 @@ public abstract class TestBase {
         roundTrip(TestTypes.NoEmptyCtor.create(true), TestTypes.NoEmptyCtor.class);
     }
 
-    public static <E> void registerCustomCodec(CodecCore<E> core) {
+    public static <IN, OUT> void registerCustomCodec(CodecCore<IN, OUT> core) {
         core.registerCodec(TestTypes.Custom.class)
-                .nullField("colour", c -> c.colour, TestTypes.Custom.Colour.class)
-                .nullField("date", c -> c.date, LocalDate.class)
+                .field("colour", c -> c.colour, TestTypes.Custom.Colour.class)
+                .field("date", c -> c.date, LocalDate.class)
                 .field("flag", c -> c.flag, Boolean.class)
-                .nullField("name", c -> c.name, String.class)
+                .field("name", c -> c.name, String.class)
                 .field("age", c -> c.age, Double.class)
                 .map(args -> new TestTypes.Custom(
                         (TestTypes.Custom.Colour)args[0],
