@@ -712,14 +712,14 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
     }
 
     @Override
-    public <V> Codec<Map<String, V>, Input, Output> mapCodec(
+    public <V> Codec<Map<String, V>, Input, Output> createMapCodec(
             Class<Map<String, V>> type,
             Codec<V, Input, Output> valueCodec) {
         return new XmlMapCodecs.StringMapCodec<V>(this, type, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, Input, Output> mapCodec(
+    public <K, V> Codec<Map<K, V>, Input, Output> createMapCodec(
             Class<Map<K, V>> type,
             Codec<K, Input, Output> keyCodec,
             Codec<V, Input, Output> valueCodec) {
@@ -727,7 +727,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
     }
 
     @Override
-    public <T> Codec<Collection<T>, Input, Output> collCodec(
+    public <T> Codec<Collection<T>, Input, Output> createCollCodec(
             Class<Collection<T>> collType,
             Codec<T, Input, Output> elemCodec) {
         return new CollectionCodec<T, Input, Output>(
@@ -767,7 +767,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
     }
 
     @Override
-    public <T> Codec<T[], Input, Output> objectArrayCodec(
+    public <T> Codec<T[], Input, Output> createObjectArrayCodec(
             Class<T[]> arrType,
             Class<T> elemType,
             Codec<T, Input, Output> elemCodec) {

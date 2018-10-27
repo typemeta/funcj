@@ -4,6 +4,7 @@ import org.typemeta.funcj.functions.Functions;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -15,6 +16,8 @@ import java.util.stream.StreamSupport;
 public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
     String classToName(Class<?> clazz);
+
+    String classToName(Class<?> clazz, Class<?>... classes);
 
     <X> Class<X> remapType(Class<X> type);
 
@@ -76,30 +79,33 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
     <EM extends Enum<EM>> Codec<EM, IN, OUT> enumCodec(Class<EM> enumType);
 
-    <K, V> Codec<Map<K, V>, IN, OUT> mapCodec(
+    <T> Codec<T, IN, OUT> getCodec(Class<T> type);
+
+    <T> Codec<T, IN, OUT> getCodec(
+            String name,
+            Supplier<Codec<T, IN, OUT>> supp);
+
+    <T> Codec<Collection<T>, IN, OUT> getCollCodec(
+            Class<Collection<T>> collType,
+            Codec<T, IN, OUT> elemCodec);
+
+    <K, V> Codec<Map<K, V>, IN, OUT> getMapCodec(
             Class<Map<K, V>> mapType,
             Class<K> keyType,
             Class<V> valType);
 
-    <V> Codec<Map<String, V>, IN, OUT> mapCodec(
-            Class<Map<String, V>> type,
-            Codec<V, IN, OUT> valueCodec);
+    <V> Codec<Map<String, V>, IN, OUT> getMapCodec(
+            Class<Map<String, V>> mapType,
+            Class<V> valType);
 
-    <K, V> Codec<Map<K, V>, IN, OUT> mapCodec(
-            Class<Map<K, V>> type,
+    <K, V> Codec<Map<K, V>, IN, OUT> getMapCodec(
+            Class<Map<K, V>> mapType,
             Codec<K, IN, OUT> keyCodec,
             Codec<V, IN, OUT> valueCodec);
 
-    <T> Codec<Collection<T>, IN, OUT> collCodec(
-            Class<Collection<T>> collType,
-            Codec<T, IN, OUT> elemCodec);
-
-    <T> Codec<T[], IN, OUT> objectArrayCodec(
-            Class<T[]> arrType,
-            Class<T> elemType,
-            Codec<T, IN, OUT> elemCodec);
-
-    <T> Codec<T, IN, OUT> getCodec(Class<T> type);
+    <V> Codec<Map<String, V>, IN, OUT> getMapCodec(
+            Class<Map<String, V>> mapType,
+            Codec<V, IN, OUT> valueCodec);
 
     <T> Codec<T, IN, OUT> createCodec(Class<T> type);
 
@@ -107,7 +113,34 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
             Class<T> type,
             Map<String, FieldCodec<IN, OUT>> fieldCodecs);
 
-    <T> ObjectCodecBuilder<T, IN, OUT> objectCodec(Class<T> type);
+    <K, V> Codec<Map<K, V>, IN, OUT> createMapCodec(
+            Class<Map<K, V>> mapType,
+            Class<K> keyType,
+            Class<V> valType);
+
+    <V> Codec<Map<String, V>, IN, OUT> createMapCodec(
+            Class<Map<String, V>> type,
+            Class<V> valType);
+
+    <V> Codec<Map<String, V>, IN, OUT> createMapCodec(
+            Class<Map<String, V>> type,
+            Codec<V, IN, OUT> valueCodec);
+
+    <K, V> Codec<Map<K, V>, IN, OUT> createMapCodec(
+            Class<Map<K, V>> type,
+            Codec<K, IN, OUT> keyCodec,
+            Codec<V, IN, OUT> valueCodec);
+
+    <T> Codec<Collection<T>, IN, OUT> createCollCodec(
+            Class<Collection<T>> collType,
+            Codec<T, IN, OUT> elemCodec);
+
+    <T> Codec<T[], IN, OUT> createObjectArrayCodec(
+            Class<T[]> arrType,
+            Class<T> elemType,
+            Codec<T, IN, OUT> elemCodec);
+
+    <T> ObjectCodecBuilder<T, IN, OUT> createObjectCodecBuilder(Class<T> type);
 
     <T> ObjectCodecBuilder<T, IN, OUT> objectCodecDeferredRegister(Class<T> type);
 

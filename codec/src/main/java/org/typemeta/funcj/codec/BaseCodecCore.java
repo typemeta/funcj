@@ -8,6 +8,8 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -109,6 +111,25 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
+    public String classToName(Class<?> clazz, Class<?>... classes) {
+        switch (classes.length) {
+            case 1:
+                return classToName(clazz) + '|' + classToName(classes[0]);
+            case 2:
+                return classToName(clazz) + '|' + classToName(classes[0])
+                        + '|' + classToName(classes[1]);
+            default: {
+                final StringBuilder sb = new StringBuilder();
+                sb.append(classToName(clazz)).append('|');
+                for (Class<?> cls : classes) {
+                    sb.append(classToName(cls)).append('|');
+                }
+                return sb.toString();
+            }
+        }
+    }
+
+    @Override
     public <X> Class<X> remapType(Class<X> type) {
         final String typeName = classToName(type);
         if (typeProxyRegistry.containsKey(typeName)) {
@@ -134,21 +155,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                 name,
                 n -> TypeConstructor.create(clazz));
     }
-
-    @Override
-    public <K, V> Codec<Map<K, V>, IN, OUT> mapCodec(
-            Class<Map<K, V>> mapType,
-            Class<K> keyType,
-            Class<V> valType)  {
-        final Codec<V, IN, OUT> valueCodec = getCodec(valType);
-        if (String.class.equals(keyType)) {
-            return (Codec)mapCodec((Class<Map<String, V>>)(Class)mapType, valueCodec);
-        } else {
-            final Codec<K, IN, OUT> keyCodec = getCodec(keyType);
-            return mapCodec(mapType, keyCodec, valueCodec);
-        }
-    }
-
     /**
      * Lookup a {@code Codec} for a name, and, if one doesn't exist,
      * then create a new one.
@@ -161,8 +167,23 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
      */
     @Override
     public <T> Codec<T, IN, OUT> getCodec(Class<T> type) {
-        final String name = classToName(type);
+        return getCodec(classToName(type), () -> createCodec(type));
+    }
 
+    /**
+     * Lookup a {@code Codec} for a name, and, if one doesn't exist,
+     * then create a new one.
+     * <p>
+     * This is slightly tricky as it needs to be re-entrant in case the
+     * type in question is recursive.
+     * @param name      the type name
+     * @param <T>       the raw type to be encoded/decoded
+     * @return          the {@code Codec} for the specified name
+     */
+    @Override
+    public <T> Codec<T, IN, OUT> getCodec(
+            String name,
+            Supplier<Codec<T, IN, OUT>> supp) {
         // First attempt, without locking.
         if (codecRegistry.containsKey(name)) {
             return (Codec<T, IN, OUT>)codecRegistry.get(name);
@@ -180,9 +201,73 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             }
 
             // Initialise the CodecRef, and overwrite the registry entry with the real Codec.
-            codecRegistry.put(name, codecRef.setIfUninitialised(() -> createCodec(type)));
+            codecRegistry.put(name, codecRef.setIfUninitialised(supp::get));
 
             return (Codec<T, IN, OUT>)codecRegistry.get(name);
+        }
+    }
+
+    @Override
+    public <T> Codec<Collection<T>, IN, OUT> getCollCodec(
+            Class<Collection<T>> collType,
+            Codec<T, IN, OUT> elemCodec) {
+        final String name = classToName(collType, elemCodec.type());
+        return getCodec(name, () -> createCollCodec(collType, elemCodec));
+    }
+
+    @Override
+    public <K, V> Codec<Map<K, V>, IN, OUT> getMapCodec(
+            Class<Map<K, V>> mapType,
+            Class<K> keyType,
+            Class<V> valType) {
+        final String name = classToName(mapType, keyType, valType);
+        return getCodec(name, () -> createMapCodec(mapType, keyType, valType));
+    }
+
+    @Override
+    public <V> Codec<Map<String, V>, IN, OUT> createMapCodec(
+            Class<Map<String, V>> mapType,
+            Class<V> valType) {
+        final String name = classToName(mapType, String.class, valType);
+        return getCodec(name, () -> createMapCodec(mapType, valType));
+    }
+
+    @Override
+    public <V> Codec<Map<String, V>, IN, OUT> getMapCodec(
+            Class<Map<String, V>> mapType,
+            Class<V> valType) {
+        final String name = classToName(mapType, String.class, valType);
+        return getCodec(name, () -> createMapCodec(mapType, valType));
+    }
+
+    @Override
+    public <K, V> Codec<Map<K, V>, IN, OUT> getMapCodec(
+            Class<Map<K, V>> mapType,
+            Codec<K, IN, OUT> keyCodec,
+            Codec<V, IN, OUT> valueCodec) {
+        final String name = classToName(mapType, keyCodec.type(), valueCodec.type());
+        return getCodec(name, () -> createMapCodec(mapType, keyCodec, valueCodec));
+    }
+
+    @Override
+    public <V> Codec<Map<String, V>, IN, OUT> getMapCodec(
+            Class<Map<String, V>> mapType,
+            Codec<V, IN, OUT> valueCodec) {
+        final String name = classToName(mapType, String.class, valueCodec.type());
+        return getCodec(name, () -> createMapCodec(mapType, valueCodec));
+    }
+
+    @Override
+    public <K, V> Codec<Map<K, V>, IN, OUT> createMapCodec(
+            Class<Map<K, V>> mapType,
+            Class<K> keyType,
+            Class<V> valType)  {
+        final Codec<V, IN, OUT> valueCodec = getCodec(valType);
+        if (String.class.equals(keyType)) {
+            return (Codec)createMapCodec((Class<Map<String, V>>)(Class)mapType, valueCodec);
+        } else {
+            final Codec<K, IN, OUT> keyCodec = getCodec(keyType);
+            return createMapCodec(mapType, keyCodec, valueCodec);
         }
     }
 
@@ -229,24 +314,24 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                     return (Codec<T, IN, OUT>) doubleArrayCodec();
                 } else {
                     if (elemType.equals(Boolean.class)) {
-                        return (Codec<T, IN, OUT>) objectArrayCodec((Class)type, Boolean.class, booleanCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Boolean.class, booleanCodec());
                     } else if (elemType.equals(Byte.class)) {
-                        return (Codec<T, IN, OUT>) objectArrayCodec((Class)type, Byte.class, byteCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Byte.class, byteCodec());
                     } else if (elemType.equals(Character.class)) {
-                        return (Codec<T, IN, OUT>) objectArrayCodec((Class)type, Character.class, charCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Character.class, charCodec());
                     } else if (elemType.equals(Short.class)) {
-                        return (Codec<T, IN, OUT>) objectArrayCodec((Class)type, Short.class, shortCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Short.class, shortCodec());
                     } else if (elemType.equals(Integer.class)) {
-                        return (Codec<T, IN, OUT>) objectArrayCodec((Class)type, Integer.class, intCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Integer.class, intCodec());
                     } else if (elemType.equals(Long.class)) {
-                        return (Codec<T, IN, OUT>) objectArrayCodec((Class)type, Long.class, longCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Long.class, longCodec());
                     } else if (elemType.equals(Float.class)) {
-                        return (Codec<T, IN, OUT>) objectArrayCodec((Class)type, Float.class, floatCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Float.class, floatCodec());
                     } else if (elemType.equals(Double.class)) {
-                        return (Codec<T, IN, OUT>) objectArrayCodec((Class)type, Double.class, doubleCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Double.class, doubleCodec());
                     } else {
                         final Codec<Object, IN, OUT> elemCodec = getCodec((Class<Object>)elemType);
-                        return (Codec<T, IN, OUT>) objectArrayCodec((Class)type, (Class<Object>) elemType, elemCodec);
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, (Class<Object>) elemType, elemCodec);
                     }
                 }
             } else if (type.isEnum()) {
@@ -274,9 +359,9 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                 if (typeArgs.size() == 2) {
                     final Class keyType = typeArgs.get(0);
                     final Class valueType = typeArgs.get(1);
-                    return (Codec<T, IN, OUT>) mapCodec((Class)type, keyType, valueType);
+                    return (Codec<T, IN, OUT>) getMapCodec((Class)type, keyType, valueType);
                 } else {
-                    return (Codec<T, IN, OUT>) mapCodec((Class)type, Object.class, Object.class);
+                    return (Codec<T, IN, OUT>) getMapCodec((Class)type, Object.class, Object.class);
                 }
             } else if (Collection.class.isAssignableFrom(type)) {
                 final Codec<Object, IN, OUT> elemCodec;
@@ -287,7 +372,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                 } else {
                     elemCodec = getCodec(Object.class);
                 }
-                return (Codec<T, IN, OUT>) collCodec((Class<Collection<Object>>) type, elemCodec);
+                return (Codec<T, IN, OUT>) getCollCodec((Class<Collection<Object>>) type, elemCodec);
             } else {
                 return createObjectCodec(type);
             }
@@ -376,7 +461,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> ObjectCodecBuilder<T, IN, OUT> objectCodec(Class<T> type) {
+    public <T> ObjectCodecBuilder<T, IN, OUT> createObjectCodecBuilder(Class<T> type) {
         return new ObjectCodecBuilder<T, IN, OUT>(this, type);
     }
 
@@ -527,9 +612,9 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                 if (typeArgs.size() == 2) {
                     final Class keyType = typeArgs.get(0);
                     final Class valueType = typeArgs.get(1);
-                    codec = (Codec<T, IN, OUT>) mapCodec((Class)type, keyType, valueType);
+                    codec = (Codec<T, IN, OUT>) getMapCodec((Class)type, keyType, valueType);
                 } else {
-                    codec = (Codec<T, IN, OUT>) mapCodec((Class)type, Object.class, Object.class);
+                    codec = (Codec<T, IN, OUT>) getMapCodec((Class)type, Object.class, Object.class);
                 }
             } else if (Collection.class.isAssignableFrom(type)) {
                 final Codec<Object, IN, OUT> elemCodec;
@@ -540,7 +625,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                 } else {
                     elemCodec = getCodec(Object.class);
                 }
-                codec = (Codec<T, IN, OUT>) collCodec((Class<Collection<Object>>) type, elemCodec);
+                codec = (Codec<T, IN, OUT>) getCollCodec((Class<Collection<Object>>) type, elemCodec);
             } else {
                 codec = getCodec(type);
             }

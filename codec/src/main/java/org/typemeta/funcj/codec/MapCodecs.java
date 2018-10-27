@@ -24,7 +24,7 @@ public abstract class MapCodecs {
         }
 
         protected Codec<Map<K, V>, IN, OUT> getCodec(Class<Map<K, V>> type) {
-            return core().mapCodec(type, keyCodec, valueCodec);
+            return core().getMapCodec(type, keyCodec, valueCodec);
         }
 
         @Override
@@ -45,7 +45,10 @@ public abstract class MapCodecs {
             if (core().decodeNull(in)) {
                 return null;
             } else {
-                final Map<K, V> val = core().decodeDynamicType(in);
+                final Map<K, V> val = core().decodeDynamicType(
+                        in,
+                        type -> getCodec(core().nameToClass(type)).decode(in)
+                );
                 if (val != null) {
                     return val;
                 } else {
@@ -72,7 +75,7 @@ public abstract class MapCodecs {
         }
 
         protected Codec<Map<String, V>, IN, OUT> getCodec(Class<Map<String, V>> type) {
-            return  core().mapCodec(type, valueCodec);
+            return  core().getMapCodec(type, valueCodec);
         }
 
         @Override
@@ -95,10 +98,7 @@ public abstract class MapCodecs {
             } else {
                 final Map<String, V> val = core().decodeDynamicType(
                         in,
-                        type -> core().mapCodec(
-                                core().nameToClass(type),
-                                valueCodec
-                        ).decode(in)
+                        type -> getCodec(core().nameToClass(type)).decode(in)
                 );
                 if (val != null) {
                     return val;
