@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.json;
+package org.typemeta.funcj.codec.json.io;
 
 import org.typemeta.funcj.codec.CodecException;
 
@@ -73,7 +73,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeBool(boolean value) {
+    public JsonIO.Output writeBoolean(boolean value) {
         if (pendingComma) {
             writeComma();
         }
@@ -100,7 +100,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNum(byte value) {
+    public JsonIO.Output writeNumber(byte value) {
         if (pendingComma) {
             writeComma();
         }
@@ -109,7 +109,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNum(short value) {
+    public JsonIO.Output writeNumber(short value) {
         if (pendingComma) {
             writeComma();
         }
@@ -118,7 +118,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNum(int value) {
+    public JsonIO.Output writeNumber(int value) {
         if (pendingComma) {
             writeComma();
         }
@@ -127,7 +127,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNum(long value) {
+    public JsonIO.Output writeNumber(long value) {
         if (pendingComma) {
             writeComma();
         }
@@ -136,7 +136,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNum(float value) {
+    public JsonIO.Output writeNumber(float value) {
         if (pendingComma) {
             writeComma();
         }
@@ -145,7 +145,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNum(double value) {
+    public JsonIO.Output writeNumber(double value) {
         if (pendingComma) {
             writeComma();
         }
@@ -154,7 +154,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNum(Number value) {
+    public JsonIO.Output writeNumber(Number value) {
         if (pendingComma) {
             writeComma();
         }
@@ -163,7 +163,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNum(BigDecimal value) {
+    public JsonIO.Output writeNumber(BigDecimal value) {
         if (pendingComma) {
             writeComma();
         }
@@ -172,7 +172,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNum(String value) {
+    public JsonIO.Output writeNumber(String value) {
         if (pendingComma) {
             writeComma();
         }

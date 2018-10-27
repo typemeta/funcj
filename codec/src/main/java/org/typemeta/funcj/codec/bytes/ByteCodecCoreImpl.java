@@ -1,6 +1,8 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.bytes.io.ByteIO;
+import org.typemeta.funcj.codec.bytes.io.ByteIO.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Folds;
 
@@ -11,7 +13,7 @@ import java.util.*;
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 
 @SuppressWarnings("unchecked")
-public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output> implements ByteCodecCore {
+public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements ByteCodecCore {
 
     public ByteCodecCoreImpl() {
     }
@@ -21,30 +23,30 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     }
 
     @Override
-    public <T> boolean encodeNull(T val, ByteIO.Output out) {
+    public <T> boolean encodeNull(T val, Output out) {
         final boolean isNull = val == null;
         out.writeBoolean(isNull);
         return isNull;
     }
 
     @Override
-    public boolean decodeNull(ByteIO.Input in) {
+    public boolean decodeNull(Input in) {
         return in.readBoolean();
     }
 
     @Override
     public <T> boolean encodeDynamicType(
-            Codec<T, ByteIO.Input, ByteIO.Output> codec,
+            Codec<T, Input, Output> codec,
             T val,
-            ByteIO.Output out,
-            Functions.F<Class<T>, Codec<T, ByteIO.Input, ByteIO.Output>> getDynCodec) {
+            Output out,
+            Functions.F<Class<T>, Codec<T, Input, Output>> getDynCodec) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (dynType.equals(codec.type())) {
             out.writeBoolean(false);
             return false;
         } else {
             out.writeBoolean(true);
-            final Codec<T, ByteIO.Input, ByteIO.Output> dynCodec = getDynCodec.apply(dynType);
+            final Codec<T, Input, Output> dynCodec = getDynCodec.apply(dynType);
             out.writeString(classToName(dynType));
             dynCodec.encode(val, out);
             return true;
@@ -52,7 +54,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     }
 
     @Override
-    public <T> T decodeDynamicType(ByteIO.Input in, Functions.F<String, T> decoder) {
+    public <T> T decodeDynamicType(Input in, Functions.F<String, T> decoder) {
         if (in.readBoolean()) {
             final String typeName = in.readString();
             return decoder.apply(typeName);
@@ -62,36 +64,36 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     }
 
     @Override
-    public <T> T decodeDynamicType(ByteIO.Input in) {
+    public <T> T decodeDynamicType(Input in) {
         return decodeDynamicType(in, name -> getCodec(this.<T>nameToClass(name)).decode(in));
     }
 
-    protected final Codec.BooleanCodec<ByteIO.Input, ByteIO.Output> booleanCodec =
-            new Codec.BooleanCodec<ByteIO.Input, ByteIO.Output>() {
+    protected final Codec.BooleanCodec<Input, Output> booleanCodec =
+            new Codec.BooleanCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public ByteIO.Output encodePrim(boolean val, ByteIO.Output out) {
+        public Output encodePrim(boolean val, Output out) {
             return out.writeBoolean(val);
         }
 
         @Override
-        public boolean decodePrim(ByteIO.Input in) {
+        public boolean decodePrim(Input in) {
             return in.readBoolean();
         }
     };
 
     @Override
-    public Codec.BooleanCodec<ByteIO.Input, ByteIO.Output> booleanCodec() {
+    public Codec.BooleanCodec<Input, Output> booleanCodec() {
         return booleanCodec;
     }
 
-    protected final Codec<boolean[], ByteIO.Input, ByteIO.Output> booleanArrayCodec =
-            new Codec.Base<boolean[], ByteIO.Input, ByteIO.Output>(this) {
+    protected final Codec<boolean[], Input, Output> booleanArrayCodec =
+            new Codec.Base<boolean[], Input, Output>(this) {
 
         @Override
         public Class<boolean[]> type() {
@@ -99,7 +101,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(boolean[] vals, ByteIO.Output out) {
+        public Output encode(boolean[] vals, Output out) {
             out.writeInt(vals.length);
             for (boolean val : vals) {
                 booleanCodec().encode(val, out);
@@ -108,7 +110,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public boolean[] decode(ByteIO.Input in) {
+        public boolean[] decode(Input in) {
             final int l = in.readInt();
             final boolean[] vals = new boolean[l];
 
@@ -121,36 +123,36 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     };
 
     @Override
-    public Codec<boolean[], ByteIO.Input, ByteIO.Output> booleanArrayCodec() {
+    public Codec<boolean[], Input, Output> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
-    protected final Codec.ByteCodec<ByteIO.Input, ByteIO.Output> byteCodec =
-            new Codec.ByteCodec<ByteIO.Input, ByteIO.Output>() {
+    protected final Codec.ByteCodec<Input, Output> byteCodec =
+            new Codec.ByteCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public ByteIO.Output encodePrim(byte val, ByteIO.Output out) {
+        public Output encodePrim(byte val, Output out) {
             return out.writeByte(val);
         }
 
         @Override
-        public byte decodePrim(ByteIO.Input in) {
+        public byte decodePrim(Input in) {
             return in.readByte();
         }
     };
 
     @Override
-    public Codec.ByteCodec<ByteIO.Input, ByteIO.Output> byteCodec() {
+    public Codec.ByteCodec<Input, Output> byteCodec() {
         return byteCodec;
     }
 
-    protected final Codec<byte[], ByteIO.Input, ByteIO.Output> byteArrayCodec =
-            new Codec.Base<byte[], ByteIO.Input, ByteIO.Output>(this) {
+    protected final Codec<byte[], Input, Output> byteArrayCodec =
+            new Codec.Base<byte[], Input, Output>(this) {
 
         @Override
         public Class<byte[]> type() {
@@ -158,7 +160,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(byte[] vals, ByteIO.Output out) {
+        public Output encode(byte[] vals, Output out) {
             out.writeInt(vals.length);
             for (byte val : vals) {
                 byteCodec().encode(val, out);
@@ -167,7 +169,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public byte[] decode(ByteIO.Input in) {
+        public byte[] decode(Input in) {
             final int l = in.readInt();
             final byte[] vals = new byte[l];
 
@@ -180,36 +182,36 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     };
 
     @Override
-    public Codec<byte[], ByteIO.Input, ByteIO.Output> byteArrayCodec() {
+    public Codec<byte[], Input, Output> byteArrayCodec() {
         return byteArrayCodec;
     }
 
-    protected final Codec.CharCodec<ByteIO.Input, ByteIO.Output> charCodec =
-            new Codec.CharCodec<ByteIO.Input, ByteIO.Output>() {
+    protected final Codec.CharCodec<Input, Output> charCodec =
+            new Codec.CharCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public ByteIO.Output encodePrim(char val, ByteIO.Output out) {
+        public Output encodePrim(char val, Output out) {
             return out.writeChar(val);
         }
 
         @Override
-        public char decodePrim(ByteIO.Input in ) {
+        public char decodePrim(Input in ) {
             return in.readChar();
         }
     };
 
     @Override
-    public Codec.CharCodec<ByteIO.Input, ByteIO.Output> charCodec() {
+    public Codec.CharCodec<Input, Output> charCodec() {
         return charCodec;
     }
 
-    protected final Codec<char[], ByteIO.Input, ByteIO.Output> charArrayCodec =
-            new Codec.Base<char[], ByteIO.Input, ByteIO.Output>(this) {
+    protected final Codec<char[], Input, Output> charArrayCodec =
+            new Codec.Base<char[], Input, Output>(this) {
 
         @Override
         public Class<char[]> type() {
@@ -217,7 +219,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(char[] vals, ByteIO.Output out) {
+        public Output encode(char[] vals, Output out) {
             out.writeInt(vals.length);
             for (char val : vals) {
                 charCodec().encode(val, out);
@@ -226,7 +228,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public char[] decode(ByteIO.Input in) {
+        public char[] decode(Input in) {
             final int l = in.readInt();
             final char[] vals = new char[l];
 
@@ -239,36 +241,36 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     };
 
     @Override
-    public Codec<char[], ByteIO.Input, ByteIO.Output> charArrayCodec() {
+    public Codec<char[], Input, Output> charArrayCodec() {
         return charArrayCodec;
     }
 
-    protected final Codec.ShortCodec<ByteIO.Input, ByteIO.Output> shortCodec =
-            new Codec.ShortCodec<ByteIO.Input, ByteIO.Output>() {
+    protected final Codec.ShortCodec<Input, Output> shortCodec =
+            new Codec.ShortCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public ByteIO.Output encodePrim(short val, ByteIO.Output out) {
+        public Output encodePrim(short val, Output out) {
             return out.writeShort(val);
         }
 
         @Override
-        public short decodePrim(ByteIO.Input in ) {
+        public short decodePrim(Input in ) {
             return in.readShort();
         }
     };
 
     @Override
-    public Codec.ShortCodec<ByteIO.Input, ByteIO.Output> shortCodec() {
+    public Codec.ShortCodec<Input, Output> shortCodec() {
         return shortCodec;
     }
 
-    protected final Codec<short[], ByteIO.Input, ByteIO.Output> shortArrayCodec =
-            new Codec.Base<short[], ByteIO.Input, ByteIO.Output>(this) {
+    protected final Codec<short[], Input, Output> shortArrayCodec =
+            new Codec.Base<short[], Input, Output>(this) {
 
         @Override
         public Class<short[]> type() {
@@ -276,7 +278,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(short[] vals, ByteIO.Output out) {
+        public Output encode(short[] vals, Output out) {
             out.writeInt(vals.length);
             for (short val : vals) {
                 shortCodec().encode(val, out);
@@ -285,7 +287,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public short[] decode(ByteIO.Input in) {
+        public short[] decode(Input in) {
             final int l = in.readInt();
             final short[] vals = new short[l];
 
@@ -298,36 +300,36 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     };
 
     @Override
-    public Codec<short[], ByteIO.Input, ByteIO.Output> shortArrayCodec() {
+    public Codec<short[], Input, Output> shortArrayCodec() {
         return shortArrayCodec;
     }
 
-    protected final Codec.IntCodec<ByteIO.Input, ByteIO.Output> intCodec =
-            new Codec.IntCodec<ByteIO.Input, ByteIO.Output>() {
+    protected final Codec.IntCodec<Input, Output> intCodec =
+            new Codec.IntCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public ByteIO.Output encodePrim(int val, ByteIO.Output out) {
+        public Output encodePrim(int val, Output out) {
             return out.writeInt(val);
         }
 
         @Override
-        public int decodePrim(ByteIO.Input in ) {
+        public int decodePrim(Input in ) {
             return in.readInt();
         }
     };
 
     @Override
-    public Codec.IntCodec<ByteIO.Input, ByteIO.Output> intCodec() {
+    public Codec.IntCodec<Input, Output> intCodec() {
         return intCodec;
     }
 
-    protected final Codec<int[], ByteIO.Input, ByteIO.Output> intArrayCodec =
-            new Codec.Base<int[], ByteIO.Input, ByteIO.Output>(this) {
+    protected final Codec<int[], Input, Output> intArrayCodec =
+            new Codec.Base<int[], Input, Output>(this) {
 
         @Override
         public Class<int[]> type() {
@@ -335,7 +337,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(int[] vals, ByteIO.Output out) {
+        public Output encode(int[] vals, Output out) {
             out.writeInt(vals.length);
             for (int val : vals) {
                 intCodec().encode(val, out);
@@ -344,7 +346,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public int[] decode(ByteIO.Input in) {
+        public int[] decode(Input in) {
             final int l = in.readInt();
             final int[] vals = new int[l];
 
@@ -357,36 +359,36 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     };
 
     @Override
-    public Codec<int[], ByteIO.Input, ByteIO.Output> intArrayCodec() {
+    public Codec<int[], Input, Output> intArrayCodec() {
         return intArrayCodec;
     }
 
-    protected final Codec.LongCodec<ByteIO.Input, ByteIO.Output> longCodec =
-            new Codec.LongCodec<ByteIO.Input, ByteIO.Output>() {
+    protected final Codec.LongCodec<Input, Output> longCodec =
+            new Codec.LongCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public ByteIO.Output encodePrim(long val, ByteIO.Output out) {
+        public Output encodePrim(long val, Output out) {
             return out.writeLong(val);
         }
 
         @Override
-        public long decodePrim(ByteIO.Input in) {
+        public long decodePrim(Input in) {
             return in.readLong();
         }
     };
 
     @Override
-    public Codec.LongCodec<ByteIO.Input, ByteIO.Output> longCodec() {
+    public Codec.LongCodec<Input, Output> longCodec() {
         return longCodec;
     }
 
-    protected final Codec<long[], ByteIO.Input, ByteIO.Output> longArrayCodec =
-            new Codec.Base<long[], ByteIO.Input, ByteIO.Output>(this) {
+    protected final Codec<long[], Input, Output> longArrayCodec =
+            new Codec.Base<long[], Input, Output>(this) {
 
         @Override
         public Class<long[]> type() {
@@ -394,7 +396,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(long[] vals, ByteIO.Output out) {
+        public Output encode(long[] vals, Output out) {
             out.writeInt(vals.length);
             for (long val : vals) {
                 longCodec().encode(val, out);
@@ -403,7 +405,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public long[] decode(ByteIO.Input in) {
+        public long[] decode(Input in) {
             final int l = in.readInt();
             final long[] vals = new long[l];
 
@@ -416,36 +418,36 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     };
 
     @Override
-    public Codec<long[], ByteIO.Input, ByteIO.Output> longArrayCodec() {
+    public Codec<long[], Input, Output> longArrayCodec() {
         return longArrayCodec;
     }
 
-    protected final Codec.FloatCodec<ByteIO.Input, ByteIO.Output> floatCodec =
-            new Codec.FloatCodec<ByteIO.Input, ByteIO.Output>() {
+    protected final Codec.FloatCodec<Input, Output> floatCodec =
+            new Codec.FloatCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public ByteIO.Output encodePrim(float val, ByteIO.Output out) {
+        public Output encodePrim(float val, Output out) {
             return out.writeFloat(val);
         }
 
         @Override
-        public float decodePrim(ByteIO.Input in ) {
+        public float decodePrim(Input in ) {
             return in.readFloat();
         }
     };
 
     @Override
-    public Codec.FloatCodec<ByteIO.Input, ByteIO.Output> floatCodec() {
+    public Codec.FloatCodec<Input, Output> floatCodec() {
         return floatCodec;
     }
 
-    protected final Codec<float[], ByteIO.Input, ByteIO.Output> floatArrayCodec =
-            new Codec.Base<float[], ByteIO.Input, ByteIO.Output>(this) {
+    protected final Codec<float[], Input, Output> floatArrayCodec =
+            new Codec.Base<float[], Input, Output>(this) {
 
         @Override
         public Class<float[]> type() {
@@ -453,7 +455,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(float[] vals, ByteIO.Output out) {
+        public Output encode(float[] vals, Output out) {
             out.writeInt(vals.length);
             for (float val : vals) {
                 floatCodec().encode(val, out);
@@ -462,7 +464,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public float[] decode(ByteIO.Input in) {
+        public float[] decode(Input in) {
             final int l = in.readInt();
             final float[] vals = new float[l];
 
@@ -475,36 +477,36 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     };
 
     @Override
-    public Codec<float[], ByteIO.Input, ByteIO.Output> floatArrayCodec() {
+    public Codec<float[], Input, Output> floatArrayCodec() {
         return floatArrayCodec;
     }
 
-    protected final Codec.DoubleCodec<ByteIO.Input, ByteIO.Output> doubleCodec =
-            new Codec.DoubleCodec<ByteIO.Input, ByteIO.Output>() {
+    protected final Codec.DoubleCodec<Input, Output> doubleCodec =
+            new Codec.DoubleCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return ByteCodecCoreImpl.this;
         }
 
         @Override
-        public ByteIO.Output encodePrim(double val, ByteIO.Output out) {
+        public Output encodePrim(double val, Output out) {
             return out.writeDouble(val);
         }
 
         @Override
-        public double decodePrim(ByteIO.Input in ) {
+        public double decodePrim(Input in ) {
             return in.readDouble();
         }
     };
 
     @Override
-    public Codec.DoubleCodec<ByteIO.Input, ByteIO.Output> doubleCodec() {
+    public Codec.DoubleCodec<Input, Output> doubleCodec() {
         return doubleCodec;
     }
 
-    protected final Codec<double[], ByteIO.Input, ByteIO.Output> doubleArrayCodec =
-            new Codec.Base<double[], ByteIO.Input, ByteIO.Output>(this) {
+    protected final Codec<double[], Input, Output> doubleArrayCodec =
+            new Codec.Base<double[], Input, Output>(this) {
 
         @Override
         public Class<double[]> type() {
@@ -512,7 +514,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(double[] vals, ByteIO.Output out) {
+        public Output encode(double[] vals, Output out) {
             out.writeInt(vals.length);
             for (double val : vals) {
                 doubleCodec().encode(val, out);
@@ -521,7 +523,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public double[] decode(ByteIO.Input in) {
+        public double[] decode(Input in) {
             final int l = in.readInt();
             final double[] vals = new double[l];
 
@@ -534,12 +536,12 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     };
 
     @Override
-    public Codec<double[], ByteIO.Input, ByteIO.Output> doubleArrayCodec() {
+    public Codec<double[], Input, Output> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
-    protected final Codec<String, ByteIO.Input, ByteIO.Output> stringCodec =
-            new Codec.Base<String, ByteIO.Input, ByteIO.Output>(this) {
+    protected final Codec<String, Input, Output> stringCodec =
+            new Codec.Base<String, Input, Output>(this) {
 
         @Override
         public Class<String> type() {
@@ -547,61 +549,61 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(String val, ByteIO.Output out) {
+        public Output encode(String val, Output out) {
             return out.writeString(val);
         }
 
         @Override
-        public String decode(ByteIO.Input in) {
+        public String decode(Input in) {
             return in.readString();
         }
     };
 
     @Override
-    public Codec<String, ByteIO.Input, ByteIO.Output> stringCodec() {
+    public Codec<String, Input, Output> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    public <EM extends Enum<EM>> Codec<EM, ByteIO.Input, ByteIO.Output> enumCodec(Class<EM> enumType) {
-        return new Codec.Base<EM, ByteIO.Input, ByteIO.Output>(this) {
+    public <EM extends Enum<EM>> Codec<EM, Input, Output> enumCodec(Class<EM> enumType) {
+        return new Codec.Base<EM, Input, Output>(this) {
             @Override
             public Class<EM> type() {
                 return enumType;
             }
 
             @Override
-            public ByteIO.Output encode(EM val, ByteIO.Output out) {
+            public Output encode(EM val, Output out) {
                 return out.writeString(val.name());
             }
 
             @Override
-            public EM decode(ByteIO.Input in) {
+            public EM decode(Input in) {
                 return EM.valueOf(type(), in.readString());
             }
         };
     }
 
     @Override
-    public <V> Codec<Map<String, V>, ByteIO.Input, ByteIO.Output> mapCodec(
+    public <V> Codec<Map<String, V>, Input, Output> mapCodec(
             Class<Map<String, V>> type,
-            Codec<V, ByteIO.Input, ByteIO.Output> valueCodec) {
+            Codec<V, Input, Output> valueCodec) {
         return new ByteMapCodecs.StringMapCodec<V>(this, type, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, ByteIO.Input, ByteIO.Output> mapCodec(
+    public <K, V> Codec<Map<K, V>, Input, Output> mapCodec(
             Class<Map<K, V>> type,
-            Codec<K, ByteIO.Input, ByteIO.Output> keyCodec,
-            Codec<V, ByteIO.Input, ByteIO.Output> valueCodec) {
+            Codec<K, Input, Output> keyCodec,
+            Codec<V, Input, Output> valueCodec) {
         return new ByteMapCodecs.MapCodec<K, V>(this, type, keyCodec, valueCodec);
     }
 
     @Override
-    public <T> Codec<Collection<T>, ByteIO.Input, ByteIO.Output> collCodec(
+    public <T> Codec<Collection<T>, Input, Output> collCodec(
             Class<Collection<T>> collType,
-            Codec<T, ByteIO.Input, ByteIO.Output> elemCodec) {
-        return new CollectionCodec<T, ByteIO.Input, ByteIO.Output>(
+            Codec<T, Input, Output> elemCodec) {
+        return new CollectionCodec<T, Input, Output>(
             ByteCodecCoreImpl.this,
                 elemCodec) {
             @Override
@@ -610,7 +612,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
             }
 
             @Override
-            public ByteIO.Output encode(Collection<T> vals, ByteIO.Output out) {
+            public Output encode(Collection<T> vals, Output out) {
                 out.writeInt(vals.size());
                 for (T val : vals) {
                     elemCodec.encodeWithCheck(val, out);
@@ -619,7 +621,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
             }
 
             @Override
-            public Collection<T> decode(ByteIO.Input in) {
+            public Collection<T> decode(Input in) {
                 final int l = in.readInt();
                 final Collection<T> vals = getTypeConstructor(collType).construct();
 
@@ -633,13 +635,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     }
 
     @Override
-    public <T> Codec<T[], ByteIO.Input, ByteIO.Output> objectArrayCodec(
+    public <T> Codec<T[], Input, Output> objectArrayCodec(
             Class<T[]> arrType,
             Class<T> elemType,
-            Codec<T, ByteIO.Input, ByteIO.Output> elemCodec) {
-        return new Codec<T[], ByteIO.Input, ByteIO.Output>() {
+            Codec<T, Input, Output> elemCodec) {
+        return new Codec<T[], Input, Output>() {
             @Override
-            public CodecCoreIntl<ByteIO.Input, ByteIO.Output> core() {
+            public CodecCoreInternal<Input, Output> core() {
                 return ByteCodecCoreImpl.this;
             }
 
@@ -649,7 +651,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
             }
 
             @Override
-            public ByteIO.Output encode(T[] vals, ByteIO.Output out) {
+            public Output encode(T[] vals, Output out) {
                 out.writeInt(vals.length);
                 for (T val : vals) {
                     elemCodec.encodeWithCheck(val, out);
@@ -658,7 +660,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
             }
 
             @Override
-            public T[] decode(ByteIO.Input in) {
+            public T[] decode(Input in) {
                 final int l = in.readInt();
                 final T[] vals = (T[]) Array.newInstance(elemType, l);
 
@@ -672,9 +674,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, ByteIO.Input, ByteIO.Output> createObjectCodec(
+    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, Input, Output> createObjectCodec(
             Class<T> type,
-            ObjectMeta<T, ByteIO.Input, ByteIO.Output, RA> objMeta) {
+            ObjectMeta<T, Input, Output, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
             return new FinalObjectCodec<T, RA>(this, type, objMeta);
         } else {
@@ -683,16 +685,16 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
     }
 
     private static class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
-            extends Codec.Base<T, ByteIO.Input, ByteIO.Output> {
+            extends Codec.Base<T, Input, Output> {
 
         private final Class<T> type;
-        private final ObjectMeta<T, ByteIO.Input, ByteIO.Output, RA> objMeta;
-        private final Map<String, ObjectMeta.Field<T, ByteIO.Input, ByteIO.Output, RA>> fields;
+        private final ObjectMeta<T, Input, Output, RA> objMeta;
+        private final Map<String, ObjectMeta.Field<T, Input, Output, RA>> fields;
 
         private ObjectCodec(
-                CodecCoreIntl<ByteIO.Input, ByteIO.Output> core,
+                CodecCoreInternal<Input, Output> core,
                 Class<T> type,
-                ObjectMeta<T, ByteIO.Input, ByteIO.Output, RA> objMeta) {
+                ObjectMeta<T, Input, Output, RA> objMeta) {
             super(core);
             this.type = type;
             this.objMeta = objMeta;
@@ -709,7 +711,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public ByteIO.Output encode(T val, ByteIO.Output out) {
+        public Output encode(T val, Output out) {
             objMeta.forEach(field ->
                     field.encodeField(val, out)
             );
@@ -717,7 +719,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
         }
 
         @Override
-        public T decode(ByteIO.Input in) {
+        public T decode(Input in) {
             return Folds.foldLeft(
                     (acc, field) -> field.decodeField(acc, in),
                     objMeta.startDecode(),
@@ -728,12 +730,12 @@ public class ByteCodecCoreImpl extends BaseCodecCore<ByteIO.Input, ByteIO.Output
 
     private static class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
             extends ObjectCodec<T, RA>
-            implements Codec.FinalCodec<T, ByteIO.Input, ByteIO.Output> {
+            implements Codec.FinalCodec<T, Input, Output> {
 
         private FinalObjectCodec(
-                CodecCoreIntl<ByteIO.Input, ByteIO.Output> core,
+                CodecCoreInternal<Input, Output> core,
                 Class<T> type,
-                ObjectMeta<T, ByteIO.Input, ByteIO.Output, RA> objMeta) {
+                ObjectMeta<T, Input, Output, RA> objMeta) {
             super(core, type, objMeta);
         }
     }

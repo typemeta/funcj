@@ -33,12 +33,12 @@ public class ObjectCodecBuilder<T, IN, OUT> {
         }
     }
 
-    private final CodecCoreIntl<IN, OUT> core;
+    private final CodecCoreInternal<IN, OUT> core;
     private final Class<T> type;
 
     protected final Map<String, FieldCodec<T, IN, OUT>> fields = new LinkedHashMap<>();
 
-    public ObjectCodecBuilder(CodecCoreIntl<IN, OUT> core, Class<T> type) {
+    public ObjectCodecBuilder(CodecCoreInternal<IN, OUT> core, Class<T> type) {
         this.core = core;
         this.type = type;
     }

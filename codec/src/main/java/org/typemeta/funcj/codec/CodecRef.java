@@ -18,7 +18,7 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
         INSTANCE;
 
         @Override
-        public CodecCoreIntl<Object, Object> core() {
+        public CodecCoreInternal<Object, Object> core() {
             throw error();
         }
 
@@ -83,7 +83,7 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
     }
 
     @Override
-    public CodecCoreIntl<IN, OUT> core() {
+    public CodecCoreInternal<IN, OUT> core() {
         return impl.core();
     }
 

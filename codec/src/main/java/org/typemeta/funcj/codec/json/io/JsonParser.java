@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.json;
+package org.typemeta.funcj.codec.json.io;
 
 import org.typemeta.funcj.codec.CodecException;
 
@@ -281,7 +281,7 @@ public class JsonParser implements JsonIO.Input {
     }
 
     @Override
-    public boolean readBool() {
+    public boolean readBoolean() {
         final Event.Type currType = currentEvent().type();
         if (currType.equals(Event.Type.FALSE)) {
             processCurrentEvent();
@@ -295,7 +295,7 @@ public class JsonParser implements JsonIO.Input {
     }
 
     @Override
-    public String readStr() {
+    public String readString() {
         checkTokenType(Event.Type.STRING);
         final String result = ((Event.JString) currentEvent()).value;
         processCurrentEvent();
@@ -351,7 +351,7 @@ public class JsonParser implements JsonIO.Input {
     }
 
     @Override
-    public double readDbl() {
+    public double readDouble() {
         checkTokenType(Event.Type.NUMBER);
         final String value = ((Event.JNumber) currentEvent()).value;
         processCurrentEvent();
@@ -359,7 +359,7 @@ public class JsonParser implements JsonIO.Input {
     }
 
     @Override
-    public BigDecimal readBigDec() {
+    public BigDecimal readBigDecimal() {
         checkTokenType(Event.Type.NUMBER);
         final String value = ((Event.JNumber) currentEvent()).value;
         processCurrentEvent();

@@ -1,5 +1,7 @@
 package org.typemeta.funcj.codec.json;
 
+import org.typemeta.funcj.codec.json.io.*;
+
 import java.io.Reader;
 import java.io.Writer;
 
@@ -31,7 +33,7 @@ public class JsonBridge {
                     break;
                 case FALSE:
                 case TRUE:
-                    output.writeBool(input.readBool());
+                    output.writeBoolean(input.readBoolean());
                     break;
                 case FIELD_NAME:
                     output.writeField(input.readFieldName());
@@ -41,7 +43,7 @@ public class JsonBridge {
                     output.writeNull();
                     break;
                 case NUMBER:
-                    output.writeNum(input.readNumber());
+                    output.writeNumber(input.readNumber());
                     break;
                 case OBJECT_END:
                     input.endObject();
@@ -52,7 +54,7 @@ public class JsonBridge {
                     output.startObject();
                     break;
                 case STRING:
-                    output.writeStr(input.readStr());
+                    output.writeStr(input.readString());
                     break;
             }
         }

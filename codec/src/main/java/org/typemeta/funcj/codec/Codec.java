@@ -11,14 +11,14 @@ package org.typemeta.funcj.codec;
 public interface Codec<T, IN, OUT> {
 
     abstract class Base<T, IN, OUT> implements Codec<T, IN, OUT> {
-        protected final CodecCoreIntl<IN, OUT> core;
+        protected final CodecCoreInternal<IN, OUT> core;
 
-        protected Base(CodecCoreIntl<IN, OUT> core) {
+        protected Base(CodecCoreInternal<IN, OUT> core) {
             this.core = core;
         }
 
         @Override
-        public CodecCoreIntl<IN, OUT> core() {
+        public CodecCoreInternal<IN, OUT> core() {
             return core;
         }
     }
@@ -260,7 +260,7 @@ public interface Codec<T, IN, OUT> {
         double decodePrim(IN in);
     }
 
-    CodecCoreIntl<IN, OUT> core();
+    CodecCoreInternal<IN, OUT> core();
 
     Class<T> type();
 

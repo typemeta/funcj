@@ -2,11 +2,11 @@ package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.MapCodecs.*;
-import org.typemeta.funcj.codec.bytes.ByteIO.Input;
+import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
 
 import java.util.Map;
 
-import static org.typemeta.funcj.codec.bytes.ByteIO.*;
+import static org.typemeta.funcj.codec.bytes.io.ByteIO.*;
 
 public abstract class ByteMapCodecs {
 
@@ -23,7 +23,7 @@ public abstract class ByteMapCodecs {
         }
 
         @Override
-        public CodecCoreIntl<Input, Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return core;
         }
 
@@ -67,7 +67,7 @@ public abstract class ByteMapCodecs {
         }
 
         @Override
-        public CodecCoreIntl<Input, Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return core;
         }
 

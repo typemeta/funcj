@@ -2,8 +2,8 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.MapCodecs.*;
-import org.typemeta.funcj.codec.json.JsonIO.Input;
-import org.typemeta.funcj.codec.json.JsonIO.Output;
+import org.typemeta.funcj.codec.json.io.JsonIO.Input;
+import org.typemeta.funcj.codec.json.io.JsonIO.Output;
 
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public CodecCoreIntl<Input, Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return core;
         }
 
@@ -100,7 +100,7 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public CodecCoreIntl<Input, Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return core;
         }
 

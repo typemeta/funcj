@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toList;
  * @param <OUT>     the encoded output type
  */
 @SuppressWarnings("unchecked")
-public abstract class BaseCodecCore<IN, OUT> implements CodecCoreIntl<IN, OUT> {
+public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OUT> {
 
     /**
      * A map from class name to {@code Codec}, associating a class with its {@code Codec}.

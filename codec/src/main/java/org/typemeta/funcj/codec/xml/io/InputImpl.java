@@ -156,12 +156,12 @@ class InputImpl implements XmlIO.Input {
 
 
     @Override
-    public boolean readBool() {
+    public boolean readBoolean() {
         return Boolean.parseBoolean(readText());
     }
 
     @Override
-    public String readStr() {
+    public String readString() {
         return readText();
     }
 
@@ -196,12 +196,12 @@ class InputImpl implements XmlIO.Input {
     }
 
     @Override
-    public double readDbl() {
+    public double readDouble() {
         return Double.parseDouble(readText());
     }
 
     @Override
-    public BigDecimal readBigDec() {
+    public BigDecimal readBigDecimal() {
         return new BigDecimal(readText());
     }
 

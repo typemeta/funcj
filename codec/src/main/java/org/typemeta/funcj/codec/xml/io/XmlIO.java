@@ -9,16 +9,16 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public abstract class XmlIO {
-    public static Input of(XMLStreamReader rdr) {
+    public static Input inputOf(XMLStreamReader rdr) {
         return new InputImpl(rdr);
     }
 
-    public static Input of(Reader rdr, String rootElemName) {
+    public static Input inputOf(Reader rdr, String rootElemName) {
         try {
             final XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
             xmlInFact.setProperty(XMLInputFactory.IS_COALESCING, true);
             final XMLStreamReader xrdr = xmlInFact.createXMLStreamReader(rdr);
-            final Input in = of(xrdr);
+            final Input in = inputOf(xrdr);
             in.startDocument();
             in.startElement(rootElemName);
             return in;
@@ -27,11 +27,11 @@ public abstract class XmlIO {
         }
     }
 
-    public static Output of(XMLStreamWriter wtr) {
+    public static Output outputOf(XMLStreamWriter wtr) {
         return new OutputImpl(wtr);
     }
 
-    public static Output of(Writer wtr, String rootElemName) {
+    public static Output outputOf(Writer wtr, String rootElemName) {
         try {
             final XMLOutputFactory xmlOutFact = XMLOutputFactory.newInstance();
             xmlOutFact.setProperty("escapeCharacters", false);
@@ -108,9 +108,9 @@ public abstract class XmlIO {
         AttributeMap attributeMap();
         void endElement();
 
-        boolean readBool();
+        boolean readBoolean();
 
-        String readStr();
+        String readString();
         char readChar();
 
         byte readByte();
@@ -118,8 +118,8 @@ public abstract class XmlIO {
         int readInt();
         long readLong();
         float readFloat();
-        double readDbl();
-        BigDecimal readBigDec();
+        double readDouble();
+        BigDecimal readBigDecimal();
         Number readNumber();
     }
 
@@ -134,20 +134,20 @@ public abstract class XmlIO {
         Output attribute(String localName, String value);
         Output endElement();
 
-        Output writeBool(boolean value);
+        Output writeBoolean(boolean value);
 
-        Output writeStr(String value);
+        Output writeString(String value);
         Output writeChar(char value);
 
-        Output writeNum(byte value);
-        Output writeNum(short value);
-        Output writeNum(int value);
-        Output writeNum(long value);
-        Output writeNum(float value);
-        Output writeNum(double value);
-        Output writeNum(Number value);
-        Output writeNum(BigDecimal value);
-        Output writeNum(String value);
+        Output writeByte(byte value);
+        Output writeShort(short value);
+        Output writeInt(int value);
+        Output writeLong(long value);
+        Output writeFloat(float value);
+        Output writeDouble(double value);
+        Output writeNumber(Number value);
+        Output writeBigDecimal(BigDecimal value);
+        Output writeNumber(String value);
     }
 }
 

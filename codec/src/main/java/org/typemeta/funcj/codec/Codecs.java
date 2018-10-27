@@ -37,7 +37,7 @@ public abstract class Codecs {
         return ByteCodecs.registerAll(codec);
     }
 
-    public static <IN, OUT, C extends CodecCoreIntl<IN, OUT>> C registerAll(C core) {
+    public static <IN, OUT, C extends CodecCoreInternal<IN, OUT>> C registerAll(C core) {
 
         core.registerStringProxyCodec(
                 Class.class,
@@ -100,17 +100,16 @@ public abstract class Codecs {
      */
     public static abstract class CodecBase<T, IN, OUT> implements Codec<T, IN, OUT> {
 
-        protected final CodecCoreIntl<IN, OUT> core;
+        protected final CodecCoreInternal<IN, OUT> core;
 
-        protected CodecBase(CodecCoreIntl<IN, OUT> core) {
+        protected CodecBase(CodecCoreInternal<IN, OUT> core) {
             this.core = core;
         }
 
         @Override
-        public CodecCoreIntl<IN, OUT> core() {
+        public CodecCoreInternal<IN, OUT> core() {
             return core;
         }
-
     }
 
     /**
@@ -127,7 +126,7 @@ public abstract class Codecs {
         protected final F<String, T> decode;
 
         public StringProxyCodec(
-                CodecCoreIntl<IN, OUT> core,
+                CodecCoreInternal<IN, OUT> core,
                 Class<T> type,
                 F<T, String> encode,
                 F<String, T> decode) {

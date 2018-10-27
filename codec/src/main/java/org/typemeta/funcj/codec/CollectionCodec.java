@@ -12,7 +12,7 @@ public abstract class CollectionCodec<T, IN, OUT> extends Codec.Base<Collection<
 
     protected final Codec<T, IN, OUT> elemCodec;
 
-    protected CollectionCodec(CodecCoreIntl<IN, OUT> core, Codec<T, IN, OUT> elemCodec) {
+    protected CollectionCodec(CodecCoreInternal<IN, OUT> core, Codec<T, IN, OUT> elemCodec) {
         super(core);
         this.elemCodec = elemCodec;
     }

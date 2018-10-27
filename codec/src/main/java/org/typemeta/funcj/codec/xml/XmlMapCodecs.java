@@ -23,7 +23,7 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public CodecCoreIntl<Input, Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return core;
         }
 
@@ -80,7 +80,7 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public CodecCoreIntl<Input, Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return core;
         }
 

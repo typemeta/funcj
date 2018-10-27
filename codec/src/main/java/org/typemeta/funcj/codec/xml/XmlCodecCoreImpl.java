@@ -2,6 +2,7 @@ package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.xml.io.XmlIO;
+import org.typemeta.funcj.codec.xml.io.XmlIO.*;
 import org.typemeta.funcj.functions.Functions;
 
 import java.io.*;
@@ -11,18 +12,18 @@ import java.util.*;
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 
 @SuppressWarnings("unchecked")
-public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> implements XmlCodecCore {
+public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements XmlCodecCore {
 
     public XmlCodecCoreImpl() {
     }
 
     @Override
-    public <T> XmlIO.Output encode(
+    public <T> Output encode(
             Class<T> type,
             T val,
             Writer wtr,
             String rootElemName) {
-        final  XmlIO.Output out = encode(type, val, XmlIO.of(wtr, rootElemName));
+        final  Output out = encode(type, val, XmlIO.outputOf(wtr, rootElemName));
         return out.close();
     }
 
@@ -31,7 +32,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
             Class<T> type,
             Reader rdr,
             String rootElemName) {
-        return decode(type, XmlIO.of(rdr, rootElemName));
+        return decode(type, XmlIO.inputOf(rdr, rootElemName));
     }
 
     public String entryElemName() {
@@ -66,11 +67,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         return 16;
     }
 
-    public <T> XmlIO.Output encode(T val) {
+    public <T> Output encode(T val) {
         return encode((Class<T>)val.getClass(), val);
     }
 
-    public <T> XmlIO.Output encode(Class<T> type, T val) {
+    public <T> Output encode(Class<T> type, T val) {
         return super.encode(type, val, null);
     }
 
@@ -84,7 +85,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     }
 
     @Override
-    public <T> boolean encodeNull(T val, XmlIO.Output out) {
+    public <T> boolean encodeNull(T val, Output out) {
         if (val == null) {
             out.attribute(metaAttrName(), nullAttrVal());
             return true;
@@ -94,21 +95,21 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     }
 
     @Override
-    public boolean decodeNull(XmlIO.Input in) {
+    public boolean decodeNull(Input in) {
         return in.attributeMap().nameHasValue(metaAttrName(), nullAttrVal());
     }
 
     @Override
     public <T> boolean encodeDynamicType(
-            Codec<T, XmlIO.Input, XmlIO.Output> codec,
+            Codec<T, Input, Output> codec,
             T val,
-            XmlIO.Output out,
-            Functions.F<Class<T>, Codec<T, XmlIO.Input, XmlIO.Output>> getDynCodec) {
+            Output out,
+            Functions.F<Class<T>, Codec<T, Input, Output>> getDynCodec) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (dynType.equals(codec.type())) {
             return false;
         } else {
-            final Codec<T, XmlIO.Input, XmlIO.Output> dynCodec = getDynCodec.apply(dynType);
+            final Codec<T, Input, Output> dynCodec = getDynCodec.apply(dynType);
             out.attribute(typeAttrName(), classToName(dynType));
             dynCodec.encode(val, out);
             return true;
@@ -116,7 +117,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     }
 
     @Override
-    public <T> T decodeDynamicType(XmlIO.Input in, Functions.F<String, T> decoder) {
+    public <T> T decodeDynamicType(Input in, Functions.F<String, T> decoder) {
         if (in.attributeMap().hasName(typeAttrName())) {
             final String typeName = in.attributeMap().getValue(typeAttrName());
             return decoder.apply(typeName);
@@ -126,36 +127,36 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     }
 
     @Override
-    public <T> T decodeDynamicType(XmlIO.Input in) {
+    public <T> T decodeDynamicType(Input in) {
         return decodeDynamicType(in, name -> getCodec(this.<T>nameToClass(name)).decode(in));
     }
 
-    protected final Codec.BooleanCodec<XmlIO.Input, XmlIO.Output> booleanCodec =
-            new Codec.BooleanCodec<XmlIO.Input, XmlIO.Output>() {
+    protected final Codec.BooleanCodec<Input, Output> booleanCodec =
+            new Codec.BooleanCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<XmlIO.Input, XmlIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return XmlCodecCoreImpl.this;
         }
 
         @Override
-        public XmlIO.Output encodePrim(boolean val, XmlIO.Output out) {
-            return out.writeBool(val);
+        public Output encodePrim(boolean val, Output out) {
+            return out.writeBoolean(val);
         }
 
         @Override
-        public boolean decodePrim(XmlIO.Input in) {
-            return in.readBool();
+        public boolean decodePrim(Input in) {
+            return in.readBoolean();
         }
     };
 
     @Override
-    public Codec.BooleanCodec<XmlIO.Input, XmlIO.Output> booleanCodec() {
+    public Codec.BooleanCodec<Input, Output> booleanCodec() {
         return booleanCodec;
     }
 
-    protected final Codec<boolean[], XmlIO.Input, XmlIO.Output> booleanArrayCodec =
-            new Codec.Base<boolean[], XmlIO.Input, XmlIO.Output>(this) {
+    protected final Codec<boolean[], Input, Output> booleanArrayCodec =
+            new Codec.Base<boolean[], Input, Output>(this) {
 
         @Override
         public Class<boolean[]> type() {
@@ -163,7 +164,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(boolean[] vals, XmlIO.Output out) {
+        public Output encode(boolean[] vals, Output out) {
             for (boolean val : vals) {
                 booleanCodec().encode(val, out.startElement(entryElemName()));
                 out.endElement();
@@ -172,11 +173,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public boolean[] decode(XmlIO.Input in) {
+        public boolean[] decode(Input in) {
             boolean[] arr = new boolean[defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -193,36 +194,36 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     };
 
     @Override
-    public Codec<boolean[], XmlIO.Input, XmlIO.Output> booleanArrayCodec() {
+    public Codec<boolean[], Input, Output> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
-    protected final Codec.ByteCodec<XmlIO.Input, XmlIO.Output> byteCodec =
-            new Codec.ByteCodec<XmlIO.Input, XmlIO.Output>() {
+    protected final Codec.ByteCodec<Input, Output> byteCodec =
+            new Codec.ByteCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<XmlIO.Input, XmlIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return XmlCodecCoreImpl.this;
         }
 
         @Override
-        public XmlIO.Output encodePrim(byte val, XmlIO.Output out) {
-            return out.writeNum(val);
+        public Output encodePrim(byte val, Output out) {
+            return out.writeByte(val);
         }
 
         @Override
-        public byte decodePrim(XmlIO.Input in) {
+        public byte decodePrim(Input in) {
             return in.readByte();
         }
     };
 
     @Override
-    public Codec.ByteCodec<XmlIO.Input, XmlIO.Output> byteCodec() {
+    public Codec.ByteCodec<Input, Output> byteCodec() {
         return byteCodec;
     }
 
-    protected final Codec<byte[], XmlIO.Input, XmlIO.Output> byteArrayCodec =
-            new Codec.Base<byte[], XmlIO.Input, XmlIO.Output>(this) {
+    protected final Codec<byte[], Input, Output> byteArrayCodec =
+            new Codec.Base<byte[], Input, Output>(this) {
 
         @Override
         public Class<byte[]> type() {
@@ -230,7 +231,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(byte[] vals, XmlIO.Output out) {
+        public Output encode(byte[] vals, Output out) {
             for (byte val : vals) {
                 byteCodec().encode(val, out.startElement(entryElemName()));
                 out.endElement();
@@ -239,11 +240,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public byte[] decode(XmlIO.Input in) {
+        public byte[] decode(Input in) {
             byte[] arr = new byte[defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -260,36 +261,36 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     };
 
     @Override
-    public Codec<byte[], XmlIO.Input, XmlIO.Output> byteArrayCodec() {
+    public Codec<byte[], Input, Output> byteArrayCodec() {
         return byteArrayCodec;
     }
 
-    protected final Codec.CharCodec<XmlIO.Input, XmlIO.Output> charCodec =
-            new Codec.CharCodec<XmlIO.Input, XmlIO.Output>() {
+    protected final Codec.CharCodec<Input, Output> charCodec =
+            new Codec.CharCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<XmlIO.Input, XmlIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return XmlCodecCoreImpl.this;
         }
 
         @Override
-        public XmlIO.Output encodePrim(char val, XmlIO.Output out) {
+        public Output encodePrim(char val, Output out) {
             return out.writeChar(val);
         }
 
         @Override
-        public char decodePrim(XmlIO.Input in ) {
+        public char decodePrim(Input in ) {
             return in.readChar();
         }
     };
 
     @Override
-    public Codec.CharCodec<XmlIO.Input, XmlIO.Output> charCodec() {
+    public Codec.CharCodec<Input, Output> charCodec() {
         return charCodec;
     }
 
-    protected final Codec<char[], XmlIO.Input, XmlIO.Output> charArrayCodec =
-            new Codec.Base<char[], XmlIO.Input, XmlIO.Output>(this) {
+    protected final Codec<char[], Input, Output> charArrayCodec =
+            new Codec.Base<char[], Input, Output>(this) {
 
         @Override
         public Class<char[]> type() {
@@ -297,7 +298,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(char[] vals, XmlIO.Output out) {
+        public Output encode(char[] vals, Output out) {
             for (char val : vals) {
                 charCodec().encode(val, out.startElement(entryElemName()));
                 out.endElement();
@@ -306,11 +307,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public char[] decode(XmlIO.Input in) {
+        public char[] decode(Input in) {
             char[] arr = new char[defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -327,36 +328,36 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     };
 
     @Override
-    public Codec<char[], XmlIO.Input, XmlIO.Output> charArrayCodec() {
+    public Codec<char[], Input, Output> charArrayCodec() {
         return charArrayCodec;
     }
 
-    protected final Codec.ShortCodec<XmlIO.Input, XmlIO.Output> shortCodec =
-            new Codec.ShortCodec<XmlIO.Input, XmlIO.Output>() {
+    protected final Codec.ShortCodec<Input, Output> shortCodec =
+            new Codec.ShortCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<XmlIO.Input, XmlIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return XmlCodecCoreImpl.this;
         }
 
         @Override
-        public XmlIO.Output encodePrim(short val, XmlIO.Output out) {
-            return out.writeNum(val);
+        public Output encodePrim(short val, Output out) {
+            return out.writeShort(val);
         }
 
         @Override
-        public short decodePrim(XmlIO.Input in ) {
+        public short decodePrim(Input in ) {
             return in.readShort();
         }
     };
 
     @Override
-    public Codec.ShortCodec<XmlIO.Input, XmlIO.Output> shortCodec() {
+    public Codec.ShortCodec<Input, Output> shortCodec() {
         return shortCodec;
     }
 
-    protected final Codec<short[], XmlIO.Input, XmlIO.Output> shortArrayCodec =
-            new Codec.Base<short[], XmlIO.Input, XmlIO.Output>(this) {
+    protected final Codec<short[], Input, Output> shortArrayCodec =
+            new Codec.Base<short[], Input, Output>(this) {
 
         @Override
         public Class<short[]> type() {
@@ -364,7 +365,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(short[] vals, XmlIO.Output out) {
+        public Output encode(short[] vals, Output out) {
             for (short val : vals) {
                 shortCodec().encode(val, out.startElement(entryElemName()));
                 out.endElement();
@@ -373,11 +374,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public short[] decode(XmlIO.Input in) {
+        public short[] decode(Input in) {
             short[] arr = new short[defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -394,36 +395,36 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     };
 
     @Override
-    public Codec<short[], XmlIO.Input, XmlIO.Output> shortArrayCodec() {
+    public Codec<short[], Input, Output> shortArrayCodec() {
         return shortArrayCodec;
     }
 
-    protected final Codec.IntCodec<XmlIO.Input, XmlIO.Output> intCodec =
-            new Codec.IntCodec<XmlIO.Input, XmlIO.Output>() {
+    protected final Codec.IntCodec<Input, Output> intCodec =
+            new Codec.IntCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<XmlIO.Input, XmlIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return XmlCodecCoreImpl.this;
         }
 
         @Override
-        public XmlIO.Output encodePrim(int val, XmlIO.Output out) {
-            return out.writeNum(val);
+        public Output encodePrim(int val, Output out) {
+            return out.writeInt(val);
         }
 
         @Override
-        public int decodePrim(XmlIO.Input in ) {
+        public int decodePrim(Input in ) {
             return in.readInt();
         }
     };
 
     @Override
-    public Codec.IntCodec<XmlIO.Input, XmlIO.Output> intCodec() {
+    public Codec.IntCodec<Input, Output> intCodec() {
         return intCodec;
     }
 
-    protected final Codec<int[], XmlIO.Input, XmlIO.Output> intArrayCodec =
-            new Codec.Base<int[], XmlIO.Input, XmlIO.Output>(this) {
+    protected final Codec<int[], Input, Output> intArrayCodec =
+            new Codec.Base<int[], Input, Output>(this) {
 
         @Override
         public Class<int[]> type() {
@@ -431,7 +432,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(int[] vals, XmlIO.Output out) {
+        public Output encode(int[] vals, Output out) {
             for (int val : vals) {
                 intCodec().encode(val, out.startElement(entryElemName()));
                 out.endElement();
@@ -440,11 +441,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public int[] decode(XmlIO.Input in) {
+        public int[] decode(Input in) {
             int[] arr = new int[defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -461,36 +462,36 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     };
 
     @Override
-    public Codec<int[], XmlIO.Input, XmlIO.Output> intArrayCodec() {
+    public Codec<int[], Input, Output> intArrayCodec() {
         return intArrayCodec;
     }
 
-    protected final Codec.LongCodec<XmlIO.Input, XmlIO.Output> longCodec =
-            new Codec.LongCodec<XmlIO.Input, XmlIO.Output>() {
+    protected final Codec.LongCodec<Input, Output> longCodec =
+            new Codec.LongCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<XmlIO.Input, XmlIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return XmlCodecCoreImpl.this;
         }
 
         @Override
-        public XmlIO.Output encodePrim(long val, XmlIO.Output out) {
-            return out.writeNum(val);
+        public Output encodePrim(long val, Output out) {
+            return out.writeLong(val);
         }
 
         @Override
-        public long decodePrim(XmlIO.Input in) {
+        public long decodePrim(Input in) {
             return in.readLong();
         }
     };
 
     @Override
-    public Codec.LongCodec<XmlIO.Input, XmlIO.Output> longCodec() {
+    public Codec.LongCodec<Input, Output> longCodec() {
         return longCodec;
     }
 
-    protected final Codec<long[], XmlIO.Input, XmlIO.Output> longArrayCodec =
-            new Codec.Base<long[], XmlIO.Input, XmlIO.Output>(this) {
+    protected final Codec<long[], Input, Output> longArrayCodec =
+            new Codec.Base<long[], Input, Output>(this) {
 
         @Override
         public Class<long[]> type() {
@@ -498,7 +499,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(long[] vals, XmlIO.Output out) {
+        public Output encode(long[] vals, Output out) {
             for (long val : vals) {
                 longCodec().encode(val, out.startElement(entryElemName()));
                 out.endElement();
@@ -507,11 +508,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public long[] decode(XmlIO.Input in) {
+        public long[] decode(Input in) {
             long[] arr = new long[defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -528,36 +529,36 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     };
 
     @Override
-    public Codec<long[], XmlIO.Input, XmlIO.Output> longArrayCodec() {
+    public Codec<long[], Input, Output> longArrayCodec() {
         return longArrayCodec;
     }
 
-    protected final Codec.FloatCodec<XmlIO.Input, XmlIO.Output> floatCodec =
-            new Codec.FloatCodec<XmlIO.Input, XmlIO.Output>() {
+    protected final Codec.FloatCodec<Input, Output> floatCodec =
+            new Codec.FloatCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<XmlIO.Input, XmlIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return XmlCodecCoreImpl.this;
         }
 
         @Override
-        public XmlIO.Output encodePrim(float val, XmlIO.Output out) {
-            return out.writeNum(val);
+        public Output encodePrim(float val, Output out) {
+            return out.writeFloat(val);
         }
 
         @Override
-        public float decodePrim(XmlIO.Input in ) {
+        public float decodePrim(Input in ) {
             return in.readFloat();
         }
     };
 
     @Override
-    public Codec.FloatCodec<XmlIO.Input, XmlIO.Output> floatCodec() {
+    public Codec.FloatCodec<Input, Output> floatCodec() {
         return floatCodec;
     }
 
-    protected final Codec<float[], XmlIO.Input, XmlIO.Output> floatArrayCodec =
-            new Codec.Base<float[], XmlIO.Input, XmlIO.Output>(this) {
+    protected final Codec<float[], Input, Output> floatArrayCodec =
+            new Codec.Base<float[], Input, Output>(this) {
 
         @Override
         public Class<float[]> type() {
@@ -565,7 +566,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(float[] vals, XmlIO.Output out) {
+        public Output encode(float[] vals, Output out) {
             for (float val : vals) {
                 floatCodec().encode(val, out.startElement(entryElemName()));
                 out.endElement();
@@ -574,11 +575,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public float[] decode(XmlIO.Input in) {
+        public float[] decode(Input in) {
             float[] arr = new float[defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -595,36 +596,36 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     };
 
     @Override
-    public Codec<float[], XmlIO.Input, XmlIO.Output> floatArrayCodec() {
+    public Codec<float[], Input, Output> floatArrayCodec() {
         return floatArrayCodec;
     }
 
-    protected final Codec.DoubleCodec<XmlIO.Input, XmlIO.Output> doubleCodec =
-            new Codec.DoubleCodec<XmlIO.Input, XmlIO.Output>() {
+    protected final Codec.DoubleCodec<Input, Output> doubleCodec =
+            new Codec.DoubleCodec<Input, Output>() {
 
         @Override
-        public CodecCoreIntl<XmlIO.Input, XmlIO.Output> core() {
+        public CodecCoreInternal<Input, Output> core() {
             return XmlCodecCoreImpl.this;
         }
 
         @Override
-        public XmlIO.Output encodePrim(double val, XmlIO.Output out) {
-            return out.writeNum(val);
+        public Output encodePrim(double val, Output out) {
+            return out.writeDouble(val);
         }
 
         @Override
-        public double decodePrim(XmlIO.Input in ) {
-            return in.readDbl();
+        public double decodePrim(Input in ) {
+            return in.readDouble();
         }
     };
 
     @Override
-    public Codec.DoubleCodec<XmlIO.Input, XmlIO.Output> doubleCodec() {
+    public Codec.DoubleCodec<Input, Output> doubleCodec() {
         return doubleCodec;
     }
 
-    protected final Codec<double[], XmlIO.Input, XmlIO.Output> doubleArrayCodec =
-            new Codec.Base<double[], XmlIO.Input, XmlIO.Output>(this) {
+    protected final Codec<double[], Input, Output> doubleArrayCodec =
+            new Codec.Base<double[], Input, Output>(this) {
 
         @Override
         public Class<double[]> type() {
@@ -632,7 +633,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(double[] vals, XmlIO.Output out) {
+        public Output encode(double[] vals, Output out) {
             for (double val : vals) {
                 doubleCodec().encode(val, out.startElement(entryElemName()));
                 out.endElement();
@@ -641,11 +642,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public double[] decode(XmlIO.Input in) {
+        public double[] decode(Input in) {
             double[] arr = new double[defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -662,12 +663,12 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     };
 
     @Override
-    public Codec<double[], XmlIO.Input, XmlIO.Output> doubleArrayCodec() {
+    public Codec<double[], Input, Output> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
-    protected final Codec<String, XmlIO.Input, XmlIO.Output> stringCodec =
-            new Codec.Base<String, XmlIO.Input, XmlIO.Output>(this) {
+    protected final Codec<String, Input, Output> stringCodec =
+            new Codec.Base<String, Input, Output>(this) {
 
         @Override
         public Class<String> type() {
@@ -675,61 +676,61 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(String val, XmlIO.Output out) {
-            return out.writeStr(val);
+        public Output encode(String val, Output out) {
+            return out.writeString(val);
         }
 
         @Override
-        public String decode(XmlIO.Input in) {
-            return in.readStr();
+        public String decode(Input in) {
+            return in.readString();
         }
     };
 
     @Override
-    public Codec<String, XmlIO.Input, XmlIO.Output> stringCodec() {
+    public Codec<String, Input, Output> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    public <EM extends Enum<EM>> Codec<EM, XmlIO.Input, XmlIO.Output> enumCodec(Class<EM> enumType) {
-        return new Codec.Base<EM, XmlIO.Input, XmlIO.Output>(this) {
+    public <EM extends Enum<EM>> Codec<EM, Input, Output> enumCodec(Class<EM> enumType) {
+        return new Codec.Base<EM, Input, Output>(this) {
             @Override
             public Class<EM> type() {
                 return enumType;
             }
 
             @Override
-            public XmlIO.Output encode(EM val, XmlIO.Output out) {
-                return out.writeStr(val.name());
+            public Output encode(EM val, Output out) {
+                return out.writeString(val.name());
             }
 
             @Override
-            public EM decode(XmlIO.Input in) {
-                return EM.valueOf(type(), in.readStr());
+            public EM decode(Input in) {
+                return EM.valueOf(type(), in.readString());
             }
         };
     }
 
     @Override
-    public <V> Codec<Map<String, V>, XmlIO.Input, XmlIO.Output> mapCodec(
+    public <V> Codec<Map<String, V>, Input, Output> mapCodec(
             Class<Map<String, V>> type,
-            Codec<V, XmlIO.Input, XmlIO.Output> valueCodec) {
+            Codec<V, Input, Output> valueCodec) {
         return new XmlMapCodecs.StringMapCodec<V>(this, type, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, XmlIO.Input, XmlIO.Output> mapCodec(
+    public <K, V> Codec<Map<K, V>, Input, Output> mapCodec(
             Class<Map<K, V>> type,
-            Codec<K, XmlIO.Input, XmlIO.Output> keyCodec,
-            Codec<V, XmlIO.Input, XmlIO.Output> valueCodec) {
+            Codec<K, Input, Output> keyCodec,
+            Codec<V, Input, Output> valueCodec) {
         return new XmlMapCodecs.MapCodec<K, V>(this, type, keyCodec, valueCodec);
     }
 
     @Override
-    public <T> Codec<Collection<T>, XmlIO.Input, XmlIO.Output> collCodec(
+    public <T> Codec<Collection<T>, Input, Output> collCodec(
             Class<Collection<T>> collType,
-            Codec<T, XmlIO.Input, XmlIO.Output> elemCodec) {
-        return new CollectionCodec<T, XmlIO.Input, XmlIO.Output>(
+            Codec<T, Input, Output> elemCodec) {
+        return new CollectionCodec<T, Input, Output>(
             XmlCodecCoreImpl.this,
                 elemCodec) {
             @Override
@@ -738,7 +739,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
             }
 
             @Override
-            public XmlIO.Output encode(Collection<T> vals, XmlIO.Output out) {
+            public Output encode(Collection<T> vals, Output out) {
                 for (T val : vals) {
                     elemCodec.encodeWithCheck(val, out.startElement(entryElemName()));
                     out.endElement();
@@ -747,11 +748,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
             }
 
             @Override
-            public Collection<T> decode(XmlIO.Input in) {
+            public Collection<T> decode(Input in) {
                 final Collection<T> vals = getTypeConstructor(collType).construct();
 
                 while (in.hasNext()) {
-                    if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                    if (!in.type().equals(Input.Type.START_ELEMENT)) {
                         break;
                     }
 
@@ -766,13 +767,13 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     }
 
     @Override
-    public <T> Codec<T[], XmlIO.Input, XmlIO.Output> objectArrayCodec(
+    public <T> Codec<T[], Input, Output> objectArrayCodec(
             Class<T[]> arrType,
             Class<T> elemType,
-            Codec<T, XmlIO.Input, XmlIO.Output> elemCodec) {
-        return new Codec<T[], XmlIO.Input, XmlIO.Output>() {
+            Codec<T, Input, Output> elemCodec) {
+        return new Codec<T[], Input, Output>() {
             @Override
-            public CodecCoreIntl<XmlIO.Input, XmlIO.Output> core() {
+            public CodecCoreInternal<Input, Output> core() {
                 return XmlCodecCoreImpl.this;
             }
 
@@ -782,7 +783,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
             }
 
             @Override
-            public XmlIO.Output encode(T[] vals, XmlIO.Output out) {
+            public Output encode(T[] vals, Output out) {
                 for (T val : vals) {
                     elemCodec.encodeWithCheck(val, out.startElement(entryElemName()));
                     out.endElement();
@@ -791,11 +792,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
             }
 
             @Override
-            public T[] decode(XmlIO.Input in) {
+            public T[] decode(Input in) {
                 T[] arr = (T[]) Array.newInstance(elemCodec.type(), defaultArrSize());
                 int i = 0;
                 while (in.hasNext()) {
-                    if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                    if (!in.type().equals(Input.Type.START_ELEMENT)) {
                         break;
                     }
 
@@ -813,9 +814,9 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, XmlIO.Input, XmlIO.Output> createObjectCodec(
+    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, Input, Output> createObjectCodec(
             Class<T> type,
-            ObjectMeta<T, XmlIO.Input, XmlIO.Output, RA> objMeta) {
+            ObjectMeta<T, Input, Output, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
             return new FinalObjectCodec<T, RA>(this, type, objMeta);
         } else {
@@ -824,16 +825,16 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
     }
 
     private static class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
-            extends Codec.Base<T, XmlIO.Input, XmlIO.Output> {
+            extends Codec.Base<T, Input, Output> {
 
         private final Class<T> type;
-        private final ObjectMeta<T, XmlIO.Input, XmlIO.Output, RA> objMeta;
-        private final Map<String, ObjectMeta.Field<T, XmlIO.Input, XmlIO.Output, RA>> fields;
+        private final ObjectMeta<T, Input, Output, RA> objMeta;
+        private final Map<String, ObjectMeta.Field<T, Input, Output, RA>> fields;
 
         private ObjectCodec(
-                CodecCoreIntl<XmlIO.Input, XmlIO.Output> core,
+                CodecCoreInternal<Input, Output> core,
                 Class<T> type,
-                ObjectMeta<T, XmlIO.Input, XmlIO.Output, RA> objMeta) {
+                ObjectMeta<T, Input, Output, RA> objMeta) {
             super(core);
             this.type = type;
             this.objMeta = objMeta;
@@ -850,7 +851,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public XmlIO.Output encode(T val, XmlIO.Output out) {
+        public Output encode(T val, Output out) {
             fields.forEach((name, field) -> {
                 field.encodeField(val, out.startElement(field.name()));
                 out.endElement();
@@ -860,12 +861,12 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
         }
 
         @Override
-        public T decode(XmlIO.Input in) {
+        public T decode(Input in) {
             final Set<String> expKeys = fields.keySet();
             final Set<String> setFields = new HashSet<>();
             final RA ra = objMeta.startDecode();
 
-            while(in.hasNext() && in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+            while(in.hasNext() && in.type().equals(Input.Type.START_ELEMENT)) {
                 final String name = in.startElement();
                 if (!expKeys.contains(name)) {
                     throw new CodecException("Field name '" + name + "' unexpected for type " + type +
@@ -892,12 +893,12 @@ public class XmlCodecCoreImpl extends BaseCodecCore<XmlIO.Input, XmlIO.Output> i
 
     private static class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
             extends ObjectCodec<T, RA>
-            implements Codec.FinalCodec<T, XmlIO.Input, XmlIO.Output> {
+            implements Codec.FinalCodec<T, Input, Output> {
 
         private FinalObjectCodec(
-                CodecCoreIntl<XmlIO.Input, XmlIO.Output> core,
+                CodecCoreInternal<Input, Output> core,
                 Class<T> type,
-                ObjectMeta<T, XmlIO.Input, XmlIO.Output, RA> objMeta) {
+                ObjectMeta<T, Input, Output, RA> objMeta) {
             super(core, type, objMeta);
         }
     }

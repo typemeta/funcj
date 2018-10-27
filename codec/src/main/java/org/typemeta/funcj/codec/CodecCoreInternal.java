@@ -12,7 +12,7 @@ import java.util.stream.StreamSupport;
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
  */
-public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
+public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
     String classToName(Class<?> clazz);
 
@@ -126,8 +126,8 @@ public interface CodecCoreIntl<IN, OUT> extends CodecCore<IN, OUT> {
 
     <T> FieldCodec<IN, OUT> createFieldCodec(Field field);
 
-    abstract class ObjectMeta<T, IN, OUT, RA extends CodecCoreIntl.ObjectMeta.ResultAccumlator<T>>
-            implements Iterable<CodecCoreIntl.ObjectMeta.Field<T, IN, OUT, RA>> {
+    abstract class ObjectMeta<T, IN, OUT, RA extends CodecCoreInternal.ObjectMeta.ResultAccumlator<T>>
+            implements Iterable<CodecCoreInternal.ObjectMeta.Field<T, IN, OUT, RA>> {
         public interface ResultAccumlator<T> {
             T construct();
         }

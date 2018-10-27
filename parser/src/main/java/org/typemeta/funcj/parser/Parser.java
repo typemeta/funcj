@@ -417,6 +417,7 @@ public interface Parser<I, A> {
      * @param <A>       the parser result type
      * @return          a parser that attempts one or more parsers in turn
      */
+    @SafeVarargs
     static <I, A>
     Parser<I, A> choice(Parser<I, A>... ps) {
         if (ps.length == 0) {

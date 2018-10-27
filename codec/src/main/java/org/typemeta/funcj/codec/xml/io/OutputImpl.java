@@ -102,12 +102,12 @@ class OutputImpl implements XmlIO.Output {
     }
 
     @Override
-    public XmlIO.Output writeBool(boolean value) {
+    public XmlIO.Output writeBoolean(boolean value) {
         return writeCharacters(Boolean.toString(value));
     }
 
     @Override
-    public XmlIO.Output writeStr(String value) {
+    public XmlIO.Output writeString(String value) {
         return writeCharacters(XmlUtils.escapeXml(value));
     }
 
@@ -117,47 +117,47 @@ class OutputImpl implements XmlIO.Output {
     }
 
     @Override
-    public XmlIO.Output writeNum(byte value) {
+    public XmlIO.Output writeByte(byte value) {
         return writeCharacters(Byte.toString(value));
     }
 
     @Override
-    public XmlIO.Output writeNum(short value) {
+    public XmlIO.Output writeShort(short value) {
         return writeCharacters(Short.toString(value));
     }
 
     @Override
-    public XmlIO.Output writeNum(int value) {
+    public XmlIO.Output writeInt(int value) {
         return writeCharacters(Integer.toString(value));
     }
 
     @Override
-    public XmlIO.Output writeNum(long value) {
+    public XmlIO.Output writeLong(long value) {
         return writeCharacters(Long.toString(value));
     }
 
     @Override
-    public XmlIO.Output writeNum(float value) {
+    public XmlIO.Output writeFloat(float value) {
         return writeCharacters(Float.toString(value));
     }
 
     @Override
-    public XmlIO.Output writeNum(double value) {
+    public XmlIO.Output writeDouble(double value) {
         return writeCharacters(Double.toString(value));
     }
 
     @Override
-    public XmlIO.Output writeNum(Number value) {
+    public XmlIO.Output writeNumber(Number value) {
         return writeCharacters(value.toString());
     }
 
     @Override
-    public XmlIO.Output writeNum(BigDecimal value) {
+    public XmlIO.Output writeBigDecimal(BigDecimal value) {
         return writeCharacters(value.toString());
     }
 
     @Override
-    public XmlIO.Output writeNum(String value) {
+    public XmlIO.Output writeNumber(String value) {
         return writeCharacters(XmlUtils.escapeXml(value));
     }
 }
