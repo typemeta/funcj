@@ -2,8 +2,8 @@ package org.typemeta.funcj.codec.bytes;
 
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
-import javax.xml.bind.DatatypeConverter;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 
 public class ByteCodecTest extends TestBase {

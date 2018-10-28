@@ -3,8 +3,7 @@ package org.typemeta.funcj.codec.xml;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.MapCodecs.*;
 import org.typemeta.funcj.codec.xml.io.XmlIO;
-import org.typemeta.funcj.codec.xml.io.XmlIO.Input;
-import org.typemeta.funcj.codec.xml.io.XmlIO.Output;
+import org.typemeta.funcj.codec.xml.io.XmlIO.*;
 
 import java.util.Map;
 

@@ -3,13 +3,10 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -99,28 +96,36 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
         return getCodec(remapType(type)).decodeWithCheck(in);
     }
 
+    @Override
+    public <T> Class<T> nameToClass(String name) {
+        try {
+            return (Class<T>) Class.forName(name);
+        } catch (ClassNotFoundException ex) {
+            throw new CodecException("Cannot create class from class name '" + name + "'", ex);
+        }
+    }
+
     /**
      * Map a class to a class name.
-     * This method exists primarily to allow it to be overridden in one place.
-     * @param clazz     the class
+     * @param type      the class
      * @return          the class name
      */
     @Override
-    public String classToName(Class<?> clazz) {
-        return clazz.getName();
+    public String classToName(Class<?> type) {
+        return type.getName();
     }
 
     @Override
-    public String classToName(Class<?> clazz, Class<?>... classes) {
+    public String classToName(Class<?> type, Class<?>... classes) {
         switch (classes.length) {
             case 1:
-                return classToName(clazz) + '|' + classToName(classes[0]);
+                return classToName(type) + '|' + classToName(classes[0]);
             case 2:
-                return classToName(clazz) + '|' + classToName(classes[0])
+                return classToName(type) + '|' + classToName(classes[0])
                         + '|' + classToName(classes[1]);
             default: {
                 final StringBuilder sb = new StringBuilder();
-                sb.append(classToName(clazz)).append('|');
+                sb.append(classToName(type)).append('|');
                 for (Class<?> cls : classes) {
                     sb.append(classToName(cls)).append('|');
                 }
@@ -140,20 +145,11 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> Class<T> nameToClass(String name) {
-        try {
-            return (Class<T>) Class.forName(name);
-        } catch (ClassNotFoundException ex) {
-            throw new CodecException("Cannot create class from class name '" + name + "'", ex);
-        }
-    }
-
-    @Override
-    public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
-        final String name = classToName(clazz);
+    public <T> TypeConstructor<T> getTypeConstructor(Class<T> type) {
+        final String name = classToName(type);
         return (TypeConstructor<T>) typeCtorRegistry.computeIfAbsent(
                 name,
-                n -> TypeConstructor.create(clazz));
+                n -> TypeConstructor.create(type));
     }
     /**
      * Lookup a {@code Codec} for a name, and, if one doesn't exist,
@@ -382,9 +378,9 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     @Override
     public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> type) {
         final Map<String, FieldCodec<IN, OUT>> fieldCodecs = new LinkedHashMap<>();
-        Class<?> clazz = type;
-        for (int depth = 0; !clazz.equals(Object.class); depth++) {
-            final Field[] fields = clazz.getDeclaredFields();
+        Class<?> type2 = type;
+        for (int depth = 0; !type2.equals(Object.class); depth++) {
+            final Field[] fields = type2.getDeclaredFields();
             for (Field field : fields) {
                 final int fm = field.getModifiers();
                 if (!Modifier.isStatic(fm) && !Modifier.isTransient(fm)) {
@@ -392,7 +388,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                     fieldCodecs.put(fieldName, createFieldCodec(field));
                 }
             }
-            clazz = clazz.getSuperclass();
+            type2 = type2.getSuperclass();
         }
 
         return createObjectCodec(type, fieldCodecs);
@@ -495,28 +491,29 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             }
         }
 
-        final List<ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>> fieldMetas = fieldCodecs.entrySet().stream()
-                .map(en -> {
-                    final String name = en.getKey();
-                    final ObjectCodecBuilder.FieldCodec<T, IN, OUT> codec = en.getValue();
-                    return new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
-                        @Override
-                        public String name() {
-                            return name;
-                        }
+        final List<ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>> fieldMetas =
+                fieldCodecs.entrySet().stream()
+                        .map(en -> {
+                            final String name = en.getKey();
+                            final ObjectCodecBuilder.FieldCodec<T, IN, OUT> codec = en.getValue();
+                            return new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
+                                @Override
+                                public String name() {
+                                    return name;
+                                }
 
-                        @Override
-                        public OUT encodeField(T val, OUT out) {
-                            return codec.encodeField(val, out);
-                        }
+                                @Override
+                                public OUT encodeField(T val, OUT out) {
+                                    return codec.encodeField(val, out);
+                                }
 
-                        @Override
-                        public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN in) {
-                            acc.ctorArgs[acc.i++] = codec.decodeField(in);
-                            return acc;
-                        }
-                    };
-                }).collect(toList());
+                                @Override
+                                public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN in) {
+                                    acc.ctorArgs[acc.i++] = codec.decodeField(in);
+                                    return acc;
+                                }
+                            };
+                        }).collect(toList());
 
         return createObjectCodec(
                 type,

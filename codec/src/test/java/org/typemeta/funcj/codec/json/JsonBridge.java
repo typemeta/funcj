@@ -2,8 +2,7 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.json.io.*;
 
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
 public class JsonBridge {
     private final JsonIO.Input input;

@@ -3,8 +3,7 @@ package org.typemeta.funcj.codec.xml;
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
 
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 
 public class XmlsCodecTest extends TestBase {
     final static XmlCodecCore codec = Codecs.xmlCodec();

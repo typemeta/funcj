@@ -1,8 +1,6 @@
 package org.typemeta.funcj.codec.bytes;
 
-import org.typemeta.funcj.codec.*;
-
-import java.util.Optional;
+import org.typemeta.funcj.codec.Codecs;
 
 @SuppressWarnings("unchecked")
 public class ByteCodecs {

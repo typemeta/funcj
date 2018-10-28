@@ -5,8 +5,7 @@ import org.typemeta.funcj.functions.Functions;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * Internal interface for {@link CodecCore} implementations.
@@ -15,13 +14,13 @@ import java.util.stream.StreamSupport;
  */
 public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
+    <T> Class<T> nameToClass(String name);
+
     String classToName(Class<?> clazz);
 
     String classToName(Class<?> clazz, Class<?>... classes);
 
     <X> Class<X> remapType(Class<X> type);
-
-    <T> Class<T> nameToClass(String name);
 
     <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz);
 

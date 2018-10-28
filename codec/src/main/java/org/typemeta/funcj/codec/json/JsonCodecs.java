@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codecs;
 
 @SuppressWarnings("unchecked")
 public class JsonCodecs {

@@ -6,7 +6,7 @@ import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
 
 import java.util.Map;
 
-import static org.typemeta.funcj.codec.bytes.io.ByteIO.*;
+import static org.typemeta.funcj.codec.bytes.io.ByteIO.Output;
 
 public abstract class ByteMapCodecs {
 

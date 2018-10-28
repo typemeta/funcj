@@ -4,8 +4,7 @@ import org.typemeta.funcj.codec.CodecException;
 
 import javax.xml.stream.*;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
+import java.text.*;
 
 class InputImpl implements XmlIO.Input {
 

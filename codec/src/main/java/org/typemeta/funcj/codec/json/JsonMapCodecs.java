@@ -2,8 +2,7 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.MapCodecs.*;
-import org.typemeta.funcj.codec.json.io.JsonIO.Input;
-import org.typemeta.funcj.codec.json.io.JsonIO.Output;
+import org.typemeta.funcj.codec.json.io.JsonIO.*;
 
 import java.util.Map;
 

@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Base class for {@link Codec}s for {@link Collection}s.

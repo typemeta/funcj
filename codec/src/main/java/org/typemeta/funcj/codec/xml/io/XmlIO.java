@@ -3,8 +3,7 @@ package org.typemeta.funcj.codec.xml.io;
 import org.typemeta.funcj.codec.CodecException;
 
 import javax.xml.stream.*;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 
