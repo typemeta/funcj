@@ -87,13 +87,13 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> OUT encode(Class<T> type, T val, OUT out) {
-        return getCodec(remapType(type)).encodeWithCheck(val, out);
+    public <T> OUT encode(Class<T> clazz, T val, OUT out) {
+        return getCodec(remapType(clazz)).encodeWithCheck(val, out);
     }
 
     @Override
-    public <T> T decode(Class<T> type, IN in) {
-        return getCodec(remapType(type)).decodeWithCheck(in);
+    public <T> T decode(Class<T> clazz, IN in) {
+        return getCodec(remapType(clazz)).decodeWithCheck(in);
     }
 
     @Override
@@ -105,28 +105,23 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
         }
     }
 
-    /**
-     * Map a class to a class name.
-     * @param type      the class
-     * @return          the class name
-     */
     @Override
-    public String classToName(Class<?> type) {
-        return type.getName();
+    public String classToName(Class<?> clazz) {
+        return clazz.getName();
     }
 
     @Override
-    public String classToName(Class<?> type, Class<?>... classes) {
-        switch (classes.length) {
+    public String classToName(Class<?> clazz, Class<?>... types) {
+        switch (types.length) {
             case 1:
-                return classToName(type) + '|' + classToName(classes[0]);
+                return classToName(clazz) + '|' + classToName(types[0]);
             case 2:
-                return classToName(type) + '|' + classToName(classes[0])
-                        + '|' + classToName(classes[1]);
+                return classToName(clazz) + '|' + classToName(types[0])
+                        + '|' + classToName(types[1]);
             default: {
                 final StringBuilder sb = new StringBuilder();
-                sb.append(classToName(type)).append('|');
-                for (Class<?> cls : classes) {
+                sb.append(classToName(clazz)).append('|');
+                for (Class<?> cls : types) {
                     sb.append(classToName(cls)).append('|');
                 }
                 return sb.toString();
@@ -135,51 +130,32 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <X> Class<X> remapType(Class<X> type) {
-        final String typeName = classToName(type);
+    public <X> Class<X> remapType(Class<X> clazz) {
+        final String typeName = classToName(clazz);
         if (typeProxyRegistry.containsKey(typeName)) {
             return (Class<X>) typeProxyRegistry.get(typeName);
         } else {
-            return type;
+            return clazz;
         }
     }
 
     @Override
-    public <T> TypeConstructor<T> getTypeConstructor(Class<T> type) {
-        final String name = classToName(type);
+    public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
+        final String name = classToName(clazz);
         return (TypeConstructor<T>) typeCtorRegistry.computeIfAbsent(
                 name,
-                n -> TypeConstructor.create(type));
-    }
-    /**
-     * Lookup a {@code Codec} for a name, and, if one doesn't exist,
-     * then create a new one.
-     * <p>
-     * This is slightly tricky as it needs to be re-entrant in case the
-     * type in question is recursive.
-     * @param type      the type
-     * @param <T>       the raw type to be encoded/decoded
-     * @return          the {@code Codec} for the specified name
-     */
-    @Override
-    public <T> Codec<T, IN, OUT> getCodec(Class<T> type) {
-        return getCodec(classToName(type), () -> createCodec(type));
+                n -> TypeConstructor.create(clazz));
     }
 
-    /**
-     * Lookup a {@code Codec} for a name, and, if one doesn't exist,
-     * then create a new one.
-     * <p>
-     * This is slightly tricky as it needs to be re-entrant in case the
-     * type in question is recursive.
-     * @param name      the type name
-     * @param <T>       the raw type to be encoded/decoded
-     * @return          the {@code Codec} for the specified name
-     */
+    @Override
+    public <T> Codec<T, IN, OUT> getCodec(Class<T> clazz) {
+        return getCodec(classToName(clazz), () -> createCodec(clazz));
+    }
+
     @Override
     public <T> Codec<T, IN, OUT> getCodec(
             String name,
-            Supplier<Codec<T, IN, OUT>> supp) {
+            Supplier<Codec<T, IN, OUT>> codecSupp) {
         // First attempt, without locking.
         if (codecRegistry.containsKey(name)) {
             return (Codec<T, IN, OUT>)codecRegistry.get(name);
@@ -197,7 +173,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             }
 
             // Initialise the CodecRef, and overwrite the registry entry with the real Codec.
-            codecRegistry.put(name, codecRef.setIfUninitialised(supp::get));
+            codecRegistry.put(name, codecRef.setIfUninitialised(codecSupp::get));
 
             return (Codec<T, IN, OUT>)codecRegistry.get(name);
         }
@@ -268,30 +244,30 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> Codec<T, IN, OUT> createCodec(Class<T> type) {
-        if (type.isPrimitive()) {
-            if (type.equals(boolean.class)) {
+    public <T> Codec<T, IN, OUT> createCodec(Class<T> clazz) {
+        if (clazz.isPrimitive()) {
+            if (clazz.equals(boolean.class)) {
                 return (Codec<T, IN, OUT>)booleanCodec();
-            } else if (type.equals(byte.class)) {
+            } else if (clazz.equals(byte.class)) {
                 return (Codec<T, IN, OUT>) byteCodec();
-            } else if (type.equals(char.class)) {
+            } else if (clazz.equals(char.class)) {
                 return (Codec<T, IN, OUT>) charCodec();
-            } else if (type.equals(short.class)) {
+            } else if (clazz.equals(short.class)) {
                 return (Codec<T, IN, OUT>) shortCodec();
-            } else if (type.equals(int.class)) {
+            } else if (clazz.equals(int.class)) {
                 return (Codec<T, IN, OUT>) intCodec();
-            } else if (type.equals(long.class)) {
+            } else if (clazz.equals(long.class)) {
                 return (Codec<T, IN, OUT>) longCodec();
-            } else if (type.equals(float.class)) {
+            } else if (clazz.equals(float.class)) {
                 return (Codec<T, IN, OUT>) floatCodec();
-            } else if (type.equals(double.class)) {
+            } else if (clazz.equals(double.class)) {
                 return (Codec<T, IN, OUT>) doubleCodec();
             } else {
-                throw new IllegalStateException("Unexpected primitive type - " + type);
+                throw new IllegalStateException("Unexpected primitive type - " + clazz);
             }
         } else {
-            if (type.isArray()) {
-                final Class<?> elemType = type.getComponentType();
+            if (clazz.isArray()) {
+                final Class<?> elemType = clazz.getComponentType();
                 if (elemType.equals(boolean.class)) {
                     return (Codec<T, IN, OUT>) booleanArrayCodec();
                 } else if (elemType.equals(byte.class)) {
@@ -310,77 +286,77 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                     return (Codec<T, IN, OUT>) doubleArrayCodec();
                 } else {
                     if (elemType.equals(Boolean.class)) {
-                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Boolean.class, booleanCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)clazz, Boolean.class, booleanCodec());
                     } else if (elemType.equals(Byte.class)) {
-                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Byte.class, byteCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)clazz, Byte.class, byteCodec());
                     } else if (elemType.equals(Character.class)) {
-                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Character.class, charCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)clazz, Character.class, charCodec());
                     } else if (elemType.equals(Short.class)) {
-                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Short.class, shortCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)clazz, Short.class, shortCodec());
                     } else if (elemType.equals(Integer.class)) {
-                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Integer.class, intCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)clazz, Integer.class, intCodec());
                     } else if (elemType.equals(Long.class)) {
-                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Long.class, longCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)clazz, Long.class, longCodec());
                     } else if (elemType.equals(Float.class)) {
-                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Float.class, floatCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)clazz, Float.class, floatCodec());
                     } else if (elemType.equals(Double.class)) {
-                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, Double.class, doubleCodec());
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)clazz, Double.class, doubleCodec());
                     } else {
                         final Codec<Object, IN, OUT> elemCodec = getCodec((Class<Object>)elemType);
-                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)type, (Class<Object>) elemType, elemCodec);
+                        return (Codec<T, IN, OUT>) createObjectArrayCodec((Class)clazz, (Class<Object>) elemType, elemCodec);
                     }
                 }
-            } else if (type.isEnum()) {
-                return enumCodec((Class) type);
-            } else if (type.equals(Boolean.class)) {
+            } else if (clazz.isEnum()) {
+                return enumCodec((Class) clazz);
+            } else if (clazz.equals(Boolean.class)) {
                 return (Codec<T, IN, OUT>) booleanCodec();
-            } else if (type.equals(Byte.class)) {
+            } else if (clazz.equals(Byte.class)) {
                 return (Codec<T, IN, OUT>) byteCodec();
-            } else if (type.equals(Character.class)) {
+            } else if (clazz.equals(Character.class)) {
                 return (Codec<T, IN, OUT>) charCodec();
-            } else if (type.equals(Short.class)) {
+            } else if (clazz.equals(Short.class)) {
                 return (Codec<T, IN, OUT>) shortCodec();
-            } else if (type.equals(Integer.class)) {
+            } else if (clazz.equals(Integer.class)) {
                 return (Codec<T, IN, OUT>) intCodec();
-            } else if (type.equals(Long.class)) {
+            } else if (clazz.equals(Long.class)) {
                 return (Codec<T, IN, OUT>) longCodec();
-            } else if (type.equals(Float.class)) {
+            } else if (clazz.equals(Float.class)) {
                 return (Codec<T, IN, OUT>) floatCodec();
-            } else if (type.equals(Double.class)) {
+            } else if (clazz.equals(Double.class)) {
                 return (Codec<T, IN, OUT>) doubleCodec();
-            } else if (type.equals(String.class)) {
+            } else if (clazz.equals(String.class)) {
                 return (Codec<T, IN, OUT>) stringCodec();
-            } else if (Map.class.isAssignableFrom(type)) {
-                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(type, Map.class);
+            } else if (Map.class.isAssignableFrom(clazz)) {
+                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(clazz, Map.class);
                 if (typeArgs.size() == 2) {
                     final Class keyType = typeArgs.get(0);
                     final Class valueType = typeArgs.get(1);
-                    return (Codec<T, IN, OUT>) getMapCodec((Class)type, keyType, valueType);
+                    return (Codec<T, IN, OUT>) getMapCodec((Class)clazz, keyType, valueType);
                 } else {
-                    return (Codec<T, IN, OUT>) getMapCodec((Class)type, Object.class, Object.class);
+                    return (Codec<T, IN, OUT>) getMapCodec((Class)clazz, Object.class, Object.class);
                 }
-            } else if (Collection.class.isAssignableFrom(type)) {
+            } else if (Collection.class.isAssignableFrom(clazz)) {
                 final Codec<Object, IN, OUT> elemCodec;
-                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(type, Collection.class);
+                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(clazz, Collection.class);
                 if (typeArgs.size() == 1) {
                     final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
                     elemCodec = getCodec(elemType);
                 } else {
                     elemCodec = getCodec(Object.class);
                 }
-                return (Codec<T, IN, OUT>) getCollCodec((Class<Collection<Object>>) type, elemCodec);
+                return (Codec<T, IN, OUT>) getCollCodec((Class<Collection<Object>>) clazz, elemCodec);
             } else {
-                return createObjectCodec(type);
+                return createObjectCodec(clazz);
             }
         }
     }
 
     @Override
-    public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> type) {
+    public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz) {
         final Map<String, FieldCodec<IN, OUT>> fieldCodecs = new LinkedHashMap<>();
-        Class<?> type2 = type;
-        for (int depth = 0; !type2.equals(Object.class); depth++) {
-            final Field[] fields = type2.getDeclaredFields();
+        Class<?> clazz2 = clazz;
+        for (int depth = 0; !clazz2.equals(Object.class); depth++) {
+            final Field[] fields = clazz2.getDeclaredFields();
             for (Field field : fields) {
                 final int fm = field.getModifiers();
                 if (!Modifier.isStatic(fm) && !Modifier.isTransient(fm)) {
@@ -388,21 +364,21 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                     fieldCodecs.put(fieldName, createFieldCodec(field));
                 }
             }
-            type2 = type2.getSuperclass();
+            clazz2 = clazz2.getSuperclass();
         }
 
-        return createObjectCodec(type, fieldCodecs);
+        return createObjectCodec(clazz, fieldCodecs);
     }
 
     @Override
     public <T> Codec<T, IN, OUT> createObjectCodec(
-            Class<T> type,
+            Class<T> clazz,
             Map<String, FieldCodec<IN, OUT>> fieldCodecs) {
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final T val;
 
-            ResultAccumlatorImpl(Class<T> type) {
-                this.val = getTypeConstructor(type).construct();
+            ResultAccumlatorImpl(Class<T> clazz) {
+                this.val = getTypeConstructor(clazz).construct();
             }
 
             @Override
@@ -436,7 +412,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                         }).collect(toList());
 
         return createObjectCodec(
-                type,
+                clazz,
                 new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
                         @Override
                         public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
@@ -445,7 +421,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
                         @Override
                         public ResultAccumlatorImpl startDecode() {
-                            return new ResultAccumlatorImpl(type);
+                            return new ResultAccumlatorImpl(clazz);
                         }
 
                         @Override
@@ -457,16 +433,16 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> ObjectCodecBuilder<T, IN, OUT> createObjectCodecBuilder(Class<T> type) {
-        return new ObjectCodecBuilder<T, IN, OUT>(this, type);
+    public <T> ObjectCodecBuilder<T, IN, OUT> createObjectCodecBuilder(Class<T> clazz) {
+        return new ObjectCodecBuilder<T, IN, OUT>(this, clazz);
     }
 
     @Override
-    public <T> ObjectCodecBuilder<T, IN, OUT> objectCodecDeferredRegister(Class<T> type) {
-        return new ObjectCodecBuilder<T, IN, OUT>(this, type) {
+    public <T> ObjectCodecBuilder<T, IN, OUT> objectCodecDeferredRegister(Class<T> clazz) {
+        return new ObjectCodecBuilder<T, IN, OUT>(this, clazz) {
             @Override
             protected Codec<T, IN, OUT> registration(Codec<T, IN, OUT> codec) {
-                registerCodec(type, codec);
+                registerCodec(clazz, codec);
                 return codec;
             }
         };
@@ -474,14 +450,14 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> Codec<T, IN, OUT> createObjectCodec(
-            Class<T> type,
+            Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
             Functions.F<Object[], T> ctor) {
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final Object[] ctorArgs;
             int i = 0;
 
-            ResultAccumlatorImpl(Class<T> type) {
+            ResultAccumlatorImpl(Class<T> clazz) {
                 this.ctorArgs = new Object[fieldCodecs.size()];
             }
 
@@ -516,7 +492,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                         }).collect(toList());
 
         return createObjectCodec(
-                type,
+                clazz,
                 new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
                         @Override
                         public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
@@ -525,7 +501,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
                         @Override
                         public ResultAccumlatorImpl startDecode() {
-                            return new ResultAccumlatorImpl(type);
+                            return new ResultAccumlatorImpl(clazz);
                         }
 
                         @Override
@@ -547,29 +523,29 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> FieldCodec<IN, OUT> createFieldCodec(Field field) {
-        final Class<T> type = (Class<T>)field.getType();
-        if (type.isPrimitive()) {
-            if (type.equals(boolean.class)) {
+        final Class<T> clazz = (Class<T>)field.getType();
+        if (clazz.isPrimitive()) {
+            if (clazz.equals(boolean.class)) {
                 return new FieldCodec.BooleanFieldCodec<IN, OUT>(field, booleanCodec());
-            } else if (type.equals(byte.class)) {
+            } else if (clazz.equals(byte.class)) {
                 return new FieldCodec.ByteFieldCodec<IN, OUT>(field, byteCodec());
-            } else if (type.equals(char.class)) {
+            } else if (clazz.equals(char.class)) {
                 return new FieldCodec.CharFieldCodec<IN, OUT>(field, charCodec());
-            } else if (type.equals(short.class)) {
+            } else if (clazz.equals(short.class)) {
                 return new FieldCodec.ShortFieldCodec<IN, OUT>(field, shortCodec());
-            } else if (type.equals(int.class)) {
+            } else if (clazz.equals(int.class)) {
                 return new FieldCodec.IntegerFieldCodec<IN, OUT>(field, intCodec());
-            } else if (type.equals(long.class)) {
+            } else if (clazz.equals(long.class)) {
                 return new FieldCodec.LongFieldCodec<IN, OUT>(field, longCodec());
-            } else if (type.equals(float.class)) {
+            } else if (clazz.equals(float.class)) {
                 return new FieldCodec.FloatFieldCodec<IN, OUT>(field, floatCodec());
-            } else if (type.equals(double.class)) {
+            } else if (clazz.equals(double.class)) {
                 return new FieldCodec.DoubleFieldCodec<IN, OUT>(field, doubleCodec());
             } else {
-                throw new IllegalStateException("Unexpected primitive type - " + type);
+                throw new IllegalStateException("Unexpected primitive type - " + clazz);
             }
-        } else if (type.isArray()) {
-            final Class<?> elemType = type.getComponentType();
+        } else if (clazz.isArray()) {
+            final Class<?> elemType = clazz.getComponentType();
             if (elemType.equals(boolean.class)) {
                 return new FieldCodec.BooleanArrayFieldCodec<IN, OUT>(field, booleanArrayCodec());
             } else if (elemType.equals(byte.class)) {
@@ -587,33 +563,33 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             } else if (elemType.equals(double.class)) {
                 return new FieldCodec.DoubleArrayFieldCodec<IN, OUT>(field, doubleArrayCodec());
             } else {
-                final Codec<Object[], IN, OUT> codec = getCodec((Class<Object[]>)type);
+                final Codec<Object[], IN, OUT> codec = getCodec((Class<Object[]>)clazz);
                 return new FieldCodec.ObjectArrayFieldCodec<>(field, codec);
             }
         } else {
             Codec<T, IN, OUT> codec;
 
-            if (type.isEnum() ||
-                    type.equals(Boolean.class) ||
-                    type.equals(Byte.class) ||
-                    type.equals(Character.class) ||
-                    type.equals(Short.class) ||
-                    type.equals(Integer.class) ||
-                    type.equals(Long.class) ||
-                    type.equals(Float.class) ||
-                    type.equals(Double.class) ||
-                    type.equals(String.class)) {
-                codec = getCodec(type);
-            } else if (Map.class.isAssignableFrom(type)) {
+            if (clazz.isEnum() ||
+                    clazz.equals(Boolean.class) ||
+                    clazz.equals(Byte.class) ||
+                    clazz.equals(Character.class) ||
+                    clazz.equals(Short.class) ||
+                    clazz.equals(Integer.class) ||
+                    clazz.equals(Long.class) ||
+                    clazz.equals(Float.class) ||
+                    clazz.equals(Double.class) ||
+                    clazz.equals(String.class)) {
+                codec = getCodec(clazz);
+            } else if (Map.class.isAssignableFrom(clazz)) {
                 final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
                 if (typeArgs.size() == 2) {
                     final Class keyType = typeArgs.get(0);
                     final Class valueType = typeArgs.get(1);
-                    codec = (Codec<T, IN, OUT>) getMapCodec((Class)type, keyType, valueType);
+                    codec = (Codec<T, IN, OUT>) getMapCodec((Class)clazz, keyType, valueType);
                 } else {
-                    codec = (Codec<T, IN, OUT>) getMapCodec((Class)type, Object.class, Object.class);
+                    codec = (Codec<T, IN, OUT>) getMapCodec((Class)clazz, Object.class, Object.class);
                 }
-            } else if (Collection.class.isAssignableFrom(type)) {
+            } else if (Collection.class.isAssignableFrom(clazz)) {
                 final Codec<Object, IN, OUT> elemCodec;
                 final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Collection.class);
                 if (typeArgs.size() == 1) {
@@ -622,9 +598,9 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                 } else {
                     elemCodec = getCodec(Object.class);
                 }
-                codec = (Codec<T, IN, OUT>) getCollCodec((Class<Collection<Object>>) type, elemCodec);
+                codec = (Codec<T, IN, OUT>) getCollCodec((Class<Collection<Object>>) clazz, elemCodec);
             } else {
-                codec = getCodec(type);
+                codec = getCodec(clazz);
             }
 
             return new FieldCodec.ObjectFieldCodec<>(field, codec);

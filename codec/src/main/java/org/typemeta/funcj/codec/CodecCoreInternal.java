@@ -16,11 +16,23 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
     <T> Class<T> nameToClass(String name);
 
+    /**
+     * Map a class to a name.
+     * @param clazz     the class
+     * @return          the name
+     */
     String classToName(Class<?> clazz);
 
+
+    /**
+     * Map one or  more classes to a name.
+     * @param clazz     the class
+     * @param classes   the classes
+     * @return          the name
+     */
     String classToName(Class<?> clazz, Class<?>... classes);
 
-    <X> Class<X> remapType(Class<X> type);
+    <X> Class<X> remapType(Class<X> clazz);
 
     <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz);
 
@@ -78,11 +90,30 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
     <EM extends Enum<EM>> Codec<EM, IN, OUT> enumCodec(Class<EM> enumType);
 
-    <T> Codec<T, IN, OUT> getCodec(Class<T> type);
+    /**
+     * Lookup a {@code Codec} for a name, and, if one doesn't exist,
+     * then create a new one.
+     * @param clazz     the type
+     * @param <T>       the raw type to be encoded/decoded
+     * @return          the {@code Codec} for the specified name
+     */
+    <T> Codec<T, IN, OUT> getCodec(Class<T> clazz);
 
+
+    /**
+     * Lookup a {@code Codec} for a name, and, if one doesn't exist,
+     * then create a new one using the supplier.
+     * <p>
+     * This is slightly tricky as it needs to be re-entrant in case the
+     * type in question is recursive.
+     * @param name      the type name
+     * @param codecSupp the supplier of
+     * @param <T>       the raw type to be encoded/decoded
+     * @return          the {@code Codec} for the specified name
+     */
     <T> Codec<T, IN, OUT> getCodec(
             String name,
-            Supplier<Codec<T, IN, OUT>> supp);
+            Supplier<Codec<T, IN, OUT>> codecSupp);
 
     <T> Codec<Collection<T>, IN, OUT> getCollCodec(
             Class<Collection<T>> collType,
@@ -106,10 +137,10 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
             Class<Map<String, V>> mapType,
             Codec<V, IN, OUT> valueCodec);
 
-    <T> Codec<T, IN, OUT> createCodec(Class<T> type);
+    <T> Codec<T, IN, OUT> createCodec(Class<T> clazz);
 
     <T> Codec<T, IN, OUT> createObjectCodec(
-            Class<T> type,
+            Class<T> clazz,
             Map<String, FieldCodec<IN, OUT>> fieldCodecs);
 
     <K, V> Codec<Map<K, V>, IN, OUT> createMapCodec(
@@ -139,19 +170,19 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
             Class<T> elemType,
             Codec<T, IN, OUT> elemCodec);
 
-    <T> ObjectCodecBuilder<T, IN, OUT> createObjectCodecBuilder(Class<T> type);
+    <T> ObjectCodecBuilder<T, IN, OUT> createObjectCodecBuilder(Class<T> clazz);
 
-    <T> ObjectCodecBuilder<T, IN, OUT> objectCodecDeferredRegister(Class<T> type);
+    <T> ObjectCodecBuilder<T, IN, OUT> objectCodecDeferredRegister(Class<T> clazz);
 
-    <T> Codec<T, IN, OUT> createObjectCodec(Class<T> type);
+    <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz);
 
     <T> Codec<T, IN, OUT> createObjectCodec(
-            Class<T> type,
+            Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
             Functions.F<Object[], T> ctor);
 
     <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(
-            Class<T> type,
+            Class<T> clazz,
             ObjectMeta<T, IN, OUT, RA> objMeta);
 
     String getFieldName(Field field, int depth, Set<String> existingNames);

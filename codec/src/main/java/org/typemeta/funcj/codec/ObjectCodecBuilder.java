@@ -51,7 +51,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
     }
 
     <A> _1<A> field(String name, Functions.F<T, A> getter, Codec<A, IN, OUT> codec) {
-        fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
+        fields.put(name, new FieldCodec<>(getter, codec));
         return new _1<A>();
     }
 
@@ -69,7 +69,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
         }
 
         <B> _2<B> field(String name, Functions.F<T, B> getter, Codec<B, IN, OUT> codec) {
-            fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
+            fields.put(name, new FieldCodec<>(getter, codec));
             return new _2<B>();
         }
 
@@ -87,7 +87,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
             }
 
             <C> _3<C> field(String name, Functions.F<T, C> getter, Codec<C, IN, OUT> codec) {
-                fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
+                fields.put(name, new FieldCodec<>(getter, codec));
                 return new _3<C>();
             }
 
@@ -105,7 +105,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                 }
 
                 <D> _4<D> field(String name, Functions.F<T, D> getter, Codec<D, IN, OUT> codec) {
-                    fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
+                    fields.put(name, new FieldCodec<>(getter, codec));
                     return new _4<D>();
                 }
 
@@ -123,7 +123,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                     }
 
                     <N> _N field(String name, Functions.F<T, N> getter, Codec<N, IN, OUT> codec) {
-                        fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
+                        fields.put(name, new FieldCodec<>(getter, codec));
                         return new _N();
                     }
 
@@ -137,7 +137,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                         }
 
                         <N> _N field(String name, Functions.F<T, N> getter, Codec<N, IN, OUT> codec) {
-                            fields.put(name, new FieldCodec<T, IN, OUT>(getter, codec));
+                            fields.put(name, new FieldCodec<>(getter, codec));
                             return new _N();
                         }
 
