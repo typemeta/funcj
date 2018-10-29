@@ -49,7 +49,7 @@ or to simply override the default encoding provided by the framework.
 
 ## Limitations
 
-* Does not, currently, handle object graphs with loops.
+* Does not, currently, handle cyclic object graphs (i.e. graphs with loops).
 
 # Getting Started
 
@@ -125,14 +125,14 @@ To round trip the data via JSON:
 ```java
 final JsonCodecCore codec = Codecs.jsonCodec();
 
-// Encode Person to JSON.
-final JSValue json = codec.encode(person);
-System.out.println(JsonToDoc.toString(json, 40));
+// Encode to JSON.
+final StringWriter wtr = new StringWriter();
+jsonCodecCore.encode(Person.class, person, wtr);
+System.out.println(wtr.toString());
 
 // Decode back to Java.
-final Person person2 = codec.decode(Person.class, json);
-
-// Assert the round-tripped value matches the original.
+final StringReader rdr = new StringReader(wtr.toString());
+final Person person2 = jsonCodecCore.decode(Person.class, rdr);
 assert(person.equals(person2));
 ```
 
@@ -188,21 +188,16 @@ but the basics are the same:
 ```java
 final XmlCodecCore codec = Codecs.xmlCodec();
 
-// Create an XML Document object.
-final Document doc =
-        DocumentBuilderFactory
-                .newInstance()
-                .newDocumentBuilder()
-                .newDocument();
+final String root = "person";
 
-// Encode Person to XML.
-final Element elem = codec.encode(Person.class, person, doc.createElement("person"));
-System.out.println(XmlUtils.nodeToString(elem, true));
+// Encode to XML.
+final StringWriter wtr = new StringWriter();
+xmlCodecCore.encode(Person.class, person, wtr, root);
+System.out.println(wtr.toString());
 
 // Decode back to Java.
-final Person person2 = codec.decode(Person.class, elem);
-
-// Assert the round-tripped value matches the original.
+final StringReader rdr = new StringReader(wtr.toString());
+final Person person2 = xmlCodecCore.decode(Person.class, rdr, root);
 assert(person.equals(person2));
 ```
 
@@ -303,6 +298,9 @@ and:
 </person>
 ```
 
+In fact, since encoding a value as a string is a common use case,
+there's specific support for this - see next section.
+
 For reference, the default codec for `ZonedDateTime` is defined as below:
 
 ```java
@@ -313,7 +311,7 @@ core.registerCodec(ZonedDateTime.class)
         .map(ZonedDateTime::ofLocal);
 ```
 
-Note that the same custom codec can be used for any encoding format.
+Note that the same custom codec can be used for any encoding format - XML, JSON etc.
 
 #### StringProxyCodec
 
@@ -369,27 +367,47 @@ it has to be specialised for a specific encoding.
 For example, a custom JSON codec for the `ZonedDateTime` could be written as follows:
 
 ```java
-class ZonedDateTimeJsonCodec extends Codecs.CodecBase<ZonedDateTime, JsValue> {
+static class ZonedDateTimeJsonCodec
+        extends Codecs.CodecBase<ZonedDateTime, JsonIO.Input, JsonIO.Output>
+        implements Codec.FinalCodec<ZonedDateTime, JsonIO.Input, JsonIO.Output> {
 
     public ZonedDateTimeJsonCodec(JsonCodecCore core) {
         super(core);
     }
 
     @Override
-    public JsValue encode(ZonedDateTime val, JsValue enc) {
-        return JSAPI.obj(
-                JSAPI.field("dateTime", core.encode(val.toLocalDateTime(), enc)),
-                JSAPI.field("zone", core.encode(val.getZone(), enc)),
-                JSAPI.field("offset", core.encode(val.getOffset(), enc)));
+    public Class<ZonedDateTime> type() {
+        return ZonedDateTime.class;
     }
 
     @Override
-    public ZonedDateTime decode(JsValue enc) {
-        final JsObject obj = enc.asObject();
-        return ZonedDateTime.ofLocal(
-                core.decode(LocalDateTime.class, obj.get("dateTime")),
-                core.decode(ZoneId.class, obj.get("zone")),
-                core.decode(ZoneOffset.class, obj.get("offset")));
+    public JsonIO.Output encode(ZonedDateTime value, JsonIO.Output out) {
+        out.startObject();
+
+        out.writeField("dateTime");
+        core.encode(LocalDateTime.class, value.toLocalDateTime(), out);
+        out.writeField("zone");
+        core.encode(ZoneId.class, value.getZone(), out);
+        out.writeField("offset");
+        core.encode(ZoneOffset.class, value.getOffset(), out);
+
+        return out.endObject();
+    }
+
+    @Override
+    public ZonedDateTime decode(JsonIO.Input in) {
+        in.startObject();
+
+        in.readFieldName("dateTime");
+        final LocalDateTime ldt = core.decode(LocalDateTime.class, in);
+        in.readFieldName("zone");
+        final ZoneId zid = core.decode(ZoneId.class, in);
+        in.readFieldName("offset");
+        final ZoneOffset zo = core.decode(ZoneOffset.class, in);
+
+        in.endObject();
+
+        return ZonedDateTime.ofLocal(ldt, zid, zo);
     }
 }
 ```
@@ -432,13 +450,13 @@ will also contain pre-registered codecs for the following types:
 
 For any classes encountered by the framework that it doesn't recognise,
 it will introspect the class structure in order to create an object codec for that type.
-For each non-static, non-transient field found in the class, and its parents,
+For each non-static, non-transient field found in the class (including its superclasses),
 the codec for that type will be fetched (or created).
 The codec for the class is then a composition of the codecs for its constituent fields.
 
 For each field and it's corresonding value,
 the static type is compared to the dynamic type.
-If they are the same, then no type meta data need be encoded.
+If they are the same, then no type meta-data need be encoded.
 If they are different, then the dynamic type is added to the encoding.
 
 The class must have a default constructor.
