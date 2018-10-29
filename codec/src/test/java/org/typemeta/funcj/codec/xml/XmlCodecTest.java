@@ -5,7 +5,7 @@ import org.typemeta.funcj.codec.*;
 
 import java.io.*;
 
-public class XmlsCodecTest extends TestBase {
+public class XmlCodecTest extends TestBase {
     final static XmlCodecCore codec = Codecs.xmlCodec();
 
     public static final String rootElemName = "root";
