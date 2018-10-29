@@ -13,12 +13,21 @@ import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 @SuppressWarnings("unchecked")
 public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements ByteCodecCore {
 
-    public ByteCodecCoreImpl() {
+    protected final ByteCodecConfig config;
+
+    public ByteCodecCoreImpl(ByteCodecConfig config) {
+        this.config = config;
     }
 
-    protected int defaultArrSize() {
-        return 16;
+    public ByteCodecCoreImpl() {
+        this(new ByteCodecConfig());
     }
+
+    @Override
+    public ByteCodecConfig config() {
+        return config;
+    }
+
 
     @Override
     public <T> boolean encodeNull(T val, Output out) {
@@ -45,7 +54,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         } else {
             out.writeBoolean(true);
             final Codec<T, Input, Output> dynCodec = getDynCodec.apply(dynType);
-            out.writeString(classToName(dynType));
+            out.writeString(config().classToName(dynType));
             dynCodec.encode(val, out);
             return true;
         }
@@ -63,7 +72,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
 
     @Override
     public <T> T decodeDynamicType(Input in) {
-        return decodeDynamicType(in, name -> getCodec(this.<T>nameToClass(name)).decode(in));
+        return decodeDynamicType(in, name -> getCodec(this.config().<T>nameToClass(name)).decode(in));
     }
 
     protected final Codec.BooleanCodec<Input, Output> booleanCodec =

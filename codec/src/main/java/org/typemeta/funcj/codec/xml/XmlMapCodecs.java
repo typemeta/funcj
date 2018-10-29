@@ -30,11 +30,11 @@ public abstract class XmlMapCodecs {
         public Output encode(Map<K, V> map, Output out) {
 
             map.forEach((k, v) -> {
-                out.startElement(core.entryElemName());
-                out.startElement(core.keyElemName());
+                out.startElement(core.config().entryElemName());
+                out.startElement(core.config().keyElemName());
                 keyCodec.encodeWithCheck(k, out);
                 out.endElement();
-                out.startElement(core.valueElemName());
+                out.startElement(core.config().valueElemName());
                 valueCodec.encodeWithCheck(v, out);
                 out.endElement();
                 out.endElement();
@@ -52,11 +52,11 @@ public abstract class XmlMapCodecs {
                     break;
                 }
 
-                in.startElement(core.entryElemName());
-                in.startElement(core.keyElemName());
+                in.startElement(core.config().entryElemName());
+                in.startElement(core.config().keyElemName());
                 final K key = keyCodec.decodeWithCheck(in);
                 in.endElement();
-                in.startElement(core.valueElemName());
+                in.startElement(core.config().valueElemName());
                 final V val = valueCodec.decodeWithCheck(in);
                 in.endElement();
                 in.endElement();

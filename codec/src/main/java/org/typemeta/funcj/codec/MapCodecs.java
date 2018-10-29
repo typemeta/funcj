@@ -47,7 +47,7 @@ public abstract class MapCodecs {
             } else {
                 final Map<K, V> val = core().decodeDynamicType(
                         in,
-                        type -> getCodec(core().nameToClass(type)).decode(in)
+                        type -> getCodec(core().config().nameToClass(type)).decode(in)
                 );
                 if (val != null) {
                     return val;
@@ -98,7 +98,7 @@ public abstract class MapCodecs {
             } else {
                 final Map<String, V> val = core().decodeDynamicType(
                         in,
-                        type -> getCodec(core().nameToClass(type)).decode(in)
+                        type -> getCodec(core().config().nameToClass(type)).decode(in)
                 );
                 if (val != null) {
                     return val;

@@ -14,7 +14,19 @@ import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 @SuppressWarnings("unchecked")
 public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements XmlCodecCore {
 
+    protected final XmlCodecConfig config;
+
+    public XmlCodecCoreImpl(XmlCodecConfig config) {
+        this.config = config;
+    }
+
     public XmlCodecCoreImpl() {
+        this(new XmlCodecConfig());
+    }
+
+    @Override
+    public XmlCodecConfig config() {
+        return config;
     }
 
     @Override
@@ -33,38 +45,6 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
             Reader rdr,
             String rootElemName) {
         return decode(type, XmlIO.inputOf(rdr, rootElemName));
-    }
-
-    public String entryElemName() {
-        return "_";
-    }
-
-    public String typeAttrName() {
-        return "type";
-    }
-
-    public String keyAttrName() {
-        return "key";
-    }
-
-    public String keyElemName() {
-        return "key";
-    }
-
-    public String valueElemName() {
-        return "value";
-    }
-
-    public String metaAttrName() {
-        return "meta";
-    }
-
-    public String nullAttrVal() {
-        return "null";
-    }
-
-    protected int defaultArrSize() {
-        return 16;
     }
 
     public <T> Output encode(T val) {
@@ -87,7 +67,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
     @Override
     public <T> boolean encodeNull(T val, Output out) {
         if (val == null) {
-            out.attribute(metaAttrName(), nullAttrVal());
+            out.attribute(config.nullAttrName(), config.nullAttrVal());
             return true;
         } else {
             return false;
@@ -96,7 +76,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
     @Override
     public boolean decodeNull(Input in) {
-        return in.attributeMap().nameHasValue(metaAttrName(), nullAttrVal());
+        return in.attributeMap().nameHasValue(config.nullAttrName(), config.nullAttrVal());
     }
 
     @Override
@@ -110,7 +90,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
             return false;
         } else {
             final Codec<T, Input, Output> dynCodec = getDynCodec.apply(dynType);
-            out.attribute(typeAttrName(), classToName(dynType));
+            out.attribute(config.typeAttrName(), config().classToName(dynType));
             dynCodec.encode(val, out);
             return true;
         }
@@ -118,8 +98,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
     @Override
     public <T> T decodeDynamicType(Input in, Functions.F<String, T> decoder) {
-        if (in.attributeMap().hasName(typeAttrName())) {
-            final String typeName = in.attributeMap().getValue(typeAttrName());
+        if (in.attributeMap().hasName(config.typeAttrName())) {
+            final String typeName = in.attributeMap().getValue(config.typeAttrName());
             return decoder.apply(typeName);
         } else {
             return null;
@@ -128,7 +108,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
     @Override
     public <T> T decodeDynamicType(Input in) {
-        return decodeDynamicType(in, name -> getCodec(this.<T>nameToClass(name)).decode(in));
+        return decodeDynamicType(in, name -> getCodec(this.config().<T>nameToClass(name)).decode(in));
     }
 
     protected final Codec.BooleanCodec<Input, Output> booleanCodec =
@@ -166,7 +146,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         @Override
         public Output encode(boolean[] vals, Output out) {
             for (boolean val : vals) {
-                booleanCodec().encode(val, out.startElement(entryElemName()));
+                booleanCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -174,7 +154,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public boolean[] decode(Input in) {
-            boolean[] arr = new boolean[defaultArrSize()];
+            boolean[] arr = new boolean[config.defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -185,7 +165,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
 
-                in.startElement(entryElemName());
+                in.startElement(config.entryElemName());
                 arr[i++] = booleanCodec().decode(in);
                 in.endElement();
             }
@@ -233,7 +213,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         @Override
         public Output encode(byte[] vals, Output out) {
             for (byte val : vals) {
-                byteCodec().encode(val, out.startElement(entryElemName()));
+                byteCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -241,7 +221,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public byte[] decode(Input in) {
-            byte[] arr = new byte[defaultArrSize()];
+            byte[] arr = new byte[config.defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -252,7 +232,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
 
-                in.startElement(entryElemName());
+                in.startElement(config.entryElemName());
                 arr[i++] = byteCodec().decode(in);
                 in.endElement();
             }
@@ -300,7 +280,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         @Override
         public Output encode(char[] vals, Output out) {
             for (char val : vals) {
-                charCodec().encode(val, out.startElement(entryElemName()));
+                charCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -308,7 +288,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public char[] decode(Input in) {
-            char[] arr = new char[defaultArrSize()];
+            char[] arr = new char[config.defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -319,7 +299,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
 
-                in.startElement(entryElemName());
+                in.startElement(config.entryElemName());
                 arr[i++] = charCodec().decode(in);
                 in.endElement();
             }
@@ -367,7 +347,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         @Override
         public Output encode(short[] vals, Output out) {
             for (short val : vals) {
-                shortCodec().encode(val, out.startElement(entryElemName()));
+                shortCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -375,7 +355,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public short[] decode(Input in) {
-            short[] arr = new short[defaultArrSize()];
+            short[] arr = new short[config.defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -386,7 +366,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
 
-                in.startElement(entryElemName());
+                in.startElement(config.entryElemName());
                 arr[i++] = shortCodec().decode(in);
                 in.endElement();
             }
@@ -434,7 +414,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         @Override
         public Output encode(int[] vals, Output out) {
             for (int val : vals) {
-                intCodec().encode(val, out.startElement(entryElemName()));
+                intCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -442,7 +422,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public int[] decode(Input in) {
-            int[] arr = new int[defaultArrSize()];
+            int[] arr = new int[config.defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -453,7 +433,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
 
-                in.startElement(entryElemName());
+                in.startElement(config.entryElemName());
                 arr[i++] = intCodec().decode(in);
                 in.endElement();
             }
@@ -501,7 +481,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         @Override
         public Output encode(long[] vals, Output out) {
             for (long val : vals) {
-                longCodec().encode(val, out.startElement(entryElemName()));
+                longCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -509,7 +489,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public long[] decode(Input in) {
-            long[] arr = new long[defaultArrSize()];
+            long[] arr = new long[config.defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -520,7 +500,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
 
-                in.startElement(entryElemName());
+                in.startElement(config.entryElemName());
                 arr[i++] = longCodec().decode(in);
                 in.endElement();
             }
@@ -568,7 +548,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         @Override
         public Output encode(float[] vals, Output out) {
             for (float val : vals) {
-                floatCodec().encode(val, out.startElement(entryElemName()));
+                floatCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -576,7 +556,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public float[] decode(Input in) {
-            float[] arr = new float[defaultArrSize()];
+            float[] arr = new float[config.defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -587,7 +567,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
 
-                in.startElement(entryElemName());
+                in.startElement(config.entryElemName());
                 arr[i++] = floatCodec().decode(in);
                 in.endElement();
             }
@@ -635,7 +615,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         @Override
         public Output encode(double[] vals, Output out) {
             for (double val : vals) {
-                doubleCodec().encode(val, out.startElement(entryElemName()));
+                doubleCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -643,7 +623,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public double[] decode(Input in) {
-            double[] arr = new double[defaultArrSize()];
+            double[] arr = new double[config.defaultArrSize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -654,7 +634,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                     arr = Arrays.copyOf(arr, arr.length * 2);
                 }
 
-                in.startElement(entryElemName());
+                in.startElement(config.entryElemName());
                 arr[i++] = doubleCodec().decode(in);
                 in.endElement();
             }
@@ -741,7 +721,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
             @Override
             public Output encode(Collection<T> vals, Output out) {
                 for (T val : vals) {
-                    elemCodec.encodeWithCheck(val, out.startElement(entryElemName()));
+                    elemCodec.encodeWithCheck(val, out.startElement(config.entryElemName()));
                     out.endElement();
                 }
                 return out;
@@ -756,7 +736,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                         break;
                     }
 
-                    in.startElement(entryElemName());
+                    in.startElement(config.entryElemName());
                     vals.add(elemCodec.decodeWithCheck(in));
                     in.endElement();
                 }
@@ -785,7 +765,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
             @Override
             public Output encode(T[] vals, Output out) {
                 for (T val : vals) {
-                    elemCodec.encodeWithCheck(val, out.startElement(entryElemName()));
+                    elemCodec.encodeWithCheck(val, out.startElement(config.entryElemName()));
                     out.endElement();
                 }
                 return out;
@@ -793,7 +773,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
             @Override
             public T[] decode(Input in) {
-                T[] arr = (T[]) Array.newInstance(elemCodec.type(), defaultArrSize());
+                T[] arr = (T[]) Array.newInstance(elemCodec.type(), config.defaultArrSize());
                 int i = 0;
                 while (in.hasNext()) {
                     if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -804,7 +784,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                         arr = Arrays.copyOf(arr, arr.length * 2);
                     }
 
-                    in.startElement(entryElemName());
+                    in.startElement(config.entryElemName());
                     arr[i++] = elemCodec.decodeWithCheck(in);
                     in.endElement();
                 }

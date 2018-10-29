@@ -41,8 +41,8 @@ public abstract class Codecs {
 
         core.registerStringProxyCodec(
                 Class.class,
-                core::classToName,
-                core::nameToClass
+                core.config()::classToName,
+                core.config()::nameToClass
         );
 
         core.registerTypeProxy("java.time.ZoneRegion", ZoneId.class);

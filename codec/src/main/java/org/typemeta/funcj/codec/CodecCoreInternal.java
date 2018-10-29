@@ -14,23 +14,7 @@ import java.util.stream.*;
  */
 public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
-    <T> Class<T> nameToClass(String name);
-
-    /**
-     * Map a class to a name.
-     * @param clazz     the class
-     * @return          the name
-     */
-    String classToName(Class<?> clazz);
-
-
-    /**
-     * Map one or  more classes to a name.
-     * @param clazz     the class
-     * @param classes   the classes
-     * @return          the name
-     */
-    String classToName(Class<?> clazz, Class<?>... classes);
+    CodecConfig config();
 
     <X> Class<X> remapType(Class<X> clazz);
 

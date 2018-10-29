@@ -27,8 +27,8 @@ public abstract class JsonMapCodecs {
 
         @Override
         public Output encode(Map<K, V> map, Output out) {
-            final String keyFieldName = core.keyFieldName();
-            final String valueFieldName = core.valueFieldName();
+            final String keyFieldName = core.config().keyFieldName();
+            final String valueFieldName = core.config().valueFieldName();
 
             out.startArray();
 
@@ -46,8 +46,8 @@ public abstract class JsonMapCodecs {
 
         @Override
         public Map<K, V> decode(Input in) {
-            final String keyFieldName = core.keyFieldName();
-            final String valueFieldName = core.valueFieldName();
+            final String keyFieldName = core.config().keyFieldName();
+            final String valueFieldName = core.config().valueFieldName();
 
             final Map<K, V> map = core.getTypeConstructor(type).construct();
 

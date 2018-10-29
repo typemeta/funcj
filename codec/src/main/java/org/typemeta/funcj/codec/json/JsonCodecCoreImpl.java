@@ -12,23 +12,19 @@ import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 @SuppressWarnings("unchecked")
 public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements JsonCodecCore {
 
+    protected final JsonCodecConfig config;
+
+    public JsonCodecCoreImpl(JsonCodecConfig config) {
+        this.config = config;
+    }
+
     public JsonCodecCoreImpl() {
+        this(new JsonCodecConfig());
     }
 
-    public String typeFieldName() {
-        return "@type";
-    }
-
-    public String keyFieldName() {
-        return "@key";
-    }
-
-    public String valueFieldName() {
-        return "@value";
-    }
-
-    protected int defaultArrSize() {
-        return 16;
+    @Override
+    public JsonCodecConfig config() {
+        return config;
     }
 
     @Override
@@ -64,9 +60,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
             final Codec<T, Input, Output> dynCodec = getDynCodec.apply(dynType);
             out.startObject();
 
-            out.writeField(typeFieldName())
-                    .writeStr(classToName(dynType));
-            out.writeField(valueFieldName());
+            out.writeField(config.typeFieldName())
+                    .writeStr(config().classToName(dynType));
+            out.writeField(config.valueFieldName());
             dynCodec.encode(val, out);
 
             out.endObject();
@@ -77,9 +73,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
     @Override
     public <T> T decodeDynamicType(Input in, Functions.F<String, T> decoder) {
         if (in.notEOF() && in.currentEventType() == Input.Event.Type.OBJECT_START) {
-            final String typeFieldName = typeFieldName();
+            final String typeFieldName = config.typeFieldName();
             final Input.Event.FieldName typeField = new Input.Event.FieldName(typeFieldName);
-            final String valueFieldName = valueFieldName();
+            final String valueFieldName = config.valueFieldName();
 
             final Input.Event next = in.event(1);
             if (next.equals(typeField)) {
@@ -105,7 +101,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
     @Override
     public <T> T decodeDynamicType(Input in) {
-        return decodeDynamicType(in, name -> getCodec(this.<T>nameToClass(name)).decode(in));
+        return decodeDynamicType(in, name -> getCodec(this.config().<T>nameToClass(name)).decode(in));
     }
 
     protected final Codec.BooleanCodec<Input, Output> booleanCodec =
@@ -151,7 +147,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public boolean[] decode(Input in) {
-            boolean[] arr = new boolean[defaultArrSize()];
+            boolean[] arr = new boolean[config.defaultArrSize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -213,7 +209,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public byte[] decode(Input in) {
-            byte[] arr = new byte[defaultArrSize()];
+            byte[] arr = new byte[config.defaultArrSize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -275,7 +271,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public char[] decode(Input in) {
-            char[] arr = new char[defaultArrSize()];
+            char[] arr = new char[config.defaultArrSize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -337,7 +333,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public short[] decode(Input in) {
-            short[] arr = new short[defaultArrSize()];
+            short[] arr = new short[config.defaultArrSize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -399,7 +395,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public int[] decode(Input in) {
-            int[] arr = new int[defaultArrSize()];
+            int[] arr = new int[config.defaultArrSize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -461,7 +457,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public long[] decode(Input in) {
-            long[] arr = new long[defaultArrSize()];
+            long[] arr = new long[config.defaultArrSize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -523,7 +519,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public float[] decode(Input in) {
-            float[] arr = new float[defaultArrSize()];
+            float[] arr = new float[config.defaultArrSize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -585,7 +581,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public double[] decode(Input in) {
-            double[] arr = new double[defaultArrSize()];
+            double[] arr = new double[config.defaultArrSize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -728,7 +724,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
             @Override
             public T[] decode(Input in) {
-                T[] arr = (T[]) Array.newInstance(elemType, defaultArrSize());
+                T[] arr = (T[]) Array.newInstance(elemType, config.defaultArrSize());
 
                 in.startArray();
                 int i = 0;

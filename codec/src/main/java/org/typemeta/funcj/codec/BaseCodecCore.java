@@ -45,8 +45,11 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
+    public abstract CodecConfig config();
+
+    @Override
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec) {
-        registerCodec(classToName(clazz), codec);
+        registerCodec(config().classToName(clazz), codec);
     }
 
     @Override
@@ -71,7 +74,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public void registerTypeProxy(Class<?> type, Class<?> proxyType) {
-        registerTypeProxy(classToName(type), proxyType);
+        registerTypeProxy(config().classToName(type), proxyType);
     }
 
     @Override
@@ -83,7 +86,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     public <T> void registerTypeConstructor(
             Class<? extends T> clazz,
             TypeConstructor<T> typeCtor) {
-        typeCtorRegistry.put(classToName(clazz), typeCtor);
+        typeCtorRegistry.put(config().classToName(clazz), typeCtor);
     }
 
     @Override
@@ -97,41 +100,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> Class<T> nameToClass(String name) {
-        try {
-            return (Class<T>) Class.forName(name);
-        } catch (ClassNotFoundException ex) {
-            throw new CodecException("Cannot create class from class name '" + name + "'", ex);
-        }
-    }
-
-    @Override
-    public String classToName(Class<?> clazz) {
-        return clazz.getName();
-    }
-
-    @Override
-    public String classToName(Class<?> clazz, Class<?>... types) {
-        switch (types.length) {
-            case 1:
-                return classToName(clazz) + '|' + classToName(types[0]);
-            case 2:
-                return classToName(clazz) + '|' + classToName(types[0])
-                        + '|' + classToName(types[1]);
-            default: {
-                final StringBuilder sb = new StringBuilder();
-                sb.append(classToName(clazz)).append('|');
-                for (Class<?> cls : types) {
-                    sb.append(classToName(cls)).append('|');
-                }
-                return sb.toString();
-            }
-        }
-    }
-
-    @Override
     public <X> Class<X> remapType(Class<X> clazz) {
-        final String typeName = classToName(clazz);
+        final String typeName = config().classToName(clazz);
         if (typeProxyRegistry.containsKey(typeName)) {
             return (Class<X>) typeProxyRegistry.get(typeName);
         } else {
@@ -141,7 +111,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
-        final String name = classToName(clazz);
+        final String name = config().classToName(clazz);
         return (TypeConstructor<T>) typeCtorRegistry.computeIfAbsent(
                 name,
                 n -> TypeConstructor.create(clazz));
@@ -149,7 +119,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> Codec<T, IN, OUT> getCodec(Class<T> clazz) {
-        return getCodec(classToName(clazz), () -> createCodec(clazz));
+        return getCodec(config().classToName(clazz), () -> createCodec(clazz));
     }
 
     @Override
@@ -183,7 +153,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     public <T> Codec<Collection<T>, IN, OUT> getCollCodec(
             Class<Collection<T>> collType,
             Codec<T, IN, OUT> elemCodec) {
-        final String name = classToName(collType, elemCodec.type());
+        final String name = config().classToName(collType, elemCodec.type());
         return getCodec(name, () -> createCollCodec(collType, elemCodec));
     }
 
@@ -192,7 +162,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             Class<Map<K, V>> mapType,
             Class<K> keyType,
             Class<V> valType) {
-        final String name = classToName(mapType, keyType, valType);
+        final String name = config().classToName(mapType, keyType, valType);
         return getCodec(name, () -> createMapCodec(mapType, keyType, valType));
     }
 
@@ -200,7 +170,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     public <V> Codec<Map<String, V>, IN, OUT> createMapCodec(
             Class<Map<String, V>> mapType,
             Class<V> valType) {
-        final String name = classToName(mapType, String.class, valType);
+        final String name = config().classToName(mapType, String.class, valType);
         return getCodec(name, () -> createMapCodec(mapType, valType));
     }
 
@@ -208,7 +178,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     public <V> Codec<Map<String, V>, IN, OUT> getMapCodec(
             Class<Map<String, V>> mapType,
             Class<V> valType) {
-        final String name = classToName(mapType, String.class, valType);
+        final String name = config().classToName(mapType, String.class, valType);
         return getCodec(name, () -> createMapCodec(mapType, valType));
     }
 
@@ -217,7 +187,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             Class<Map<K, V>> mapType,
             Codec<K, IN, OUT> keyCodec,
             Codec<V, IN, OUT> valueCodec) {
-        final String name = classToName(mapType, keyCodec.type(), valueCodec.type());
+        final String name = config().classToName(mapType, keyCodec.type(), valueCodec.type());
         return getCodec(name, () -> createMapCodec(mapType, keyCodec, valueCodec));
     }
 
@@ -225,7 +195,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     public <V> Codec<Map<String, V>, IN, OUT> getMapCodec(
             Class<Map<String, V>> mapType,
             Codec<V, IN, OUT> valueCodec) {
-        final String name = classToName(mapType, String.class, valueCodec.type());
+        final String name = config().classToName(mapType, String.class, valueCodec.type());
         return getCodec(name, () -> createMapCodec(mapType, valueCodec));
     }
 

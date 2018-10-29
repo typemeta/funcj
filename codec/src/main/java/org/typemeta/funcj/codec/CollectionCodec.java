@@ -41,7 +41,7 @@ public abstract class CollectionCodec<T, IN, OUT> extends Codec.Base<Collection<
         } else {
             final Collection<T> val = core().decodeDynamicType(
                     in,
-                    type -> getCodec(core().nameToClass(type)).decode(in)
+                    type -> getCodec(core().config().nameToClass(type)).decode(in)
             );
             if (val != null) {
                 return val;
