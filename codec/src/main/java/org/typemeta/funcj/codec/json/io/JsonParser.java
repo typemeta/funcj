@@ -8,6 +8,11 @@ import java.text.*;
 import java.util.*;
 import java.util.function.Supplier;
 
+/**
+ * Pull-based parser. Parses a stream of characters.
+ * The caller calls methods on the parser to extract JSON events.
+ * We implement our own parser here as we need the ability to lookahead.
+ */
 public class JsonParser implements JsonIO.Input {
     enum State {
         OBJECT_NAME,
@@ -34,10 +39,6 @@ public class JsonParser implements JsonIO.Input {
         this(new JsonTokeniser(reader), lookAhead);
     }
 
-    public JsonParser(Reader reader) {
-        this(new JsonTokeniser(reader), 3);
-    }
-
     private CodecException raiseError(String msg) {
         return new CodecException(msg + " at position " + tokeniser.position());
     }
@@ -57,7 +58,7 @@ public class JsonParser implements JsonIO.Input {
 
     private void popState() {
         if (stateStack.isEmpty()) {
-            throw raiseError("Attempting to pop empty stack due to mis-match closing brace/bracket");
+            throw raiseError("Attempting to pop empty stack due to mis-matching closing brace/bracket");
         } else {
             state = stateStack.remove(stateStack.size() - 1);
         }
@@ -357,14 +358,6 @@ public class JsonParser implements JsonIO.Input {
     }
 
     @Override
-    public BigDecimal readBigDecimal() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
-        processCurrentEvent();
-        return new BigDecimal(value);
-    }
-
-    @Override
     public Number readNumber() {
         checkTokenType(Event.Type.NUMBER);
         final String value = ((Event.JNumber) currentEvent()).value;
@@ -375,6 +368,22 @@ public class JsonParser implements JsonIO.Input {
             final String excerpt = value.length() > 16 ? value.substring(0, 16) + "..." : value;
             throw raiseError("Number token '" + excerpt + "' is not a valid number");
         }
+    }
+
+    @Override
+    public BigDecimal readBigDecimal() {
+        checkTokenType(Event.Type.NUMBER);
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
+        return new BigDecimal(value);
+    }
+
+    @Override
+    public String readStringNumber() {
+        checkTokenType(Event.Type.NUMBER);
+        final String value = ((Event.JNumber) currentEvent()).value;
+        processCurrentEvent();
+        return value;
     }
 
     @Override

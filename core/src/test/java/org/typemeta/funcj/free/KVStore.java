@@ -282,12 +282,12 @@ public class KVStore {
     public static void main(String[] args) {
         {
             final Option<String> oi = program.foldMapId(impureInterp()).value;
-            System.out.println(oi);
+            System.out.println("\nResult=" + oi + "\n");
         }
 
         {
             final Option<Integer> oi = programInt.foldMapMS(pureInterp()).eval(IMapS.empty());
-            System.out.println(oi);
+            System.out.println("\nResult=" + oi + "\n");
         }
     }
 }

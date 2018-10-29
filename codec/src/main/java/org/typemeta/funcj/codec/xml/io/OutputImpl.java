@@ -156,7 +156,7 @@ class OutputImpl implements XmlIO.Output {
     }
 
     @Override
-    public XmlIO.Output writeNumber(String value) {
+    public XmlIO.Output writeStringNumber(String value) {
         return writeCharacters(XmlUtils.escapeXml(value));
     }
 }

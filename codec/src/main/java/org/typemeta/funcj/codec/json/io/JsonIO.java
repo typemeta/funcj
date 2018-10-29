@@ -5,12 +5,14 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public abstract class JsonIO {
+    private static final int MAX_PARSER_LOOKAHEAD = 3;
+
     public static Input inputOf(Reader reader) {
-        return new JsonParser(reader);
+        return new JsonParser(reader, MAX_PARSER_LOOKAHEAD);
     }
 
     public static Input inputOf(InputStream is) {
-        return new JsonParser(new InputStreamReader(is));
+        return new JsonParser(new InputStreamReader(is), MAX_PARSER_LOOKAHEAD);
     }
 
     public static Output outputOf(Writer writer) {
@@ -171,8 +173,9 @@ public abstract class JsonIO {
         long readLong();
         float readFloat();
         double readDouble();
-        BigDecimal readBigDecimal();
         Number readNumber();
+        BigDecimal readBigDecimal();
+        String readStringNumber();
 
         void startObject();
         String readFieldName();
@@ -188,18 +191,18 @@ public abstract class JsonIO {
 
         Output writeBoolean(boolean value);
 
-        Output writeStr(String value);
+        Output writeString(String value);
         Output writeChar(char value);
 
-        Output writeNumber(byte value);
-        Output writeNumber(short value);
-        Output writeNumber(int value);
-        Output writeNumber(long value);
-        Output writeNumber(float value);
-        Output writeNumber(double value);
+        Output writeByte(byte value);
+        Output writeShort(short value);
+        Output writeint(int value);
+        Output writeLong(long value);
+        Output writeFloat(float value);
+        Output writeDouble(double value);
         Output writeNumber(Number value);
-        Output writeNumber(BigDecimal value);
-        Output writeNumber(String value);
+        Output writeBigDecimal(BigDecimal value);
+        Output writeStringNumber(String value);
 
         Output startObject();
         Output writeField(String name);

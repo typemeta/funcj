@@ -61,7 +61,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
             out.startObject();
 
             out.writeField(config.typeFieldName())
-                    .writeStr(config().classToName(dynType));
+                    .writeString(config().classToName(dynType));
             out.writeField(config.valueFieldName());
             dynCodec.encode(val, out);
 
@@ -176,7 +176,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public Output encodePrim(byte val, Output out) {
-            return out.writeNumber(val);
+            return out.writeByte(val);
         }
 
         @Override
@@ -300,7 +300,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public Output encodePrim(short val, Output out) {
-            return out.writeNumber(val);
+            return out.writeShort(val);
         }
 
         @Override
@@ -362,7 +362,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public Output encodePrim(int val, Output out) {
-            return out.writeNumber(val);
+            return out.writeint(val);
         }
 
         @Override
@@ -424,7 +424,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public Output encodePrim(long val, Output out) {
-            return out.writeNumber(val);
+            return out.writeLong(val);
         }
 
         @Override
@@ -486,7 +486,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public Output encodePrim(float val, Output out) {
-            return out.writeNumber(val);
+            return out.writeFloat(val);
         }
 
         @Override
@@ -548,7 +548,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public Output encodePrim(double val, Output out) {
-            return out.writeNumber(val);
+            return out.writeDouble(val);
         }
 
         @Override
@@ -610,7 +610,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public Output encode(String val, Output out) {
-            return out.writeStr(val);
+            return out.writeString(val);
         }
 
         @Override
@@ -634,7 +634,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
             @Override
             public Output encode(EM val, Output out) {
-                return out.writeStr(val.name());
+                return out.writeString(val.name());
             }
 
             @Override

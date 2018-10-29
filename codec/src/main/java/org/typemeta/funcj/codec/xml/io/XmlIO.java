@@ -120,6 +120,7 @@ public abstract class XmlIO {
         double readDouble();
         BigDecimal readBigDecimal();
         Number readNumber();
+        String readStringNumber();
     }
 
     public interface Output {
@@ -146,7 +147,7 @@ public abstract class XmlIO {
         Output writeDouble(double value);
         Output writeNumber(Number value);
         Output writeBigDecimal(BigDecimal value);
-        Output writeNumber(String value);
+        Output writeStringNumber(String value);
     }
 }
 

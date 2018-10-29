@@ -20,7 +20,7 @@ public abstract class SideEffectGenEx {
          * @param f         the function
          * @return          the function
          */
-        static F0 of(F0 f) {
+        static <X extends Exception> F0<X> of(F0<X> f) {
             return f;
         }
 

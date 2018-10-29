@@ -7,11 +7,13 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Supplier;
 
+/**
+ * Tokenise a stream of characters into JSON tokens.
+ */
 public class JsonTokeniser {
 
     private static final class Buffer {
         private static final int DEFAULT_SIZE = 64;
-        private static final int MAX_SIZE = 1024;
 
         private char[] buffer;
         private int size = 0;
@@ -22,7 +24,7 @@ public class JsonTokeniser {
 
         void add(char c) {
             if (size == buffer.length) {
-                if (buffer.length >= MAX_SIZE) {
+                if (buffer.length >= Integer.MAX_VALUE / 2) {
                     throw new IllegalStateException("Buffer too large");
                 } else {
                     buffer = Arrays.copyOf(buffer, buffer.length * 2);

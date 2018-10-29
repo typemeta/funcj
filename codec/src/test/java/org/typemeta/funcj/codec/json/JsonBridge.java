@@ -4,17 +4,20 @@ import org.typemeta.funcj.codec.json.io.*;
 
 import java.io.*;
 
+/**
+ * Connect a JSON input to a JSON output.
+ */
 public class JsonBridge {
     private final JsonIO.Input input;
     private final JsonIO.Output output;
 
-    public JsonBridge(JsonParser input, JsonGenerator output) {
+    public JsonBridge(JsonIO.Input input, JsonIO.Output output) {
         this.input = input;
         this.output = output;
     }
 
     public JsonBridge(Reader reader, Writer writer) {
-        this(new JsonParser(reader), new JsonGenerator(writer));
+        this(new JsonParser(reader, 1), new JsonGenerator(writer));
     }
 
     void run() {
@@ -53,7 +56,7 @@ public class JsonBridge {
                     output.startObject();
                     break;
                 case STRING:
-                    output.writeStr(input.readString());
+                    output.writeString(input.readString());
                     break;
             }
         }

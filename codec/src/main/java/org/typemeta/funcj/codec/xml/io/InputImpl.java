@@ -214,4 +214,9 @@ class InputImpl implements XmlIO.Input {
             throw new CodecException("Number token '" + excerpt + "' is not a valid number");
         }
     }
+
+    @Override
+    public String readStringNumber() {
+        return readText();
+    }
 }

@@ -375,7 +375,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @param <T>    the element type
      */
     public static final class Empty<T> extends IList<T> {
-        static final Empty EMPTY = new Empty();
+        static final Empty<?> EMPTY = new Empty<Void>();
 
         private Empty() {
         }

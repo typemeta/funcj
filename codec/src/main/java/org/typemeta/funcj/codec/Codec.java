@@ -23,6 +23,12 @@ public interface Codec<T, IN, OUT> {
         }
     }
 
+    /**
+     * A sub-interface for codecs for classes which are final.
+     * @param <T>       the raw type to be encoded/decoded
+     * @param <IN>      the encoded input type
+     * @param <OUT>     the encoded output type
+     */
     interface FinalCodec<T, IN, OUT> extends Codec<T, IN, OUT> {
 
         @Override

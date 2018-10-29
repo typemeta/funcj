@@ -1,12 +1,15 @@
 package org.typemeta.funcj.codec.json.io;
 
-import org.typemeta.funcj.codec.CodecException;
-
 import java.io.*;
 import java.math.BigDecimal;
 
+import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.raiseWriteFailure;
+import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.write;
+
 public class JsonGenerator implements JsonIO.Output {
+
     private final Writer writer;
+
     private boolean pendingComma = false;
 
     public JsonGenerator(Writer writer) {
@@ -18,48 +21,48 @@ public class JsonGenerator implements JsonIO.Output {
         try {
             writer.close();
         } catch (IOException ex) {
-            throw new CodecException("Failed to close output stream", ex);
+            throw raiseWriteFailure(ex);
         }
     }
 
-    private JsonGenerator write(String value) {
+    private JsonGenerator writeUnquotedString(String value) {
         try {
             writer.append(value);
             return this;
         } catch (IOException ex) {
-            throw new CodecException("Failed to write to output stream", ex);
+            throw raiseWriteFailure(ex);
         }
     }
 
-    private JsonGenerator write(char value) {
+    private JsonGenerator writeUnquotedString(char value) {
         try {
             writer.append(value);
             return this;
         } catch (IOException ex) {
-            throw new CodecException("Failed to write to output stream", ex);
+            throw raiseWriteFailure(ex);
         }
     }
 
-    private JsonGenerator writeString(String value) {
+    private JsonGenerator writeQuotedString(String value) {
         try {
-            JsonGeneratorUtils.format(value, writer);
+            write(value, writer);
             return this;
         } catch (IOException ex) {
-            throw new CodecException("Failed to write to output stream", ex);
+            throw raiseWriteFailure(ex);
         }
     }
 
-    private JsonGenerator writeString(char value) {
+    private JsonGenerator writeQuotedString(char value) {
         try {
-            JsonGeneratorUtils.format(value, writer);
+            write(value, writer);
             return this;
         } catch (IOException ex) {
-            throw new CodecException("Failed to write to output stream", ex);
+            throw raiseWriteFailure(ex);
         }
     }
 
     private void writeComma() {
-        write(',');
+        writeUnquotedString(',');
     }
 
     @Override
@@ -68,7 +71,7 @@ public class JsonGenerator implements JsonIO.Output {
             writeComma();
         }
         pendingComma = true;
-        return write("null");
+        return writeUnquotedString("null");
     }
 
     @Override
@@ -77,16 +80,16 @@ public class JsonGenerator implements JsonIO.Output {
             writeComma();
         }
         pendingComma = true;
-        return write(Boolean.toString(value));
+        return writeUnquotedString(Boolean.toString(value));
     }
 
     @Override
-    public JsonIO.Output writeStr(String value) {
+    public JsonIO.Output writeString(String value) {
         if (pendingComma) {
             writeComma();
         }
         pendingComma = true;
-        return writeString(value);
+        return writeQuotedString(value);
     }
 
     @Override
@@ -95,61 +98,61 @@ public class JsonGenerator implements JsonIO.Output {
             writeComma();
         }
         pendingComma = true;
-        return writeString(value);
+        return writeQuotedString(value);
     }
 
     @Override
-    public JsonIO.Output writeNumber(byte value) {
+    public JsonIO.Output writeByte(byte value) {
         if (pendingComma) {
             writeComma();
         }
         pendingComma = true;
-        return write(Byte.toString(value));
+        return writeUnquotedString(Byte.toString(value));
     }
 
     @Override
-    public JsonIO.Output writeNumber(short value) {
+    public JsonIO.Output writeShort(short value) {
         if (pendingComma) {
             writeComma();
         }
         pendingComma = true;
-        return write(Short.toString(value));
+        return writeUnquotedString(Short.toString(value));
     }
 
     @Override
-    public JsonIO.Output writeNumber(int value) {
+    public JsonIO.Output writeint(int value) {
         if (pendingComma) {
             writeComma();
         }
         pendingComma = true;
-        return write(Integer.toString(value));
+        return writeUnquotedString(Integer.toString(value));
     }
 
     @Override
-    public JsonIO.Output writeNumber(long value) {
+    public JsonIO.Output writeLong(long value) {
         if (pendingComma) {
             writeComma();
         }
         pendingComma = true;
-        return write(Long.toString(value));
+        return writeUnquotedString(Long.toString(value));
     }
 
     @Override
-    public JsonIO.Output writeNumber(float value) {
+    public JsonIO.Output writeFloat(float value) {
         if (pendingComma) {
             writeComma();
         }
         pendingComma = true;
-        return write(Float.toString(value));
+        return writeUnquotedString(Float.toString(value));
     }
 
     @Override
-    public JsonIO.Output writeNumber(double value) {
+    public JsonIO.Output writeDouble(double value) {
         if (pendingComma) {
             writeComma();
         }
         pendingComma = true;
-        return write(Double.toString(value));
+        return writeUnquotedString(Double.toString(value));
     }
 
     @Override
@@ -158,25 +161,25 @@ public class JsonGenerator implements JsonIO.Output {
             writeComma();
         }
         pendingComma = true;
-        return write(value.toString());
+        return writeUnquotedString(value.toString());
     }
 
     @Override
-    public JsonIO.Output writeNumber(BigDecimal value) {
+    public JsonIO.Output writeBigDecimal(BigDecimal value) {
         if (pendingComma) {
             writeComma();
         }
         pendingComma = true;
-        return write(value.toString());
+        return writeUnquotedString(value.toString());
     }
 
     @Override
-    public JsonIO.Output writeNumber(String value) {
+    public JsonIO.Output writeStringNumber(String value) {
         if (pendingComma) {
             writeComma();
         }
         pendingComma = true;
-        return write(value);
+        return writeUnquotedString(value);
     }
 
     @Override
@@ -185,7 +188,7 @@ public class JsonGenerator implements JsonIO.Output {
             writeComma();
             pendingComma = false;
         }
-        return write('{');
+        return writeUnquotedString('{');
     }
 
     @Override
@@ -194,14 +197,14 @@ public class JsonGenerator implements JsonIO.Output {
             writeComma();
             pendingComma = false;
         }
-        return writeString(name)
-                .write(':');
+        return writeQuotedString(name)
+                .writeUnquotedString(':');
     }
 
     @Override
     public JsonIO.Output endObject() {
         pendingComma = true;
-        return write('}');
+        return writeUnquotedString('}');
     }
 
     @Override
@@ -210,75 +213,12 @@ public class JsonGenerator implements JsonIO.Output {
             writeComma();
             pendingComma = false;
         }
-        return write('[');
+        return writeUnquotedString('[');
     }
 
     @Override
     public JsonIO.Output endArray() {
         pendingComma = true;
-        return write(']');
-    }
-}
-
-abstract class JsonGeneratorUtils {
-
-    static Writer format(String s, Writer wtr) throws IOException {
-        wtr.append('"');
-        escape(s, wtr);
-        return wtr.append('"');
-    }
-
-    static Writer format(char c, Writer wtr) throws IOException {
-        wtr.append('"');
-        escape(c, wtr);
-        return wtr.append('"');
-    }
-
-    static Writer escape(String s, Writer wtr) throws IOException {
-        final int len = s.length();
-        for (int i = 0; i < len; ++i) {
-            escape(s.charAt(i), wtr);
-        }
-
-        return wtr;
-    }
-
-    static Writer escape(char c, Writer wtr) throws IOException {
-        switch(c) {
-            case '\"':
-                wtr.append("\\\"");
-                break;
-            case '\\':
-                wtr.append("\\\\");
-                break;
-            //                case '/':
-            //                    wtr.append("\\/");
-            //                    break;
-            case '\b':
-                wtr.append("\\b");
-                break;
-            case '\f':
-                wtr.append("\\f");
-                break;
-            case '\n':
-                wtr.append("\\n");
-                break;
-            case '\r':
-                wtr.append("\\r");
-                break;
-            case '\t':
-                wtr.append("\\t");
-                break;
-            default:
-                if (c <= '\u001F' ||
-                        c >= '\u007F' && c <= '\u009F' ||
-                        c >= '\u00ff') {
-                    wtr.append("\\u").append(Integer.toHexString(c | 0x10000).substring(1));
-                } else {
-                    wtr.append(c);
-                }
-        }
-
-        return wtr;
+        return writeUnquotedString(']');
     }
 }
