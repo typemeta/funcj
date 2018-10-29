@@ -73,13 +73,13 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public void registerTypeProxy(Class<?> type, Class<?> proxyType) {
-        registerTypeProxy(config().classToName(type), proxyType);
+    public void registerTypeProxy(Class<?> clazz, Class<?> proxyType) {
+        registerTypeProxy(config().classToName(clazz), proxyType);
     }
 
     @Override
-    public void registerTypeProxy(String typeName, Class<?> proxyType) {
-        typeProxyRegistry.put(typeName, proxyType);
+    public void registerTypeProxy(String name, Class<?> proxyType) {
+        typeProxyRegistry.put(name, proxyType);
     }
 
     @Override
