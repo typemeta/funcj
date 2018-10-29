@@ -5,7 +5,7 @@ import org.typemeta.funcj.codec.json.io.*;
 
 public class JsonTokeniserTest {
     @Test
-    public void test() throws Exception {
+    public void test() throws Throwable {
         FileUtils.openResource("/example.json")
                 .map(JsonTokeniser::new)
                 .map(jt -> {

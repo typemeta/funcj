@@ -3,7 +3,12 @@ package org.typemeta.funcj.codec;
 //import org.typemeta.funcj.codec.xml.XmlCodecCore;
 //import org.typemeta.funcj.codec.xml.XmlUtils;
 
-import java.time.ZonedDateTime;
+import org.typemeta.funcj.codec.json.JsonCodecCore;
+import org.typemeta.funcj.codec.json.io.JsonIO;
+import org.typemeta.funcj.codec.xml.XmlCodecCore;
+
+import java.io.*;
+import java.time.*;
 import java.util.*;
 
 public class Example {
@@ -43,82 +48,100 @@ public class Example {
     }
 
     public static void main(String[] args) {
-//        jsonTest();
-//        xmlTest();
+        jsonTest();
+        xmlTest();
     }
-//
-//    static class ZonedDateTimeJsonCodec extends Codecs.CodecBase<ZonedDateTime, JsValue, JsValue> {
-//
-//        public ZonedDateTimeJsonCodec(JsonCodecCore core) {
-//            super(core);
-//        }
-//
-//        @Override
-//        public JsValue encode(ZonedDateTime val, JsValue enc) {
-//            return JSAPI.obj(
-//                    JSAPI.field("dateTime", core.encode(val.toLocalDateTime(), enc)),
-//                    JSAPI.field("zone", core.encode(val.getZone(), enc)),
-//                    JSAPI.field("offset", core.encode(val.getOffset(), enc))
-//            );
-//        }
-//
-//        @Override
-//        public ZonedDateTime decode(JsValue enc) {
-//            final JsObject obj = enc.asObject();
-//            return ZonedDateTime.ofLocal(
-//                    core.decode(LocalDateTime.class, obj.get("dateTime")),
-//                    core.decode(ZoneId.class, obj.get("zone")),
-//                    core.decode(ZoneOffset.class, obj.get("offset"))
-//            );
-//        }
-//    }
-//
-//    static final Person person = new Person(
-//            "Jon",
-//            1.86,
-//            ZonedDateTime.of(
-//                    LocalDateTime.of(1970, 04, 19, 17, 05, 41),
-//                    ZoneId.of("GMT")),
-//            Colour.GREEN, Colour.BLUE);
-//
-//    static void jsonTest() {
-//        final JsonCodecCore jsonCodecCore = Codecs.jsonCodec();
-////        codec.registerStringProxyCodec(
-////                ZonedDateTime.class,
-////                ZonedDateTime::toString,
-////                ZonedDateTime::parse);
-//
-//        jsonCodecCore.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec(jsonCodecCore));
-//
-//        // Serialise to JSON.
-//        final JsValue json = jsonCodecCore.encode(person);
-//        System.out.println(json.toString(40));
-//
-//        // Deserialise back to Java.
-//        final Person person2 = jsonCodecCore.decode(Person.class, json);
-//        assert(person.equals(person2));
-//    }
-//
-//    static void xmlTest() {
-//        final XmlCodecCore mmlCodecCore = Codecs.xmlCodec();
-//        mmlCodecCore.registerStringProxyCodec(
-//                ZonedDateTime.class,
-//                ZonedDateTime::toString,
-//                ZonedDateTime::parse);
-//
-//        final Document doc = CodecException.wrap(() ->
-//                DocumentBuilderFactory
-//                        .newInstance()
-//                        .newDocumentBuilder()
-//                        .newDocument()
-//        );
-//
-//        // Serialise to XML.
-//        final Element elem = mmlCodecCore.encode(Person.class, person, doc.createElement("person"));
-//        System.out.println(XmlUtils.nodeToString(elem,true));
-//
-//        // Deserialise back to Java.
-//        final Person person2 = mmlCodecCore.decode(Person.class, elem);
-//        assert(person.equals(person2));
-//    }
+
+    static class ZonedDateTimeJsonCodec
+            extends Codecs.CodecBase<ZonedDateTime, JsonIO.Input, JsonIO.Output>
+            implements Codec.FinalCodec<ZonedDateTime, JsonIO.Input, JsonIO.Output> {
+
+        public ZonedDateTimeJsonCodec(JsonCodecCore core) {
+            super(core);
+        }
+
+        @Override
+        public Class<ZonedDateTime> type() {
+            return ZonedDateTime.class;
+        }
+
+        @Override
+        public JsonIO.Output encode(ZonedDateTime value, JsonIO.Output out) {
+            out.startObject();
+
+            out.writeField("dateTime");
+            core.encode(LocalDateTime.class, value.toLocalDateTime(), out);
+            out.writeField("zone");
+            core.encode(ZoneId.class, value.getZone(), out);
+            out.writeField("offset");
+            core.encode(ZoneOffset.class, value.getOffset(), out);
+
+            return out.endObject();
+        }
+
+        @Override
+        public ZonedDateTime decode(JsonIO.Input in) {
+            in.startObject();
+
+            in.readFieldName("dateTime");
+            final LocalDateTime ldt = core.decode(LocalDateTime.class, in);
+            in.readFieldName("zone");
+            final ZoneId zid = core.decode(ZoneId.class, in);
+            in.readFieldName("offset");
+            final ZoneOffset zo = core.decode(ZoneOffset.class, in);
+
+            in.endObject();
+
+            return ZonedDateTime.ofLocal(ldt, zid, zo);
+        }
+    }
+
+    static final Person person = new Person(
+            "Jon",
+            1.86,
+            ZonedDateTime.of(
+                    LocalDateTime.of(1970, 04, 19, 17, 05, 41),
+                    ZoneId.of("GMT")),
+            Colour.GREEN, Colour.BLUE);
+
+    static void jsonTest() {
+        final JsonCodecCore jsonCodecCore = Codecs.jsonCodec();
+        jsonCodecCore.registerStringProxyCodec(
+                ZonedDateTime.class,
+                ZonedDateTime::toString,
+                ZonedDateTime::parse);
+
+        jsonCodecCore.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec(jsonCodecCore));
+
+        // Serialise to JSON.
+        final StringWriter wtr = new StringWriter();
+        jsonCodecCore.encode(Person.class, person, wtr);
+        System.out.println(wtr.toString());
+
+        // Deserialise back to Java.
+        final StringReader rdr = new StringReader(wtr.toString());
+        final Person person2 = jsonCodecCore.decode(Person.class, rdr);
+        assert(person.equals(person2));
+    }
+
+    static void xmlTest() {
+        final String root = "root";
+
+        final XmlCodecCore xmlCodecCore = Codecs.xmlCodec();
+        xmlCodecCore.registerStringProxyCodec(
+                ZonedDateTime.class,
+                ZonedDateTime::toString,
+                ZonedDateTime::parse);
+
+
+        // Serialise to XML.
+        final StringWriter wtr = new StringWriter();
+        xmlCodecCore.encode(Person.class, person, wtr, root);
+        System.out.println(wtr.toString());
+
+        // Deserialise back to Java.
+        final StringReader rdr = new StringReader(wtr.toString());
+        final Person person2 = xmlCodecCore.decode(Person.class, rdr, root);
+        assert(person.equals(person2));
+    }
 }

@@ -261,7 +261,7 @@ public interface Codec<T, IN, OUT> {
             return decodePrim(in);
         }
 
-        OUT encodePrim(double val, OUT out);
+        OUT encodePrim(double value, OUT out);
 
         double decodePrim(IN in);
     }

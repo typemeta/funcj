@@ -180,6 +180,7 @@ public abstract class JsonIO {
 
         void startObject();
         String readFieldName();
+        void readFieldName(String name);
         void endObject();
 
         void startArray();

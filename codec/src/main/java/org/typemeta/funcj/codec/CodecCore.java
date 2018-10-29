@@ -55,7 +55,7 @@ public interface CodecCore<IN, OUT> {
      * @param clazz     the type to be mapped
      * @param proxyType the proxy type
      */
-    void registerTypeProxy(Class<?> clazz, Class<?> proxyType);
+    <T> void registerTypeProxy(Class<T> clazz, Class<? super T> proxyType);
 
     /**
      * Register a type proxy.

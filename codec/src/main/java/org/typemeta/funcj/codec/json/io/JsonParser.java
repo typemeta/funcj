@@ -401,6 +401,15 @@ public class JsonParser implements JsonIO.Input {
     }
 
     @Override
+    public void readFieldName(String name) {
+        final String actualName = readFieldName();
+        if (!actualName.equals(name)) {
+            throw raiseError("Expected a field named '" + name +
+                    "' but got '" + actualName + "'");
+        }
+    }
+
+    @Override
     public void endObject() {
         checkTokenType(Event.Type.OBJECT_END);
         processCurrentEvent();

@@ -6,7 +6,7 @@ import java.io.*;
 
 public class JsonBridgeTest {
     @Test
-    public void test() throws Exception {
+    public void test() throws Throwable {
         final StringWriter wtr = new StringWriter();
         final BufferedReader br = FileUtils.openResource("/example.json").getOrThrow();
         final JsonBridge jb = new JsonBridge(br, wtr);

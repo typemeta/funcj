@@ -81,7 +81,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
             if (next.equals(typeField)) {
                 in.startObject();
 
-                in.readFieldName();
+                in.readFieldName(typeFieldName);
                 final String typeName = in.readString();
 
                 final String field2 = in.readFieldName();
@@ -547,8 +547,8 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encodePrim(double val, Output out) {
-            return out.writeDouble(val);
+        public Output encodePrim(double value, Output out) {
+            return out.writeDouble(value);
         }
 
         @Override

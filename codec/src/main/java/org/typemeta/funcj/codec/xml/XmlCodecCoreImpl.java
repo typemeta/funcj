@@ -563,8 +563,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encodePrim(double val, Output out) {
-            return out.writeDouble(val);
+        public Output encodePrim(double value, Output out) {
+            return out.writeDouble(value);
         }
 
         @Override

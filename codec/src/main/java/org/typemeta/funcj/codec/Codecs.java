@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.bytes.*;
+import org.typemeta.funcj.codec.json.*;
 import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.functions.Functions.F;
 
@@ -15,8 +16,8 @@ public abstract class Codecs {
      * Construct and return a new instance of a {@link org.typemeta.funcj.codec.json.JsonCodecCore}.
      * @return the new {@code JsonCodecCore}
      */
-    public static org.typemeta.funcj.codec.json.JsonCodecCore jsonsCodec() {
-        return org.typemeta.funcj.codec.json.JsonCodecs.registerAll(new org.typemeta.funcj.codec.json.JsonCodecCoreImpl());
+    public static org.typemeta.funcj.codec.json.JsonCodecCore jsonCodec() {
+        return JsonCodecs.registerAll(new JsonCodecCoreImpl());
     }
 
     /**

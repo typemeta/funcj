@@ -73,7 +73,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public void registerTypeProxy(Class<?> clazz, Class<?> proxyType) {
+    public <T> void registerTypeProxy(Class<T> clazz, Class<? super T> proxyType) {
         registerTypeProxy(config().classToName(clazz), proxyType);
     }
 
@@ -91,12 +91,12 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> OUT encode(Class<? super T> clazz, T val, OUT out) {
-        return getCodec(remapType(clazz)).encodeWithCheck(val, out);
+        return getCodec(clazz).encodeWithCheck(val, out);
     }
 
     @Override
     public <T> T decode(Class<? super T> clazz, IN in) {
-        return (T)getCodec(remapType(clazz)).decodeWithCheck(in);
+        return (T)getCodec(clazz).decodeWithCheck(in);
     }
 
     @Override
@@ -119,7 +119,10 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> Codec<T, IN, OUT> getCodec(Class<T> clazz) {
-        return getCodec(config().classToName(clazz), () -> createCodec(clazz));
+        return getCodec(
+                config().classToName(remapType(clazz)),
+                () -> createCodec(clazz)
+        );
     }
 
     @Override

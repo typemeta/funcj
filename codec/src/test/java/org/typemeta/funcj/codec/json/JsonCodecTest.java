@@ -7,7 +7,7 @@ import java.io.*;
 
 public class JsonCodecTest extends TestBase {
 
-    final static JsonCodecCore codec = Codecs.jsonsCodec();
+    final static JsonCodecCore codec = Codecs.jsonCodec();
 
     static {
         codec.registerTypeConstructor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
