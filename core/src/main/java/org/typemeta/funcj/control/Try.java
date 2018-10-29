@@ -41,7 +41,7 @@ public interface Try<T> {
      * @return          a {@code Failure} value
      * @throws          NullPointerException if {@code error} is null
      */
-    static <T> Try<T> failure(Exception error) {
+    static <T> Try<T> failure(Throwable error) {
         return new Failure<T>(error);
     }
 
@@ -260,9 +260,9 @@ public interface Try<T> {
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
      * @return          the wrapped value if it's a {@code Success}
-     * @throws          Exception if the wrapped value is a {@code Failure}
+     * @throws          Throwable if the wrapped value is a {@code Failure}
      */
-    T getOrThrow() throws Exception;
+    T getOrThrow() throws Throwable;
 
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw a RuntimeException.
@@ -390,7 +390,7 @@ public interface Try<T> {
         }
 
         @Override
-        public T getOrThrow() throws Exception {
+        public T getOrThrow() {
             return value;
         }
 
@@ -436,9 +436,9 @@ public interface Try<T> {
      */
     final class Failure<T> implements Try<T> {
 
-        public final Exception error;
+        public final Throwable error;
 
-        private Failure(Exception error) {
+        private Failure(Throwable error) {
             this.error = Objects.requireNonNull(error);
         }
 
@@ -485,7 +485,7 @@ public interface Try<T> {
         }
 
         @Override
-        public T getOrThrow() throws Exception {
+        public T getOrThrow() throws Throwable {
             throw error;
         }
 

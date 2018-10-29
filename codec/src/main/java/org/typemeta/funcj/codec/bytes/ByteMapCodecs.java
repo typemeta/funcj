@@ -28,10 +28,10 @@ public abstract class ByteMapCodecs {
         }
 
         @Override
-        public Output encode(Map<K, V> map, Output out) {
-            core.intCodec().encodePrim(map.size(), out);
+        public Output encode(Map<K, V> value, Output out) {
+            core.intCodec().encodePrim(value.size(), out);
 
-            for (Map.Entry<K, V> entry : map.entrySet()) {
+            for (Map.Entry<K, V> entry : value.entrySet()) {
                 keyCodec.encodeWithCheck(entry.getKey(), out);
                 valueCodec.encodeWithCheck(entry.getValue(), out);
             }
@@ -72,10 +72,10 @@ public abstract class ByteMapCodecs {
         }
 
         @Override
-        public Output encode(Map<String, V> map, Output out) {
-            core.intCodec().encodePrim(map.size(), out);
+        public Output encode(Map<String, V> value, Output out) {
+            core.intCodec().encodePrim(value.size(), out);
 
-            for (Map.Entry<String, V> entry : map.entrySet()) {
+            for (Map.Entry<String, V> entry : value.entrySet()) {
                 core.stringCodec().encode(entry.getKey(), out);
                 valueCodec.encodeWithCheck(entry.getValue(), out);
             }

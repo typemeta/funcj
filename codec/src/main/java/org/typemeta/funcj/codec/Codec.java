@@ -32,11 +32,11 @@ public interface Codec<T, IN, OUT> {
     interface FinalCodec<T, IN, OUT> extends Codec<T, IN, OUT> {
 
         @Override
-        default OUT encodeWithCheck(T val, OUT out) {
-            if (core().encodeNull(val, out)) {
+        default OUT encodeWithCheck(T value, OUT out) {
+            if (core().encodeNull(value, out)) {
                 return out;
             } else {
-                return encode(val, out);
+                return encode(value, out);
             }
         }
 
@@ -63,8 +63,8 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Boolean val, OUT out) {
-            return encodePrim(val, out);
+        default OUT encode(Boolean value, OUT out) {
+            return encodePrim(value, out);
         }
 
         @Override
@@ -90,8 +90,8 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Byte val, OUT out) {
-            return encodePrim(val, out);
+        default OUT encode(Byte value, OUT out) {
+            return encodePrim(value, out);
         }
 
         @Override
@@ -117,8 +117,8 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Character val, OUT out) {
-            return encodePrim(val, out);
+        default OUT encode(Character value, OUT out) {
+            return encodePrim(value, out);
         }
 
         @Override
@@ -144,8 +144,8 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Short val, OUT out) {
-            return encodePrim(val, out);
+        default OUT encode(Short value, OUT out) {
+            return encodePrim(value, out);
         }
 
         @Override
@@ -171,8 +171,8 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Integer val, OUT out) {
-            return encodePrim(val, out);
+        default OUT encode(Integer value, OUT out) {
+            return encodePrim(value, out);
         }
 
         @Override
@@ -198,8 +198,8 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Long val, OUT out) {
-            return encodePrim(val, out);
+        default OUT encode(Long value, OUT out) {
+            return encodePrim(value, out);
         }
 
         @Override
@@ -225,8 +225,8 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Float val, OUT out) {
-            return encodePrim(val, out);
+        default OUT encode(Float value, OUT out) {
+            return encodePrim(value, out);
         }
 
         @Override
@@ -252,8 +252,8 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Double val, OUT out) {
-            return encodePrim(val, out);
+        default OUT encode(Double value, OUT out) {
+            return encodePrim(value, out);
         }
 
         @Override
@@ -272,39 +272,51 @@ public interface Codec<T, IN, OUT> {
 
     /**
      * Encode a value of type {@code T} into an encoded value of type {@code OUT}.
-     * @param val       the unencoded value
-     * @param out       the encoded parent value
-     * @return          the encoded value
+     * @param value     the unencoded value
+     * @param out       the encoded output stream
+     * @return          the encoded output stream
      */
-    OUT encode(T val, OUT out);
+    OUT encode(T value, OUT out);
 
     /**
      * Decode an encoded value of type {@code IN} back into a value of type {@code T}.
-     * One of the two {@code decode} methods must be implemented by sub-classes.
-     * @param in        the encoded value
+     * @param in        the encoded input stream
      * @return          the decoded value
      */
     T decode(IN in);
 
-    default OUT encodeWithCheck(T val, OUT out) {
-        if (core().encodeNull(val, out)) {
+    /**
+     * Encode a value of type {@code T} into an encoded value of type {@code OUT},
+     * where the value maybe either null or of a different (sub-) type.
+     * @param value     the unencoded value
+     * @param out       the encoded output stream
+     * @return          the encoded output stream
+     */
+    default OUT encodeWithCheck(T value, OUT out) {
+        if (core().encodeNull(value, out)) {
             return out;
         } else {
-            if (!core().encodeDynamicType(this, val, out)) {
-                return encode(val, out);
+            if (!core().encodeDynamicType(this, value, out)) {
+                return encode(value, out);
             } else {
                 return out;
             }
         }
     }
 
+    /**
+     * Decode an encoded value of type {@code IN} back into a value of type {@code T},
+     * where the unencoded value maybe either null or of a different (sub-) type..
+     * @param in        the encoded input stream
+     * @return          the decoded value
+     */
     default T decodeWithCheck(IN in) {
         if (core().decodeNull(in)) {
             return null;
         } else {
-            final T val = core().decodeDynamicType(in);
-            if (val != null) {
-                return val;
+            final T value = core().decodeDynamicType(in);
+            if (value != null) {
+                return value;
             } else {
                 return decode(in);
             }

@@ -74,18 +74,6 @@ public abstract class Functions {
         }
 
         /**
-         * Convert a curried function by reversing the order of its arguments
-         * @param f         the function to be flipped
-         * @param <A>       the function's first argument type
-         * @param <B>       the function's second argument type
-         * @param <R>       the function's return type
-         * @return          the flipped function
-         */
-        static <A, B, R> F<B, F<A, R>> flip(F<A, F<B, R>> f) {
-            return b -> a -> f.apply(a).apply(b);
-        }
-
-        /**
          * Apply this function
          * @param a         the function argument
          * @return          the result of applying this function
@@ -166,6 +154,18 @@ public abstract class Functions {
          */
         static <A, B, R> F2<A, B, R> of(F2<A, B, R> f) {
             return f;
+        }
+
+        /**
+         * Convert a curried function by reversing the order of its arguments
+         * @param f         the function to be flipped
+         * @param <A>       the function's first argument type
+         * @param <B>       the function's second argument type
+         * @param <R>       the function's return type
+         * @return          the flipped function
+         */
+        static <A, B, R> F<B, F<A, R>> flip(F<A, F<B, R>> f) {
+            return b -> a -> f.apply(a).apply(b);
         }
 
         /**

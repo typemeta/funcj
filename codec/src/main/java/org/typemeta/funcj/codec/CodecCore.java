@@ -84,7 +84,7 @@ public interface CodecCore<IN, OUT> {
      * @param <T>       the decoded value type
      * @return          the encoded value
      */
-    <T> OUT encode(Class<T> type, T val, OUT out);
+    <T> OUT encode(Class<? super T> type, T val, OUT out);
 
     /**
      * Decode a value of type {@code T} from encoded value of type {@code E}.
@@ -93,5 +93,5 @@ public interface CodecCore<IN, OUT> {
      * @param <T>       the decoded value type
      * @return          the decoded value
      */
-    <T> T decode(Class<T> type, IN in);
+    <T> T decode(Class<? super T> type, IN in);
 }

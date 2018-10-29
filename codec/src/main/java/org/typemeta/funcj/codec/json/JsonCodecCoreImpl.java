@@ -137,9 +137,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(boolean[] vals, Output out) {
+        public Output encode(boolean[] value, Output out) {
             out.startArray();
-            for (boolean val : vals) {
+            for (boolean val : value) {
                 booleanCodec().encode(val, out);
             }
             return out.endArray();
@@ -199,9 +199,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(byte[] vals, Output out) {
+        public Output encode(byte[] value, Output out) {
             out.startArray();
-            for (byte val : vals) {
+            for (byte val : value) {
                 byteCodec().encode(val, out);
             }
             return out.endArray();
@@ -261,9 +261,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(char[] vals, Output out) {
+        public Output encode(char[] value, Output out) {
             out.startArray();
-            for (char val : vals) {
+            for (char val : value) {
                 charCodec().encode(val, out);
             }
             return out.endArray();
@@ -323,9 +323,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(short[] vals, Output out) {
+        public Output encode(short[] value, Output out) {
             out.startArray();
-            for (short val : vals) {
+            for (short val : value) {
                 shortCodec().encode(val, out);
             }
             return out.endArray();
@@ -385,9 +385,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(int[] vals, Output out) {
+        public Output encode(int[] value, Output out) {
             out.startArray();
-            for (int val : vals) {
+            for (int val : value) {
                 intCodec().encode(val, out);
             }
             return out.endArray();
@@ -447,9 +447,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(long[] vals, Output out) {
+        public Output encode(long[] value, Output out) {
             out.startArray();
-            for (long val : vals) {
+            for (long val : value) {
                 longCodec().encode(val, out);
             }
             return out.endArray();
@@ -509,9 +509,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(float[] vals, Output out) {
+        public Output encode(float[] value, Output out) {
             out.startArray();
-            for (float val : vals) {
+            for (float val : value) {
                 floatCodec().encode(val, out);
             }
             return out.endArray();
@@ -571,9 +571,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(double[] vals, Output out) {
+        public Output encode(double[] value, Output out) {
             out.startArray();
-            for (double val : vals) {
+            for (double val : value) {
                 doubleCodec().encode(val, out);
             }
             return out.endArray();
@@ -609,8 +609,8 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(String val, Output out) {
-            return out.writeString(val);
+        public Output encode(String value, Output out) {
+            return out.writeString(value);
         }
 
         @Override
@@ -633,8 +633,8 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
             }
 
             @Override
-            public Output encode(EM val, Output out) {
-                return out.writeString(val.name());
+            public Output encode(EM value, Output out) {
+                return out.writeString(value.name());
             }
 
             @Override
@@ -672,9 +672,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
             }
 
             @Override
-            public Output encode(Collection<T> vals, Output out) {
+            public Output encode(Collection<T> value, Output out) {
                 out.startArray();
-                for (T val : vals) {
+                for (T val : value) {
                     elemCodec.encodeWithCheck(val, out);
                 }
                 return out.endArray();
@@ -714,9 +714,9 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
             }
 
             @Override
-            public Output encode(T[] vals, Output out) {
+            public Output encode(T[] value, Output out) {
                 out.startArray();
-                for (T val : vals) {
+                for (T val : value) {
                     elemCodec.encodeWithCheck(val, out);
                 }
                 return out.endArray();
@@ -779,12 +779,12 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
         }
 
         @Override
-        public Output encode(T val, Output out) {
+        public Output encode(T value, Output out) {
             out.startObject();
 
             fields.forEach((name, field) -> {
                 out.writeField(field.name());
-                field.encodeField(val, out);
+                field.encodeField(value, out);
             });
 
             return out.endObject();

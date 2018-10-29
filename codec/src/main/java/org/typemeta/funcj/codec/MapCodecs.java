@@ -28,12 +28,12 @@ public abstract class MapCodecs {
         }
 
         @Override
-        public OUT encodeWithCheck(Map<K, V> val, OUT out) {
-            if (core().encodeNull(val, out)) {
+        public OUT encodeWithCheck(Map<K, V> value, OUT out) {
+            if (core().encodeNull(value, out)) {
                 return out;
             } else {
-                if (!core().encodeDynamicType(this, val, out, this::getCodec)) {
-                    return encode(val, out);
+                if (!core().encodeDynamicType(this, value, out, this::getCodec)) {
+                    return encode(value, out);
                 } else {
                     return out;
                 }
@@ -79,12 +79,12 @@ public abstract class MapCodecs {
         }
 
         @Override
-        public OUT encodeWithCheck(Map<String, V> val, OUT out) {
-            if (core().encodeNull(val, out)) {
+        public OUT encodeWithCheck(Map<String, V> value, OUT out) {
+            if (core().encodeNull(value, out)) {
                 return out;
             } else {
-                if (!core().encodeDynamicType(this, val, out, this::getCodec)) {
-                    return encode(val, out);
+                if (!core().encodeDynamicType(this, value, out, this::getCodec)) {
+                    return encode(value, out);
                 } else {
                     return out;
                 }

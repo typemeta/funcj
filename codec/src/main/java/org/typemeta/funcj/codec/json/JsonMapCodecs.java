@@ -26,13 +26,13 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Output encode(Map<K, V> map, Output out) {
+        public Output encode(Map<K, V> value, Output out) {
             final String keyFieldName = core.config().keyFieldName();
             final String valueFieldName = core.config().valueFieldName();
 
             out.startArray();
 
-            map.forEach((k, v) -> {
+            value.forEach((k, v) -> {
                 out.startObject();
                 out.writeField(keyFieldName);
                 keyCodec.encodeWithCheck(k, out);
@@ -104,10 +104,10 @@ public abstract class JsonMapCodecs {
         }
 
         @Override
-        public Output encode(Map<String, V> map, Output out) {
+        public Output encode(Map<String, V> value, Output out) {
             out.startObject();
 
-            map.forEach((key, val) -> {
+            value.forEach((key, val) -> {
                 out.writeField(key);
                 valueCodec.encodeWithCheck(val, out);
             });

@@ -22,12 +22,12 @@ public abstract class CollectionCodec<T, IN, OUT> extends Codec.Base<Collection<
     }
 
     @Override
-    public OUT encodeWithCheck(Collection<T> val, OUT out) {
-        if (core().encodeNull(val, out)) {
+    public OUT encodeWithCheck(Collection<T> value, OUT out) {
+        if (core().encodeNull(value, out)) {
             return out;
         } else {
-            if (!core().encodeDynamicType(this, val, out, this::getCodec)) {
-                return encode(val, out);
+            if (!core().encodeDynamicType(this, value, out, this::getCodec)) {
+                return encode(value, out);
             } else {
                 return out;
             }

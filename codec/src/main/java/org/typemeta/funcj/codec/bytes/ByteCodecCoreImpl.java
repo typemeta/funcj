@@ -108,9 +108,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(boolean[] vals, Output out) {
-            out.writeInt(vals.length);
-            for (boolean val : vals) {
+        public Output encode(boolean[] value, Output out) {
+            out.writeInt(value.length);
+            for (boolean val : value) {
                 booleanCodec().encode(val, out);
             }
             return out;
@@ -167,9 +167,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(byte[] vals, Output out) {
-            out.writeInt(vals.length);
-            for (byte val : vals) {
+        public Output encode(byte[] value, Output out) {
+            out.writeInt(value.length);
+            for (byte val : value) {
                 byteCodec().encode(val, out);
             }
             return out;
@@ -226,9 +226,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(char[] vals, Output out) {
-            out.writeInt(vals.length);
-            for (char val : vals) {
+        public Output encode(char[] value, Output out) {
+            out.writeInt(value.length);
+            for (char val : value) {
                 charCodec().encode(val, out);
             }
             return out;
@@ -285,9 +285,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(short[] vals, Output out) {
-            out.writeInt(vals.length);
-            for (short val : vals) {
+        public Output encode(short[] value, Output out) {
+            out.writeInt(value.length);
+            for (short val : value) {
                 shortCodec().encode(val, out);
             }
             return out;
@@ -344,9 +344,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(int[] vals, Output out) {
-            out.writeInt(vals.length);
-            for (int val : vals) {
+        public Output encode(int[] value, Output out) {
+            out.writeInt(value.length);
+            for (int val : value) {
                 intCodec().encode(val, out);
             }
             return out;
@@ -403,9 +403,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(long[] vals, Output out) {
-            out.writeInt(vals.length);
-            for (long val : vals) {
+        public Output encode(long[] value, Output out) {
+            out.writeInt(value.length);
+            for (long val : value) {
                 longCodec().encode(val, out);
             }
             return out;
@@ -462,9 +462,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(float[] vals, Output out) {
-            out.writeInt(vals.length);
-            for (float val : vals) {
+        public Output encode(float[] value, Output out) {
+            out.writeInt(value.length);
+            for (float val : value) {
                 floatCodec().encode(val, out);
             }
             return out;
@@ -521,9 +521,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(double[] vals, Output out) {
-            out.writeInt(vals.length);
-            for (double val : vals) {
+        public Output encode(double[] value, Output out) {
+            out.writeInt(value.length);
+            for (double val : value) {
                 doubleCodec().encode(val, out);
             }
             return out;
@@ -556,8 +556,8 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(String val, Output out) {
-            return out.writeString(val);
+        public Output encode(String value, Output out) {
+            return out.writeString(value);
         }
 
         @Override
@@ -580,8 +580,8 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
             }
 
             @Override
-            public Output encode(EM val, Output out) {
-                return out.writeString(val.name());
+            public Output encode(EM value, Output out) {
+                return out.writeString(value.name());
             }
 
             @Override
@@ -619,9 +619,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
             }
 
             @Override
-            public Output encode(Collection<T> vals, Output out) {
-                out.writeInt(vals.size());
-                for (T val : vals) {
+            public Output encode(Collection<T> value, Output out) {
+                out.writeInt(value.size());
+                for (T val : value) {
                     elemCodec.encodeWithCheck(val, out);
                 }
                 return out;
@@ -658,9 +658,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
             }
 
             @Override
-            public Output encode(T[] vals, Output out) {
-                out.writeInt(vals.length);
-                for (T val : vals) {
+            public Output encode(T[] value, Output out) {
+                out.writeInt(value.length);
+                for (T val : value) {
                     elemCodec.encodeWithCheck(val, out);
                 }
                 return out;
@@ -718,9 +718,9 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
         }
 
         @Override
-        public Output encode(T val, Output out) {
+        public Output encode(T value, Output out) {
             objMeta.forEach(field ->
-                    field.encodeField(val, out)
+                    field.encodeField(value, out)
             );
             return out;
         }

@@ -142,8 +142,8 @@ public abstract class Codecs {
         }
 
         @Override
-        public OUT encode(T val, OUT out) {
-            return core.stringCodec().encode(encode.apply(val), out);
+        public OUT encode(T value, OUT out) {
+            return core.stringCodec().encode(encode.apply(value), out);
         }
 
         @Override

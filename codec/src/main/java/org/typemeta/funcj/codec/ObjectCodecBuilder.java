@@ -46,8 +46,8 @@ public class ObjectCodecBuilder<T, IN, OUT> {
         return codec;
     }
 
-    private <X> Codec<X, IN, OUT> getCodec(Class<X> stcType) {
-        return core.getCodec(stcType);
+    private <X> Codec<X, IN, OUT> getCodec(Class<X> clazz) {
+        return core.getCodec(clazz);
     }
 
     <A> _1<A> field(String name, Functions.F<T, A> getter, Codec<A, IN, OUT> codec) {

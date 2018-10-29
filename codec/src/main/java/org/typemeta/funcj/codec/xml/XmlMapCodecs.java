@@ -27,9 +27,9 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Output encode(Map<K, V> map, Output out) {
+        public Output encode(Map<K, V> value, Output out) {
 
-            map.forEach((k, v) -> {
+            value.forEach((k, v) -> {
                 out.startElement(core.config().entryElemName());
                 out.startElement(core.config().keyElemName());
                 keyCodec.encodeWithCheck(k, out);
@@ -84,8 +84,8 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Output encode(Map<String, V> map, Output out) {
-            map.forEach((key, val) -> {
+        public Output encode(Map<String, V> value, Output out) {
+            value.forEach((key, val) -> {
                 valueCodec.encodeWithCheck(val, out.startElement(key));
                 out.endElement();
             });

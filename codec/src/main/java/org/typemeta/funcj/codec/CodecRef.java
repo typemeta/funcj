@@ -28,7 +28,7 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
         }
 
         @Override
-        public Object encode(Object val, Object in) {
+        public Object encode(Object value, Object in) {
             throw error();
         }
 
@@ -93,8 +93,8 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
     }
 
     @Override
-    public OUT encode(T val, OUT out) {
-        return impl.encode(val, out);
+    public OUT encode(T value, OUT out) {
+        return impl.encode(value, out);
     }
 
     @Override

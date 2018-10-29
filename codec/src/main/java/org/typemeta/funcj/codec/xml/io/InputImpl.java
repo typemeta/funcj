@@ -16,6 +16,15 @@ class InputImpl implements XmlIO.Input {
     }
 
     @Override
+    public void close() {
+        try {
+            rdr.close();
+        } catch (XMLStreamException ex) {
+            throw new CodecException(ex);
+        }
+    }
+
+    @Override
     public String location() {
         return rdr.getLocation().toString();
     }
@@ -75,15 +84,6 @@ class InputImpl implements XmlIO.Input {
                 return Type.CHARACTERS;
             default:
                 return Type.OTHER;
-        }
-    }
-
-    @Override
-    public void close() {
-        try {
-            rdr.close();
-        } catch (XMLStreamException ex) {
-            throw new CodecException(ex);
         }
     }
 

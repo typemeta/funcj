@@ -90,20 +90,20 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> OUT encode(Class<T> clazz, T val, OUT out) {
+    public <T> OUT encode(Class<? super T> clazz, T val, OUT out) {
         return getCodec(remapType(clazz)).encodeWithCheck(val, out);
     }
 
     @Override
-    public <T> T decode(Class<T> clazz, IN in) {
-        return getCodec(remapType(clazz)).decodeWithCheck(in);
+    public <T> T decode(Class<? super T> clazz, IN in) {
+        return (T)getCodec(remapType(clazz)).decodeWithCheck(in);
     }
 
     @Override
-    public <X> Class<X> remapType(Class<X> clazz) {
+    public <T> Class<T> remapType(Class<T> clazz) {
         final String typeName = config().classToName(clazz);
         if (typeProxyRegistry.containsKey(typeName)) {
-            return (Class<X>) typeProxyRegistry.get(typeName);
+            return (Class<T>) typeProxyRegistry.get(typeName);
         } else {
             return clazz;
         }

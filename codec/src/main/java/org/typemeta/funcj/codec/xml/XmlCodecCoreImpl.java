@@ -30,32 +30,6 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
     }
 
     @Override
-    public <T> Output encode(
-            Class<T> type,
-            T val,
-            Writer wtr,
-            String rootElemName) {
-        final  Output out = encode(type, val, XmlIO.outputOf(wtr, rootElemName));
-        return out.close();
-    }
-
-    @Override
-    public <T> T decode(
-            Class<T> type,
-            Reader rdr,
-            String rootElemName) {
-        return decode(type, XmlIO.inputOf(rdr, rootElemName));
-    }
-
-    public <T> Output encode(T val) {
-        return encode((Class<T>)val.getClass(), val);
-    }
-
-    public <T> Output encode(Class<T> type, T val) {
-        return super.encode(type, val, null);
-    }
-
-    @Override
     public String getFieldName(Field field, int depth, Set<String> existingNames) {
         String name = field.getName();
         while (existingNames.contains(name)) {
@@ -144,8 +118,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(boolean[] vals, Output out) {
-            for (boolean val : vals) {
+        public Output encode(boolean[] value, Output out) {
+            for (boolean val : value) {
                 booleanCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
@@ -211,8 +185,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(byte[] vals, Output out) {
-            for (byte val : vals) {
+        public Output encode(byte[] value, Output out) {
+            for (byte val : value) {
                 byteCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
@@ -278,8 +252,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(char[] vals, Output out) {
-            for (char val : vals) {
+        public Output encode(char[] value, Output out) {
+            for (char val : value) {
                 charCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
@@ -345,8 +319,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(short[] vals, Output out) {
-            for (short val : vals) {
+        public Output encode(short[] value, Output out) {
+            for (short val : value) {
                 shortCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
@@ -412,8 +386,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(int[] vals, Output out) {
-            for (int val : vals) {
+        public Output encode(int[] value, Output out) {
+            for (int val : value) {
                 intCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
@@ -479,8 +453,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(long[] vals, Output out) {
-            for (long val : vals) {
+        public Output encode(long[] value, Output out) {
+            for (long val : value) {
                 longCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
@@ -546,8 +520,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(float[] vals, Output out) {
-            for (float val : vals) {
+        public Output encode(float[] value, Output out) {
+            for (float val : value) {
                 floatCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
@@ -613,8 +587,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(double[] vals, Output out) {
-            for (double val : vals) {
+        public Output encode(double[] value, Output out) {
+            for (double val : value) {
                 doubleCodec().encode(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
@@ -656,8 +630,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(String val, Output out) {
-            return out.writeString(val);
+        public Output encode(String value, Output out) {
+            return out.writeString(value);
         }
 
         @Override
@@ -680,8 +654,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
             }
 
             @Override
-            public Output encode(EM val, Output out) {
-                return out.writeString(val.name());
+            public Output encode(EM value, Output out) {
+                return out.writeString(value.name());
             }
 
             @Override
@@ -719,8 +693,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
             }
 
             @Override
-            public Output encode(Collection<T> vals, Output out) {
-                for (T val : vals) {
+            public Output encode(Collection<T> value, Output out) {
+                for (T val : value) {
                     elemCodec.encodeWithCheck(val, out.startElement(config.entryElemName()));
                     out.endElement();
                 }
@@ -763,8 +737,8 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
             }
 
             @Override
-            public Output encode(T[] vals, Output out) {
-                for (T val : vals) {
+            public Output encode(T[] value, Output out) {
+                for (T val : value) {
                     elemCodec.encodeWithCheck(val, out.startElement(config.entryElemName()));
                     out.endElement();
                 }
@@ -831,9 +805,9 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
         }
 
         @Override
-        public Output encode(T val, Output out) {
+        public Output encode(T value, Output out) {
             fields.forEach((name, field) -> {
-                field.encodeField(val, out.startElement(field.name()));
+                field.encodeField(value, out.startElement(field.name()));
                 out.endElement();
             });
 

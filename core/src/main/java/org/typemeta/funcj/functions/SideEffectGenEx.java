@@ -18,6 +18,7 @@ public abstract class SideEffectGenEx {
         /**
          * Static constructor.
          * @param f         the function
+         * @param <X>       the exception type
          * @return          the function
          */
         static <X extends Exception> F0<X> of(F0<X> f) {

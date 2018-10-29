@@ -8,15 +8,20 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public abstract class XmlIO {
-    public static Input inputOf(XMLStreamReader rdr) {
-        return new InputImpl(rdr);
+    public static Input inputOf(XMLStreamReader reader) {
+        if (reader.getProperty(XMLInputFactory.IS_COALESCING) != Boolean.TRUE) {
+            throw new CodecException("XMLStreamReader must have the '" + XMLInputFactory.IS_COALESCING + "' " +
+                                             " property set to true");
+        } else {
+            return new InputImpl(reader);
+        }
     }
 
-    public static Input inputOf(Reader rdr, String rootElemName) {
+    public static Input inputOf(Reader reader, String rootElemName) {
         try {
             final XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
             xmlInFact.setProperty(XMLInputFactory.IS_COALESCING, true);
-            final XMLStreamReader xrdr = xmlInFact.createXMLStreamReader(rdr);
+            final XMLStreamReader xrdr = xmlInFact.createXMLStreamReader(reader);
             final Input in = inputOf(xrdr);
             in.startDocument();
             in.startElement(rootElemName);
@@ -26,15 +31,19 @@ public abstract class XmlIO {
         }
     }
 
-    public static Output outputOf(XMLStreamWriter wtr) {
-        return new OutputImpl(wtr);
+    public static Output outputOf(XMLStreamWriter writer) {
+        if (writer.getProperty("escapeCharacters") != Boolean.TRUE) {
+            throw new CodecException("XMLStreamWriter must have the 'escapeCharacters' property set to true");
+        } else {
+            return new OutputImpl(writer);
+        }
     }
 
-    public static Output outputOf(Writer wtr, String rootElemName) {
+    public static Output outputOf(Writer writer, String rootElemName) {
         try {
             final XMLOutputFactory xmlOutFact = XMLOutputFactory.newInstance();
             xmlOutFact.setProperty("escapeCharacters", false);
-            final XMLStreamWriter xwtr = xmlOutFact.createXMLStreamWriter(wtr);
+            final XMLStreamWriter xwtr = xmlOutFact.createXMLStreamWriter(writer);
             xwtr.writeStartDocument();
             xwtr.writeStartElement(rootElemName);
 
@@ -57,7 +66,7 @@ public abstract class XmlIO {
             OTHER
         }
 
-        public class AttributeMap {
+        class AttributeMap {
             protected final Map<String, String> attrMap = new TreeMap<>();
 
             void load(XMLStreamReader rdr) {
@@ -90,6 +99,8 @@ public abstract class XmlIO {
             }
         }
 
+        void close();
+
         String location();
 
         boolean hasNext();
@@ -97,7 +108,6 @@ public abstract class XmlIO {
 
         Type type();
 
-        void close();
 
         void startDocument();
         void endDocument();
