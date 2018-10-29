@@ -1,11 +1,9 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.xml.io.XmlIO;
 import org.typemeta.funcj.codec.xml.io.XmlIO.*;
 import org.typemeta.funcj.functions.Functions;
 
-import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 

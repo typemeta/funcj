@@ -3,8 +3,7 @@ package org.typemeta.funcj.codec.json.io;
 import java.io.*;
 import java.math.BigDecimal;
 
-import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.raiseWriteFailure;
-import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.write;
+import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.*;
 
 public class JsonGenerator implements JsonIO.Output {
 
