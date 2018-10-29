@@ -119,7 +119,6 @@ public abstract class XmlIO {
 
         boolean readBoolean();
 
-        String readString();
         char readChar();
 
         byte readByte();
@@ -131,6 +130,8 @@ public abstract class XmlIO {
         BigDecimal readBigDecimal();
         Number readNumber();
         String readStringNumber();
+
+        String readString();
     }
 
     public interface Output {
@@ -146,7 +147,6 @@ public abstract class XmlIO {
 
         Output writeBoolean(boolean value);
 
-        Output writeString(String value);
         Output writeChar(char value);
 
         Output writeByte(byte value);
@@ -158,6 +158,8 @@ public abstract class XmlIO {
         Output writeNumber(Number value);
         Output writeBigDecimal(BigDecimal value);
         Output writeStringNumber(String value);
+
+        Output writeString(String value);
     }
 }
 

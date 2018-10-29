@@ -3,9 +3,8 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.functions.Functions;
 
 /**
- * Interface for classes which providing an encoding into a specific target type.
- * Unlike {@link Codec}, which can only encode a single type,
- * {@code CodecCore} implementations will handle any type.
+ * Interface for classes which provide an encoding of values of any type,
+ * into a specific target type.
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
  */
@@ -53,18 +52,18 @@ public interface CodecCore<IN, OUT> {
     /**
      * Register a type proxy.
      * A type proxy maps a type to its proxy before selecting its {@code Codec}.
-     * @param type      type to be mapped
-     * @param proxyType proxy type
+     * @param clazz     the type to be mapped
+     * @param proxyType the proxy type
      */
-    void registerTypeProxy(Class<?> type, Class<?> proxyType);
+    void registerTypeProxy(Class<?> clazz, Class<?> proxyType);
 
     /**
      * Register a type proxy.
      * A type proxy maps a type to its proxy before selecting its {@code Codec}.
-     * @param typeName  name of type to be mapped
-     * @param proxyType proxy type
+     * @param name      the name of type to be mapped
+     * @param proxyType the proxy type
      */
-    void registerTypeProxy(String typeName, Class<?> proxyType);
+    void registerTypeProxy(String name, Class<?> proxyType);
 
     /**
      * Register a {@code TypeConstructor} for the specified class.

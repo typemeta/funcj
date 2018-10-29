@@ -164,7 +164,6 @@ public abstract class JsonIO {
 
         boolean readBoolean();
 
-        String readString();
         char readChar();
 
         byte readByte();
@@ -176,6 +175,8 @@ public abstract class JsonIO {
         Number readNumber();
         BigDecimal readBigDecimal();
         String readStringNumber();
+
+        String readString();
 
         void startObject();
         String readFieldName();
@@ -191,7 +192,6 @@ public abstract class JsonIO {
 
         Output writeBoolean(boolean value);
 
-        Output writeString(String value);
         Output writeChar(char value);
 
         Output writeByte(byte value);
@@ -203,6 +203,8 @@ public abstract class JsonIO {
         Output writeNumber(Number value);
         Output writeBigDecimal(BigDecimal value);
         Output writeStringNumber(String value);
+
+        Output writeString(String value);
 
         Output startObject();
         Output writeField(String name);
