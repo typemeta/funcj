@@ -25,13 +25,14 @@
 
 **funcj.codec** is a Java framework for round-tripping Java data via structured data formats
 such as JSON and XML, as well as byte streams.
-It can encode Java object graphs into an encoded form,
+It can encode Java object graphs into data streams,
 and can then decode the data to reconstruct the original Java values.
 
 ## Features
 
 * Supports encoding via JSON, XML, and byte streams. Can be extended to support further formats.
-* Supports primitive types, generics, collections, Optionals, as well as any Java class using field-based Reflection.
+* Uses streaming to avoid building, for example, large DOM or JSON node graphs in memory.
+* Supports primitive types, generics, collections, nulls, as well as any Java class using field-based Reflection.
 * Should round-trip data perfectly, meaning that for example,
 a `TreeMap` will be reconstructed as the same type (and not as a `HashMap`).
 * Is thread-safe.
@@ -173,7 +174,7 @@ A few things to note:
 
 * The encoded form mirrors the structure of the Java data.
 * For most fields type information is not required in the encoded representation,
-as the framework will use the static type information.
+as the framework will use the static type information when reconstructing the Java data.
   * However a couple of fields do have extra type metadata.
 In these cases the dynamic type of the value (e.g. `HashSet`)
 is different to the static type (e.g. `Set`),
@@ -181,9 +182,7 @@ hence the extra type metadata is included in the encoded form.
 
 ### XML
 
-If, instead, we want to encode as XML,
-then as it's XML there's a little more ceremony,
-but the basics are the same:
+If, instead, we want to encode as XML, then the basics are the same:
 
 ```java
 final XmlCodecCore codec = Codecs.xmlCodec();
@@ -204,7 +203,8 @@ assert(person.equals(person2));
 and the resultant XML is as follows:
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?><person>
+<?xml version="1.0" encoding="UTF-8"?>
+<person>
     <name>Marconi</name>
     <height>1.86</height>
     <birthDate>
@@ -253,55 +253,10 @@ You first call `field` for each field comprising the class,
 supplying the field name, a getter for the field,
 and either a codec,
 or a class value (which is used to look up the appropriate codec).
-Finally call `map` with the method which,
-given the field values, will constuct an instance of the type.
+Finally call the `map` method with the function which,
+when supplied with the field values, will constuct an instance of the type.
 
-For example, if we want to override how the `ZonedDateTime` type is encoded,
-to encode it as a `String`,
-we can do so like this:
-
-```java
-codec.registerCodec(ZonedDateTime.class)
-        .field("time", ZonedDateTime::toString, String.class)
-        .map(ZonedDateTime::parse);
-```
-
-The encoded results are then:
-
-```json
-{
-    "name" : "Marconi",
-    "height" : 1.86,
-    "birthDate" : {
-        "time" : "1874-04-25T17:05:41Z[GMT]"
-    },
-    "favColours" : {
-        "@type" : "java.util.HashSet",
-        "@value" : ["GREEN", "BLUE"]
-    }
-}
-```
-
-and:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?><person>
-    <name>Marconi</name>
-    <height>1.86</height>
-    <birthDate>
-        <time>1874-04-25T17:05:41Z[GMT]</time>
-    </birthDate>
-    <favColours type="java.util.HashSet">
-        <elem>GREEN</elem>
-        <elem>BLUE</elem>
-    </favColours>
-</person>
-```
-
-In fact, since encoding a value as a string is a common use case,
-there's specific support for this - see next section.
-
-For reference, the default codec for `ZonedDateTime` is defined as below:
+For example, the codec for `ZonedDateTime` type is defined like this
 
 ```java
 core.registerCodec(ZonedDateTime.class)
@@ -364,7 +319,7 @@ The third way to define a custom codec is to define a class that implements the 
 As the codec is dealing directly with the underlying encoding - e.g. JSON,
 it has to be specialised for a specific encoding.
 
-For example, a custom JSON codec for the `ZonedDateTime` could be written as follows:
+For example, a custom JSON codec for the `ZonedDateTime` class could be written as follows:
 
 ```java
 static class ZonedDateTimeJsonCodec
