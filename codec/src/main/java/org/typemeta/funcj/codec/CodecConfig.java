@@ -1,5 +1,8 @@
 package org.typemeta.funcj.codec;
 
+import java.lang.reflect.Field;
+import java.util.Set;
+
 /**
  * Interface for classes which provide configuration information
  * for CodecCore implementations.
@@ -28,6 +31,8 @@ public interface CodecConfig {
      * @return          the class value
      */
     <T> Class<T> nameToClass(String name);
+
+    String getFieldName(Field field, int depth, Set<String> existingNames);
 
     /**
      * Return the default size for arrays.

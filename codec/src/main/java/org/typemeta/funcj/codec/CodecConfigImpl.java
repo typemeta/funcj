@@ -1,19 +1,12 @@
 package org.typemeta.funcj.codec;
 
+import java.lang.reflect.Field;
+import java.util.Set;
+
 /**
  * Base class for {@link CodecConfig} implementations.
  */
 public class CodecConfigImpl implements CodecConfig {
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> Class<T> nameToClass(String name) {
-        try {
-            return (Class<T>) Class.forName(name);
-        } catch (ClassNotFoundException ex) {
-            throw new CodecException("Cannot create class from class name '" + name + "'", ex);
-        }
-    }
 
     @Override
     public String classToName(Class<?> clazz) {
@@ -37,6 +30,25 @@ public class CodecConfigImpl implements CodecConfig {
                 return sb.toString();
             }
         }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Class<T> nameToClass(String name) {
+        try {
+            return (Class<T>) Class.forName(name);
+        } catch (ClassNotFoundException ex) {
+            throw new CodecException("Cannot create class from class name '" + name + "'", ex);
+        }
+    }
+
+    @Override
+    public String getFieldName(Field field, int depth, Set<String> existingNames) {
+        String name = field.getName();
+        while (existingNames.contains(name)) {
+            name = "*" + name;
+        }
+        return name;
     }
 
     @Override

@@ -2,10 +2,22 @@ package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.CodecConfigImpl;
 
+import java.lang.reflect.Field;
+import java.util.Set;
+
 /**
  * Base class for {@link XmlCodecConfig} implementations.
  */
 public class XmlCodecConfigImpl extends CodecConfigImpl implements XmlCodecConfig {
+
+    @Override
+    public String getFieldName(Field field, int depth, Set<String> existingNames) {
+        String name = field.getName();
+        while (existingNames.contains(name)) {
+            name = "_" + name;
+        }
+        return name;
+    }
 
     @Override
     public String entryElemName() {

@@ -28,15 +28,6 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
     }
 
     @Override
-    public String getFieldName(Field field, int depth, Set<String> existingNames) {
-        String name = field.getName();
-        while (existingNames.contains(name)) {
-            name = "_" + name;
-        }
-        return name;
-    }
-
-    @Override
     public <T> boolean encodeNull(T val, Output out) {
         if (val == null) {
             out.attribute(config.nullAttrName(), config.nullAttrVal());

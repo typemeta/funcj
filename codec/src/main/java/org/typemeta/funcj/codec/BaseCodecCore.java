@@ -300,8 +300,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             } else if (Map.class.isAssignableFrom(clazz)) {
                 final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(clazz, Map.class);
                 if (typeArgs.size() == 2) {
-                    final Class keyType = typeArgs.get(0);
-                    final Class valueType = typeArgs.get(1);
+                    final Class<?> keyType = typeArgs.get(0);
+                    final Class<?> valueType = typeArgs.get(1);
                     return (Codec<T, IN, OUT>) getMapCodec((Class)clazz, keyType, valueType);
                 } else {
                     return (Codec<T, IN, OUT>) getMapCodec((Class)clazz, Object.class, Object.class);
@@ -331,7 +331,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             for (Field field : fields) {
                 final int fm = field.getModifiers();
                 if (!Modifier.isStatic(fm) && !Modifier.isTransient(fm)) {
-                    final String fieldName = getFieldName(field, depth, fieldCodecs.keySet());
+                    final String fieldName = config().getFieldName(field, depth, fieldCodecs.keySet());
                     fieldCodecs.put(fieldName, createFieldCodec(field));
                 }
             }
@@ -484,15 +484,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public String getFieldName(Field field, int depth, Set<String> existingNames) {
-        String name = field.getName();
-        while (existingNames.contains(name)) {
-            name = "*" + name;
-        }
-        return name;
-    }
-
-    @Override
     public <T> FieldCodec<IN, OUT> createFieldCodec(Field field) {
         final Class<T> clazz = (Class<T>)field.getType();
         if (clazz.isPrimitive()) {
@@ -538,7 +529,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                 return new FieldCodec.ObjectArrayFieldCodec<>(field, codec);
             }
         } else {
-            Codec<T, IN, OUT> codec;
+            final Codec<T, IN, OUT> codec;
 
             if (clazz.isEnum() ||
                     clazz.equals(Boolean.class) ||
@@ -554,8 +545,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             } else if (Map.class.isAssignableFrom(clazz)) {
                 final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
                 if (typeArgs.size() == 2) {
-                    final Class keyType = typeArgs.get(0);
-                    final Class valueType = typeArgs.get(1);
+                    final Class<?> keyType = typeArgs.get(0);
+                    final Class<?> valueType = typeArgs.get(1);
                     codec = (Codec<T, IN, OUT>) getMapCodec((Class)clazz, keyType, valueType);
                 } else {
                     codec = (Codec<T, IN, OUT>) getMapCodec((Class)clazz, Object.class, Object.class);

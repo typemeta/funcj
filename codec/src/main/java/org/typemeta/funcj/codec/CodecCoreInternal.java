@@ -83,7 +83,6 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
      */
     <T> Codec<T, IN, OUT> getCodec(Class<T> clazz);
 
-
     /**
      * Lookup a {@code Codec} for a name, and, if one doesn't exist,
      * then create a new one using the supplier.
@@ -168,8 +167,6 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
     <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,
             ObjectMeta<T, IN, OUT, RA> objMeta);
-
-    String getFieldName(Field field, int depth, Set<String> existingNames);
 
     <T> FieldCodec<IN, OUT> createFieldCodec(Field field);
 

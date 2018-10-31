@@ -45,7 +45,7 @@ public abstract class ReflectionUtils {
      * @param iface generic interface
      * @return type arguments
      */
-    public static TypeArgs getTypeArgs(Field field, Class iface) {
+    public static TypeArgs getTypeArgs(Field field, Class<?> iface) {
         final Type type = field.getGenericType();
         if (type instanceof ParameterizedType) {
             final ParameterizedType pt = (ParameterizedType) type;
@@ -57,7 +57,7 @@ public abstract class ReflectionUtils {
                     if (typeArg instanceof Class) {
                         results.add((Class<?>) typeArg);
                     } else if (typeArg instanceof TypeVariable) {
-                        final TypeVariable tv = (TypeVariable) typeArg;
+                        final TypeVariable<?> tv = (TypeVariable<?>) typeArg;
                         final Type[] bounds = tv.getBounds();
                         if (bounds.length == 1 && bounds[0] instanceof Class) {
                             results.add((Class<?>) bounds[0]);
@@ -83,7 +83,7 @@ public abstract class ReflectionUtils {
      * @param iface generic interface
      * @return type arguments
      */
-    public static TypeArgs getTypeArgs(Class implClass, Class iface) {
+    public static TypeArgs getTypeArgs(Class<?> implClass, Class<?> iface) {
         final List<ParameterizedType> genIfaces =
                 Arrays.stream(implClass.getGenericInterfaces())
                         .filter(t -> t instanceof ParameterizedType)
