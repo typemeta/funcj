@@ -12,18 +12,18 @@ import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 @SuppressWarnings("unchecked")
 public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements JsonCodecCore {
 
-    protected final JsonCodecConfig config;
+    protected final JsonCodecConfigImpl config;
 
-    public JsonCodecCoreImpl(JsonCodecConfig config) {
+    public JsonCodecCoreImpl(JsonCodecConfigImpl config) {
         this.config = config;
     }
 
     public JsonCodecCoreImpl() {
-        this(new JsonCodecConfig());
+        this(new JsonCodecConfigImpl());
     }
 
     @Override
-    public JsonCodecConfig config() {
+    public JsonCodecConfigImpl config() {
         return config;
     }
 

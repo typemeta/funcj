@@ -19,7 +19,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
     }
 
     public XmlCodecCoreImpl() {
-        this(new XmlCodecConfig());
+        this(new XmlCodecConfigImpl());
     }
 
     @Override

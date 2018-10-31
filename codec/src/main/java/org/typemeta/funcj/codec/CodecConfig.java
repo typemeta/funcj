@@ -1,24 +1,17 @@
 package org.typemeta.funcj.codec;
 
-public class CodecConfig {
-
-    @SuppressWarnings("unchecked")
-    public <T> Class<T> nameToClass(String name) {
-        try {
-            return (Class<T>) Class.forName(name);
-        } catch (ClassNotFoundException ex) {
-            throw new CodecException("Cannot create class from class name '" + name + "'", ex);
-        }
-    }
+/**
+ * Interface for classes which provide configuration information
+ * for CodecCore implementations.
+ */
+public interface CodecConfig {
 
     /**
-     * Map a class to a name.
+     * Convert a class to a name.
      * @param clazz     the class
      * @return          the name
      */
-    public String classToName(Class<?> clazz) {
-        return clazz.getName();
-    }
+    String classToName(Class<?> clazz);
 
     /**
      * Map one or  more classes to a name.
@@ -26,26 +19,19 @@ public class CodecConfig {
      * @param classes   the classes
      * @return          the name
      */
-    public String classToName(Class<?> clazz, Class<?>... classes) {
-        switch (classes.length) {
-            case 1:
-                return classToName(clazz) + '|' + classToName(classes[0]);
-            case 2:
-                return classToName(clazz) + '|' + classToName(classes[0])
-                        + '|' + classToName(classes[1]);
-            default: {
-                final StringBuilder sb = new StringBuilder();
-                sb.append(classToName(clazz)).append('|');
-                for (Class<?> cls : classes) {
-                    sb.append(classToName(cls)).append('|');
-                }
-                return sb.toString();
-            }
-        }
-    }
+    String classToName(Class<?> clazz, Class<?>... classes);
 
-    public int defaultArrSize() {
-        return 16;
-    }
+    /**
+     * Convert a name back to a class.
+     * @param name      the name
+     * @param <T>       the class type
+     * @return          the class value
+     */
+    <T> Class<T> nameToClass(String name);
 
+    /**
+     * Return the default size for arrays.
+     * @return          the default size for arrays
+     */
+    int defaultArrSize();
 }

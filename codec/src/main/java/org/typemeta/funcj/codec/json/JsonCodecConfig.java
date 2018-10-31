@@ -2,17 +2,15 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.CodecConfig;
 
-public class JsonCodecConfig extends CodecConfig {
+/**
+ * Interface for classes which provide configuration information
+ * for {@link JsonCodecCore} implementations.
+ */
+public interface JsonCodecConfig extends CodecConfig {
 
-    public String typeFieldName() {
-        return "@type";
-    }
+    String typeFieldName();
 
-    public String keyFieldName() {
-        return "@key";
-    }
+    String keyFieldName();
 
-    public String valueFieldName() {
-        return "@value";
-    }
+    String valueFieldName();
 }

@@ -113,12 +113,12 @@ public class Example {
 
         jsonCodecCore.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec(jsonCodecCore));
 
-        // Serialise to JSON.
+        // Encode to JSON.
         final StringWriter wtr = new StringWriter();
         jsonCodecCore.encode(Person.class, person, wtr);
         System.out.println(wtr.toString());
 
-        // Deserialise back to Java.
+        // Decode back to Java.
         final StringReader rdr = new StringReader(wtr.toString());
         final Person person2 = jsonCodecCore.decode(Person.class, rdr);
         assert(person.equals(person2));
@@ -134,12 +134,12 @@ public class Example {
                 ZonedDateTime::parse);
 
 
-        // Serialise to XML.
+        // Encode to XML.
         final StringWriter wtr = new StringWriter();
         xmlCodecCore.encode(Person.class, person, wtr, root);
         System.out.println(wtr.toString());
 
-        // Deserialise back to Java.
+        // Decode back to Java.
         final StringReader rdr = new StringReader(wtr.toString());
         final Person person2 = xmlCodecCore.decode(Person.class, rdr, root);
         assert(person.equals(person2));

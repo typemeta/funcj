@@ -20,7 +20,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
     }
 
     public ByteCodecCoreImpl() {
-        this(new ByteCodecConfig());
+        this(new ByteCodecConfigImpl());
     }
 
     @Override

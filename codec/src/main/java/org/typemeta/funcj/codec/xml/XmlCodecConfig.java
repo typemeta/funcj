@@ -2,33 +2,22 @@ package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.CodecConfig;
 
-public class XmlCodecConfig extends CodecConfig {
+/**
+ * Interface for classes which provide configuration information
+ * for {@link XmlCodecCore} implementations.
+ */
+public interface XmlCodecConfig extends CodecConfig {
+    String entryElemName();
 
-    public String entryElemName() {
-        return "_";
-    }
+    String typeAttrName();
 
-    public String typeAttrName() {
-        return "type";
-    }
+    String keyAttrName();
 
-    public String keyAttrName() {
-        return "key";
-    }
+    String keyElemName();
 
-    public String keyElemName() {
-        return "key";
-    }
+    String valueElemName();
 
-    public String valueElemName() {
-        return "value";
-    }
+    String nullAttrName();
 
-    public String nullAttrName() {
-        return "null";
-    }
-
-    public String nullAttrVal() {
-        return "true";
-    }
+    String nullAttrVal();
 }

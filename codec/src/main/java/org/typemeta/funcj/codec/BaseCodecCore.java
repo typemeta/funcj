@@ -45,9 +45,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public abstract CodecConfig config();
-
-    @Override
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec) {
         registerCodec(config().classToName(clazz), codec);
     }
@@ -114,7 +111,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
         final String name = config().classToName(clazz);
         return (TypeConstructor<T>) typeCtorRegistry.computeIfAbsent(
                 name,
-                n -> TypeConstructor.create(clazz));
+                n -> TypeConstructor.create(clazz)
+        );
     }
 
     @Override
