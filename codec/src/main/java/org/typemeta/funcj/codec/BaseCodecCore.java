@@ -41,13 +41,9 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec) {
-        registerCodec(config().classToName(clazz), codec);
-    }
-
-    @Override
-    public <T> void registerCodec(String name, Codec<T, IN, OUT> codec) {
+        config().registerAllowedClass(clazz);
         synchronized (codecRegistry) {
-            codecRegistry.put(name, codec);
+            codecRegistry.put(config().classToName(clazz), codec);
         }
     }
 

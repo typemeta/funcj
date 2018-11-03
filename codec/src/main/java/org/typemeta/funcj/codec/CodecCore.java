@@ -25,14 +25,6 @@ public interface CodecCore<IN, OUT> {
     <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec);
 
     /**
-     * Register a {@code Codec} for a class.
-     * @param name      name of class to register codec against
-     * @param codec     the codec
-     * @param <T>       the codec value type
-     */
-    <T> void registerCodec(String name, Codec<T, IN, OUT> codec);
-
-    /**
      * Create a {@code ObjectCodecBuilder} for the specified class.
      * <p>
      * Create a {@code ObjectCodecBuilder}, essentially a fluent interface
