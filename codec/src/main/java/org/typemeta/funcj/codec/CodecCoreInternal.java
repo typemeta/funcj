@@ -83,7 +83,7 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
      * Lookup a {@code Codec} for a name, and, if one doesn't exist,
      * then create a new one using the supplier.
      * <p>
-     * This is slightly tricky as it needs to be re-entrant in case the
+     * This method needs to be thread-safe and re-entrant in case the
      * type in question is recursive.
      * @param name      the type name
      * @param codecSupp the supplier of
@@ -101,10 +101,6 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
     <K, V> Codec<Map<K, V>, IN, OUT> getMapCodec(
             Class<Map<K, V>> mapType,
             Class<K> keyType,
-            Class<V> valType);
-
-    <V> Codec<Map<String, V>, IN, OUT> getMapCodec(
-            Class<Map<String, V>> mapType,
             Class<V> valType);
 
     <K, V> Codec<Map<K, V>, IN, OUT> getMapCodec(
@@ -125,10 +121,6 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
     <K, V> Codec<Map<K, V>, IN, OUT> createMapCodec(
             Class<Map<K, V>> mapType,
             Class<K> keyType,
-            Class<V> valType);
-
-    <V> Codec<Map<String, V>, IN, OUT> createMapCodec(
-            Class<Map<String, V>> type,
             Class<V> valType);
 
     <V> Codec<Map<String, V>, IN, OUT> createMapCodec(

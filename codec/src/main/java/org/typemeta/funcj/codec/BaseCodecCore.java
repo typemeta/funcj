@@ -36,9 +36,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
      */
     protected final ConcurrentMap<String, TypeConstructor<?>> typeCtorRegistry = new ConcurrentHashMap<>();
 
-    protected BaseCodecCore() {
-    }
-
     @Override
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec) {
         config().registerAllowedClass(clazz);
@@ -136,22 +133,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             Class<V> valType) {
         final String name = config().classToName(mapType, keyType, valType);
         return getCodec(name, () -> createMapCodec(mapType, keyType, valType));
-    }
-
-    @Override
-    public <V> Codec<Map<String, V>, IN, OUT> createMapCodec(
-            Class<Map<String, V>> mapType,
-            Class<V> valType) {
-        final String name = config().classToName(mapType, String.class, valType);
-        return getCodec(name, () -> createMapCodec(mapType, valType));
-    }
-
-    @Override
-    public <V> Codec<Map<String, V>, IN, OUT> getMapCodec(
-            Class<Map<String, V>> mapType,
-            Class<V> valType) {
-        final String name = config().classToName(mapType, String.class, valType);
-        return getCodec(name, () -> createMapCodec(mapType, valType));
     }
 
     @Override
