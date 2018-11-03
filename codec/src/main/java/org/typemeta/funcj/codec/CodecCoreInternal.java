@@ -14,7 +14,7 @@ import java.util.stream.*;
  */
 public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
-    <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz);
+    <T> NoArgsCtor<T> getTypeConstructor(Class<T> clazz);
 
     <T> boolean encodeNull(T val, OUT out);
 
@@ -73,7 +73,7 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
     /**
      * Lookup a {@code Codec} for a name, and, if one doesn't exist,
      * then create a new one.
-     * @param clazz     the type
+     * @param clazz     the class
      * @param <T>       the raw type to be encoded/decoded
      * @return          the {@code Codec} for the specified name
      */
@@ -85,13 +85,13 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
      * <p>
      * This method needs to be thread-safe and re-entrant in case the
      * type in question is recursive.
-     * @param name      the type name
-     * @param codecSupp the supplier of
+     * @param key       the class key
+     * @param codecSupp the supplier of the new codec
      * @param <T>       the raw type to be encoded/decoded
      * @return          the {@code Codec} for the specified name
      */
     <T> Codec<T, IN, OUT> getCodec(
-            String name,
+            ClassKey<T> key,
             Supplier<Codec<T, IN, OUT>> codecSupp);
 
     <T> Codec<Collection<T>, IN, OUT> getCollCodec(

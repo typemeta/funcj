@@ -117,7 +117,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public boolean[] decode(Input in) {
-            boolean[] arr = new boolean[config.defaultArrSize()];
+            boolean[] arr = new boolean[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -184,7 +184,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public byte[] decode(Input in) {
-            byte[] arr = new byte[config.defaultArrSize()];
+            byte[] arr = new byte[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -251,7 +251,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public char[] decode(Input in) {
-            char[] arr = new char[config.defaultArrSize()];
+            char[] arr = new char[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -318,7 +318,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public short[] decode(Input in) {
-            short[] arr = new short[config.defaultArrSize()];
+            short[] arr = new short[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -385,7 +385,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public int[] decode(Input in) {
-            int[] arr = new int[config.defaultArrSize()];
+            int[] arr = new int[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -452,7 +452,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public long[] decode(Input in) {
-            long[] arr = new long[config.defaultArrSize()];
+            long[] arr = new long[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -519,7 +519,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public float[] decode(Input in) {
-            float[] arr = new float[config.defaultArrSize()];
+            float[] arr = new float[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -586,7 +586,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
         @Override
         public double[] decode(Input in) {
-            double[] arr = new double[config.defaultArrSize()];
+            double[] arr = new double[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
                 if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -736,7 +736,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
             @Override
             public T[] decode(Input in) {
-                T[] arr = (T[]) Array.newInstance(elemCodec.type(), config.defaultArrSize());
+                T[] arr = (T[]) Array.newInstance(elemCodec.type(), config.defaultArraySize());
                 int i = 0;
                 while (in.hasNext()) {
                     if (!in.type().equals(Input.Type.START_ELEMENT)) {

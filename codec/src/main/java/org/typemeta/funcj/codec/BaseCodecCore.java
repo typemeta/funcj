@@ -25,22 +25,22 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
      * As and when new classes are encountered, they are inspected via Reflection,
      * and a {@code Codec} is constructed and registered.
      */
-    protected final ConcurrentMap<String, Codec<?, IN, OUT>> codecRegistry = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<ClassKey<?>, Codec<?, IN, OUT>> codecRegistry = new ConcurrentHashMap<>();
 
     /**
-     * A map from class name to {@code TypeConstructor}, associating a class with its {@code TypeConstructor}.
+     * A map from class name to {@codeNoArgsCtor}, associating a class with its {@code TypeConstructor}.
      * Although {@code TypeConstructor}s can be registered by the caller prior to en/decoding,
      * the primary populator of the registry is this {@code CodecCore} implementation.
      * As and when new classes are encountered, they are inspected via Reflection,
      * and a {@code TypeConstructor} is constructed and registered.
      */
-    protected final ConcurrentMap<String, TypeConstructor<?>> typeCtorRegistry = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<ClassKey<?>, NoArgsCtor<?>> noArgsCtorRegistry = new ConcurrentHashMap<>();
 
     @Override
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec) {
         config().registerAllowedClass(clazz);
         synchronized (codecRegistry) {
-            codecRegistry.put(config().classToName(clazz), codec);
+            codecRegistry.put(ClassKey.valueOf(clazz), codec);
         }
     }
 
@@ -60,8 +60,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     @Override
     public <T> void registerTypeConstructor(
             Class<? extends T> clazz,
-            TypeConstructor<T> typeCtor) {
-        typeCtorRegistry.put(config().classToName(clazz), typeCtor);
+            NoArgsCtor<T> typeCtor) {
+        noArgsCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
     }
 
     @Override
@@ -75,46 +75,45 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
-        final String name = config().classToName(clazz);
-        return (TypeConstructor<T>) typeCtorRegistry.computeIfAbsent(
-                name,
-                n -> TypeConstructor.create(clazz)
+    public <T> NoArgsCtor<T> getTypeConstructor(Class<T> clazz) {
+        return (NoArgsCtor<T>) noArgsCtorRegistry.computeIfAbsent(
+                ClassKey.valueOf(clazz),
+                n -> NoArgsCtor.create(clazz)
         );
     }
 
     @Override
     public <T> Codec<T, IN, OUT> getCodec(Class<T> clazz) {
         return getCodec(
-                config().classToName(config().remapType(clazz)),
+                ClassKey.valueOf(config().remapType(clazz)),
                 () -> createCodec(clazz)
         );
     }
 
     @Override
     public <T> Codec<T, IN, OUT> getCodec(
-            String name,
+            ClassKey<T> key,
             Supplier<Codec<T, IN, OUT>> codecSupp) {
         // First attempt, without locking.
-        if (codecRegistry.containsKey(name)) {
-            return (Codec<T, IN, OUT>)codecRegistry.get(name);
+        if (codecRegistry.containsKey(key)) {
+            return (Codec<T, IN, OUT>)codecRegistry.get(key);
         } else {
             final CodecRef<T, IN, OUT> codecRef;
             // Lock and try again.
             synchronized(codecRegistry) {
-                if (codecRegistry.containsKey(name)) {
-                    return (Codec<T, IN, OUT>) codecRegistry.get(name);
+                if (codecRegistry.containsKey(key)) {
+                    return (Codec<T, IN, OUT>) codecRegistry.get(key);
                 } else {
                     // Ok, it's definitely not there, so add a CodecRef.
                     codecRef = new CodecRef<T, IN, OUT>();
-                    codecRegistry.put(name, codecRef);
+                    codecRegistry.put(key, codecRef);
                 }
             }
 
             // Initialise the CodecRef, and overwrite the registry entry with the real Codec.
-            codecRegistry.put(name, codecRef.setIfUninitialised(codecSupp::get));
+            codecRegistry.put(key, codecRef.setIfUninitialised(codecSupp::get));
 
-            return (Codec<T, IN, OUT>)codecRegistry.get(name);
+            return (Codec<T, IN, OUT>)codecRegistry.get(key);
         }
     }
 
@@ -122,8 +121,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     public <T> Codec<Collection<T>, IN, OUT> getCollCodec(
             Class<Collection<T>> collType,
             Codec<T, IN, OUT> elemCodec) {
-        final String name = config().classToName(collType, elemCodec.type());
-        return getCodec(name, () -> createCollCodec(collType, elemCodec));
+        final ClassKey<Collection<T>> key = ClassKey.valueOf(collType, elemCodec.type());
+        return getCodec(key, () -> createCollCodec(collType, elemCodec));
     }
 
     @Override
@@ -131,8 +130,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             Class<Map<K, V>> mapType,
             Class<K> keyType,
             Class<V> valType) {
-        final String name = config().classToName(mapType, keyType, valType);
-        return getCodec(name, () -> createMapCodec(mapType, keyType, valType));
+        final ClassKey<Map<K, V>> key = ClassKey.valueOf(mapType, keyType, valType);
+        return getCodec(key, () -> createMapCodec(mapType, keyType, valType));
     }
 
     @Override
@@ -140,16 +139,16 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             Class<Map<K, V>> mapType,
             Codec<K, IN, OUT> keyCodec,
             Codec<V, IN, OUT> valueCodec) {
-        final String name = config().classToName(mapType, keyCodec.type(), valueCodec.type());
-        return getCodec(name, () -> createMapCodec(mapType, keyCodec, valueCodec));
+        final ClassKey<Map<K, V>> key = ClassKey.valueOf(mapType, keyCodec.type(), valueCodec.type());
+        return getCodec(key, () -> createMapCodec(mapType, keyCodec, valueCodec));
     }
 
     @Override
     public <V> Codec<Map<String, V>, IN, OUT> getMapCodec(
             Class<Map<String, V>> mapType,
             Codec<V, IN, OUT> valueCodec) {
-        final String name = config().classToName(mapType, String.class, valueCodec.type());
-        return getCodec(name, () -> createMapCodec(mapType, valueCodec));
+        final ClassKey<Map<String, V>> key = ClassKey.valueOf(mapType, String.class, valueCodec.type());
+        return getCodec(key, () -> createMapCodec(mapType, valueCodec));
     }
 
     @Override

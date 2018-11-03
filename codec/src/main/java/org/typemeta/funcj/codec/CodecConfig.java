@@ -53,14 +53,6 @@ public interface CodecConfig {
     String classToName(Class<?> clazz);
 
     /**
-     * Map one or  more classes to a name.
-     * @param clazz     the class
-     * @param classes   the classes
-     * @return          the name
-     */
-    String classToName(Class<?> clazz, Class<?>... classes);
-
-    /**
      * Convert a name back to a class.
      * @param name      the name
      * @param <T>       the class type
@@ -71,8 +63,8 @@ public interface CodecConfig {
     String getFieldName(Field field, int depth, Set<String> existingNames);
 
     /**
-     * Return the default size for arrays.
+     * Return the default size for arrays created when decoding data.
      * @return          the default size for arrays
      */
-    int defaultArrSize();
+    int defaultArraySize();
 }

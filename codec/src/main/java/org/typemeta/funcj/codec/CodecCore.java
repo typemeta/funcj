@@ -55,7 +55,7 @@ public interface CodecCore<IN, OUT> {
      */
     <T> void registerTypeConstructor(
             Class<? extends T> clazz,
-            TypeConstructor<T> typeCtor);
+            NoArgsCtor<T> typeCtor);
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.

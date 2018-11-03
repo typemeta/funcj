@@ -147,7 +147,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public boolean[] decode(Input in) {
-            boolean[] arr = new boolean[config.defaultArrSize()];
+            boolean[] arr = new boolean[config.defaultArraySize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -209,7 +209,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public byte[] decode(Input in) {
-            byte[] arr = new byte[config.defaultArrSize()];
+            byte[] arr = new byte[config.defaultArraySize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -271,7 +271,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public char[] decode(Input in) {
-            char[] arr = new char[config.defaultArrSize()];
+            char[] arr = new char[config.defaultArraySize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -333,7 +333,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public short[] decode(Input in) {
-            short[] arr = new short[config.defaultArrSize()];
+            short[] arr = new short[config.defaultArraySize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -395,7 +395,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public int[] decode(Input in) {
-            int[] arr = new int[config.defaultArrSize()];
+            int[] arr = new int[config.defaultArraySize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -457,7 +457,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public long[] decode(Input in) {
-            long[] arr = new long[config.defaultArrSize()];
+            long[] arr = new long[config.defaultArraySize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -519,7 +519,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public float[] decode(Input in) {
-            float[] arr = new float[config.defaultArrSize()];
+            float[] arr = new float[config.defaultArraySize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -581,7 +581,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
         @Override
         public double[] decode(Input in) {
-            double[] arr = new double[config.defaultArrSize()];
+            double[] arr = new double[config.defaultArraySize()];
             in.startArray();
             int i = 0;
             while (in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
@@ -724,7 +724,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
             @Override
             public T[] decode(Input in) {
-                T[] arr = (T[]) Array.newInstance(elemType, config.defaultArrSize());
+                T[] arr = (T[]) Array.newInstance(elemType, config.defaultArraySize());
 
                 in.startArray();
                 int i = 0;

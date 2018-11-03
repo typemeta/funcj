@@ -10,7 +10,7 @@ public abstract class CodecConfigImpl implements CodecConfig {
 
     protected final Set<Package> allowedPackages = new HashSet<>();
 
-    protected final Set<Class> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
+    protected final Set<Class<?>> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
 
     /**
      * A map that associates a class with its proxy.
@@ -59,6 +59,7 @@ public abstract class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Class<T> remapType(Class<T> clazz) {
         if (typeProxyRegistry.containsKey(clazz)) {
             return (Class<T>) typeProxyRegistry.get(clazz);
@@ -69,31 +70,7 @@ public abstract class CodecConfigImpl implements CodecConfig {
 
     @Override
     public String classToName(Class<?> clazz) {
-        return classToNameImpl(checkClassIsAllowed(clazz));
-    }
-
-    @Override
-    public String classToName(Class<?> clazz, Class<?>... classes) {
-        checkClassIsAllowed(clazz);
-        switch (classes.length) {
-            case 1:
-                return classToNameImpl(clazz) + '|' + classToNameImpl(classes[0]);
-            case 2:
-                return classToNameImpl(clazz) + '|' + classToNameImpl(classes[0])
-                        + '|' + classToNameImpl(classes[1]);
-            default: {
-                final StringBuilder sb = new StringBuilder();
-                sb.append(classToNameImpl(clazz)).append('|');
-                for (Class<?> cls : classes) {
-                    sb.append(classToNameImpl(cls)).append('|');
-                }
-                return sb.toString();
-            }
-        }
-    }
-
-    protected String classToNameImpl(Class<?> clazz) {
-        return clazz.getName();
+        return checkClassIsAllowed(clazz).getName();
     }
 
     @Override
@@ -116,7 +93,7 @@ public abstract class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
-    public int defaultArrSize() {
+    public int defaultArraySize() {
         return 16;
     }
 }

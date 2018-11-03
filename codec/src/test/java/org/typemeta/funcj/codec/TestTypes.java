@@ -665,10 +665,14 @@ public abstract class TestTypes {
     }
 
     public static class HasOptional<T> {
+        public static <T> HasOptional<T> create() {
+            return new HasOptional<>();
+        }
+
         public final Optional<T> optVal;
         public final Optional<String> optStr;
 
-        public HasOptional() {
+        private HasOptional() {
             this.optVal = null;
             this.optStr = null;
         }

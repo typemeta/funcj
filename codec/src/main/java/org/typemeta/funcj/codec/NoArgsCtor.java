@@ -8,19 +8,21 @@ import java.util.*;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Interface for constructing an uninitialised value of type {@code T}.
+ * Interface for constructing an uninitialised value of type {@code T},
+ * using a no-args constructor
  * @param <T>       the type of value to be constructed
  */
 @SuppressWarnings("unchecked")
-public interface TypeConstructor<T> {
+public interface NoArgsCtor<T> {
     /**
      * Create a {@code TypeConstructor} for the specified class.
      * @param clazz     type descriptor which conveys the type argument
-     * @param <T>       the type we want a {@code TypeConstructor} for
-     * @return          a {@code TypeConstructor}
-     * @throws CodecException if type has no constructors
+     * @param <T>       the type we want a {@codeNoArgsCtor} for
+     * @return          a {@codeNoArgsCtor}
+     * @throws CodecException if the class has no no-args constructors,
+     *                  or if it is not accessible.
      */
-    static <T> TypeConstructor<T> create(Class<T> clazz)
+    static <T> NoArgsCtor<T> create(Class<T> clazz)
             throws CodecException {
         // Get the empty-arg constructors.
         final List<Constructor<T>> ctors =
@@ -29,34 +31,29 @@ public interface TypeConstructor<T> {
                         .map(ctor -> (Constructor<T>)ctor)
                         .collect(toList());
 
-        // Select the accessible ctor if there is only one, otherwise just use
-        // the first one.
-        final Constructor<T> defCtor;
+        // Select the accessible ctor if there is only one, otherwise just use any one.
+        final Constructor<T> noArgsCtor;
         switch (ctors.size()) {
             case 0:
                 throw new CodecException(clazz.getName() + " has no default constructor");
             case 1:
-                defCtor = ctors.get(0);
+                noArgsCtor = ctors.get(0);
                 break;
             default:
-                defCtor = ctors.stream()
+                noArgsCtor = ctors.stream()
                         .filter(AccessibleObject::isAccessible)
                         .findAny()
                         .orElse(ctors.get(0));
                 break;
         }
 
-        final F0<T, ReflectiveOperationException> ctor = () -> defCtor.newInstance((Object[])null);
-
         final F0<T, ReflectiveOperationException> accCtor;
-        if (defCtor.isAccessible()) {
-            accCtor = ctor;
+        if (noArgsCtor.isAccessible()) {
+            accCtor = () -> noArgsCtor.newInstance((Object[])null);
         } else {
+            noArgsCtor.setAccessible(true);
             accCtor = () -> {
-                defCtor.setAccessible(true);
-                final T result = ctor.apply();
-                defCtor.setAccessible(false);
-                return result;
+                return noArgsCtor.newInstance((Object[])null);
             };
         }
 

@@ -103,7 +103,7 @@ public abstract class TestBase {
 
     @Test
     public void testOptionalNulls() throws Exception {
-        roundTrip(new TestTypes.HasOptional<Integer>(), TestTypes.HasOptional.class);
+        roundTrip(TestTypes.HasOptional.<Integer>create(), TestTypes.HasOptional.class);
     }
 
     @Test
