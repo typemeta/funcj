@@ -14,10 +14,6 @@ import java.util.stream.*;
  */
 public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
-    CodecConfig config();
-
-    <X> Class<X> remapType(Class<X> clazz);
-
     <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz);
 
     <T> boolean encodeNull(T val, OUT out);

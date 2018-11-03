@@ -12,8 +12,8 @@ public class GzipByteCodecTest extends TestBase {
 
 
     static {
+        prepareCodecCore(codec);
         codec.registerTypeConstructor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
-        registerCustomCodec(codec);
     }
 
     @Override

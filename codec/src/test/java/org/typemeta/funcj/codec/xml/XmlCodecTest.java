@@ -11,8 +11,8 @@ public class XmlCodecTest extends TestBase {
     public static final String rootElemName = "root";
 
     static {
+        prepareCodecCore(codec);
         codec.registerTypeConstructor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
-        registerCustomCodec(codec);
     }
 
     @Override

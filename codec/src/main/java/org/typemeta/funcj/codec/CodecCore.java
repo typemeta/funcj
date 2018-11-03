@@ -11,6 +11,12 @@ import org.typemeta.funcj.functions.Functions;
 public interface CodecCore<IN, OUT> {
 
     /**
+     * Return the config object associated with this {@code CodecCore}.
+     * @return          the config object associated with this {@code CodecCore}
+     */
+    CodecConfig config();
+
+    /**
      * Register a {@code Codec} for a class.
      * @param clazz     the class to register codec against
      * @param codec     the codec
@@ -48,22 +54,6 @@ public interface CodecCore<IN, OUT> {
             Class<T> clazz,
             Functions.F<T, String> encode,
             Functions.F<String, T> decode);
-
-    /**
-     * Register a type proxy.
-     * A type proxy maps a type to its proxy before selecting its {@code Codec}.
-     * @param clazz     the type to be mapped
-     * @param proxyType the proxy type
-     */
-    <T> void registerTypeProxy(Class<T> clazz, Class<? super T> proxyType);
-
-    /**
-     * Register a type proxy.
-     * A type proxy maps a type to its proxy before selecting its {@code Codec}.
-     * @param name      the name of type to be mapped
-     * @param proxyType the proxy type
-     */
-    void registerTypeProxy(String name, Class<?> proxyType);
 
     /**
      * Register a {@code TypeConstructor} for the specified class.

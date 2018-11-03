@@ -4,6 +4,7 @@ import org.typemeta.funcj.codec.bytes.*;
 import org.typemeta.funcj.codec.json.*;
 import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.util.Exceptions;
 
 import java.time.*;
 
@@ -40,13 +41,17 @@ public abstract class Codecs {
 
     public static <IN, OUT, C extends CodecCoreInternal<IN, OUT>> C registerAll(C core) {
 
+        core.config().registerAllowedPackage(java.lang.String.class.getPackage());
+        core.config().registerAllowedPackage(java.util.Collection.class.getPackage());
+        core.config().registerAllowedPackage(java.time.LocalDate.class.getPackage());
+
         core.registerStringProxyCodec(
                 Class.class,
                 core.config()::classToName,
                 core.config()::nameToClass
         );
 
-        core.registerTypeProxy("java.time.ZoneRegion", ZoneId.class);
+        Exceptions.wrap(() -> core.config().registerTypeProxy(Class.forName("java.time.ZoneRegion"), ZoneId.class));
 
         core.registerCodec(LocalDate.class)
                 .field("year", LocalDate::getYear, Integer.class)

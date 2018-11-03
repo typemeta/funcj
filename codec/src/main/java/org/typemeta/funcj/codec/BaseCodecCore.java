@@ -36,11 +36,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
      */
     protected final ConcurrentMap<String, TypeConstructor<?>> typeCtorRegistry = new ConcurrentHashMap<>();
 
-    /**
-     * A map from class name to its type proxy, associating a class with its type proxy.
-     */
-    protected final Map<String, Class<?>> typeProxyRegistry = new HashMap<>();
-
     protected BaseCodecCore() {
     }
 
@@ -70,16 +65,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> void registerTypeProxy(Class<T> clazz, Class<? super T> proxyType) {
-        registerTypeProxy(config().classToName(clazz), proxyType);
-    }
-
-    @Override
-    public void registerTypeProxy(String name, Class<?> proxyType) {
-        typeProxyRegistry.put(name, proxyType);
-    }
-
-    @Override
     public <T> void registerTypeConstructor(
             Class<? extends T> clazz,
             TypeConstructor<T> typeCtor) {
@@ -97,16 +82,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> Class<T> remapType(Class<T> clazz) {
-        final String typeName = config().classToName(clazz);
-        if (typeProxyRegistry.containsKey(typeName)) {
-            return (Class<T>) typeProxyRegistry.get(typeName);
-        } else {
-            return clazz;
-        }
-    }
-
-    @Override
     public <T> TypeConstructor<T> getTypeConstructor(Class<T> clazz) {
         final String name = config().classToName(clazz);
         return (TypeConstructor<T>) typeCtorRegistry.computeIfAbsent(
@@ -118,7 +93,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     @Override
     public <T> Codec<T, IN, OUT> getCodec(Class<T> clazz) {
         return getCodec(
-                config().classToName(remapType(clazz)),
+                config().classToName(config().remapType(clazz)),
                 () -> createCodec(clazz)
         );
     }

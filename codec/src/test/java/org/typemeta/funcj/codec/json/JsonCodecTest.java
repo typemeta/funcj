@@ -10,8 +10,8 @@ public class JsonCodecTest extends TestBase {
     final static JsonCodecCore codec = Codecs.jsonCodec();
 
     static {
+        prepareCodecCore(codec);
         codec.registerTypeConstructor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
-        registerCustomCodec(codec);
     }
 
     @Override

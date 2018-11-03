@@ -11,8 +11,8 @@ public class ByteCodecTest extends TestBase {
 
 
     static {
+        prepareCodecCore(codec);
         codec.registerTypeConstructor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
-        registerCustomCodec(codec);
     }
 
     @Override
