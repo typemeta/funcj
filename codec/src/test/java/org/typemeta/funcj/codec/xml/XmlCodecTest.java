@@ -6,17 +6,12 @@ import org.typemeta.funcj.codec.*;
 import java.io.*;
 
 public class XmlCodecTest extends TestBase {
-    final static XmlCodecCore codec = Codecs.xmlCodec();
-
-    public static final String rootElemName = "root";
-
-    static {
-        prepareCodecCore(codec);
-        codec.registerTypeConstructor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
-    }
+    private static final String rootElemName = "root";
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
+        final XmlCodecCore codec = prepareCodecCore(Codecs.xmlCodec());
+
         final StringWriter sw = new StringWriter();
         codec.encode(clazz, val, sw, rootElemName);
 

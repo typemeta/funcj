@@ -45,7 +45,7 @@ public abstract class XmlMapCodecs {
 
         @Override
         public Map<K, V> decode(Input in) {
-            final Map<K, V> map = core.getTypeConstructor(type).construct();
+            final Map<K, V> map = core.getNoArgsCtor(type).construct();
 
             while(in.hasNext()) {
                 if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
@@ -95,7 +95,7 @@ public abstract class XmlMapCodecs {
 
         @Override
         public Map<String, V> decode(Input in) {
-            final Map<String, V> map = core.getTypeConstructor(type).construct();
+            final Map<String, V> map = core.getNoArgsCtor(type).construct();
 
             while (in.hasNext()) {
                 if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {

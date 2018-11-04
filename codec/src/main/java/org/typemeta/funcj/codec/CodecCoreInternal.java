@@ -14,7 +14,11 @@ import java.util.stream.*;
  */
 public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
-    <T> NoArgsCtor<T> getTypeConstructor(Class<T> clazz);
+    <T> Optional<NoArgsCtor<T>> getNoArgsCtorOpt(Class<T> clazz);
+
+    <T> NoArgsCtor<T> getNoArgsCtor(Class<T> clazz);
+
+    <T> Optional<ArgArrayCtor<T>> getArgArrayCtorOpt(Class<T> clazz);
 
     <T> boolean encodeNull(T val, OUT out);
 
@@ -114,9 +118,14 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
     <T> Codec<T, IN, OUT> createCodec(Class<T> clazz);
 
+    <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, NoArgsCtor<T> ctor);
+
     <T> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,
-            Map<String, FieldCodec<IN, OUT>> fieldCodecs);
+            Map<String, FieldCodec<IN, OUT>> fieldCodecs,
+            NoArgsCtor<T> ctor);
+
+    <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, ArgArrayCtor<T> ctor);
 
     <K, V> Codec<Map<K, V>, IN, OUT> createMapCodec(
             Class<Map<K, V>> mapType,
@@ -150,7 +159,7 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
     <T> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
-            Functions.F<Object[], T> ctor);
+            ArgArrayCtor<T> ctor);
 
     <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,

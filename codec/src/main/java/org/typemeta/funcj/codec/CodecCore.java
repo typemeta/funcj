@@ -53,9 +53,13 @@ public interface CodecCore<IN, OUT> {
      * @param typeCtor  the {@code TypeConstructor}
      * @param <T>       the type constructed by the {@code TypeConstructor}
      */
-    <T> void registerTypeConstructor(
+    <T> void registerNoArgsCtor(
             Class<? extends T> clazz,
             NoArgsCtor<T> typeCtor);
+
+    <T> void registerArgArrayCtor(
+            Class<? extends T> clazz,
+            ArgArrayCtor<T> typeCtor);
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.

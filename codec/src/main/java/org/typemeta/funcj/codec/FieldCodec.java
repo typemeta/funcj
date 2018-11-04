@@ -501,6 +501,7 @@ public interface FieldCodec<IN, OUT> {
         }
     }
 
+
     /**
      * Encode a field within an object into an encoded type {@code OUT}.
      * @param obj       the object to which the field belongs

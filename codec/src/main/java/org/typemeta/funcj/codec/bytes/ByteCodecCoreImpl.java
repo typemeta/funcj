@@ -630,7 +630,7 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
             @Override
             public Collection<T> decode(Input in) {
                 final int l = in.readInt();
-                final Collection<T> vals = getTypeConstructor(collType).construct();
+                final Collection<T> vals = getNoArgsCtor(collType).construct();
 
                 for (int i = 0; i < l; ++i) {
                     vals.add(elemCodec.decodeWithCheck(in));

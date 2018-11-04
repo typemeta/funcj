@@ -18,7 +18,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
         protected final Functions.F2<T, OUT, OUT> encoder;
         protected final Functions.F<IN, Object> decoder;
 
-        <FT> FieldCodec(Functions.F<T, FT> getter, Codec<FT, IN, OUT> codec) {
+        public <FT> FieldCodec(Functions.F<T, FT> getter, Codec<FT, IN, OUT> codec) {
             encoder = (val, out) -> codec.encodeWithCheck(getter.apply(val), out);
             decoder = codec::decodeWithCheck;
         }
@@ -132,7 +132,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                     }
 
                     class _N {
-                        public Codec<T, IN, OUT> map(Functions.F<Object[], T> ctor) {
+                        public Codec<T, IN, OUT> map(ArgArrayCtor<T> ctor) {
                             return registration(core.createObjectCodec(type, fields, ctor));
                         }
 

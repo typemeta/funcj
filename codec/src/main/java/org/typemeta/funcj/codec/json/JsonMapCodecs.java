@@ -49,7 +49,7 @@ public abstract class JsonMapCodecs {
             final String keyFieldName = core.config().keyFieldName();
             final String valueFieldName = core.config().valueFieldName();
 
-            final Map<K, V> map = core.getTypeConstructor(type).construct();
+            final Map<K, V> map = core.getNoArgsCtor(type).construct();
 
             in.startArray();
 
@@ -119,7 +119,7 @@ public abstract class JsonMapCodecs {
         public Map<String, V> decode(Input in) {
             in.startObject();
 
-            final Map<String, V> map = core.getTypeConstructor(type).construct();
+            final Map<String, V> map = core.getNoArgsCtor(type).construct();
 
             while(in.notEOF() && in.currentEventType() == Input.Event.Type.FIELD_NAME) {
                 final String key = in.readFieldName();

@@ -18,11 +18,10 @@ public interface NoArgsCtor<T> {
      * Create a {@code TypeConstructor} for the specified class.
      * @param clazz     type descriptor which conveys the type argument
      * @param <T>       the type we want a {@codeNoArgsCtor} for
-     * @return          a {@codeNoArgsCtor}
-     * @throws CodecException if the class has no no-args constructors,
-     *                  or if it is not accessible.
+     * @return          an {code Optional wrapping a }{@codeNoArgsCtor} if one exists,
+     *                  otherwise an empty Optional
      */
-    static <T> NoArgsCtor<T> create(Class<T> clazz)
+    static <T> Optional<NoArgsCtor<T>> create(Class<T> clazz)
             throws CodecException {
         // Get the empty-arg constructors.
         final List<Constructor<T>> ctors =
@@ -35,7 +34,8 @@ public interface NoArgsCtor<T> {
         final Constructor<T> noArgsCtor;
         switch (ctors.size()) {
             case 0:
-                throw new CodecException(clazz.getName() + " has no default constructor");
+                // No default constructor.
+                return Optional.empty();
             case 1:
                 noArgsCtor = ctors.get(0);
                 break;
@@ -48,22 +48,19 @@ public interface NoArgsCtor<T> {
         }
 
         final F0<T, ReflectiveOperationException> accCtor;
-        if (noArgsCtor.isAccessible()) {
-            accCtor = () -> noArgsCtor.newInstance((Object[])null);
-        } else {
+        if (!noArgsCtor.isAccessible()) {
             noArgsCtor.setAccessible(true);
-            accCtor = () -> {
-                return noArgsCtor.newInstance((Object[])null);
-            };
         }
 
-        return () -> {
+        accCtor = () -> noArgsCtor.newInstance((Object[])null);
+
+        return Optional.of(() -> {
             try {
                 return accCtor.apply();
             } catch (ReflectiveOperationException ex) {
                 throw new CodecException("Unable to construct object of type '" + clazz.getName() + "'", ex);
             }
-        };
+        });
     }
 
     /**

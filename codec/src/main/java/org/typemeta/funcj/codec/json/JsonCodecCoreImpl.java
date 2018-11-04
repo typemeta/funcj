@@ -682,7 +682,7 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
             @Override
             public Collection<T> decode(Input in) {
-                final Collection<T> vals = getTypeConstructor(collType).construct();
+                final Collection<T> vals = getNoArgsCtor(collType).construct();
 
                 in.startArray();
 

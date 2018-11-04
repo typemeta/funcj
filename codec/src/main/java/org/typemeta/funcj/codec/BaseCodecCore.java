@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Base class for classes which implement an encoding into a specific target type.
@@ -19,7 +20,7 @@ import static java.util.stream.Collectors.toList;
 public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OUT> {
 
     /**
-     * A map from class name to {@code Codec}, associating a class with its {@code Codec}.
+     * A map that associates a class with a {@code Codec}.
      * Although {@code Codec}s can be registered by the caller prior to en/decoding,
      * the primary populator of the registry is this {@code CodecCore} implementation.
      * As and when new classes are encountered, they are inspected via Reflection,
@@ -28,13 +29,15 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     protected final ConcurrentMap<ClassKey<?>, Codec<?, IN, OUT>> codecRegistry = new ConcurrentHashMap<>();
 
     /**
-     * A map from class name to {@codeNoArgsCtor}, associating a class with its {@code TypeConstructor}.
+     * A map that associates a class with a {@code NoArgsCtor}.
      * Although {@code TypeConstructor}s can be registered by the caller prior to en/decoding,
      * the primary populator of the registry is this {@code CodecCore} implementation.
      * As and when new classes are encountered, they are inspected via Reflection,
      * and a {@code TypeConstructor} is constructed and registered.
      */
     protected final ConcurrentMap<ClassKey<?>, NoArgsCtor<?>> noArgsCtorRegistry = new ConcurrentHashMap<>();
+
+    protected final ConcurrentMap<ClassKey<?>, ArgArrayCtor<?>> argArrayCtorRegistry = new ConcurrentHashMap<>();
 
     @Override
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec) {
@@ -51,17 +54,27 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> void registerStringProxyCodec(
-            Class<T> type,
+            Class<T> clazz,
             Functions.F<T, String> encode,
             Functions.F<String, T> decode) {
-        registerCodec(type, new Codecs.StringProxyCodec<T, IN, OUT>(this, type, encode, decode));
+        config().registerAllowedClass(clazz);
+        registerCodec(clazz, new Codecs.StringProxyCodec<T, IN, OUT>(this, clazz, encode, decode));
     }
 
     @Override
-    public <T> void registerTypeConstructor(
+    public <T> void registerNoArgsCtor(
             Class<? extends T> clazz,
             NoArgsCtor<T> typeCtor) {
+        config().registerAllowedClass(clazz);
         noArgsCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
+    }
+
+    @Override
+    public <T> void registerArgArrayCtor(
+            Class<? extends T> clazz,
+            ArgArrayCtor<T> typeCtor) {
+        config().registerAllowedClass(clazz);
+        argArrayCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
     }
 
     @Override
@@ -75,11 +88,39 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> NoArgsCtor<T> getTypeConstructor(Class<T> clazz) {
-        return (NoArgsCtor<T>) noArgsCtorRegistry.computeIfAbsent(
-                ClassKey.valueOf(clazz),
-                n -> NoArgsCtor.create(clazz)
-        );
+    public <T> Optional<NoArgsCtor<T>> getNoArgsCtorOpt(Class<T> clazz) {
+        final ClassKey<T> key = ClassKey.valueOf(clazz);
+        NoArgsCtor<T> ctor = (NoArgsCtor<T>)noArgsCtorRegistry.get(key);
+
+        if (ctor == null) {
+            final Optional<NoArgsCtor<T>> newCtor = NoArgsCtor.create(clazz);
+            if (newCtor.isPresent()) {
+                ctor = (NoArgsCtor<T>) noArgsCtorRegistry.putIfAbsent(key, newCtor.get());
+                if (ctor == null) {
+                    return newCtor;
+                } else {
+                    return Optional.of(ctor);
+                }
+            } else {
+                return newCtor;
+            }
+        } else {
+            return Optional.of(ctor);
+        }
+    }
+    @Override
+    public <T> NoArgsCtor<T> getNoArgsCtor(Class<T> clazz) {
+        return getNoArgsCtorOpt(clazz)
+                .orElseThrow(() ->
+                        new CodecException("A no-args constructor was not found for class " + clazz)
+                );
+    }
+
+
+    @Override
+    public <T> Optional<ArgArrayCtor<T>> getArgArrayCtorOpt(Class<T> clazz) {
+        final ClassKey<T> key = ClassKey.valueOf(clazz);
+        return Optional.ofNullable((ArgArrayCtor<T>)argArrayCtorRegistry.get(key));
     }
 
     @Override
@@ -275,6 +316,18 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz) {
+        final Optional<NoArgsCtor<T>> ctorOpt = getNoArgsCtorOpt(clazz);
+        if (ctorOpt.isPresent()) {
+            return createObjectCodec(clazz, ctorOpt.get());
+        } else {
+            final ArgArrayCtor<T> ctor = getArgArrayCtorOpt(clazz)
+                    .orElseThrow(() -> new CodecException("No constructore was found for class " + clazz));
+            return createObjectCodec(clazz, ctor);
+        }
+    }
+
+    @Override
+    public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, NoArgsCtor<T> ctor) {
         final Map<String, FieldCodec<IN, OUT>> fieldCodecs = new LinkedHashMap<>();
         Class<?> clazz2 = clazz;
         for (int depth = 0; !clazz2.equals(Object.class); depth++) {
@@ -289,18 +342,19 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             clazz2 = clazz2.getSuperclass();
         }
 
-        return createObjectCodec(clazz, fieldCodecs);
+        return createObjectCodec(clazz, fieldCodecs, ctor);
     }
 
     @Override
     public <T> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,
-            Map<String, FieldCodec<IN, OUT>> fieldCodecs) {
+            Map<String, FieldCodec<IN, OUT>> fieldCodecs,
+            NoArgsCtor<T> ctor) {
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final T val;
 
             ResultAccumlatorImpl(Class<T> clazz) {
-                this.val = getTypeConstructor(clazz).construct();
+                this.val = ctor.construct();
             }
 
             @Override
@@ -355,6 +409,37 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
+    public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, ArgArrayCtor<T> ctor) {
+        Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs = new LinkedHashMap<>();
+        Class<?> clazz2 = clazz;
+        for (int depth = 0; !clazz2.equals(Object.class); depth++) {
+            final Field[] fields = clazz2.getDeclaredFields();
+            for (Field field : fields) {
+                final int fm = field.getModifiers();
+                if (!Modifier.isStatic(fm) && !Modifier.isTransient(fm)) {
+                    final String fieldName = config().getFieldName(field, depth, fieldCodecs.keySet());
+                    final Codec<?, IN, OUT> codec = createCodec(field.getType());
+                    final ObjectCodecBuilder.FieldCodec<T, IN, OUT> fcodec = createFieldCodec(field, codec);
+                    fieldCodecs.put(fieldName, fcodec);
+                }
+            }
+            clazz2 = clazz2.getSuperclass();
+        }
+
+        return createObjectCodec(clazz, fieldCodecs, ctor);
+    }
+
+    <T, FT> ObjectCodecBuilder.FieldCodec<T, IN, OUT> createFieldCodec(
+            Field field,
+            Codec<FT, IN, OUT> codec
+    ) {
+        return new ObjectCodecBuilder.FieldCodec<T, IN, OUT>(
+                t -> CodecException.wrap(() -> (FT)field.get(t)),
+                codec
+        );
+    }
+
+    @Override
     public <T> ObjectCodecBuilder<T, IN, OUT> createObjectCodecBuilder(Class<T> clazz) {
         return new ObjectCodecBuilder<T, IN, OUT>(this, clazz);
     }
@@ -374,7 +459,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     public <T> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
-            Functions.F<Object[], T> ctor) {
+            ArgArrayCtor<T> ctor) {
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final Object[] ctorArgs;
             int i = 0;
@@ -385,7 +470,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
             @Override
             public T construct() {
-                return ctor.apply(ctorArgs);
+                return ctor.construct(ctorArgs);
             }
         }
 

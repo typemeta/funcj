@@ -11,6 +11,7 @@ public abstract class TestTypes {
         public enum Side {
             LEFT, RIGHT
         }
+
         public static class Empty {
             @Override
             public boolean equals(Object o) {
@@ -726,7 +727,34 @@ public abstract class TestTypes {
 
         @Override
         public String toString() {
-            return "NoPublicEmptyCtor{" +
+            return "NoEmptyCtor{" +
+                    "flag=" + flag +
+                    '}';
+        }
+    }
+
+    public static final class StaticCtor {
+        public static StaticCtor create(boolean flag) {
+            return new StaticCtor(flag);
+        }
+
+        public boolean flag;
+
+        private StaticCtor(boolean flag) {
+            this.flag = flag;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            StaticCtor that = (StaticCtor) o;
+            return flag == that.flag;
+        }
+
+        @Override
+        public String toString() {
+            return "StaticCtor{" +
                     "flag=" + flag +
                     '}';
         }

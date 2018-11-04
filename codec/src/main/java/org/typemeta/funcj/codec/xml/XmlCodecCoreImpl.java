@@ -692,7 +692,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
             @Override
             public Collection<T> decode(Input in) {
-                final Collection<T> vals = getTypeConstructor(collType).construct();
+                final Collection<T> vals = getNoArgsCtor(collType).construct();
 
                 while (in.hasNext()) {
                     if (!in.type().equals(Input.Type.START_ELEMENT)) {

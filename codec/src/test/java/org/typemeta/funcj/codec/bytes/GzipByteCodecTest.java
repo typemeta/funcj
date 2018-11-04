@@ -8,16 +8,10 @@ import java.io.*;
 import java.util.zip.*;
 
 public class GzipByteCodecTest extends TestBase {
-    final static ByteCodecCore codec = Codecs.byteCodec();
-
-
-    static {
-        prepareCodecCore(codec);
-        codec.registerTypeConstructor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
-    }
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) throws Exception {
+        final ByteCodecCore codec = prepareCodecCore(Codecs.byteCodec());
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final GZIPOutputStream gzos = new GZIPOutputStream(baos);

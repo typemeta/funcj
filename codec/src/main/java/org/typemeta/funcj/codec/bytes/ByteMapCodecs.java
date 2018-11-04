@@ -43,7 +43,7 @@ public abstract class ByteMapCodecs {
         public Map<K, V> decode(Input in) {
             final int l = core.intCodec().decodePrim(in);
 
-            final Map<K, V> map = core.getTypeConstructor(type).construct();
+            final Map<K, V> map = core.getNoArgsCtor(type).construct();
 
             for (int i = 0; i < l; ++i) {
                 final K key = keyCodec.decodeWithCheck(in);
@@ -87,7 +87,7 @@ public abstract class ByteMapCodecs {
         public Map<String, V> decode(Input in) {
             final int l = core.intCodec().decodePrim(in);
 
-            final Map<String, V> map = core.getTypeConstructor(type).construct();
+            final Map<String, V> map = core.getNoArgsCtor(type).construct();
 
             for (int i = 0; i < l; ++i) {
                 final String key = core.stringCodec().decode(in);

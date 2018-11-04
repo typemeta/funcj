@@ -11,6 +11,28 @@ public abstract class TestBase {
 
     protected abstract <T> void roundTrip(T val, Class<T> clazz) throws Exception;
 
+    protected static <IN, OUT, CC extends CodecCore<IN, OUT>> CC prepareCodecCore(CC core) {
+        core.registerCodec(TestTypes.Custom.class)
+                .field("colour", c -> c.colour, TestTypes.Custom.Colour.class)
+                .field("date", c -> c.date, LocalDate.class)
+                .field("flag", c -> c.flag, Boolean.class)
+                .field("name", c -> c.name, String.class)
+                .field("age", c -> c.age, Double.class)
+                .map(args -> new TestTypes.Custom(
+                        (TestTypes.Custom.Colour)args[0],
+                        (LocalDate)args[1],
+                        (Boolean)args[2],
+                        (String)args[3],
+                        (Double)args[4]));
+
+        core.registerNoArgsCtor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
+
+        core.registerArgArrayCtor(TestTypes.StaticCtor.class, args -> TestTypes.StaticCtor.create((boolean)args[0]));
+
+        core.config().registerAllowedPackage(TestTypes.class.getPackage());
+        return core;
+    }
+
     @Test
     public void testCommonNulls() throws Exception {
         roundTrip(new TestTypes.CommonData(), TestTypes.CommonData.class);
@@ -121,21 +143,9 @@ public abstract class TestBase {
         roundTrip(TestTypes.NoEmptyCtor.create(true), TestTypes.NoEmptyCtor.class);
     }
 
-    public static <IN, OUT> void prepareCodecCore(CodecCore<IN, OUT> core) {
-        core.config().registerAllowedPackage(TestTypes.NoEmptyCtor.class.getPackage());
-
-        core.registerCodec(TestTypes.Custom.class)
-                .field("colour", c -> c.colour, TestTypes.Custom.Colour.class)
-                .field("date", c -> c.date, LocalDate.class)
-                .field("flag", c -> c.flag, Boolean.class)
-                .field("name", c -> c.name, String.class)
-                .field("age", c -> c.age, Double.class)
-                .map(args -> new TestTypes.Custom(
-                        (TestTypes.Custom.Colour)args[0],
-                        (LocalDate)args[1],
-                        (Boolean)args[2],
-                        (String)args[3],
-                        (Double)args[4]));
+    @Test
+    public void testStaticCtor() throws Exception {
+        roundTrip(TestTypes.StaticCtor.create(true), TestTypes.StaticCtor.class);
     }
 
     @Test
