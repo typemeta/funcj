@@ -35,9 +35,9 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
      * As and when new classes are encountered, they are inspected via Reflection,
      * and a {@code TypeConstructor} is constructed and registered.
      */
-    protected final ConcurrentMap<ClassKey<?>, NoArgsCtor<?>> noArgsCtorRegistry = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<ClassKey<?>, NoArgsTypeCtor<?>> noArgsCtorRegistry = new ConcurrentHashMap<>();
 
-    protected final ConcurrentMap<ClassKey<?>, ArgArrayCtor<?>> argArrayCtorRegistry = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<ClassKey<?>, ArgArrayTypeCtor<?>> argArrayCtorRegistry = new ConcurrentHashMap<>();
 
     @Override
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec) {
@@ -64,7 +64,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     @Override
     public <T> void registerNoArgsCtor(
             Class<? extends T> clazz,
-            NoArgsCtor<T> typeCtor) {
+            NoArgsTypeCtor<T> typeCtor) {
         config().registerAllowedClass(clazz);
         noArgsCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
     }
@@ -72,7 +72,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     @Override
     public <T> void registerArgArrayCtor(
             Class<? extends T> clazz,
-            ArgArrayCtor<T> typeCtor) {
+            ArgArrayTypeCtor<T> typeCtor) {
         config().registerAllowedClass(clazz);
         argArrayCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
     }
@@ -88,14 +88,14 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> Optional<NoArgsCtor<T>> getNoArgsCtorOpt(Class<T> clazz) {
+    public <T> Optional<NoArgsTypeCtor<T>> getNoArgsCtorOpt(Class<T> clazz) {
         final ClassKey<T> key = ClassKey.valueOf(clazz);
-        NoArgsCtor<T> ctor = (NoArgsCtor<T>)noArgsCtorRegistry.get(key);
+        NoArgsTypeCtor<T> ctor = (NoArgsTypeCtor<T>)noArgsCtorRegistry.get(key);
 
         if (ctor == null) {
-            final Optional<NoArgsCtor<T>> newCtor = NoArgsCtor.create(clazz);
+            final Optional<NoArgsTypeCtor<T>> newCtor = NoArgsTypeCtor.create(clazz);
             if (newCtor.isPresent()) {
-                ctor = (NoArgsCtor<T>) noArgsCtorRegistry.putIfAbsent(key, newCtor.get());
+                ctor = (NoArgsTypeCtor<T>) noArgsCtorRegistry.putIfAbsent(key, newCtor.get());
                 if (ctor == null) {
                     return newCtor;
                 } else {
@@ -109,7 +109,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
         }
     }
     @Override
-    public <T> NoArgsCtor<T> getNoArgsCtor(Class<T> clazz) {
+    public <T> NoArgsTypeCtor<T> getNoArgsCtor(Class<T> clazz) {
         return getNoArgsCtorOpt(clazz)
                 .orElseThrow(() ->
                         new CodecException("A no-args constructor was not found for class " + clazz)
@@ -118,9 +118,9 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
 
     @Override
-    public <T> Optional<ArgArrayCtor<T>> getArgArrayCtorOpt(Class<T> clazz) {
+    public <T> Optional<ArgArrayTypeCtor<T>> getArgArrayCtorOpt(Class<T> clazz) {
         final ClassKey<T> key = ClassKey.valueOf(clazz);
-        return Optional.ofNullable((ArgArrayCtor<T>)argArrayCtorRegistry.get(key));
+        return Optional.ofNullable((ArgArrayTypeCtor<T>)argArrayCtorRegistry.get(key));
     }
 
     @Override
@@ -316,18 +316,18 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
 
     @Override
     public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz) {
-        final Optional<NoArgsCtor<T>> ctorOpt = getNoArgsCtorOpt(clazz);
+        final Optional<NoArgsTypeCtor<T>> ctorOpt = getNoArgsCtorOpt(clazz);
         if (ctorOpt.isPresent()) {
             return createObjectCodec(clazz, ctorOpt.get());
         } else {
-            final ArgArrayCtor<T> ctor = getArgArrayCtorOpt(clazz)
+            final ArgArrayTypeCtor<T> ctor = getArgArrayCtorOpt(clazz)
                     .orElseThrow(() -> new CodecException("No constructore was found for class " + clazz));
             return createObjectCodec(clazz, ctor);
         }
     }
 
     @Override
-    public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, NoArgsCtor<T> ctor) {
+    public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, NoArgsTypeCtor<T> ctor) {
         final Map<String, FieldCodec<IN, OUT>> fieldCodecs = new LinkedHashMap<>();
         Class<?> clazz2 = clazz;
         for (int depth = 0; !clazz2.equals(Object.class); depth++) {
@@ -349,7 +349,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     public <T> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,
             Map<String, FieldCodec<IN, OUT>> fieldCodecs,
-            NoArgsCtor<T> ctor) {
+            NoArgsTypeCtor<T> ctor) {
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final T val;
 
@@ -409,7 +409,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, ArgArrayCtor<T> ctor) {
+    public <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, ArgArrayTypeCtor<T> ctor) {
         Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs = new LinkedHashMap<>();
         Class<?> clazz2 = clazz;
         for (int depth = 0; !clazz2.equals(Object.class); depth++) {
@@ -459,7 +459,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     public <T> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
-            ArgArrayCtor<T> ctor) {
+            ArgArrayTypeCtor<T> ctor) {
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final Object[] ctorArgs;
             int i = 0;

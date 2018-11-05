@@ -132,7 +132,7 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                     }
 
                     class _N {
-                        public Codec<T, IN, OUT> map(ArgArrayCtor<T> ctor) {
+                        public Codec<T, IN, OUT> map(ArgArrayTypeCtor<T> ctor) {
                             return registration(core.createObjectCodec(type, fields, ctor));
                         }
 

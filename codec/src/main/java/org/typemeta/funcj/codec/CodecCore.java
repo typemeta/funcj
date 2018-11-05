@@ -48,18 +48,24 @@ public interface CodecCore<IN, OUT> {
             Functions.F<String, T> decode);
 
     /**
-     * Register a {@code TypeConstructor} for the specified class.
-     * @param clazz     the class to register the {@code TypeConstructor} against
-     * @param typeCtor  the {@code TypeConstructor}
-     * @param <T>       the type constructed by the {@code TypeConstructor}
+     * Register a {@link NoArgsTypeCtor} for the specified class.
+     * @param clazz     the class to register the {@code NoArgsTypeCtor} against
+     * @param typeCtor  the {@code NoArgsTypeCtor}
+     * @param <T>       the type constructed by the {@code NoArgsTypeCtor}
      */
     <T> void registerNoArgsCtor(
             Class<? extends T> clazz,
-            NoArgsCtor<T> typeCtor);
+            NoArgsTypeCtor<T> typeCtor);
 
+    /**
+     * Register a {@link ArgArrayTypeCtor} for the specified class.
+     * @param clazz     the class to register the {@code ArgArrayTypeCtor} against
+     * @param typeCtor  the {@code ArgArrayTypeCtor}
+     * @param <T>       the type constructed by the {@code ArgArrayTypeCtor}
+     */
     <T> void registerArgArrayCtor(
             Class<? extends T> clazz,
-            ArgArrayCtor<T> typeCtor);
+            ArgArrayTypeCtor<T> typeCtor);
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.

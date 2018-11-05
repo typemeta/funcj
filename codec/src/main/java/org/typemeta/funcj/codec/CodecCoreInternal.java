@@ -14,11 +14,11 @@ import java.util.stream.*;
  */
 public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
-    <T> Optional<NoArgsCtor<T>> getNoArgsCtorOpt(Class<T> clazz);
+    <T> Optional<NoArgsTypeCtor<T>> getNoArgsCtorOpt(Class<T> clazz);
 
-    <T> NoArgsCtor<T> getNoArgsCtor(Class<T> clazz);
+    <T> NoArgsTypeCtor<T> getNoArgsCtor(Class<T> clazz);
 
-    <T> Optional<ArgArrayCtor<T>> getArgArrayCtorOpt(Class<T> clazz);
+    <T> Optional<ArgArrayTypeCtor<T>> getArgArrayCtorOpt(Class<T> clazz);
 
     <T> boolean encodeNull(T val, OUT out);
 
@@ -118,14 +118,14 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
 
     <T> Codec<T, IN, OUT> createCodec(Class<T> clazz);
 
-    <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, NoArgsCtor<T> ctor);
+    <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, NoArgsTypeCtor<T> ctor);
 
     <T> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,
             Map<String, FieldCodec<IN, OUT>> fieldCodecs,
-            NoArgsCtor<T> ctor);
+            NoArgsTypeCtor<T> ctor);
 
-    <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, ArgArrayCtor<T> ctor);
+    <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz, ArgArrayTypeCtor<T> ctor);
 
     <K, V> Codec<Map<K, V>, IN, OUT> createMapCodec(
             Class<Map<K, V>> mapType,
@@ -159,7 +159,7 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
     <T> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT>> fieldCodecs,
-            ArgArrayCtor<T> ctor);
+            ArgArrayTypeCtor<T> ctor);
 
     <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT> createObjectCodec(
             Class<T> clazz,

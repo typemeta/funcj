@@ -13,15 +13,15 @@ import static java.util.stream.Collectors.toList;
  * @param <T>       the type of value to be constructed
  */
 @SuppressWarnings("unchecked")
-public interface NoArgsCtor<T> {
+public interface NoArgsTypeCtor<T> {
     /**
-     * Create a {@code TypeConstructor} for the specified class.
+     * Create a {@code NoArgsTypeCtor} for the specified class.
      * @param clazz     type descriptor which conveys the type argument
-     * @param <T>       the type we want a {@codeNoArgsCtor} for
-     * @return          an {code Optional wrapping a }{@codeNoArgsCtor} if one exists,
+     * @param <T>       the type we want a {@code NoArgsTypeCtor} for
+     * @return          an {code Optional wrapping a {@code NoArgsTypeCtor} if one exists,
      *                  otherwise an empty Optional
      */
-    static <T> Optional<NoArgsCtor<T>> create(Class<T> clazz)
+    static <T> Optional<NoArgsTypeCtor<T>> create(Class<T> clazz)
             throws CodecException {
         // Get the empty-arg constructors.
         final List<Constructor<T>> ctors =
@@ -65,7 +65,7 @@ public interface NoArgsCtor<T> {
 
     /**
      * Construct a value of type {@code T}.
-     * @return          newly constructed value
+     * @return          the newly constructed value
      */
     T construct();
 }
