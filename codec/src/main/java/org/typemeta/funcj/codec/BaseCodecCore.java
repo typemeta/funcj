@@ -440,11 +440,6 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
     }
 
     @Override
-    public <T> ObjectCodecBuilder<T, IN, OUT> createObjectCodecBuilder(Class<T> clazz) {
-        return new ObjectCodecBuilder<T, IN, OUT>(this, clazz);
-    }
-
-    @Override
     public <T> ObjectCodecBuilder<T, IN, OUT> objectCodecDeferredRegister(Class<T> clazz) {
         return new ObjectCodecBuilder<T, IN, OUT>(this, clazz) {
             @Override

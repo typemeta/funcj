@@ -150,8 +150,6 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
             Class<T> elemType,
             Codec<T, IN, OUT> elemCodec);
 
-    <T> ObjectCodecBuilder<T, IN, OUT> createObjectCodecBuilder(Class<T> clazz);
-
     <T> ObjectCodecBuilder<T, IN, OUT> objectCodecDeferredRegister(Class<T> clazz);
 
     <T> Codec<T, IN, OUT> createObjectCodec(Class<T> clazz);
