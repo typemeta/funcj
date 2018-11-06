@@ -32,6 +32,7 @@ public interface XmlCodecCore extends CodecCoreInternal<Input, Output> {
      * @param writer    the output stream to which the XML is written
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
+     * @return          the output stream
      */
     default <T> Output encode(T value, Writer writer, String rootElemName) {
         return encode(Object.class, value, writer, rootElemName);
