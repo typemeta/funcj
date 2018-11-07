@@ -847,6 +847,46 @@ public abstract class TestTypes {
                     '}';
         }
     }
+
+    enum EnumType {
+        VALUE1 {
+            @Override
+            public String code() {
+                return "1";
+            }
+        }, VALUE2 {
+            @Override
+            public String code() {
+                return "2";
+            }
+        };
+
+        public abstract String code();
+    }
+
+    static class TypeWithEnum {
+        final EnumType enumType;
+
+        public TypeWithEnum(EnumType enumType) {
+            this.enumType = enumType;
+        }
+
+        TypeWithEnum() {
+            this.enumType = null;
+        }
+
+        @Override
+        public boolean equals(Object rhs) {
+            if (this == rhs) {
+                return true;
+            } else if (rhs == null || getClass() != rhs.getClass()) {
+                return false;
+            } else {
+                TypeWithEnum that = (TypeWithEnum) rhs;
+                return enumType == that.enumType;
+            }
+        }
+    }
 }
 
 abstract class TestDataUtils {

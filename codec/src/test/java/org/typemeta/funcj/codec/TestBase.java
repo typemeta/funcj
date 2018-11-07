@@ -159,6 +159,11 @@ public abstract class TestBase {
     }
 
     @Test
+    public void testEnum() throws Exception {
+        roundTrip(new TestTypes.TypeWithEnum(TestTypes.EnumType.VALUE2), TestTypes.TypeWithEnum.class);
+    }
+
+    @Test
     public void testRecursive() throws Exception {
         final TestTypes.Recursive rec = new TestTypes.Recursive(null, 0);
         roundTrip(rec, TestTypes.Recursive.class);

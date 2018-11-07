@@ -17,11 +17,6 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>funcj-json</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>

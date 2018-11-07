@@ -271,6 +271,8 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
                 }
             } else if (clazz.isEnum()) {
                 return enumCodec((Class) clazz);
+            } else if (ReflectionUtils.isEnumSubType(clazz)) {
+                return enumCodec((Class) clazz.getSuperclass());
             } else if (clazz.equals(Boolean.class)) {
                 return (Codec<T, IN, OUT>) booleanCodec();
             } else if (clazz.equals(Byte.class)) {
@@ -321,7 +323,7 @@ public abstract class BaseCodecCore<IN, OUT> implements CodecCoreInternal<IN, OU
             return createObjectCodec(clazz, ctorOpt.get());
         } else {
             final ArgArrayTypeCtor<T> ctor = getArgArrayCtorOpt(clazz)
-                    .orElseThrow(() -> new CodecException("No constructore was found for class " + clazz));
+                    .orElseThrow(() -> new CodecException("No suitable constructor was found for class " + clazz));
             return createObjectCodec(clazz, ctor);
         }
     }

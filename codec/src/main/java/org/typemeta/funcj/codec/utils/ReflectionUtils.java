@@ -10,7 +10,19 @@ import static java.util.stream.Collectors.toList;
  */
 @SuppressWarnings("unchecked")
 public abstract class ReflectionUtils {
+    private static final int ENUM      = 0x00004000;
 
+    /**
+     * Determine whether a class is an enum type.
+     * @param clazz     the class to check
+     * @return          true if the class is an enum type.
+     */
+    public static boolean isEnumSubType(Class<?> clazz) {
+        return (clazz.getModifiers() & ENUM) != 0 &&
+                (clazz.getSuperclass() != null &&
+                        clazz.getSuperclass().getSuperclass() == java.lang.Enum.class
+                );
+    }
     /**
      * Data structure representing the type arguments of a generic type.
      */
