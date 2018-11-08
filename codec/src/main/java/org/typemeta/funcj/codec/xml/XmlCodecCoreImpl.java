@@ -1,10 +1,12 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.xml.io.XmlIO.*;
+import org.typemeta.funcj.codec.xml.io.XmlIO.Input;
+import org.typemeta.funcj.codec.xml.io.XmlIO.Output;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
@@ -692,7 +694,7 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
 
             @Override
             public Collection<T> decode(Input in) {
-                final Collection<T> vals = getNoArgsCtor(collType).construct();
+                final CollProxy<T> collProxy = getCollectionProxy(collType);
 
                 while (in.hasNext()) {
                     if (!in.type().equals(Input.Type.START_ELEMENT)) {
@@ -700,11 +702,11 @@ public class XmlCodecCoreImpl extends BaseCodecCore<Input, Output> implements Xm
                     }
 
                     in.startElement(config.entryElemName());
-                    vals.add(elemCodec.decodeWithCheck(in));
+                    collProxy.add(elemCodec.decodeWithCheck(in));
                     in.endElement();
                 }
 
-                return vals;
+                return collProxy.construct();
             }
         };
     }

@@ -2,7 +2,8 @@ package org.typemeta.funcj.tuples;
 
 import org.typemeta.funcj.functions.Functions;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * A 7-tuple of values.
@@ -119,7 +120,7 @@ final public class Tuple7<A, B, C, D, E, F, G> {
      * The fifth value type
      */
     public final E _5;
-    
+
     /**
      * The sixth value type
      */
@@ -129,7 +130,7 @@ final public class Tuple7<A, B, C, D, E, F, G> {
      * The seventh value type
      */
     public final G _7;
-    
+
     /**
      * Create a new {@code Tuple7} comprised of the supplied values
      * @param a         the first value
@@ -206,7 +207,7 @@ final public class Tuple7<A, B, C, D, E, F, G> {
     public G get7() {
         return _7;
     }
-    
+
     /**
      * Return a new {@code Tuple7} which is a copy of this one,
      * but with the first value replaced with the supplied argument {@code t}

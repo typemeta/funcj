@@ -2,15 +2,18 @@ package org.typemeta.funcj.parser;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.junit.*;
+import org.junit.Assume;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.data.Chr;
-import org.typemeta.funcj.functions.Functions.*;
+import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.functions.Functions.Op2;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.typemeta.funcj.parser.Combinators.*;
+import static org.typemeta.funcj.parser.Combinators.any;
+import static org.typemeta.funcj.parser.Combinators.value;
 import static org.typemeta.funcj.parser.Parser.ap;
 import static org.typemeta.funcj.parser.Text.intr;
 

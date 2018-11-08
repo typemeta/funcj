@@ -1,6 +1,7 @@
 package org.typemeta.funcj.parser.expr;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class GrammarTest {
 

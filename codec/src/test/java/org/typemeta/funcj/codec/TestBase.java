@@ -164,6 +164,11 @@ public abstract class TestBase {
     }
 
     @Test
+    public void testEmptyOrSingletonColls() throws Exception {
+        roundTrip(new TestTypes.EmptyOrSingletonCollections(), TestTypes.EmptyOrSingletonCollections.class);
+    }
+
+    @Test
     public void testRecursive() throws Exception {
         final TestTypes.Recursive rec = new TestTypes.Recursive(null, 0);
         roundTrip(rec, TestTypes.Recursive.class);

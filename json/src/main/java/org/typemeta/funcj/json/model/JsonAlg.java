@@ -2,7 +2,8 @@ package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.algebra.Monoid;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * An object algebra interface for JSON values.

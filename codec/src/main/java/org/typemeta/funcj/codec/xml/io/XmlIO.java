@@ -3,9 +3,11 @@ package org.typemeta.funcj.codec.xml.io;
 import org.typemeta.funcj.codec.CodecException;
 
 import javax.xml.stream.*;
-import java.io.*;
+import java.io.Reader;
+import java.io.Writer;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 public abstract class XmlIO {
     public static Input inputOf(XMLStreamReader reader) {

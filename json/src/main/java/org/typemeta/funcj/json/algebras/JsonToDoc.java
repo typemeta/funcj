@@ -4,7 +4,8 @@ import org.typemeta.funcj.document.*;
 import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.json.model.Utils;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.typemeta.funcj.util.Streams.tupleStream;

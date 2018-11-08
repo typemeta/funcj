@@ -2,9 +2,11 @@ package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.CodecCoreInternal;
 import org.typemeta.funcj.codec.bytes.io.ByteIO;
-import org.typemeta.funcj.codec.bytes.io.ByteIO.*;
+import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
+import org.typemeta.funcj.codec.bytes.io.ByteIO.Output;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Interface for classes which implement an encoding via byte streams.

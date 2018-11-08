@@ -1,12 +1,15 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.bytes.io.ByteIO.*;
+import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
+import org.typemeta.funcj.codec.bytes.io.ByteIO.Output;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Folds;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.Map;
 
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 
@@ -630,13 +633,13 @@ public class ByteCodecCoreImpl extends BaseCodecCore<Input, Output> implements B
             @Override
             public Collection<T> decode(Input in) {
                 final int l = in.readInt();
-                final Collection<T> vals = getNoArgsCtor(collType).construct();
+                final CollProxy<T> collProxy = getCollectionProxy(collType);
 
                 for (int i = 0; i < l; ++i) {
-                    vals.add(elemCodec.decodeWithCheck(in));
+                    collProxy.add(elemCodec.decodeWithCheck(in));
                 }
 
-                return vals;
+                return collProxy.construct();
             }
         };
     }

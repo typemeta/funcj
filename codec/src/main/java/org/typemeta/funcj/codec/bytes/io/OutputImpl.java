@@ -2,7 +2,8 @@ package org.typemeta.funcj.codec.bytes.io;
 
 import org.typemeta.funcj.codec.CodecException;
 
-import java.io.*;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public final class OutputImpl implements ByteIO.Output {
     private final DataOutput output;

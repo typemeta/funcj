@@ -68,6 +68,15 @@ public interface CodecCore<IN, OUT> {
             ArgArrayTypeCtor<T> typeCtor);
 
     /**
+     * Register a {@link ArgArrayTypeCtor} for the specified class.
+     * @param className the name of class to register the {@code ArgArrayTypeCtor} against
+     * @param typeCtor  the {@code ArgArrayTypeCtor}
+     * @param <T>       the type constructed by the {@code ArgArrayTypeCtor}
+     */
+    <T> void registerArgArrayCtor(
+            String className,
+            ArgArrayTypeCtor<T> typeCtor);
+    /**
      * Encode a value of type {@code T} into encoded form {@code E}.
      * @param type      the class of the decoded value
      * @param val       the value to encode

@@ -2,7 +2,8 @@ package org.typemeta.funcj.tuples;
 
 import org.typemeta.funcj.functions.Functions;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * A 6-tuple of values.
@@ -109,7 +110,7 @@ final public class Tuple6<A, B, C, D, E, F> {
      * The fifth value type
      */
     public final E _5;
-    
+
     /**
      * The sixth value type
      */
@@ -330,7 +331,7 @@ final public class Tuple6<A, B, C, D, E, F> {
     public <T> Tuple6<A, B, C, D, E, T> map6(Functions.F<? super F, ? extends T> f) {
         return of(_1, _2, _3, _4, _5, f.apply(_6));
     }
-    
+
     @Override
     public String toString() {
         return "(" + _1 + ',' + _2 + ',' + _3 + ',' + _4 + ',' + _5 + ',' + _6 +  ')';

@@ -7,7 +7,8 @@ import org.typemeta.funcj.codec.json.JsonCodecCore;
 import org.typemeta.funcj.codec.json.io.JsonIO;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
 
-import java.io.*;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.time.*;
 import java.util.*;
 

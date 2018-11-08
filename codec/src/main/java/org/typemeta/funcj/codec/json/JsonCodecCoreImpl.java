@@ -3,10 +3,12 @@ package org.typemeta.funcj.codec.json;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
-import static org.typemeta.funcj.codec.json.io.JsonIO.*;
+import static org.typemeta.funcj.codec.json.io.JsonIO.Input;
+import static org.typemeta.funcj.codec.json.io.JsonIO.Output;
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 
 @SuppressWarnings("unchecked")
@@ -682,17 +684,17 @@ public class JsonCodecCoreImpl extends BaseCodecCore<Input, Output> implements J
 
             @Override
             public Collection<T> decode(Input in) {
-                final Collection<T> vals = getNoArgsCtor(collType).construct();
+                final CollProxy<T> collProxy = getCollectionProxy(collType);
 
                 in.startArray();
 
                 while(in.notEOF() && in.currentEventType() != Input.Event.Type.ARRAY_END) {
-                    vals.add(elemCodec.decodeWithCheck(in));
+                    collProxy.add(elemCodec.decodeWithCheck(in));
                 }
 
                 in.endArray();
 
-                return vals;
+                return collProxy.construct();
             }
         };
     }

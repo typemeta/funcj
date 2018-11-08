@@ -887,35 +887,28 @@ public abstract class TestTypes {
             }
         }
     }
-}
 
-abstract class TestDataUtils {
+    static class EmptyOrSingletonCollections {
+        final List<String> emptyList = Collections.emptyList();
+        final Set<String> emptySet = Collections.emptySet();
 
-    @SafeVarargs
-    static <T> ArrayList<T> arrayList(T... vals) {
-        final ArrayList<T> l = new ArrayList<T>(vals.length);
-        l.addAll(Arrays.asList(vals));
-        return l;
-    }
+        final List<String> singletonList = Collections.singletonList("abcd");
+        final Set<String> singletonSet = Collections.singleton("abcd");
 
-    static <K, V> HashMap<K, V> hashMap(K k0, V v0, K k1, V v1) {
-        final HashMap<K, V> m = new HashMap<>();
-        m.put(k0, v0);
-        m.put(k1, v1);
-        return m;
-    }
-
-    static <K, V> TreeMap<K, V> treeMap(K k0, V v0, K k1, V v1) {
-        final TreeMap<K, V> m = new TreeMap<>();
-        m.put(k0, v0);
-        m.put(k1, v1);
-        return m;
-    }
-
-    @SafeVarargs
-    static <T> TreeSet<T> treeSet(T... vals) {
-        final TreeSet<T> l = new TreeSet<T>();
-        l.addAll(Arrays.asList(vals));
-        return l;
+        @Override
+        public boolean equals(Object rhs) {
+            if (this == rhs) {
+                return true;
+            } else if (rhs == null || getClass() != rhs.getClass()) {
+                return false;
+            } else {
+                EmptyOrSingletonCollections that = (EmptyOrSingletonCollections) rhs;
+                return Objects.equals(emptyList, that.emptyList) &&
+                        Objects.equals(emptySet, that.emptySet) &&
+                        Objects.equals(singletonList, that.singletonList) &&
+                        Objects.equals(singletonSet, that.singletonSet);
+            }
+        }
     }
 }
+

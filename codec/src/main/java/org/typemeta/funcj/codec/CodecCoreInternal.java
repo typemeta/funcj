@@ -5,7 +5,8 @@ import org.typemeta.funcj.functions.Functions;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Internal interface for {@link CodecCore} implementations.
@@ -89,13 +90,13 @@ public interface CodecCoreInternal<IN, OUT> extends CodecCore<IN, OUT> {
      * <p>
      * This method needs to be thread-safe and re-entrant in case the
      * type in question is recursive.
-     * @param key       the class key
+     * @param name      the type name
      * @param codecSupp the supplier of the new codec
      * @param <T>       the raw type to be encoded/decoded
      * @return          the {@code Codec} for the specified name
      */
     <T> Codec<T, IN, OUT> getCodec(
-            ClassKey<T> key,
+            String name,
             Supplier<Codec<T, IN, OUT>> codecSupp);
 
     <T> Codec<Collection<T>, IN, OUT> getCollCodec(

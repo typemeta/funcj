@@ -8,9 +8,9 @@ import java.util.*;
  */
 public abstract class CodecConfigImpl implements CodecConfig {
 
-    protected final Set<Package> allowedPackages = new HashSet<>();
+    protected final Set<String> allowedPackages = new HashSet<>();
 
-    protected final Set<Class<?>> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
+    protected final Set<String> allowedClasses = new HashSet<>();
 
     /**
      * A map that associates a class with its proxy.
@@ -21,13 +21,14 @@ public abstract class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
-    public void registerAllowedPackage(Package pkg) {
-        allowedPackages.add(pkg);
+    public void registerAllowedPackage(String pkgName) {
+        allowedPackages.add(pkgName);
     }
 
+
     @Override
-    public void registerAllowedClass(Class<?> clazz) {
-        allowedClasses.add(clazz);
+    public void registerAllowedClass(String className) {
+        allowedClasses.add(className);
     }
 
     @Override
@@ -42,10 +43,10 @@ public abstract class CodecConfigImpl implements CodecConfig {
             return clazz;
         }
 
-        if (allowedPackages.contains(cls.getPackage())) {
+        if (allowedPackages.contains(cls.getPackage().getName())) {
             return clazz;
         } else {
-            if (allowedClasses.contains(cls)) {
+            if (allowedClasses.contains(cls.getName())) {
                 return clazz;
             } else {
                 throw new RuntimeException("Class '" + cls + "' is not allowed");

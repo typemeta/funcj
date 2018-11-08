@@ -3,7 +3,8 @@ package org.typemeta.funcj.codec.xml.io;
 import org.typemeta.funcj.codec.CodecException;
 import org.typemeta.funcj.functions.SideEffectGenEx;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.math.BigDecimal;
 
 class OutputImpl implements XmlIO.Output {

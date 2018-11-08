@@ -2,9 +2,11 @@ package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.CodecCoreInternal;
 import org.typemeta.funcj.codec.xml.io.XmlIO;
-import org.typemeta.funcj.codec.xml.io.XmlIO.*;
+import org.typemeta.funcj.codec.xml.io.XmlIO.Input;
+import org.typemeta.funcj.codec.xml.io.XmlIO.Output;
 
-import java.io.*;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * Interface for classes which implement an encoding via XML.

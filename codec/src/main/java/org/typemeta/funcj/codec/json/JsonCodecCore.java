@@ -2,9 +2,11 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.CodecCoreInternal;
 import org.typemeta.funcj.codec.json.io.JsonIO;
-import org.typemeta.funcj.codec.json.io.JsonIO.*;
+import org.typemeta.funcj.codec.json.io.JsonIO.Input;
+import org.typemeta.funcj.codec.json.io.JsonIO.Output;
 
-import java.io.*;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * Interface for classes which implement an encoding via JSON.

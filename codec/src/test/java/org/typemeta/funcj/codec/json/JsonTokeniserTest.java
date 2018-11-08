@@ -1,7 +1,8 @@
 package org.typemeta.funcj.codec.json;
 
 import org.junit.Test;
-import org.typemeta.funcj.codec.json.io.*;
+import org.typemeta.funcj.codec.json.io.JsonIO;
+import org.typemeta.funcj.codec.json.io.JsonTokeniser;
 
 public class JsonTokeniserTest {
     @Test

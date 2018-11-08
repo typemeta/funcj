@@ -10,16 +10,32 @@ import java.util.Set;
 public interface CodecConfig {
 
     /**
-     * Add this class to the list of allowed classes.
-     * @param name      the name of the package
+     * Add this package to the list of allowed packages.
+     * @param pkg       the package
      */
-    void registerAllowedPackage(Package name);
+    default void registerAllowedPackage(Package pkg) {
+        registerAllowedPackage(pkg.getName());
+    }
+
+    /**
+     * Add this package to the list of allowed packages.
+     * @param pkgName   the name of the  package
+     */
+    void registerAllowedPackage(String pkgName);
 
     /**
      * Add this class to the list of allowed classes.
-     * @param name      the name of the class
+     * @param clazz     the class
      */
-    void registerAllowedClass(Class<?> name);
+    default void registerAllowedClass(Class<?> clazz) {
+        registerAllowedPackage(clazz.getName());
+    }
+
+    /**
+     * Add this class to the list of allowed classes.
+     * @param className the name of the class
+     */
+    void registerAllowedClass(String className);
 
     /**
      * Check this class is allowed.

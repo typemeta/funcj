@@ -1,7 +1,9 @@
 package org.typemeta.funcj.codec.bytes;
 
-import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.MapCodecs.*;
+import org.typemeta.funcj.codec.Codec;
+import org.typemeta.funcj.codec.CodecCoreInternal;
+import org.typemeta.funcj.codec.MapCodecs.AbstractMapCodec;
+import org.typemeta.funcj.codec.MapCodecs.AbstractStringMapCodec;
 import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
 
 import java.util.Map;

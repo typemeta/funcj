@@ -1,9 +1,11 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.junit.Assert;
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codecs;
+import org.typemeta.funcj.codec.TestBase;
 
-import java.io.*;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 public class XmlCodecTest extends TestBase {
     private static final String rootElemName = "root";

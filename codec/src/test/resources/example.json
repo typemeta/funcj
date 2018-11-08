@@ -1,5 +1,9 @@
 [
     {
+        "emptyArray": [],
+        "emptyObject": {}
+    },
+    {
         "_id": "5b9a4da0e2ca9dc9b0565181",
         "index": 0,
         "guid": "f7342ebc-0f54-426c-a84e-6ff4354df815",

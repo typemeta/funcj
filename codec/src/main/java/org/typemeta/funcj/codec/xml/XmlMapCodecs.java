@@ -1,9 +1,12 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.MapCodecs.*;
+import org.typemeta.funcj.codec.Codec;
+import org.typemeta.funcj.codec.CodecCoreInternal;
+import org.typemeta.funcj.codec.MapCodecs.AbstractMapCodec;
+import org.typemeta.funcj.codec.MapCodecs.AbstractStringMapCodec;
 import org.typemeta.funcj.codec.xml.io.XmlIO;
-import org.typemeta.funcj.codec.xml.io.XmlIO.*;
+import org.typemeta.funcj.codec.xml.io.XmlIO.Input;
+import org.typemeta.funcj.codec.xml.io.XmlIO.Output;
 
 import java.util.Map;
 

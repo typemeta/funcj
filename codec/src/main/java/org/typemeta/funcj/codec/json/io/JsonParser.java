@@ -4,8 +4,10 @@ import org.typemeta.funcj.codec.CodecException;
 
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.text.*;
-import java.util.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -211,6 +213,9 @@ public class JsonParser implements JsonIO.Input {
                         case ARRAY_START:
                             state = State.ARRAY_COMMA;
                             pushState(State.ARRAY_VALUE);
+                            break;
+                        case ARRAY_END:
+                            popState();
                             break;
                         case OBJECT_START:
                             state = State.ARRAY_COMMA;

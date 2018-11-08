@@ -1,12 +1,14 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.bytes.*;
-import org.typemeta.funcj.codec.json.*;
+import org.typemeta.funcj.codec.json.JsonCodecCoreImpl;
+import org.typemeta.funcj.codec.json.JsonCodecs;
 import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.util.Exceptions;
 
 import java.time.*;
+import java.util.Collections;
 
 /**
  * Factory methods for creating CodecCore instances.
@@ -44,6 +46,14 @@ public abstract class Codecs {
         core.config().registerAllowedPackage(java.lang.String.class.getPackage());
         core.config().registerAllowedPackage(java.util.Collection.class.getPackage());
         core.config().registerAllowedPackage(java.time.LocalDate.class.getPackage());
+
+        core.registerArgArrayCtor(
+                "java.util.Collections$SingletonList",
+                args -> Collections.singletonList(args[0]));
+
+        core.registerArgArrayCtor(
+                "java.util.Collections$SingletonSet",
+                args -> Collections.singleton(args[0]));
 
         core.registerStringProxyCodec(
                 Class.class,
