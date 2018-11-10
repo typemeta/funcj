@@ -2,8 +2,8 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.bytes.*;
 import org.typemeta.funcj.codec.json.*;
+import org.typemeta.funcj.codec.utils.*;
 import org.typemeta.funcj.codec.xml.*;
-import org.typemeta.funcj.codec.utils.ClassUtils;
 import org.typemeta.funcj.functions.Functions.F;
 
 import java.time.*;
@@ -45,11 +45,11 @@ public abstract class Codecs {
         core.config().registerAllowedPackage(java.time.LocalDate.class.getPackage());
 
         core.registerArgArrayCtor(
-                ClassUtils.forName("java.util.Collections$SingletonList"),
+                ReflectionUtils.forName("java.util.Collections$SingletonList"),
                 args -> Collections.singletonList(args[0]));
 
         core.registerArgArrayCtor(
-                ClassUtils.forName("java.util.Collections$SingletonSet"),
+                ReflectionUtils.forName("java.util.Collections$SingletonSet"),
                 args -> Collections.singleton(args[0]));
 
         core.registerStringProxyCodec(
@@ -58,7 +58,7 @@ public abstract class Codecs {
                 core.config()::nameToClass
         );
 
-        core.config().registerTypeProxy(ClassUtils.forName("java.time.ZoneRegion"), ZoneId.class);
+        core.config().registerTypeProxy(ReflectionUtils.forName("java.time.ZoneRegion"), ZoneId.class);
 
         core.registerCodec(LocalDate.class)
                 .field("year", LocalDate::getYear, Integer.class)

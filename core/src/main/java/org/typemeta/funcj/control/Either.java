@@ -1,9 +1,8 @@
 package org.typemeta.funcj.control;
 
 import org.typemeta.funcj.data.IList;
-import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.functions.SideEffect;
 import org.typemeta.funcj.util.Folds;
 
 import java.util.*;
@@ -46,6 +45,22 @@ public interface Either<E, S> {
      */
     static <E, S> Either<E, S> right(S value) {
         return new Right<E, S>(value);
+    }
+
+    /**
+     * Create a {@code Either} value from a function which either yields a result or throws.
+     * @param f         the function which may throw
+     * @param <E>       the exception result type
+     * @param <S>       the successful result type
+     * @return          a {@code Either} value which wraps the function result
+     */
+    @SuppressWarnings("unchecked")
+    static <E extends Exception, S> Either<E, S> of(FunctionsGenEx.F0<S, E> f) {
+        try {
+            return right(f.apply());
+        } catch (Exception ex) {
+            return left((E)ex);
+        }
     }
 
     /**

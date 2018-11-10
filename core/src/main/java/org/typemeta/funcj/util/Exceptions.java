@@ -24,7 +24,8 @@ public abstract class Exceptions {
     /**
      * Wrap a function which throws a checked exception
      * into one that that throws a hidden checked exception.
-     * The original exception can be rethrown by an enclosing call to {@link #unwrap(SideEffectGenEx.F0)}.
+     * The original exception can be rethrown by an enclosing
+     * call to {@link #unwrap(SideEffectGenEx.F0)}.
      * @param thrower   the function that may throw
      */
     public static void wrap(SideEffectEx.F0 thrower) {
@@ -49,9 +50,9 @@ public abstract class Exceptions {
      * Wrap a function which throws a checked exception
      * into one that that throws a hidden checked exception.
      * The original exception can be rethrown by an enclosing call to {@link #unwrap(Functions.F0)}.
-     * @param thrower   function that may throw
-     * @param <R>       return type of function
-     * @return          result of function if it doesn't throw
+     * @param thrower   the function that may throw
+     * @param <R>       the return type of function
+     * @return          the result of function if it doesn't throw
      */
     public static <R> R wrap(FunctionsEx.F0<R> thrower) {
         try {
@@ -65,9 +66,9 @@ public abstract class Exceptions {
      * Wrap a function which throws a checked exception
      * into one that that throws a hidden checked exception.
      * The original exception can be rethrown by an enclosing call to {@link #unwrap(Functions.F0)}.
-     * @param thrower   function that may throw
-     * @param <T>       input type of the function
-     * @param <R>       return type of function
+     * @param thrower   the function that may throw
+     * @param <T>       the input type of the function
+     * @param <R>       the return type of function
      * @return          a function which throws an unchecked exception
      */
     public static <T, R> F<T, R> wrap(FunctionsEx.F<T, R> thrower) {
@@ -84,10 +85,10 @@ public abstract class Exceptions {
      * Wrap a function which throws a checked exception
      * into one that that throws a hidden checked exception.
      * The original exception can be rethrown by an enclosing call to {@link #unwrap(Functions.F0)}.
-     * @param thrower   function that may throw
+     * @param thrower   the function that may throw
      * @param <A>       the type of the first argument of the function
      * @param <B>       the type of the second argument of the function
-     * @param <R>       return type of function
+     * @param <R>       the return type of function
      * @return          a function which throws an unchecked exception
      */
     public static <A, B, R>
@@ -119,7 +120,7 @@ public abstract class Exceptions {
     /**
      * Undo the effect of {@code wrap} by catching the exception,
      * and rethrowing the original checked exception.
-     * @param thrower  the function that may throw an exception
+     * @param thrower   the function that may throw an exception
      * @param <R>       the return type of the function
      * @param <X>       the original exception type
      * @return          the function value, if it doesn't throw

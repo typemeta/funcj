@@ -30,11 +30,6 @@ public class ConfigImpl extends CodecConfigImpl implements Config {
     }
 
     @Override
-    public String keyAttrName() {
-        return "key";
-    }
-
-    @Override
     public String keyElemName() {
         return "key";
     }

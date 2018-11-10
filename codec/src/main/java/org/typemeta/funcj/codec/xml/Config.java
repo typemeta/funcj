@@ -11,8 +11,6 @@ public interface Config extends CodecConfig {
 
     String typeAttrName();
 
-    String keyAttrName();
-
     String keyElemName();
 
     String valueElemName();

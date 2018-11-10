@@ -1,5 +1,7 @@
 package org.typemeta.funcj.codec.utils;
 
+import org.typemeta.funcj.util.Exceptions;
+
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -23,6 +25,21 @@ public abstract class ReflectionUtils {
                         clazz.getSuperclass().getSuperclass() == java.lang.Enum.class
                 );
     }
+
+    /**
+     * Return the {@link Class} for the given name.
+     * Alternative to {@link Class#forName(String)}, that throws a {@link RuntimeException}.
+     * @param className the class name
+     * @return          the class
+     */
+    public static Class<?> forName(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     /**
      * Data structure representing the type arguments of a generic type.
      */
@@ -51,11 +68,11 @@ public abstract class ReflectionUtils {
     }
 
     /**
-     * Inspect the supplied field. If it implements the supplied generic interface
+     * Inspect the given field. If it implements the supplied generic interface
      * then extract and return the type arguments.
-     * @param field the field to inspect
-     * @param iface generic interface
-     * @return type arguments
+     * @param field     the field to inspect
+     * @param iface     the generic interface
+     * @return          the type arguments
      */
     public static TypeArgs getTypeArgs(Field field, Class<?> iface) {
         final Type type = field.getGenericType();
@@ -91,9 +108,9 @@ public abstract class ReflectionUtils {
     /**
      * Inspect the supplied type. If it implements the supplied generic interface
      * then extract and return the type arguments.
-     * @param implClass type to inspect
-     * @param iface generic interface
-     * @return type arguments
+     * @param implClass the type to inspect
+     * @param iface     the generic interface
+     * @return      <></>he type arguments
      */
     public static TypeArgs getTypeArgs(Class<?> implClass, Class<?> iface) {
         final List<ParameterizedType> genIfaces =

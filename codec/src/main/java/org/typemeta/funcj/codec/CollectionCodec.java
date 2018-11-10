@@ -102,6 +102,7 @@ public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
 
         @Override
         public Collection<T> construct() {
+            @SuppressWarnings("unchecked")
             final T[] arr = (T[]) Array.newInstance(elemType, args.size());
             args.toArray(arr);
             return argArrCtor.construct(arr);
