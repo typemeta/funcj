@@ -19,7 +19,7 @@ public interface NoArgsTypeCtor<T> {
      * Create a {@code NoArgsTypeCtor} for the specified class.
      * @param clazz     type descriptor which conveys the type argument
      * @param <T>       the type we want a {@code NoArgsTypeCtor} for
-     * @return          an {@code Optional wrapping a {@code NoArgsTypeCtor} if one exists,
+     * @return          an {@code Optional} wrapping a {@code NoArgsTypeCtor} if one exists,
      *                  otherwise an empty Optional
      */
     static <T> Optional<NoArgsTypeCtor<T>> create(Class<T> clazz)

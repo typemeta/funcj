@@ -6,11 +6,15 @@ import java.util.*;
 /**
  * Base class for {@link CodecConfig} implementations.
  */
-public abstract class CodecConfigImpl implements CodecConfig {
+public class CodecConfigImpl implements CodecConfig {
 
     protected final Set<Package> allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));
 
     protected final Set<Class<?>> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
+
+    protected final Map<Class<?>, String> classToNameMap = new TreeMap<>(Comparator.comparing(Class::getName));
+
+    protected final Map<String, Class<?>> nameToClassMap = new HashMap<>();
 
     /**
      * A map that associates a class with its proxy.
@@ -70,17 +74,29 @@ public abstract class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
+    public void registerTypeAlias(Class<?> clazz, String name) {
+        classToNameMap.put(clazz, name);
+        nameToClassMap.put(name, clazz);
+    }
+
+    @Override
     public String classToName(Class<?> clazz) {
-        return checkClassIsAllowed(clazz).getName();
+        final String name = classToNameMap.get(checkClassIsAllowed(clazz));
+        return name == null ? clazz.getName() : name;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Class<T> nameToClass(String name) {
-        try {
-            return (Class<T>) Class.forName(name);
-        } catch (ClassNotFoundException ex) {
-            throw new CodecException("Cannot create class from name '" + name + "'", ex);
+        final Class<T> clazz = (Class<T>) nameToClassMap.get(name);
+        if (clazz != null) {
+            return clazz;
+        } else {
+            try {
+                return (Class<T>) Class.forName(name);
+            } catch (ClassNotFoundException ex) {
+                throw new CodecException("Cannot find class from name '" + name + "'", ex);
+            }
         }
     }
 

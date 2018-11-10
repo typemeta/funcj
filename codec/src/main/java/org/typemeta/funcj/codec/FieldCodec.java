@@ -506,6 +506,7 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
 
     /**
      * Encode a field within an object into an encoded type {@code OUT}.
+     * @param core      the codec core
      * @param obj       the object to which the field belongs
      * @param out       the encoded parent value
      * @return          the encoded value
@@ -514,6 +515,7 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
 
     /**
      * Decode a field with an encoded type {@code IN} back into a value of type {@code T}.
+     * @param core      the codec core
      * @param obj       object to which the field belongs
      * @param in        the encoded value
      */

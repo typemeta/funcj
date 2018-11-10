@@ -110,7 +110,7 @@ public abstract class ReflectionUtils {
      * then extract and return the type arguments.
      * @param implClass the type to inspect
      * @param iface     the generic interface
-     * @return      <></>he type arguments
+     * @return          the type arguments
      */
     public static TypeArgs getTypeArgs(Class<?> implClass, Class<?> iface) {
         final List<ParameterizedType> genIfaces =

@@ -38,7 +38,15 @@ public abstract class Codecs {
         return ByteCodecs.registerAll(new ByteCodecCore());
     }
 
-    public static <IN, OUT, CFG extends CodecConfig, CC extends CodecCore<IN, OUT, CFG>> CC registerAll(CC core) {
+    public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>> CORE registerAll(CORE core) {
+
+        for (Class<?> clazz : new Class<?>[]{
+                Boolean.class, Byte.class, Character.class, Double.class, Float.class, Integer.class, Long.class, Short.class,
+                boolean.class, byte.class, char.class, double.class, float.class, int.class, long.class, short.class,
+                String.class
+        }) {
+            core.config().registerTypeAlias(clazz, clazz.getSimpleName());
+        }
 
         core.config().registerAllowedPackage(java.lang.String.class.getPackage());
         core.config().registerAllowedPackage(java.util.Collection.class.getPackage());

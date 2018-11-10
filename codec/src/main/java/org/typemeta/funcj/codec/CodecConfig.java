@@ -31,8 +31,8 @@ public interface CodecConfig {
 
     /**
      * Register a type proxy.
-     * A type proxy maps a type to its proxy before selecting its {@code Codec}.
-     * @param clazz     the type to be mapped
+     * A type proxy maps a class to its proxy before selecting its {@code Codec}.
+     * @param clazz     the class to be mapped
      * @param proxy     the proxy type
      */
     void registerTypeProxy(Class<?> clazz, Class<?> proxy);
@@ -44,6 +44,14 @@ public interface CodecConfig {
      * @return          the proxy if it has one, otherwise the original class
      */
     <T> Class<T> remapType(Class<T> clazz);
+
+    /**
+     * Register a type alias.
+     * A type alias is used in place of the class name in the encoded data.
+     * @param clazz    the clas to be mapped
+     * @param name     the proxy type
+     */
+    void registerTypeAlias(Class<?> clazz, String name);
 
     /**
      * Convert a class to a name.
