@@ -3,9 +3,9 @@ package org.typemeta.funcj.codec.json;
 import org.typemeta.funcj.codec.CodecConfigImpl;
 
 /**
- * Base class for {@link JsonCodecConfig} implementations.
+ * Base class for {@link Config} implementations.
  */
-public class JsonCodecConfigImpl extends CodecConfigImpl implements JsonCodecConfig {
+public class ConfigImpl extends CodecConfigImpl implements Config {
 
     @Override
     public String typeFieldName() {

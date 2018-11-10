@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.codec.CodecCoreInternal;
+import org.typemeta.funcj.codec.CodecCoreEx;
 import org.typemeta.funcj.codec.MapCodecs.AbstractMapCodec;
 import org.typemeta.funcj.codec.MapCodecs.AbstractStringMapCodec;
 import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
@@ -12,44 +12,36 @@ import static org.typemeta.funcj.codec.bytes.io.ByteIO.Output;
 
 public abstract class ByteMapCodecs {
 
-    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Input, Output> {
-        private final ByteCodecCoreImpl core;
+    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Input, Output, Config> {
 
         public MapCodec(
-                ByteCodecCoreImpl core,
                 Class<Map<K, V>> type,
-                Codec<K, Input, Output> keyCodec,
-                Codec<V, Input, Output> valueCodec) {
+                Codec<K, Input, Output, Config> keyCodec,
+                Codec<V, Input, Output, Config> valueCodec) {
             super(type, keyCodec, valueCodec);
-            this.core = core;
         }
 
         @Override
-        public CodecCoreInternal<Input, Output> core() {
-            return core;
-        }
-
-        @Override
-        public Output encode(Map<K, V> value, Output out) {
-            core.intCodec().encodePrim(value.size(), out);
+        public Output encode(CodecCoreEx<Input, Output, Config> core, Map<K, V> value, Output out) {
+            core.format().intCodec().encodePrim(value.size(), out);
 
             for (Map.Entry<K, V> entry : value.entrySet()) {
-                keyCodec.encodeWithCheck(entry.getKey(), out);
-                valueCodec.encodeWithCheck(entry.getValue(), out);
+                keyCodec.encodeWithCheck(core, entry.getKey(), out);
+                valueCodec.encodeWithCheck(core, entry.getValue(), out);
             }
 
             return out;
         }
 
         @Override
-        public Map<K, V> decode(Input in) {
-            final int l = core.intCodec().decodePrim(in);
+        public Map<K, V> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
+            final int l = core.format().intCodec().decodePrim(in);
 
             final Map<K, V> map = core.getNoArgsCtor(type).construct();
 
             for (int i = 0; i < l; ++i) {
-                final K key = keyCodec.decodeWithCheck(in);
-                final V value = valueCodec.decodeWithCheck(in);
+                final K key = keyCodec.decodeWithCheck(core, in);
+                final V value = valueCodec.decodeWithCheck(core, in);
                 map.put(key, value);
             }
 
@@ -57,43 +49,35 @@ public abstract class ByteMapCodecs {
         }
     }
 
-    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, Input, Output> {
-        private final ByteCodecCoreImpl core;
+    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, Input, Output, Config> {
 
         public StringMapCodec(
-                ByteCodecCoreImpl core,
                 Class<Map<String, V>> type,
-                Codec<V, Input, Output> valueCodec) {
+                Codec<V, Input, Output, Config> valueCodec) {
             super(type, valueCodec);
-            this.core = core;
         }
 
         @Override
-        public CodecCoreInternal<Input, Output> core() {
-            return core;
-        }
-
-        @Override
-        public Output encode(Map<String, V> value, Output out) {
-            core.intCodec().encodePrim(value.size(), out);
+        public Output encode(CodecCoreEx<Input, Output, Config> core, Map<String, V> value, Output out) {
+            core.format().intCodec().encodePrim(value.size(), out);
 
             for (Map.Entry<String, V> entry : value.entrySet()) {
-                core.stringCodec().encode(entry.getKey(), out);
-                valueCodec.encodeWithCheck(entry.getValue(), out);
+                core.format().stringCodec().encode(core, entry.getKey(), out);
+                valueCodec.encodeWithCheck(core, entry.getValue(), out);
             }
 
             return out;
         }
 
         @Override
-        public Map<String, V> decode(Input in) {
-            final int l = core.intCodec().decodePrim(in);
+        public Map<String, V> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
+            final int l = core.format().intCodec().decodePrim(in);
 
             final Map<String, V> map = core.getNoArgsCtor(type).construct();
 
             for (int i = 0; i < l; ++i) {
-                final String key = core.stringCodec().decode(in);
-                final V value = valueCodec.decodeWithCheck(in);
+                final String key = core.format().stringCodec().decode(core, in);
+                final V value = valueCodec.decodeWithCheck(core, in);
                 map.put(key, value);
             }
 

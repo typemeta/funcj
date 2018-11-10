@@ -4,7 +4,7 @@ import org.typemeta.funcj.codec.Codecs;
 
 @SuppressWarnings("unchecked")
 public class ByteCodecs {
-    public static ByteCodecCoreImpl registerAll(ByteCodecCoreImpl core) {
+    public static ByteCodecCore registerAll(ByteCodecCore core) {
         //core.registerCodec(Optional.class, new OptionalCodec(core));
         return Codecs.registerAll(core);
     }

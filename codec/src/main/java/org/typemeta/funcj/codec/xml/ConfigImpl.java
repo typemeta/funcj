@@ -6,9 +6,9 @@ import java.lang.reflect.Field;
 import java.util.Set;
 
 /**
- * Base class for {@link XmlCodecConfig} implementations.
+ * Base class for {@link Config} implementations.
  */
-public class XmlCodecConfigImpl extends CodecConfigImpl implements XmlCodecConfig {
+public class ConfigImpl extends CodecConfigImpl implements Config {
 
     @Override
     public String getFieldName(Field field, int depth, Set<String> existingNames) {

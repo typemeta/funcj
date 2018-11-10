@@ -12,46 +12,49 @@ import java.util.Map;
  * @param <T>       raw type to be encoded/decoded
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
+ * @param <CFG>     the config type
  */
 @SuppressWarnings("unchecked")
-public class ObjectCodecBuilder<T, IN, OUT> {
-    public static class FieldCodec<T, IN, OUT> {
-        protected final Functions.F2<T, OUT, OUT> encoder;
-        protected final Functions.F<IN, Object> decoder;
+public class ObjectCodecBuilder<T, IN, OUT, CFG extends CodecConfig> {
+    public static class FieldCodec<T, IN, OUT, CFG extends CodecConfig> {
+        protected final Functions.F3<CodecCoreEx<IN, OUT, CFG>, T, OUT, OUT> encoder;
+        protected final Functions.F2<CodecCoreEx<IN, OUT, CFG>, IN, Object> decoder;
 
-        public <FT> FieldCodec(Functions.F<T, FT> getter, Codec<FT, IN, OUT> codec) {
-            encoder = (val, out) -> codec.encodeWithCheck(getter.apply(val), out);
+        public <FT> FieldCodec(
+                Functions.F<T, FT> getter,
+                Codec<FT, IN, OUT, CFG> codec) {
+            encoder = (core, val, out) -> codec.encodeWithCheck(core, getter.apply(val), out);
             decoder = codec::decodeWithCheck;
         }
 
-        public OUT encodeField(T val, OUT out) {
-            return encoder.apply(val, out);
+        public OUT encodeField(CodecCoreEx<IN, OUT, CFG> core, T val, OUT out) {
+            return encoder.apply(core, val, out);
         }
 
-        public Object decodeField(IN in)  {
-            return decoder.apply(in);
+        public Object decodeField(CodecCoreEx<IN, OUT, CFG> core, IN in)  {
+            return decoder.apply(core, in);
         }
     }
 
-    private final CodecCoreInternal<IN, OUT> core;
-    private final Class<T> type;
+    private final CodecCoreEx<IN, OUT, CFG> core;
+    private final Class<T> clazz;
 
-    protected final Map<String, FieldCodec<T, IN, OUT>> fields = new LinkedHashMap<>();
+    protected final Map<String, FieldCodec<T, IN, OUT, CFG>> fields = new LinkedHashMap<>();
 
-    public ObjectCodecBuilder(CodecCoreInternal<IN, OUT> core, Class<T> type) {
+    public ObjectCodecBuilder(CodecCoreEx<IN, OUT, CFG> core, Class<T> clazz) {
         this.core = core;
-        this.type = type;
+        this.clazz = clazz;
     }
 
-    protected Codec<T, IN, OUT> registration(Codec<T, IN, OUT> codec) {
+    protected Codec<T, IN, OUT, CFG> registration(Codec<T, IN, OUT, CFG> codec) {
         return codec;
     }
 
-    private <X> Codec<X, IN, OUT> getCodec(Class<X> clazz) {
+    private <X> Codec<X, IN, OUT, CFG> getCodec(Class<X> clazz) {
         return core.getCodec(clazz);
     }
 
-    <A> _1<A> field(String name, Functions.F<T, A> getter, Codec<A, IN, OUT> codec) {
+    <A> _1<A> field(String name, Functions.F<T, A> getter, Codec<A, IN, OUT, CFG> codec) {
         fields.put(name, new FieldCodec<>(getter, codec));
         return new _1<A>();
     }
@@ -61,15 +64,15 @@ public class ObjectCodecBuilder<T, IN, OUT> {
     }
 
     class _1<A> {
-        public Codec<T, IN, OUT> map(Functions.F<A, T> ctor) {
+        public Codec<T, IN, OUT, CFG> map(Functions.F<A, T> ctor) {
             return registration(
                     core.createObjectCodec(
-                            type,
+                            clazz,
                             fields,
                             arr -> ctor.apply((A)arr[0])));
         }
 
-        <B> _2<B> field(String name, Functions.F<T, B> getter, Codec<B, IN, OUT> codec) {
+        <B> _2<B> field(String name, Functions.F<T, B> getter, Codec<B, IN, OUT, CFG> codec) {
             fields.put(name, new FieldCodec<>(getter, codec));
             return new _2<B>();
         }
@@ -79,15 +82,15 @@ public class ObjectCodecBuilder<T, IN, OUT> {
         }
 
         class _2<B> {
-            public Codec<T, IN, OUT> map(Functions.F2<A, B, T> ctor) {
+            public Codec<T, IN, OUT, CFG> map(Functions.F2<A, B, T> ctor) {
                 return registration(
                         core.createObjectCodec(
-                                type,
+                                clazz,
                                 fields,
                                 arr -> ctor.apply((A)arr[0], (B)arr[1])));
             }
 
-            <C> _3<C> field(String name, Functions.F<T, C> getter, Codec<C, IN, OUT> codec) {
+            <C> _3<C> field(String name, Functions.F<T, C> getter, Codec<C, IN, OUT, CFG> codec) {
                 fields.put(name, new FieldCodec<>(getter, codec));
                 return new _3<C>();
             }
@@ -97,15 +100,15 @@ public class ObjectCodecBuilder<T, IN, OUT> {
             }
 
             class _3<C> {
-                public Codec<T, IN, OUT> map(Functions.F3<A, B, C, T> ctor) {
+                public Codec<T, IN, OUT, CFG> map(Functions.F3<A, B, C, T> ctor) {
                     return registration(
                             core.createObjectCodec(
-                                    type,
+                                    clazz,
                                     fields,
                                     arr -> ctor.apply((A)arr[0], (B)arr[1], (C)arr[2])));
                 }
 
-                <D> _4<D> field(String name, Functions.F<T, D> getter, Codec<D, IN, OUT> codec) {
+                <D> _4<D> field(String name, Functions.F<T, D> getter, Codec<D, IN, OUT, CFG> codec) {
                     fields.put(name, new FieldCodec<>(getter, codec));
                     return new _4<D>();
                 }
@@ -115,15 +118,15 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                 }
 
                 class _4<D> {
-                    public Codec<T, IN, OUT> map(Functions.F4<A, B, C, D, T> ctor) {
+                    public Codec<T, IN, OUT, CFG> map(Functions.F4<A, B, C, D, T> ctor) {
                         return registration(
                                 core.createObjectCodec(
-                                        type,
+                                        clazz,
                                         fields,
                                         arr -> ctor.apply((A)arr[0], (B)arr[1], (C)arr[2], (D)arr[3])));
                     }
 
-                    <N> _N field(String name, Functions.F<T, N> getter, Codec<N, IN, OUT> codec) {
+                    <N> _N field(String name, Functions.F<T, N> getter, Codec<N, IN, OUT, CFG> codec) {
                         fields.put(name, new FieldCodec<>(getter, codec));
                         return new _N();
                     }
@@ -133,11 +136,11 @@ public class ObjectCodecBuilder<T, IN, OUT> {
                     }
 
                     class _N {
-                        public Codec<T, IN, OUT> map(ArgArrayTypeCtor<T> ctor) {
-                            return registration(core.createObjectCodec(type, fields, ctor));
+                        public Codec<T, IN, OUT, CFG> map(ArgArrayTypeCtor<T> ctor) {
+                            return registration(core.createObjectCodec(clazz, fields, ctor));
                         }
 
-                        <N> _N field(String name, Functions.F<T, N> getter, Codec<N, IN, OUT> codec) {
+                        <N> _N field(String name, Functions.F<T, N> getter, Codec<N, IN, OUT, CFG> codec) {
                             fields.put(name, new FieldCodec<>(getter, codec));
                             return new _N();
                         }

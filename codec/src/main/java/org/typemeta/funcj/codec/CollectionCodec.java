@@ -8,27 +8,35 @@ import java.util.*;
  * @param <T>       the element type of the collection
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
+ * @param <CFG>     the config type
  */
-public abstract class CollectionCodec<T, IN, OUT> extends Codec.Base<Collection<T>, IN, OUT> {
+public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
+        implements Codec<Collection<T>, IN, OUT, CFG> {
 
-    protected final Codec<T, IN, OUT> elemCodec;
+    protected final Codec<T, IN, OUT, CFG> elemCodec;
 
-    protected CollectionCodec(CodecCoreInternal<IN, OUT> core, Codec<T, IN, OUT> elemCodec) {
-        super(core);
+    protected CollectionCodec(Codec<T, IN, OUT, CFG> elemCodec) {
         this.elemCodec = elemCodec;
     }
 
-    private Codec<Collection<T>, IN, OUT> getCodec(Class<Collection<T>> type) {
-        return  core().getCollCodec(type, elemCodec);
+    private Codec<Collection<T>, IN, OUT, CFG> getCodec(
+            CodecCoreEx<IN, OUT, CFG> core,
+            Class<Collection<T>> type) {
+        return core.getCollCodec(type, elemCodec);
     }
 
     @Override
-    public OUT encodeWithCheck(Collection<T> value, OUT out) {
-        if (core().encodeNull(value, out)) {
+    public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Collection<T> value, OUT out) {
+        if (core.format().encodeNull(value, out)) {
             return out;
         } else {
-            if (!core().encodeDynamicType(this, value, out, this::getCodec)) {
-                return encode(value, out);
+            if (!core.format().encodeDynamicType(
+                    core,
+                    this,
+                    value,
+                    out,
+                    type -> getCodec(core, type))) {
+                return encode(core, value, out);
             } else {
                 return out;
             }
@@ -36,18 +44,18 @@ public abstract class CollectionCodec<T, IN, OUT> extends Codec.Base<Collection<
     }
 
     @Override
-    public Collection<T> decodeWithCheck(IN in) {
-        if (core().decodeNull(in)) {
+    public Collection<T> decodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, IN in) {
+        if (core.format().decodeNull(in)) {
             return null;
         } else {
-            final Collection<T> val = core().decodeDynamicType(
+            final Collection<T> val = core.format().decodeDynamicType(
                     in,
-                    type -> getCodec(core().config().nameToClass(type)).decode(in)
+                    type -> getCodec(core, core.config().nameToClass(type)).decode(core, in)
             );
             if (val != null) {
                 return val;
             } else {
-                return decode(in);
+                return decode(core, in);
             }
         }
     }
@@ -100,13 +108,15 @@ public abstract class CollectionCodec<T, IN, OUT> extends Codec.Base<Collection<
         }
     }
 
-    protected CollProxy<T> getCollectionProxy(Class<Collection<T>> collType) {
-        final Optional<NoArgsTypeCtor<Collection<T>>> noaCtorOpt = core().getNoArgsCtorOpt(collType);
+    protected CollProxy<T> getCollectionProxy(
+            CodecCoreEx<IN, OUT, CFG> core,
+            Class<Collection<T>> collType) {
+        final Optional<NoArgsTypeCtor<Collection<T>>> noaCtorOpt = core.getNoArgsCtorOpt(collType);
         if (noaCtorOpt.isPresent()) {
             return new CollProxy1<T>(noaCtorOpt.get().construct());
         } else {
             final ArgArrayTypeCtor<Collection<T>> argArrCtor =
-                    core().getArgArrayCtorOpt(collType)
+                    core.getArgArrayCtorOpt(collType)
                             .orElseThrow(() -> new CodecException(
                                     "Could not find suitable constructor for " + collType));
 

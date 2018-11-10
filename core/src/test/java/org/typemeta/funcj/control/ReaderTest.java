@@ -18,12 +18,12 @@ import static org.typemeta.funcj.functions.Functions.F.konst;
 @RunWith(JUnitQuickcheck.class)
 public class ReaderTest {
 
-    private static final F<Integer, Integer> add = x -> x + 10;
-    private static final F<Integer, Integer> times = x -> x * 2;
+    private static final F<Integer, Integer> add10 = x -> x + 10;
+    private static final F<Integer, Integer> times2 = x -> x * 2;
 
     @Property
     public void flatMap(int i) {
-        final F<Integer, Integer> addTimes = add.flatMap(a -> times.flatMap(b -> konst(a + b)));
+        final F<Integer, Integer> addTimes = add10.flatMap(a -> times2.flatMap(b -> konst(a + b)));
         final int exp = i*2 + i+10;
         assertEquals("add combined with times", exp, addTimes.apply(i).intValue());
     }

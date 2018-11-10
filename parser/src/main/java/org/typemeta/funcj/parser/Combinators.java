@@ -123,7 +123,7 @@ public abstract class Combinators {
     /**
      * A parser that succeeds on any input symbol, and returns that symbol.
      * @param <I>       the input stream symbol type
-     * @param clazz     dummy p[aram for type inference of generic type {@code I}
+     * @param clazz     a dummy param for type inference of generic type {@code I}
      * @return          a parser that succeeds on any input symbol
      */
     public static <I> Parser<I, I> any(Class<I> clazz) {

@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.CodecCoreInternal;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.json.io.JsonIO;
 import org.typemeta.funcj.codec.json.io.JsonIO.Input;
 import org.typemeta.funcj.codec.json.io.JsonIO.Output;
@@ -11,7 +11,20 @@ import java.io.Writer;
 /**
  * Interface for classes which implement an encoding via JSON.
  */
-public interface JsonCodecCore extends CodecCoreInternal<Input, Output> {
+public class JsonCodecCore extends CodecCoreDelegate<Input, Output, Config> {
+
+    public JsonCodecCore(JsonCodecFormat format) {
+        super(new CodecCoreImpl<>(format));
+    }
+
+    public JsonCodecCore(Config config) {
+        this(new JsonCodecFormat(config));
+    }
+
+    public JsonCodecCore() {
+        this(new ConfigImpl());
+    }
+
     /**
      * Encode the supplied value into JSON and write the results to the {@link Writer} object.
      * The static type determines whether type information is written to recover the value's
@@ -21,8 +34,8 @@ public interface JsonCodecCore extends CodecCoreInternal<Input, Output> {
      * @param writer    the output stream to which the JSON is written
      * @param <T>       the static type of the value
      */
-    default <T> void encode(Class<? super T> type, T value, Writer writer) {
-        encode(type, value, JsonIO.outputOf(writer));
+    public <T> void encode(Class<? super T> type, T value, Writer writer) {
+        delegate.encode(type, value, JsonIO.outputOf(writer));
     }
 
     /**
@@ -33,7 +46,7 @@ public interface JsonCodecCore extends CodecCoreInternal<Input, Output> {
      * @param writer    the output stream to which the JSON is written
      * @param <T>       the static type of the value
      */
-    default <T> void encode(T value, Writer writer) {
+    public <T> void encode(T value, Writer writer) {
         encode(Object.class, value, writer);
     }
 
@@ -44,7 +57,7 @@ public interface JsonCodecCore extends CodecCoreInternal<Input, Output> {
      * @param <T>       the static type of the value
      * @return          the decoded value
      */
-    default <T> T decode(Class<T> type, Reader reader) {
-        return decode(type, JsonIO.inputOf(reader));
+    public <T> T decode(Class<T> type, Reader reader) {
+        return delegate.decode(type, JsonIO.inputOf(reader));
     }
 }

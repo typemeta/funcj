@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.codec.CodecCoreInternal;
+import org.typemeta.funcj.codec.CodecCoreEx;
 import org.typemeta.funcj.codec.MapCodecs.AbstractMapCodec;
 import org.typemeta.funcj.codec.MapCodecs.AbstractStringMapCodec;
 import org.typemeta.funcj.codec.xml.io.XmlIO;
@@ -12,33 +12,25 @@ import java.util.Map;
 
 public abstract class XmlMapCodecs {
 
-    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Input, Output> {
-        private final XmlCodecCoreImpl core;
+    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Input, Output, Config> {
 
         public MapCodec(
-                XmlCodecCoreImpl core,
                 Class<Map<K, V>> type,
-                Codec<K, Input, Output> keyCodec,
-                Codec<V, Input, Output> valueCodec) {
+                Codec<K, Input, Output, Config> keyCodec,
+                Codec<V, Input, Output, Config> valueCodec) {
             super(type, keyCodec, valueCodec);
-            this.core = core;
         }
 
         @Override
-        public CodecCoreInternal<Input, Output> core() {
-            return core;
-        }
-
-        @Override
-        public Output encode(Map<K, V> value, Output out) {
+        public Output encode(CodecCoreEx<Input, Output, Config> core, Map<K, V> value, Output out) {
 
             value.forEach((k, v) -> {
                 out.startElement(core.config().entryElemName());
                 out.startElement(core.config().keyElemName());
-                keyCodec.encodeWithCheck(k, out);
+                keyCodec.encodeWithCheck(core, k, out);
                 out.endElement();
                 out.startElement(core.config().valueElemName());
-                valueCodec.encodeWithCheck(v, out);
+                valueCodec.encodeWithCheck(core, v, out);
                 out.endElement();
                 out.endElement();
             });
@@ -47,7 +39,7 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Map<K, V> decode(Input in) {
+        public Map<K, V> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
             final Map<K, V> map = core.getNoArgsCtor(type).construct();
 
             while(in.hasNext()) {
@@ -57,10 +49,10 @@ public abstract class XmlMapCodecs {
 
                 in.startElement(core.config().entryElemName());
                 in.startElement(core.config().keyElemName());
-                final K key = keyCodec.decodeWithCheck(in);
+                final K key = keyCodec.decodeWithCheck(core, in);
                 in.endElement();
                 in.startElement(core.config().valueElemName());
-                final V val = valueCodec.decodeWithCheck(in);
+                final V val = valueCodec.decodeWithCheck(core, in);
                 in.endElement();
                 in.endElement();
                 map.put(key, val);
@@ -70,26 +62,18 @@ public abstract class XmlMapCodecs {
         }
     }
 
-    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, Input, Output> {
-        private final XmlCodecCoreImpl core;
+    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, Input, Output, Config> {
 
         public StringMapCodec(
-                XmlCodecCoreImpl core,
                 Class<Map<String, V>> type,
-                Codec<V, Input, Output> valueCodec) {
+                Codec<V, Input, Output, Config> valueCodec) {
             super(type, valueCodec);
-            this.core = core;
         }
 
         @Override
-        public CodecCoreInternal<Input, Output> core() {
-            return core;
-        }
-
-        @Override
-        public Output encode(Map<String, V> value, Output out) {
+        public Output encode(CodecCoreEx<Input, Output, Config> core, Map<String, V> value, Output out) {
             value.forEach((key, val) -> {
-                valueCodec.encodeWithCheck(val, out.startElement(key));
+                valueCodec.encodeWithCheck(core, val, out.startElement(key));
                 out.endElement();
             });
 
@@ -97,7 +81,7 @@ public abstract class XmlMapCodecs {
         }
 
         @Override
-        public Map<String, V> decode(Input in) {
+        public Map<String, V> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
             final Map<String, V> map = core.getNoArgsCtor(type).construct();
 
             while (in.hasNext()) {
@@ -106,7 +90,7 @@ public abstract class XmlMapCodecs {
                 }
 
                 final String key = in.startElement();
-                final V val = valueCodec.decodeWithCheck(in);
+                final V val = valueCodec.decodeWithCheck(core, in);
                 in.endElement();
                 map.put(key, val);
             }

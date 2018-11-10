@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 /**
  * {@code Reader} is an implementation of the Reader monad.
- * {@code Reader} is essentially an enriched {@link Functions.F}.
+ * It is essentially an enriched {@link Functions.F}.
  */
 public interface Reader<A, R> {
 

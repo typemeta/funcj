@@ -7,14 +7,15 @@ import org.typemeta.funcj.functions.Functions;
  * into a specific target type.
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
+ * @param <CFG>     the config type
  */
-public interface CodecCore<IN, OUT> {
+public interface CodecCore<IN, OUT, CFG extends CodecConfig> {
 
     /**
      * Return the config object associated with this {@code CodecCore}.
      * @return          the config object associated with this {@code CodecCore}
      */
-    CodecConfig config();
+    CFG config();
 
     /**
      * Register a {@code Codec} for a class.
@@ -22,7 +23,7 @@ public interface CodecCore<IN, OUT> {
      * @param codec     the codec
      * @param <T>       the codec value type
      */
-    <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT> codec);
+    <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT, CFG> codec);
 
     /**
      * Create a {@code ObjectCodecBuilder} for the specified class.
@@ -33,7 +34,7 @@ public interface CodecCore<IN, OUT> {
      * @param <T>       the codec value type
      * @return          an {@code ObjectCodecBuilder}
      */
-    <T> ObjectCodecBuilder<T, IN, OUT> registerCodec(Class<T> clazz);
+    <T> ObjectCodecBuilder<T, IN, OUT, CFG> registerCodec(Class<T> clazz);
 
     /**
      * Create and register a {@link Codecs.StringProxyCodec} for a class.
@@ -68,30 +69,21 @@ public interface CodecCore<IN, OUT> {
             ArgArrayTypeCtor<T> typeCtor);
 
     /**
-     * Register a {@link ArgArrayTypeCtor} for the specified class.
-     * @param className the name of class to register the {@code ArgArrayTypeCtor} against
-     * @param typeCtor  the {@code ArgArrayTypeCtor}
-     * @param <T>       the type constructed by the {@code ArgArrayTypeCtor}
-     */
-    <T> void registerArgArrayCtor(
-            String className,
-            ArgArrayTypeCtor<T> typeCtor);
-    /**
      * Encode a value of type {@code T} into encoded form {@code E}.
-     * @param type      the class of the decoded value
+     * @param clazz     the class of the decoded value
      * @param val       the value to encode
      * @param out       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
      * @return          the encoded value
      */
-    <T> OUT encode(Class<? super T> type, T val, OUT out);
+    <T> OUT encode(Class<? super T> clazz, T val, OUT out);
 
     /**
      * Decode a value of type {@code T} from encoded value of type {@code E}.
-     * @param type      the type of the decoded value
+     * @param clazz     the type of the decoded value
      * @param in        the value to decode
      * @param <T>       the decoded value type
      * @return          the decoded value
      */
-    <T> T decode(Class<? super T> type, IN in);
+    <T> T decode(Class<? super T> clazz, IN in);
 }

@@ -9,15 +9,23 @@ import org.typemeta.funcj.functions.Functions.F;
 @SuppressWarnings("unchecked")
 public abstract class Exceptions {
 
+    /**
+     * Rethrow a checked exception, hiding it at the type level using a Java quirk.
+     * @param ex        the exception
+     * @param <X>       the exception type
+     * @param <T>       the return type
+     * @return          never returns
+     * @throws X        the hidden checked exception
+     */
     private static <X extends Exception, T> T throwUnchecked(Exception ex) throws X {
         throw (X) ex;
     }
 
     /**
      * Wrap a function which throws a checked exception
-     * into one that that throws a hidden {@code WrappedException}.
+     * into one that that throws a hidden checked exception.
      * The original exception can be rethrown by an enclosing call to {@link #unwrap(SideEffectGenEx.F0)}.
-     * @param thrower   function that may throw
+     * @param thrower   the function that may throw
      */
     public static void wrap(SideEffectEx.F0 thrower) {
         try {
@@ -39,7 +47,7 @@ public abstract class Exceptions {
 
     /**
      * Wrap a function which throws a checked exception
-     * into one that that throws a hidden {@code WrappedException}.
+     * into one that that throws a hidden checked exception.
      * The original exception can be rethrown by an enclosing call to {@link #unwrap(Functions.F0)}.
      * @param thrower   function that may throw
      * @param <R>       return type of function
@@ -55,7 +63,7 @@ public abstract class Exceptions {
 
     /**
      * Wrap a function which throws a checked exception
-     * into one that that throws a hidden {@code WrappedException}.
+     * into one that that throws a hidden checked exception.
      * The original exception can be rethrown by an enclosing call to {@link #unwrap(Functions.F0)}.
      * @param thrower   function that may throw
      * @param <T>       input type of the function
@@ -74,7 +82,7 @@ public abstract class Exceptions {
 
     /**
      * Wrap a function which throws a checked exception
-     * into one that that throws a hidden {@code WrappedException}.
+     * into one that that throws a hidden checked exception.
      * The original exception can be rethrown by an enclosing call to {@link #unwrap(Functions.F0)}.
      * @param thrower   function that may throw
      * @param <A>       the type of the first argument of the function
@@ -120,7 +128,7 @@ public abstract class Exceptions {
     public static <R, X extends Exception> R unwrap(Functions.F0<R> thrower) throws X {
         try {
             return thrower.apply();
-        } catch  (Exception ex) {
+        } catch (Exception ex) {
             throw (X)ex;
         }
     }

@@ -11,7 +11,7 @@ public abstract class TestBase {
 
     protected abstract <T> void roundTrip(T val, Class<T> clazz) throws Exception;
 
-    protected static <IN, OUT, CC extends CodecCore<IN, OUT>> CC prepareCodecCore(CC core) {
+    protected static <IN, OUT, CFG extends CodecConfig, CC extends CodecCore<IN, OUT, CFG>> CC prepareCodecCore(CC core) {
         core.registerCodec(TestTypes.Custom.class)
                 .field("colour", c -> c.colour, TestTypes.Custom.Colour.class)
                 .field("date", c -> c.date, LocalDate.class)

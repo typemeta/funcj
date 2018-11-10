@@ -8,44 +8,32 @@ package org.typemeta.funcj.codec;
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
  */
-public interface Codec<T, IN, OUT> {
-
-    abstract class Base<T, IN, OUT> implements Codec<T, IN, OUT> {
-        protected final CodecCoreInternal<IN, OUT> core;
-
-        protected Base(CodecCoreInternal<IN, OUT> core) {
-            this.core = core;
-        }
-
-        @Override
-        public CodecCoreInternal<IN, OUT> core() {
-            return core;
-        }
-    }
+public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
 
     /**
      * A sub-interface for codecs for classes which are final.
      * @param <T>       the raw type to be encoded/decoded
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
+     * @param <CFG>     the config type
      */
-    interface FinalCodec<T, IN, OUT> extends Codec<T, IN, OUT> {
+    interface FinalCodec<T, IN, OUT, CFG extends CodecConfig> extends Codec<T, IN, OUT, CFG> {
 
         @Override
-        default OUT encodeWithCheck(T value, OUT out) {
-            if (core().encodeNull(value, out)) {
+        default OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
+            if (core.format().encodeNull(value, out)) {
                 return out;
             } else {
-                return encode(value, out);
+                return encode(core, value, out);
             }
         }
 
         @Override
-        default T decodeWithCheck(IN in) {
-            if (core().decodeNull(in)) {
+        default T decodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, IN in) {
+            if (core.format().decodeNull(in)) {
                 return null;
             } else {
-                return decode(in);
+                return decode(core, in);
             }
         }
     }
@@ -55,7 +43,7 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface BooleanCodec<IN, OUT> extends FinalCodec<Boolean, IN, OUT> {
+    interface BooleanCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Boolean, IN, OUT, CFG> {
 
         @Override
         default Class<Boolean> type() {
@@ -63,12 +51,12 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Boolean value, OUT out) {
+        default OUT encode(CodecCoreEx<IN, OUT, CFG> core, Boolean value, OUT out) {
             return encodePrim(value, out);
         }
 
         @Override
-        default Boolean decode(IN in) {
+        default Boolean decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
             return decodePrim(in);
         }
 
@@ -82,7 +70,7 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface ByteCodec<IN, OUT> extends FinalCodec<Byte, IN, OUT> {
+    interface ByteCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Byte, IN, OUT, CFG> {
 
         @Override
         default Class<Byte> type() {
@@ -90,12 +78,12 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Byte value, OUT out) {
+        default OUT encode(CodecCoreEx<IN, OUT, CFG> core, Byte value, OUT out) {
             return encodePrim(value, out);
         }
 
         @Override
-        default Byte decode(IN in) {
+        default Byte decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
             return decodePrim(in);
         }
 
@@ -109,7 +97,7 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface CharCodec<IN, OUT> extends FinalCodec<Character, IN, OUT> {
+    interface CharCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Character, IN, OUT, CFG> {
 
         @Override
         default Class<Character> type() {
@@ -117,12 +105,12 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Character value, OUT out) {
+        default OUT encode(CodecCoreEx<IN, OUT, CFG> core, Character value, OUT out) {
             return encodePrim(value, out);
         }
 
         @Override
-        default Character decode(IN in) {
+        default Character decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
             return decodePrim(in);
         }
 
@@ -136,7 +124,7 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface ShortCodec<IN, OUT> extends FinalCodec<Short, IN, OUT> {
+    interface ShortCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Short, IN, OUT, CFG> {
 
         @Override
         default Class<Short> type() {
@@ -144,12 +132,12 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Short value, OUT out) {
+        default OUT encode(CodecCoreEx<IN, OUT, CFG> core, Short value, OUT out) {
             return encodePrim(value, out);
         }
 
         @Override
-        default Short decode(IN in) {
+        default Short decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
             return decodePrim(in);
         }
 
@@ -163,7 +151,7 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface IntCodec<IN, OUT> extends FinalCodec<Integer, IN, OUT> {
+    interface IntCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Integer, IN, OUT, CFG> {
 
         @Override
         default Class<Integer> type() {
@@ -171,12 +159,12 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Integer value, OUT out) {
+        default OUT encode(CodecCoreEx<IN, OUT, CFG> core, Integer value, OUT out) {
             return encodePrim(value, out);
         }
 
         @Override
-        default Integer decode(IN in) {
+        default Integer decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
             return decodePrim(in);
         }
 
@@ -190,7 +178,7 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface LongCodec<IN, OUT> extends FinalCodec<Long, IN, OUT> {
+    interface LongCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Long, IN, OUT, CFG> {
 
         @Override
         default Class<Long> type() {
@@ -198,12 +186,12 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Long value, OUT out) {
+        default OUT encode(CodecCoreEx<IN, OUT, CFG> core, Long value, OUT out) {
             return encodePrim(value, out);
         }
 
         @Override
-        default Long decode(IN in) {
+        default Long decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
             return decodePrim(in);
         }
 
@@ -217,7 +205,7 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface FloatCodec<IN, OUT> extends FinalCodec<Float, IN, OUT> {
+    interface FloatCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Float, IN, OUT, CFG> {
 
         @Override
         default Class<Float> type() {
@@ -225,12 +213,12 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Float value, OUT out) {
+        default OUT encode(CodecCoreEx<IN, OUT, CFG> core, Float value, OUT out) {
             return encodePrim(value, out);
         }
 
         @Override
-        default Float decode(IN in) {
+        default Float decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
             return decodePrim(in);
         }
 
@@ -244,7 +232,7 @@ public interface Codec<T, IN, OUT> {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface DoubleCodec<IN, OUT> extends FinalCodec<Double, IN, OUT> {
+    interface DoubleCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Double, IN, OUT, CFG> {
 
         @Override
         default Class<Double> type() {
@@ -252,12 +240,12 @@ public interface Codec<T, IN, OUT> {
         }
 
         @Override
-        default OUT encode(Double value, OUT out) {
+        default OUT encode(CodecCoreEx<IN, OUT, CFG> core, Double value, OUT out) {
             return encodePrim(value, out);
         }
 
         @Override
-        default Double decode(IN in) {
+        default Double decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
             return decodePrim(in);
         }
 
@@ -266,38 +254,41 @@ public interface Codec<T, IN, OUT> {
         double decodePrim(IN in);
     }
 
-    CodecCoreInternal<IN, OUT> core();
-
     Class<T> type();
 
     /**
      * Encode a value of type {@code T} into an encoded value of type {@code OUT}.
+     *
+     * @param core      the codec core
      * @param value     the unencoded value
      * @param out       the encoded output stream
      * @return          the encoded output stream
      */
-    OUT encode(T value, OUT out);
+    OUT encode(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out);
 
     /**
      * Decode an encoded value of type {@code IN} back into a value of type {@code T}.
+     *
+     * @param core      the codec core
      * @param in        the encoded input stream
      * @return          the decoded value
      */
-    T decode(IN in);
+    T decode(CodecCoreEx<IN, OUT, CFG> core, IN in);
 
     /**
      * Encode a value of type {@code T} into an encoded value of type {@code OUT},
      * where the value maybe either null or of a different (sub-) type.
+     * @param core      the codec core
      * @param value     the unencoded value
      * @param out       the encoded output stream
      * @return          the encoded output stream
      */
-    default OUT encodeWithCheck(T value, OUT out) {
-        if (core().encodeNull(value, out)) {
+    default OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
+        if (core.format().encodeNull(value, out)) {
             return out;
         } else {
-            if (!core().encodeDynamicType(this, value, out)) {
-                return encode(value, out);
+            if (!core.encodeDynamicType(this, value, out)) {
+                return encode(core, value, out);
             } else {
                 return out;
             }
@@ -306,19 +297,20 @@ public interface Codec<T, IN, OUT> {
 
     /**
      * Decode an encoded value of type {@code IN} back into a value of type {@code T},
-     * where the unencoded value maybe either null or of a different (sub-) type..
+     * where the unencoded value maybe either null or of a different (sub-) type.
+     * @param core      the codec core
      * @param in        the encoded input stream
      * @return          the decoded value
      */
-    default T decodeWithCheck(IN in) {
-        if (core().decodeNull(in)) {
+    default T decodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, IN in) {
+        if (core.format().decodeNull(in)) {
             return null;
         } else {
-            final T value = core().decodeDynamicType(in);
+            final T value = core.decodeDynamicType(in);
             if (value != null) {
                 return value;
             } else {
-                return decode(in);
+                return decode(core, in);
             }
         }
     }

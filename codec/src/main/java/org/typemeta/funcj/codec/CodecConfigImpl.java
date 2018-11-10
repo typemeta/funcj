@@ -8,9 +8,9 @@ import java.util.*;
  */
 public abstract class CodecConfigImpl implements CodecConfig {
 
-    protected final Set<String> allowedPackages = new HashSet<>();
+    protected final Set<Package> allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));
 
-    protected final Set<String> allowedClasses = new HashSet<>();
+    protected final Set<Class<?>> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
 
     /**
      * A map that associates a class with its proxy.
@@ -21,14 +21,14 @@ public abstract class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
-    public void registerAllowedPackage(String pkgName) {
-        allowedPackages.add(pkgName);
+    public void registerAllowedPackage(Package pkg) {
+        allowedPackages.add(pkg);
     }
 
 
     @Override
-    public void registerAllowedClass(String className) {
-        allowedClasses.add(className);
+    public void registerAllowedClass(Class<?> clazz) {
+        allowedClasses.add(clazz);
     }
 
     @Override
@@ -43,13 +43,13 @@ public abstract class CodecConfigImpl implements CodecConfig {
             return clazz;
         }
 
-        if (allowedPackages.contains(cls.getPackage().getName())) {
+        if (allowedPackages.contains(cls.getPackage())) {
             return clazz;
         } else {
-            if (allowedClasses.contains(cls.getName())) {
+            if (allowedClasses.contains(cls)) {
                 return clazz;
             } else {
-                throw new RuntimeException("Class '" + cls + "' is not allowed");
+                throw new RuntimeException(cls + "' is not allowed");
             }
         }
     }
@@ -80,7 +80,7 @@ public abstract class CodecConfigImpl implements CodecConfig {
         try {
             return (Class<T>) Class.forName(name);
         } catch (ClassNotFoundException ex) {
-            throw new CodecException("Cannot create class from class name '" + name + "'", ex);
+            throw new CodecException("Cannot create class from name '" + name + "'", ex);
         }
     }
 

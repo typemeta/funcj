@@ -1,11 +1,10 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.bytes.*;
-import org.typemeta.funcj.codec.json.JsonCodecCoreImpl;
-import org.typemeta.funcj.codec.json.JsonCodecs;
+import org.typemeta.funcj.codec.json.*;
 import org.typemeta.funcj.codec.xml.*;
+import org.typemeta.funcj.codec.utils.ClassUtils;
 import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.util.Exceptions;
 
 import java.time.*;
 import java.util.Collections;
@@ -19,8 +18,8 @@ public abstract class Codecs {
      * Construct and return a new instance of a {@link org.typemeta.funcj.codec.json.JsonCodecCore}.
      * @return the new {@code JsonCodecCore}
      */
-    public static org.typemeta.funcj.codec.json.JsonCodecCore jsonCodec() {
-        return JsonCodecs.registerAll(new JsonCodecCoreImpl());
+    public static JsonCodecCore jsonCodec() {
+        return JsonCodecs.registerAll(new JsonCodecCore());
     }
 
     /**
@@ -28,8 +27,7 @@ public abstract class Codecs {
      * @return the new {@code XmlCodecCore}
      */
     public static XmlCodecCore xmlCodec() {
-        final XmlCodecCoreImpl codec = new XmlCodecCoreImpl();
-        return XmlCodecs.registerAll(codec);
+        return XmlCodecs.registerAll(new XmlCodecCore());
     }
 
     /**
@@ -37,22 +35,21 @@ public abstract class Codecs {
      * @return the new {@code ByteCodecCore}
      */
     public static ByteCodecCore byteCodec() {
-        final ByteCodecCoreImpl codec = new ByteCodecCoreImpl();
-        return ByteCodecs.registerAll(codec);
+        return ByteCodecs.registerAll(new ByteCodecCore());
     }
 
-    public static <IN, OUT, C extends CodecCoreInternal<IN, OUT>> C registerAll(C core) {
+    public static <IN, OUT, CFG extends CodecConfig, CC extends CodecCore<IN, OUT, CFG>> CC registerAll(CC core) {
 
         core.config().registerAllowedPackage(java.lang.String.class.getPackage());
         core.config().registerAllowedPackage(java.util.Collection.class.getPackage());
         core.config().registerAllowedPackage(java.time.LocalDate.class.getPackage());
 
         core.registerArgArrayCtor(
-                "java.util.Collections$SingletonList",
+                ClassUtils.forName("java.util.Collections$SingletonList"),
                 args -> Collections.singletonList(args[0]));
 
         core.registerArgArrayCtor(
-                "java.util.Collections$SingletonSet",
+                ClassUtils.forName("java.util.Collections$SingletonSet"),
                 args -> Collections.singleton(args[0]));
 
         core.registerStringProxyCodec(
@@ -61,7 +58,7 @@ public abstract class Codecs {
                 core.config()::nameToClass
         );
 
-        Exceptions.wrap(() -> core.config().registerTypeProxy(Class.forName("java.time.ZoneRegion"), ZoneId.class));
+        core.config().registerTypeProxy(ClassUtils.forName("java.time.ZoneRegion"), ZoneId.class);
 
         core.registerCodec(LocalDate.class)
                 .field("year", LocalDate::getYear, Integer.class)
@@ -109,44 +106,22 @@ public abstract class Codecs {
     }
 
     /**
-     * Base class for {@code Codec}s.
-     * @param <T>       the raw type to be encoded/decoded
-     * @param <IN>      the encoded input type
-     * @param <OUT>     the encoded output type
-     */
-    public static abstract class CodecBase<T, IN, OUT> implements Codec<T, IN, OUT> {
-
-        protected final CodecCoreInternal<IN, OUT> core;
-
-        protected CodecBase(CodecCoreInternal<IN, OUT> core) {
-            this.core = core;
-        }
-
-        @Override
-        public CodecCoreInternal<IN, OUT> core() {
-            return core;
-        }
-    }
-
-    /**
      * Utility class for creating a {@code Codec} that encodes a type
      * as a {@code String}.
      * @param <T> the raw type to be encoded/decoded
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    public static class StringProxyCodec<T, IN, OUT> extends CodecBase<T, IN, OUT> {
+    public static class StringProxyCodec<T, IN, OUT, CFG extends CodecConfig> implements Codec<T, IN, OUT, CFG> {
 
         protected final Class<T> type;
         protected final F<T, String> encode;
         protected final F<String, T> decode;
 
         public StringProxyCodec(
-                CodecCoreInternal<IN, OUT> core,
                 Class<T> type,
                 F<T, String> encode,
                 F<String, T> decode) {
-            super(core);
             this.type = type;
             this.encode = encode;
             this.decode = decode;
@@ -158,13 +133,13 @@ public abstract class Codecs {
         }
 
         @Override
-        public OUT encode(T value, OUT out) {
-            return core.stringCodec().encode(encode.apply(value), out);
+        public OUT encode(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
+            return core.format().stringCodec().encode(core, encode.apply(value), out);
         }
 
         @Override
-        public T decode(IN in) {
-            return decode.apply(core.stringCodec().decode(in));
+        public T decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
+            return decode.apply(core.format().stringCodec().decode(core, in));
         }
     }
 }

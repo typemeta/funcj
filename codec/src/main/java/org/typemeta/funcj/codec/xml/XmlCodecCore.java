@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.typemeta.funcj.codec.CodecCoreInternal;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.xml.io.XmlIO;
 import org.typemeta.funcj.codec.xml.io.XmlIO.Input;
 import org.typemeta.funcj.codec.xml.io.XmlIO.Output;
@@ -11,7 +11,19 @@ import java.io.Writer;
 /**
  * Interface for classes which implement an encoding via XML.
  */
-public interface XmlCodecCore extends CodecCoreInternal<Input, Output> {
+public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
+    public XmlCodecCore(XmlCodecFormat format) {
+        super(new CodecCoreImpl<>(format));
+    }
+
+    public XmlCodecCore(Config config) {
+        this(new XmlCodecFormat(config));
+    }
+
+    public XmlCodecCore() {
+        this(new ConfigImpl());
+    }
+
     /**
      * Encode the supplied value into XML and write the results to the {@link Writer} object.
      * The static type determines whether type information is written to recover the value's
@@ -23,7 +35,7 @@ public interface XmlCodecCore extends CodecCoreInternal<Input, Output> {
      * @param <T>       the static type of the value
      * @return          the output stream
      */
-    default <T> Output encode(Class<? super T> type, T value, Writer writer, String rootElemName) {
+    public <T> Output encode(Class<? super T> type, T value, Writer writer, String rootElemName) {
         final Output out = encode(type, value, XmlIO.outputOf(writer, rootElemName));
         return out.close();
     }
@@ -36,7 +48,7 @@ public interface XmlCodecCore extends CodecCoreInternal<Input, Output> {
      * @param <T>       the static type of the value
      * @return          the output stream
      */
-    default <T> Output encode(T value, Writer writer, String rootElemName) {
+    public <T> Output encode(T value, Writer writer, String rootElemName) {
         return encode(Object.class, value, writer, rootElemName);
     }
 
@@ -48,7 +60,7 @@ public interface XmlCodecCore extends CodecCoreInternal<Input, Output> {
      * @param <T>       the static type of the value
      * @return          the decoded value
      */
-    default <T> T decode(Class<? super T> type, Reader reader, String rootElemName) {
+    public <T> T decode(Class<? super T> type, Reader reader, String rootElemName) {
         return decode(type, XmlIO.inputOf(reader, rootElemName));
     }
 
@@ -59,7 +71,7 @@ public interface XmlCodecCore extends CodecCoreInternal<Input, Output> {
      * @param <T>       the static type of the value
      * @return          the decoded value
      */
-    default <T> T decode(Reader reader, String rootElemName) {
+    public <T> T decode(Reader reader, String rootElemName) {
         return decode(Object.class, reader, rootElemName);
     }
 }

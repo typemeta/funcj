@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.bytes;
 
-import org.typemeta.funcj.codec.CodecCoreInternal;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.io.ByteIO;
 import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
 import org.typemeta.funcj.codec.bytes.io.ByteIO.Output;
@@ -11,7 +11,20 @@ import java.io.OutputStream;
 /**
  * Interface for classes which implement an encoding via byte streams.
  */
-public interface ByteCodecCore extends CodecCoreInternal<Input, Output> {
+public class ByteCodecCore extends CodecCoreDelegate<Input, Output, Config> {
+    
+    public ByteCodecCore(ByteCodecFormat format) {
+        super(new CodecCoreImpl<>(format));
+    }
+
+    public ByteCodecCore(Config config) {
+        this(new ByteCodecFormat(config));
+    }
+
+    public ByteCodecCore() {
+        this(new ConfigImpl());
+    }
+
     /**
      * Encode the supplied value into byte data and write the results to the {@link OutputStream} object.
      * The static type determines whether type information is written to recover the value's
@@ -21,7 +34,7 @@ public interface ByteCodecCore extends CodecCoreInternal<Input, Output> {
      * @param os        the output stream to which the byte data is written
      * @param <T>       the static type of the value
      */
-    default <T> void encode(Class<? super T> type, T value, OutputStream os) {
+    public <T> void encode(Class<? super T> type, T value, OutputStream os) {
         encode(type, value, ByteIO.outputOf(os));
     }
     /**
@@ -30,7 +43,7 @@ public interface ByteCodecCore extends CodecCoreInternal<Input, Output> {
      * @param os        the output stream to which the byte data is written
      * @param <T>       the static type of the value
      */
-    default <T> void encode(T value, OutputStream os) {
+    public <T> void encode(T value, OutputStream os) {
         encode(Object.class, value, os);
     }
 
@@ -41,7 +54,7 @@ public interface ByteCodecCore extends CodecCoreInternal<Input, Output> {
      * @param <T>       the static type of the value
      * @return          the decoded value
      */
-    default <T> T decode(Class<T> type, InputStream is) {
+    public <T> T decode(Class<T> type, InputStream is) {
         return decode(type, ByteIO.inputOf(is));
     }
 
@@ -51,7 +64,7 @@ public interface ByteCodecCore extends CodecCoreInternal<Input, Output> {
      * @param <T>       the static type of the value
      * @return          the decoded value
      */
-    default <T> T decode(InputStream is) {
+    public <T> T decode(InputStream is) {
         return decode(Object.class, ByteIO.inputOf(is));
     }
 }

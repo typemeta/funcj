@@ -6,7 +6,7 @@ import org.typemeta.funcj.codec.CodecConfig;
  * Interface for classes which provide configuration information
  * for {@link XmlCodecCore} implementations.
  */
-public interface XmlCodecConfig extends CodecConfig {
+public interface Config extends CodecConfig {
     String entryElemName();
 
     String typeAttrName();

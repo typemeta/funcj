@@ -12,15 +12,10 @@ import java.util.Objects;
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
  */
-public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
+public class CodecRef<T, IN, OUT, CFG extends CodecConfig> implements Codec<T, IN, OUT, CFG> {
 
-    private enum Uninitialised implements Codec<Object, Object, Object> {
+    private enum Uninitialised implements Codec<Object, Object, Object, CodecConfig> {
         INSTANCE;
-
-        @Override
-        public CodecCoreInternal<Object, Object> core() {
-            throw error();
-        }
 
         @Override
         public Class<Object> type() {
@@ -28,12 +23,12 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
         }
 
         @Override
-        public Object encode(Object value, Object in) {
+        public Object encode(CodecCoreEx<Object, Object, CodecConfig> core, Object value, Object in) {
             throw error();
         }
 
         @Override
-        public Object decode(Object in) {
+        public Object decode(CodecCoreEx<Object, Object, CodecConfig> core, Object in) {
             throw error();
         }
 
@@ -42,14 +37,14 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
         }
 
         @SuppressWarnings("unchecked")
-        static <T, IN, OUT> Codec<T, IN, OUT> of() {
-            return (Codec<T, IN, OUT>) INSTANCE;
+        static <T, IN, OUT, CFG extends CodecConfig> Codec<T, IN, OUT, CFG> of() {
+            return (Codec<T, IN, OUT, CFG>) INSTANCE;
         }
     }
 
-    private Codec<T, IN, OUT> impl;
+    private Codec<T, IN, OUT, CFG> impl;
 
-    CodecRef(Codec<T, IN, OUT> impl) {
+    CodecRef(Codec<T, IN, OUT, CFG> impl) {
         this.impl = Objects.requireNonNull(impl);
     }
 
@@ -62,7 +57,7 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
      * @param impl      the codec
      * @return          this codec
      */
-    public Codec<T, IN, OUT> set(Codec<T, IN, OUT> impl) {
+    public Codec<T, IN, OUT, CFG> set(Codec<T, IN, OUT, CFG> impl) {
         if (this.impl != Uninitialised.INSTANCE) {
             throw new IllegalStateException("CodecRef is already initialised");
         } else {
@@ -71,21 +66,17 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
         }
     }
 
-    public synchronized Codec<T, IN, OUT> setIfUninitialised(Functions.F0<Codec<T, IN, OUT>> implSupp) {
+    public synchronized Codec<T, IN, OUT, CFG> setIfUninitialised(Functions.F0<Codec<T, IN, OUT, CFG>> implSupp) {
         if (this.impl == Uninitialised.INSTANCE) {
             this.impl = Objects.requireNonNull(implSupp.apply());
         }
         return impl;
     }
 
-    public Codec<T, IN, OUT> get() {
+    public Codec<T, IN, OUT, CFG> get() {
         return impl;
     }
 
-    @Override
-    public CodecCoreInternal<IN, OUT> core() {
-        return impl.core();
-    }
 
     @Override
     public Class<T> type() {
@@ -93,12 +84,12 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
     }
 
     @Override
-    public OUT encode(T value, OUT out) {
-        return impl.encode(value, out);
+    public OUT encode(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
+        return impl.encode(core, value, out);
     }
 
     @Override
-    public T decode(IN in) {
-        return impl.decode(in);
+    public T decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
+        return impl.decode(core, in);
     }
 }

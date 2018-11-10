@@ -13,29 +13,13 @@ public interface CodecConfig {
      * Add this package to the list of allowed packages.
      * @param pkg       the package
      */
-    default void registerAllowedPackage(Package pkg) {
-        registerAllowedPackage(pkg.getName());
-    }
-
-    /**
-     * Add this package to the list of allowed packages.
-     * @param pkgName   the name of the  package
-     */
-    void registerAllowedPackage(String pkgName);
+    void registerAllowedPackage(Package pkg);
 
     /**
      * Add this class to the list of allowed classes.
      * @param clazz     the class
      */
-    default void registerAllowedClass(Class<?> clazz) {
-        registerAllowedPackage(clazz.getName());
-    }
-
-    /**
-     * Add this class to the list of allowed classes.
-     * @param className the name of the class
-     */
-    void registerAllowedClass(String className);
+    void registerAllowedClass(Class<?> clazz);
 
     /**
      * Check this class is allowed.
