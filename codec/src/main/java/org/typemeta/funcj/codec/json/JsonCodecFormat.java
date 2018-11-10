@@ -12,6 +12,9 @@ import static org.typemeta.funcj.codec.json.io.JsonIO.Input;
 import static org.typemeta.funcj.codec.json.io.JsonIO.Output;
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 
+/**
+ * Encoding via JSON streams.
+ */
 @SuppressWarnings("unchecked")
 public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
 

@@ -12,6 +12,9 @@ import java.util.*;
 
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 
+/**
+ * Encoding via XML streams.
+ */
 @SuppressWarnings("unchecked")
 public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
 

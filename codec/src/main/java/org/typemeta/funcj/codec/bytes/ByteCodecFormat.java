@@ -12,6 +12,9 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * Encoding via byte streams.
+ */
 @SuppressWarnings("unchecked")
 public class ByteCodecFormat implements CodecFormat<Input, Output, Config> {
 
