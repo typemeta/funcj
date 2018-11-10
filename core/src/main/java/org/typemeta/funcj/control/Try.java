@@ -244,8 +244,8 @@ public interface Try<T> {
     }
 
     /**
-     * Indicates if this is a {code Success} value.
-     * @return          true if this value is a {code Success} value
+     * Indicates if this is a {@code Success} value.
+     * @return          true if this value is a {@code Success} value
      */
     boolean isSuccess();
 

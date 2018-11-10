@@ -10,7 +10,7 @@ import java.util.stream.StreamSupport;
 /**
  * Simple recursive, immutable linked list.
  * <p>
- * Each {code IList} is either {@link Empty} or it is {@link NonEmpty},
+ * Each {@code IList} is either {@link Empty} or it is {@link NonEmpty},
  * in which case it has a head element value and a tail.
  * The tail is itself an {@code IList}.
  * Null elements are not allowed.
@@ -302,7 +302,7 @@ public abstract class IList<T> implements Iterable<T> {
     public abstract IList<T> reverse();
 
     /**
-     * Apply the function {code f} to each element in this list,
+     * Apply the function {@code f} to each element in this list,
      * and store the results in a new list.
      * @param f         the function to be applied to each element
      * @param <U>       the function return type

@@ -7,7 +7,7 @@ import java.io.Reader;
 import java.util.Objects;
 
 /**
- * {code Input} represents a position in a stream of input symbols,
+ * {@code Input} represents a position in a stream of input symbols,
  * that {@link Parser}s operate on.
  * @param <I>       the input stream symbol type
  */
@@ -22,7 +22,7 @@ public interface Input<I> {
     }
 
     /**
-     * Construct an {@code Input} from a {link java.lang.String}.
+     * Construct an {@code Input} from a {@link java.lang.String}.
      * @param s         the input data
      * @return          the input stream
      */
@@ -31,7 +31,7 @@ public interface Input<I> {
     }
 
     /**
-     * Construct an {@code Input} from a {link java.io.Reader}.
+     * Construct an {@code Input} from a {@link java.io.Reader}.
      * @param rdr       the input data
      * @return          the input stream
      */

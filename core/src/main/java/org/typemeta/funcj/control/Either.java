@@ -238,8 +238,14 @@ public interface Either<E, S> {
     }
 
     /**
-     * Indicates if this is a {code Right} value.
-     * @return          true if this value is a {code Right} value
+     * Indicates if this is a {@code Left} value.
+     * @return          true if this value is a {@code Left} value
+     */
+    boolean isLeft();
+
+    /**
+     * Indicates if this is a {@code Right} value.
+     * @return          true if this value is a {@code Right} value
      */
     boolean isRight();
 
@@ -369,6 +375,11 @@ public interface Either<E, S> {
         }
 
         @Override
+        public boolean isLeft() {
+            return true;
+        }
+
+        @Override
         public boolean isRight() {
             return false;
         }
@@ -458,6 +469,11 @@ public interface Either<E, S> {
         @Override
         public int hashCode() {
             return Objects.hash(value);
+        }
+
+        @Override
+        public boolean isLeft() {
+            return false;
         }
 
         @Override

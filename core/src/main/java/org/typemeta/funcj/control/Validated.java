@@ -219,7 +219,7 @@ public interface Validated<E, T> {
 
     /**
      * Indicates if this is a {@code Success} value.
-     * @return          the true if this value is a {code Success} value
+     * @return          the true if this value is a {@code Success} value
      */
     boolean isSuccess();
 

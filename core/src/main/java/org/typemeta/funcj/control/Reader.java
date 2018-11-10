@@ -200,7 +200,7 @@ public interface Reader<A, R> {
     /**
      * Applicative {@code Reader} composition.
      * @param rf        the {@code Reader} to compose with
-     * @param <B>       the return type of the function returned by {code f}
+     * @param <B>       the return type of the function returned by {@code f}
      * @return          the composed function
      */
     default <B> Reader<A, B> app(Reader<A, F<R, B>> rf) {
@@ -210,7 +210,7 @@ public interface Reader<A, R> {
     /**
      * Monadic function composition.
      * @param f         the function to compose with
-     * @param <B>       the return type of the function returned by {code f}
+     * @param <B>       the return type of the function returned by {@code f}
      * @return          the composed function
      */
     default <B> Reader<A, B> flatMap(F<R, Reader<A, B>> f) {

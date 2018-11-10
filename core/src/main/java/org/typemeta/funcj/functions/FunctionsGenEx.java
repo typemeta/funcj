@@ -128,7 +128,7 @@ public abstract class FunctionsGenEx {
         /**
          * Applicative function composition.
          * @param f         the function to compose with
-         * @param <B>       the return type of the function returned by {code f}
+         * @param <B>       the return type of the function returned by {@code f}
          * @return          the composed function
          */
         default <B> F<A, B, X> app(F<A, F<R, B, X>, X> f) {
@@ -138,7 +138,7 @@ public abstract class FunctionsGenEx {
         /**
          * Monadic function composition.
          * @param f         the function to compose with
-         * @param <B>       the return type of the function returned by {code f}
+         * @param <B>       the return type of the function returned by {@code f}
          * @return          the composed function
          */
         default <B> F<A, B, X> flatMap(F<R, F<A, B, X>, X> f) {

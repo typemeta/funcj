@@ -233,8 +233,8 @@ public interface Option<T> {
     }
 
     /**
-     * Indicates if this is a {code Some} value.
-     * @return          true if this value is a {code Some} value
+     * Indicates if this is a {@code Some} value.
+     * @return          true if this value is a {@code Some} value
      */
     boolean isPresent();
 

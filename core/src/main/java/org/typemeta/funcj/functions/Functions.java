@@ -119,7 +119,7 @@ public abstract class Functions {
         /**
          * Applicative function composition.
          * @param f         the function to compose with
-         * @param <B>       the return type of the function returned by {code f}
+         * @param <B>       the return type of the function returned by {@code f}
          * @return          the composed function
          */
         default <B> F<A, B> app(F<A, F<R, B>> f) {
@@ -129,7 +129,7 @@ public abstract class Functions {
         /**
          * Monadic function composition.
          * @param f         the function to compose with
-         * @param <B>       the return type of the function returned by {code f}
+         * @param <B>       the return type of the function returned by {@code f}
          * @return          the composed function
          */
         default <B> F<A, B> flatMap(F<R, F<A, B>> f) {

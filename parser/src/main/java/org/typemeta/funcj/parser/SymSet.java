@@ -10,7 +10,7 @@ import static org.typemeta.funcj.parser.SymSetUtils.typeError;
 /**
  * An abstraction for an immutable set of symbols.
  * <p>
- * A {code SymSet} represents an immutable set of symbols,
+ * A {@code SymSet} represents an immutable set of symbols,
  * {@code SymSet}s are used for First Sets and Follow Sets.
  * Since the {@link Combinators#value(Object)} parsers are expressed using predictaes,
  * {@code SymSet} has to support these directly else every symbol that satisfies the predicate,
