@@ -125,7 +125,7 @@ public class JsonTokeniser {
         for (int i = 1; i < s.length; ++i) {
             final char c = nextCharOrThrow();
             if (c != s[i]) {
-                throw raiseError(() -> ("Unexpected input '" + c + "' while parsing '" + s + "'"));
+                throw raiseError(() -> ("Unexpected input '" + c + "' while parsing '" + Arrays.toString(s) + "'"));
             }
         }
     }
