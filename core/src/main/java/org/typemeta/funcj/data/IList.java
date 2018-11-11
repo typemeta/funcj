@@ -416,6 +416,7 @@ public abstract class IList<T> implements Iterable<T> {
             return rhs.isEmpty();
         }
 
+        @Override
         public int hashCode() {
             return 0;
         }
@@ -599,10 +600,11 @@ public abstract class IList<T> implements Iterable<T> {
             }
         }
 
+        @Override
         public int hashCode() {
             int hashCode = 1;
-            for(IList<T> next = this; !next.isEmpty(); next = next.tail()) {
-                hashCode = 31 * hashCode + next.head().hashCode();
+            for(T elem : this) {
+                hashCode = 31 * hashCode + elem.hashCode();
             }
             return hashCode;
         }
