@@ -3,8 +3,6 @@ package org.typemeta.funcj.codec;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * Internal interface for {@link CodecCore} implementations.

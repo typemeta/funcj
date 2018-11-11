@@ -1,7 +1,5 @@
 package org.typemeta.funcj.codec.utils;
 
-import org.typemeta.funcj.util.Exceptions;
-
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -32,7 +30,7 @@ public abstract class ReflectionUtils {
      * @param className the class name
      * @return          the class
      */
-    public static Class<?> forName(String className) {
+    public static Class<?> classForName(String className) {
         try {
             return Class.forName(className);
         } catch (ClassNotFoundException ex) {

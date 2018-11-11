@@ -8,10 +8,10 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 /**
- * {@code Reader} is an implementation of the Reader monad.
+ * {@code ReaderM} is an implementation of the Reader monad.
  * It is essentially an enriched {@link Functions.F}.
  */
-public interface Reader<A, R> {
+public interface ReaderM<A, R> {
 
     /**
      * A {@code Reader} that always returns the same value, regardless of its argument
@@ -20,7 +20,7 @@ public interface Reader<A, R> {
      * @param <R>       the type of the constant value {@code r}
      * @return          the constant {@code Reader}
      */
-    static <A, R> Reader<A, R> pure(R r) {
+    static <A, R> ReaderM<A, R> pure(R r) {
         return a -> r;
     }
 
@@ -37,7 +37,7 @@ public interface Reader<A, R> {
      * @param <U>       the function return type
      * @return          the result of applying the function to the argument, wrapped in a {@code Try}
      */
-    static <A, T, U> Reader<A, U> ap(Reader<A, F<T, U>> rf, Reader<A, T> rt) {
+    static <A, T, U> ReaderM<A, U> ap(ReaderM<A, F<T, U>> rf, ReaderM<A, T> rt) {
         return rt.app(rf);
     }
 
@@ -52,7 +52,7 @@ public interface Reader<A, R> {
      * @param <B>       the return type of the {@code F} returned by the function
      * @return          an {@code F} which wraps an {@link IList} of values
      */
-    static <T, A, B> Reader<T, IList<B>> traverse(IList<A> la, F<A, Reader<T, B>> ffb) {
+    static <T, A, B> ReaderM<T, IList<B>> traverse(IList<A> la, F<A, ReaderM<T, B>> ffb) {
         return la.foldRight(
                 (a, flb) -> ffb.apply(a).app(flb.map(l -> l::add)),
                 pure(IList.nil())
@@ -69,7 +69,7 @@ public interface Reader<A, R> {
      * @param <U>       the return type of the {@code F}s in the list
      * @return          a {@code Reader} which wraps an {@link IList} of values
      */
-    static <T, U> Reader<T, IList<U>> sequence(IList<Reader<T, U>> lfu) {
+    static <T, U> ReaderM<T, IList<U>> sequence(IList<ReaderM<T, U>> lfu) {
         return lfu.foldRight(
                 (fu, flu) -> fu.app(flu.map(l -> l::add)),
                 pure(IList.nil())
@@ -77,17 +77,17 @@ public interface Reader<A, R> {
     }
 
     /**
-     * Variation of {@link Reader#sequence(IList)} for {@link Stream}.
+     * Variation of {@link ReaderM#sequence(IList)} for {@link Stream}.
      * @param sfu       the stream of {@code F} values
      * @param <T>       the error type
      * @param <U>       the return type of the {@code F}s in the stream
      * @return          a {@code F} which wraps an {@link Stream} of values
      */
-    static <T, U> Reader<T, Stream<U>> sequence(Stream<Reader<T, U>> sfu) {
-        final Iterator<Reader<T, U>> iter = sfu.iterator();
-        Reader<T, IList<U>> flu = pure(IList.nil());
+    static <T, U> ReaderM<T, Stream<U>> sequence(Stream<ReaderM<T, U>> sfu) {
+        final Iterator<ReaderM<T, U>> iter = sfu.iterator();
+        ReaderM<T, IList<U>> flu = pure(IList.nil());
         while (iter.hasNext()) {
-            final Reader<T, U> fu = iter.next();
+            final ReaderM<T, U> fu = iter.next();
             flu = fu.app(flu.map(lt -> lt::add));
         }
         return flu.map(IList::stream);
@@ -109,7 +109,7 @@ public interface Reader<A, R> {
          * @param <V>       the return type of the returned {@code F} type
          * @return          the new {@code Kleisli}
          */
-        static <T, U, V> Kleisli<T, U, V> of(F<U, Reader<T, V>> f) {
+        static <T, U, V> Kleisli<T, U, V> of(F<U, ReaderM<T, V>> f) {
             return f::apply;
         }
 
@@ -118,7 +118,7 @@ public interface Reader<A, R> {
          * @param t         the input value
          * @return          the result of the operation
          */
-        Reader<T, V> apply(U t);
+        ReaderM<T, V> apply(U t);
 
         /**
          * Compose this {@code Kleisli} with another by applying this one first,
@@ -170,7 +170,7 @@ public interface Reader<A, R> {
      * @param <T>       the argument type to {@code f}
      * @return          a {@code Reader} that first applies {@code f} and then applies this to the result.
      */
-    default <T> Reader<T, R> compose(Reader<? super T, ? extends A> f) {
+    default <T> ReaderM<T, R> compose(ReaderM<? super T, ? extends A> f) {
         return t -> this.apply(f.apply(t));
     }
 
@@ -182,18 +182,18 @@ public interface Reader<A, R> {
      * @param <T>       the argument type to {@code f}
      * @return          a function that first applies this function and then applies {@code f} to the result.
      */
-    default <T> Reader<A, T> andThen(Reader<? super R, ? extends T> f) {
+    default <T> ReaderM<A, T> andThen(ReaderM<? super R, ? extends T> f) {
         return a -> f.apply(this.apply(a));
     }
 
     /**
      * Map a function over this {@code Reader}.
-     * Essentially {@link Reader#compose} without the wildcard generic types.
+     * Essentially {@link ReaderM#compose} without the wildcard generic types.
      * @param f         the function to compose with
      * @param <T>       the argument type to {@code f}
      * @return          a function that first applies {@code f} and then applies this function to the result.
      */
-    default <T> Reader<A, T> map(F<R, T> f) {
+    default <T> ReaderM<A, T> map(F<R, T> f) {
         return a -> f.apply(apply(a));
     }
 
@@ -203,7 +203,7 @@ public interface Reader<A, R> {
      * @param <B>       the return type of the function returned by {@code f}
      * @return          the composed function
      */
-    default <B> Reader<A, B> app(Reader<A, F<R, B>> rf) {
+    default <B> ReaderM<A, B> app(ReaderM<A, F<R, B>> rf) {
         return a -> rf.apply(a).apply(this.apply(a));
     }
 
@@ -213,7 +213,7 @@ public interface Reader<A, R> {
      * @param <B>       the return type of the function returned by {@code f}
      * @return          the composed function
      */
-    default <B> Reader<A, B> flatMap(F<R, Reader<A, B>> f) {
+    default <B> ReaderM<A, B> flatMap(F<R, ReaderM<A, B>> f) {
         return a -> f.apply(this.apply(a)).apply(a);
     }
 }

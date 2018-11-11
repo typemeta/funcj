@@ -1,10 +1,8 @@
 package org.typemeta.funcj.tuples;
 
-import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.functions.Functions.F2;
+import org.typemeta.funcj.functions.Functions.*;
 
-import java.util.Comparator;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A 2-tuple of values.

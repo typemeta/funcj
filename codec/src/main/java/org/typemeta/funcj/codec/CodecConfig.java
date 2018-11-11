@@ -11,12 +11,14 @@ public interface CodecConfig {
 
     /**
      * Add this package to the list of allowed packages.
+     * Classes in allowed packages can be constructed from their name.
      * @param pkg       the package
      */
     void registerAllowedPackage(Package pkg);
 
     /**
      * Add this class to the list of allowed classes.
+     * Allowed classes can be constructed from their name.
      * @param clazz     the class
      */
     void registerAllowedClass(Class<?> clazz);
@@ -30,8 +32,8 @@ public interface CodecConfig {
     <T> Class<T> checkClassIsAllowed(Class<T> clazz);
 
     /**
-     * Register a type proxy.
-     * A type proxy maps a class to its proxy before selecting its {@code Codec}.
+     * Register a type proxy for a class.
+     * A type proxy is used in place of a class when selecting its {@code Codec}.
      * @param clazz     the class to be mapped
      * @param proxy     the proxy type
      */
@@ -43,7 +45,7 @@ public interface CodecConfig {
      * @param <T>       the class type
      * @return          the proxy if it has one, otherwise the original class
      */
-    <T> Class<T> remapType(Class<T> clazz);
+    <T> Class<T> mapToProxy(Class<T> clazz);
 
     /**
      * Register a type alias.
@@ -68,6 +70,13 @@ public interface CodecConfig {
      */
     <T> Class<T> nameToClass(String name);
 
+    /**
+     * Determine the name to use for a field.
+     * @param field     the field
+     * @param depth     the inheritance depth (increases as we go up the hierarchy)
+     * @param existingNames the set of existing field names
+     * @return
+     */
     String getFieldName(Field field, int depth, Set<String> existingNames);
 
     /**

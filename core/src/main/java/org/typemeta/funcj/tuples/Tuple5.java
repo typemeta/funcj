@@ -2,8 +2,7 @@ package org.typemeta.funcj.tuples;
 
 import org.typemeta.funcj.functions.Functions;
 
-import java.util.Comparator;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A 5-tuple of values.

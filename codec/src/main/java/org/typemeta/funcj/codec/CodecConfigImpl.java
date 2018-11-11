@@ -8,6 +8,7 @@ import java.util.*;
  */
 public class CodecConfigImpl implements CodecConfig {
 
+
     protected final Set<Package> allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));
 
     protected final Set<Class<?>> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
@@ -18,6 +19,7 @@ public class CodecConfigImpl implements CodecConfig {
 
     /**
      * A map that associates a class with its proxy.
+     * Where a class has a proxy, the codec for the proxy will be used for the class.
      */
     protected final Map<Class<?>, Class<?>> typeProxyRegistry = new TreeMap<>(Comparator.comparing(Class::getName));
 
@@ -65,7 +67,7 @@ public class CodecConfigImpl implements CodecConfig {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Class<T> remapType(Class<T> clazz) {
+    public <T> Class<T> mapToProxy(Class<T> clazz) {
         if (typeProxyRegistry.containsKey(clazz)) {
             return (Class<T>) typeProxyRegistry.get(clazz);
         } else {
@@ -81,19 +83,20 @@ public class CodecConfigImpl implements CodecConfig {
 
     @Override
     public String classToName(Class<?> clazz) {
-        final String name = classToNameMap.get(checkClassIsAllowed(clazz));
+        final String name = classToNameMap.get(clazz);
         return name == null ? clazz.getName() : name;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Class<T> nameToClass(String name) {
-        final Class<T> clazz = (Class<T>) nameToClassMap.get(name);
+        Class<T> clazz = (Class<T>) nameToClassMap.get(name);
         if (clazz != null) {
-            return clazz;
+            return checkClassIsAllowed(clazz);
         } else {
             try {
-                return (Class<T>) Class.forName(name);
+                clazz = (Class<T>) Class.forName(name);
+                return checkClassIsAllowed(clazz);
             } catch (ClassNotFoundException ex) {
                 throw new CodecException("Cannot find class from name '" + name + "'", ex);
             }

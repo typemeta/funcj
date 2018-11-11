@@ -1,13 +1,10 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.ObjectMeta;
-import org.typemeta.funcj.codec.xml.io.XmlIO.Input;
-import org.typemeta.funcj.codec.xml.io.XmlIO.Output;
+import org.typemeta.funcj.codec.xml.XmlCodec.*;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
@@ -25,7 +22,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
     }
 
     public XmlCodecFormat() {
-        this(new ConfigImpl());
+        this(new XmlConfigImpl());
     }
 
     @Override
@@ -122,7 +119,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             boolean[] arr = new boolean[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -184,7 +181,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             byte[] arr = new byte[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -246,7 +243,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             char[] arr = new char[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -308,7 +305,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             short[] arr = new short[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -370,7 +367,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             int[] arr = new int[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -432,7 +429,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             long[] arr = new long[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -494,7 +491,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             float[] arr = new float[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -555,7 +552,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             double[] arr = new double[config.defaultArraySize()];
             int i = 0;
             while (in.hasNext()) {
-                if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -659,7 +656,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
                 final CollProxy<T> collProxy = getCollectionProxy(core, collType);
 
                 while (in.hasNext()) {
-                    if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                    if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                         break;
                     }
 
@@ -699,7 +696,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
                 T[] arr = (T[]) Array.newInstance(elemCodec.type(), config.defaultArraySize());
                 int i = 0;
                 while (in.hasNext()) {
-                    if (!in.type().equals(Input.Type.START_ELEMENT)) {
+                    if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                         break;
                     }
 
@@ -767,7 +764,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             final Set<String> setFields = new HashSet<>();
             final RA ra = objMeta.startDecode();
 
-            while(in.hasNext() && in.type().equals(Input.Type.START_ELEMENT)) {
+            while(in.hasNext() && in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                 final String name = in.startElement();
                 if (!expKeys.contains(name)) {
                     throw new CodecException("Field name '" + name + "' unexpected for type " + type +

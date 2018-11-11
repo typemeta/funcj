@@ -2,18 +2,14 @@ package org.typemeta.funcj.json;
 
 import org.junit.Test;
 import org.typemeta.funcj.control.Try;
-import org.typemeta.funcj.data.Chr;
-import org.typemeta.funcj.data.Unit;
+import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.json.model.JsValue;
-import org.typemeta.funcj.parser.Input;
-import org.typemeta.funcj.parser.Result;
+import org.typemeta.funcj.parser.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
+import java.util.stream.*;
 
 import static org.junit.Assert.*;
 

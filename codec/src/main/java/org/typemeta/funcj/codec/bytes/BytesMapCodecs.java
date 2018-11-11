@@ -1,16 +1,12 @@
 package org.typemeta.funcj.codec.bytes;
 
-import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.codec.CodecCoreEx;
-import org.typemeta.funcj.codec.MapCodecs.AbstractMapCodec;
-import org.typemeta.funcj.codec.MapCodecs.AbstractStringMapCodec;
-import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
+import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.MapCodecs.*;
+import org.typemeta.funcj.codec.bytes.BytesCodec.*;
 
 import java.util.Map;
 
-import static org.typemeta.funcj.codec.bytes.io.ByteIO.Output;
-
-public abstract class ByteMapCodecs {
+public abstract class BytesMapCodecs {
 
     public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Input, Output, Config> {
 

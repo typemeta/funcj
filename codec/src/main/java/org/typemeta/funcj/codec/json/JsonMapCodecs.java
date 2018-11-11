@@ -1,10 +1,8 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.MapCodecs.AbstractMapCodec;
-import org.typemeta.funcj.codec.MapCodecs.AbstractStringMapCodec;
-import org.typemeta.funcj.codec.json.io.JsonIO.Input;
-import org.typemeta.funcj.codec.json.io.JsonIO.Output;
+import org.typemeta.funcj.codec.MapCodecs.*;
+import org.typemeta.funcj.codec.json.JsonCodec.*;
 
 import java.util.Map;
 
@@ -47,7 +45,7 @@ public abstract class JsonMapCodecs {
 
             in.startArray();
 
-            while(in.notEOF() && in.currentEventType() == Input.Event.Type.OBJECT_START) {
+            while(in.notEOF() && in.currentEventType() == JsonCodec.Input.Event.Type.OBJECT_START) {
                 K key = null;
                 V val = null;
 
@@ -107,7 +105,7 @@ public abstract class JsonMapCodecs {
 
             final Map<String, V> map = core.getNoArgsCtor(type).construct();
 
-            while(in.notEOF() && in.currentEventType() == Input.Event.Type.FIELD_NAME) {
+            while(in.notEOF() && in.currentEventType() == JsonCodec.Input.Event.Type.FIELD_NAME) {
                 final String key = in.readFieldName();
                 final V val = valueCodec.decodeWithCheck(core, in);
                 map.put(key, val);

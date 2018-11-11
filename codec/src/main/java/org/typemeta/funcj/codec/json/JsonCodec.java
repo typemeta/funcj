@@ -1,10 +1,27 @@
-package org.typemeta.funcj.codec.json.io;
+package org.typemeta.funcj.codec.json;
+
+import org.typemeta.funcj.codec.CodecConfig;
+import org.typemeta.funcj.codec.json.io.*;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public abstract class JsonIO {
+public class JsonCodec {
+
+    /**
+     * Interface for classes which provide configuration information
+     * for {@link JsonCodecCore} implementations.
+     */
+    public interface Config extends CodecConfig {
+
+        String typeFieldName();
+
+        String keyFieldName();
+
+        String valueFieldName();
+    }
+
     private static final int MAX_PARSER_LOOKAHEAD = 3;
 
     public static Input inputOf(Reader reader) {

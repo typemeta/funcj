@@ -1,28 +1,25 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.bytes.io.ByteIO;
-import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
-import org.typemeta.funcj.codec.bytes.io.ByteIO.Output;
+import org.typemeta.funcj.codec.bytes.BytesCodec.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * Interface for classes which implement an encoding via byte streams.
  */
-public class ByteCodecCore extends CodecCoreDelegate<Input, Output, Config> {
+public class BytesCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     
-    public ByteCodecCore(ByteCodecFormat format) {
+    public BytesCodecCore(BytesCodecFormat format) {
         super(new CodecCoreImpl<>(format));
     }
 
-    public ByteCodecCore(Config config) {
-        this(new ByteCodecFormat(config));
+    public BytesCodecCore(Config config) {
+        this(new BytesCodecFormat(config));
     }
 
-    public ByteCodecCore() {
-        this(new ConfigImpl());
+    public BytesCodecCore() {
+        this(new BytesConfigImpl());
     }
 
     /**
@@ -35,7 +32,7 @@ public class ByteCodecCore extends CodecCoreDelegate<Input, Output, Config> {
      * @param <T>       the static type of the value
      */
     public <T> void encode(Class<? super T> type, T value, OutputStream os) {
-        encode(type, value, ByteIO.outputOf(os));
+        encode(type, value, BytesCodec.outputOf(os));
     }
     /**
      * Encode the supplied value into byte data and write the results to the {@link OutputStream} object.
@@ -55,7 +52,7 @@ public class ByteCodecCore extends CodecCoreDelegate<Input, Output, Config> {
      * @return          the decoded value
      */
     public <T> T decode(Class<T> type, InputStream is) {
-        return decode(type, ByteIO.inputOf(is));
+        return decode(type, BytesCodec.inputOf(is));
     }
 
     /**
@@ -65,6 +62,6 @@ public class ByteCodecCore extends CodecCoreDelegate<Input, Output, Config> {
      * @return          the decoded value
      */
     public <T> T decode(InputStream is) {
-        return decode(Object.class, ByteIO.inputOf(is));
+        return decode(Object.class, BytesCodec.inputOf(is));
     }
 }

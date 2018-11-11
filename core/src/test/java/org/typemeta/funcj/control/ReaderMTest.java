@@ -4,19 +4,17 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.control.Reader.Kleisli;
-import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.functions.Functions.F2;
+import org.typemeta.funcj.control.ReaderM.Kleisli;
+import org.typemeta.funcj.functions.Functions.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.typemeta.funcj.control.Reader.pure;
+import static org.typemeta.funcj.control.ReaderM.pure;
 import static org.typemeta.funcj.functions.Functions.F.konst;
 
 @RunWith(JUnitQuickcheck.class)
-public class ReaderTest {
+public class ReaderMTest {
 
     private static final F<Integer, Integer> add10 = x -> x + 10;
     private static final F<Integer, Integer> times2 = x -> x * 2;
@@ -28,7 +26,7 @@ public class ReaderTest {
         assertEquals("add combined with times", exp, addTimes.apply(i).intValue());
     }
 
-    private static final Kleisli<Integer, Integer, Integer> kPure = Kleisli.of(Reader::pure);
+    private static final Kleisli<Integer, Integer, Integer> kPure = Kleisli.of(ReaderM::pure);
     private static final Kleisli<Integer, Integer, Integer> kA = x -> y -> x + y;
     private static final Kleisli<Integer, Integer, Integer> kB = x -> y -> x * y;
     private static final Kleisli<Integer, Integer, Integer> kC = x -> y -> x - y;
@@ -88,12 +86,12 @@ public class ReaderTest {
         fxRates.put(Ccy.EUR, usdEur);
     }
 
-    private static final F<Ccy, Reader<DAO, Double>> getFxRate = ccy -> dao -> dao.getFxRate(ccy);
+    private static final F<Ccy, ReaderM<DAO, Double>> getFxRate = ccy -> dao -> dao.getFxRate(ccy);
 
     @Test
     public void monadDemo() {
 
-        final F2<Ccy, Ccy, Reader<DAO, Double>> getFxRateAB =
+        final F2<Ccy, Ccy, ReaderM<DAO, Double>> getFxRateAB =
                 (ccyA, ccyB) ->
                         getFxRate.apply(ccyA).flatMap(fxA ->
                                 getFxRate.apply(ccyB).flatMap(fxB ->
@@ -110,7 +108,7 @@ public class ReaderTest {
     @Test
     public void applicDemo() {
 
-        final F2<Ccy, Ccy, Reader<DAO, Double>> getFxRateAB =
+        final F2<Ccy, Ccy, ReaderM<DAO, Double>> getFxRateAB =
                 (ccyA, ccyB) ->
                         getFxRate.apply(ccyB).app(
                                 getFxRate.apply(ccyA)

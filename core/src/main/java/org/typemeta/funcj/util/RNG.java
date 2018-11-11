@@ -3,8 +3,7 @@ package org.typemeta.funcj.util;
 import org.typemeta.funcj.control.State;
 import org.typemeta.funcj.tuples.Tuple2;
 
-import static org.typemeta.funcj.control.Trampoline.defer;
-import static org.typemeta.funcj.control.Trampoline.done;
+import static org.typemeta.funcj.control.Trampoline.*;
 
 /**
  * Pseudo-random number generator, using the {@link State} monad.

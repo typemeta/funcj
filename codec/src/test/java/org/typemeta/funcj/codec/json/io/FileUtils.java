@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.json;
+package org.typemeta.funcj.codec.json.io;
 
 import org.typemeta.funcj.control.Try;
 

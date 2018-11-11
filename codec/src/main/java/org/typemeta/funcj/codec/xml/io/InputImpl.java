@@ -1,16 +1,72 @@
 package org.typemeta.funcj.codec.xml.io;
 
 import org.typemeta.funcj.codec.CodecException;
+import org.typemeta.funcj.codec.xml.XmlCodec;
 
 import javax.xml.stream.*;
+import java.io.Reader;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
+import java.text.*;
+import java.util.*;
 
-class InputImpl implements XmlIO.Input {
+public class InputImpl implements XmlCodec.Input {
+    public static XmlCodec.Input inputOf(XMLStreamReader reader) {
+        if (reader.getProperty(XMLInputFactory.IS_COALESCING) != Boolean.TRUE) {
+            throw new CodecException("XMLStreamReader must have the '" + XMLInputFactory.IS_COALESCING + "' " +
+                    " property set to true");
+        } else {
+            return new InputImpl(reader);
+        }
+    }
 
+    public static XmlCodec.Input inputOf(Reader reader, String rootElemName) {
+        try {
+            final XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
+            xmlInFact.setProperty(XMLInputFactory.IS_COALESCING, true);
+            final XMLStreamReader xrdr = xmlInFact.createXMLStreamReader(reader);
+            final XmlCodec.Input in = inputOf(xrdr);
+            in.startDocument();
+            in.startElement(rootElemName);
+            return in;
+        } catch (XMLStreamException ex) {
+            throw new CodecException(ex);
+        }
+    }
+
+    protected static class AttributeMapImpl implements AttributeMap {
+        protected final Map<String, String> attrMap = new TreeMap<>();
+
+        void load(XMLStreamReader rdr) {
+            attrMap.clear();
+            final int numAtrrs = rdr.getAttributeCount();
+            if (numAtrrs > 0) {
+                for (int i = 0; i < numAtrrs; ++i) {
+                    final String name = rdr.getAttributeLocalName(i);
+                    final String value = rdr.getAttributeValue(i);
+                    attrMap.put(name, value);
+                }
+            }
+        }
+
+        void clear() {
+            attrMap.clear();
+        }
+
+        public boolean hasName(String name) {
+            return attrMap.containsKey(name);
+        }
+
+        public String getValue(String name) {
+            return attrMap.get(name);
+        }
+
+        public boolean nameHasValue(String name, String value) {
+            return attrMap.containsKey(name) &&
+                    attrMap.get(name).equals(value);
+        }
+    }
     private final XMLStreamReader rdr;
-    private final AttributeMap attrMap = new AttributeMap();
+    private final AttributeMapImpl attrMap = new AttributeMapImpl();
 
     public InputImpl(XMLStreamReader rdr) {
         this.rdr = rdr;

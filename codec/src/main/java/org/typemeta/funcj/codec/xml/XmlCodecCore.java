@@ -1,12 +1,9 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.xml.io.XmlIO;
-import org.typemeta.funcj.codec.xml.io.XmlIO.Input;
-import org.typemeta.funcj.codec.xml.io.XmlIO.Output;
+import org.typemeta.funcj.codec.xml.XmlCodec.*;
 
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * Interface for classes which implement an encoding via XML.
@@ -21,7 +18,7 @@ public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     }
 
     public XmlCodecCore() {
-        this(new ConfigImpl());
+        this(new XmlConfigImpl());
     }
 
     /**
@@ -36,7 +33,7 @@ public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
      * @return          the output stream
      */
     public <T> Output encode(Class<? super T> type, T value, Writer writer, String rootElemName) {
-        final Output out = encode(type, value, XmlIO.outputOf(writer, rootElemName));
+        final Output out = encode(type, value, XmlCodec.outputOf(writer, rootElemName));
         return out.close();
     }
 
@@ -61,7 +58,7 @@ public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
      * @return          the decoded value
      */
     public <T> T decode(Class<? super T> type, Reader reader, String rootElemName) {
-        return decode(type, XmlIO.inputOf(reader, rootElemName));
+        return decode(type, XmlCodec.inputOf(reader, rootElemName));
     }
 
     /**

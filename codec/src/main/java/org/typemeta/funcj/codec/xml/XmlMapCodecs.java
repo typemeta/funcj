@@ -1,12 +1,8 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.codec.CodecCoreEx;
-import org.typemeta.funcj.codec.MapCodecs.AbstractMapCodec;
-import org.typemeta.funcj.codec.MapCodecs.AbstractStringMapCodec;
-import org.typemeta.funcj.codec.xml.io.XmlIO;
-import org.typemeta.funcj.codec.xml.io.XmlIO.Input;
-import org.typemeta.funcj.codec.xml.io.XmlIO.Output;
+import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.MapCodecs.*;
+import org.typemeta.funcj.codec.xml.XmlCodec.*;
 
 import java.util.Map;
 
@@ -43,7 +39,7 @@ public abstract class XmlMapCodecs {
             final Map<K, V> map = core.getNoArgsCtor(type).construct();
 
             while(in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 
@@ -85,7 +81,7 @@ public abstract class XmlMapCodecs {
             final Map<String, V> map = core.getNoArgsCtor(type).construct();
 
             while (in.hasNext()) {
-                if (!in.type().equals(XmlIO.Input.Type.START_ELEMENT)) {
+                if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
                     break;
                 }
 

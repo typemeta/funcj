@@ -1,7 +1,6 @@
-package org.typemeta.funcj.codec.json;
+package org.typemeta.funcj.codec.json.io;
 
 import org.junit.Test;
-import org.typemeta.funcj.codec.json.io.JsonParser;
 
 import java.io.BufferedReader;
 

@@ -1,31 +1,27 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.ObjectMeta;
-import org.typemeta.funcj.codec.bytes.io.ByteIO.Input;
-import org.typemeta.funcj.codec.bytes.io.ByteIO.Output;
+import org.typemeta.funcj.codec.bytes.BytesCodec.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Folds;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Map;
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * Encoding via byte streams.
  */
 @SuppressWarnings("unchecked")
-public class ByteCodecFormat implements CodecFormat<Input, Output, Config> {
+public class BytesCodecFormat implements CodecFormat<Input, Output, Config> {
 
     protected final Config config;
 
-    public ByteCodecFormat(Config config) {
+    public BytesCodecFormat(Config config) {
         this.config = config;
     }
 
-    public ByteCodecFormat() {
-        this(new ConfigImpl());
+    public BytesCodecFormat() {
+        this(new BytesConfigImpl());
     }
 
     @Override
@@ -560,7 +556,7 @@ public class ByteCodecFormat implements CodecFormat<Input, Output, Config> {
     public <V> Codec<Map<String, V>, Input, Output, Config> createMapCodec(
             Class<Map<String, V>> type,
             Codec<V, Input, Output, Config> valueCodec) {
-        return new ByteMapCodecs.StringMapCodec<V>(type, valueCodec);
+        return new BytesMapCodecs.StringMapCodec<V>(type, valueCodec);
     }
 
     @Override
@@ -568,7 +564,7 @@ public class ByteCodecFormat implements CodecFormat<Input, Output, Config> {
             Class<Map<K, V>> type,
             Codec<K, Input, Output, Config> keyCodec,
             Codec<V, Input, Output, Config> valueCodec) {
-        return new ByteMapCodecs.MapCodec<K, V>(type, keyCodec, valueCodec);
+        return new BytesMapCodecs.MapCodec<K, V>(type, keyCodec, valueCodec);
     }
 
     @Override

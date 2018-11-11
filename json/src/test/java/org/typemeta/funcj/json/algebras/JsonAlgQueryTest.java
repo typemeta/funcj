@@ -1,12 +1,10 @@
 package org.typemeta.funcj.json.algebras;
 
 import org.junit.Test;
-import org.typemeta.funcj.algebra.Monoid;
-import org.typemeta.funcj.algebra.MonoidInstances;
+import org.typemeta.funcj.algebra.*;
 import org.typemeta.funcj.json.model.JsonAlg;
 
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.typemeta.funcj.json.Example.testValue;

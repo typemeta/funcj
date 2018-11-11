@@ -2,8 +2,7 @@ package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 

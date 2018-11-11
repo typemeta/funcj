@@ -1,9 +1,9 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.bytes.*;
-import org.typemeta.funcj.codec.json.*;
-import org.typemeta.funcj.codec.utils.*;
-import org.typemeta.funcj.codec.xml.*;
+import org.typemeta.funcj.codec.bytes.BytesCodecCore;
+import org.typemeta.funcj.codec.json.JsonCodecCore;
+import org.typemeta.funcj.codec.utils.ReflectionUtils;
+import org.typemeta.funcj.codec.xml.XmlCodecCore;
 import org.typemeta.funcj.functions.Functions.F;
 
 import java.time.*;
@@ -15,11 +15,11 @@ import java.util.Collections;
 public abstract class Codecs {
 
     /**
-     * Construct and return a new instance of a {@link org.typemeta.funcj.codec.json.JsonCodecCore}.
+     * Construct and return a new instance of a {@link JsonCodecCore}.
      * @return the new {@code JsonCodecCore}
      */
     public static JsonCodecCore jsonCodec() {
-        return JsonCodecs.registerAll(new JsonCodecCore());
+        return registerAll(new JsonCodecCore());
     }
 
     /**
@@ -27,15 +27,15 @@ public abstract class Codecs {
      * @return the new {@code XmlCodecCore}
      */
     public static XmlCodecCore xmlCodec() {
-        return XmlCodecs.registerAll(new XmlCodecCore());
+        return registerAll(new XmlCodecCore());
     }
 
     /**
-     * Construct and return a new instance of a {@link ByteCodecCore}.
+     * Construct and return a new instance of a {@link BytesCodecCore}.
      * @return the new {@code ByteCodecCore}
      */
-    public static ByteCodecCore byteCodec() {
-        return ByteCodecs.registerAll(new ByteCodecCore());
+    public static BytesCodecCore byteCodec() {
+        return registerAll(new BytesCodecCore());
     }
 
     public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>> CORE registerAll(CORE core) {
@@ -53,11 +53,11 @@ public abstract class Codecs {
         core.config().registerAllowedPackage(java.time.LocalDate.class.getPackage());
 
         core.registerArgArrayCtor(
-                ReflectionUtils.forName("java.util.Collections$SingletonList"),
+                ReflectionUtils.classForName("java.util.Collections$SingletonList"),
                 args -> Collections.singletonList(args[0]));
 
         core.registerArgArrayCtor(
-                ReflectionUtils.forName("java.util.Collections$SingletonSet"),
+                ReflectionUtils.classForName("java.util.Collections$SingletonSet"),
                 args -> Collections.singleton(args[0]));
 
         core.registerStringProxyCodec(
@@ -66,7 +66,7 @@ public abstract class Codecs {
                 core.config()::nameToClass
         );
 
-        core.config().registerTypeProxy(ReflectionUtils.forName("java.time.ZoneRegion"), ZoneId.class);
+        core.config().registerTypeProxy(ReflectionUtils.classForName("java.time.ZoneRegion"), ZoneId.class);
 
         core.registerCodec(LocalDate.class)
                 .field("year", LocalDate::getYear, Integer.class)

@@ -3,11 +3,9 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
@@ -145,7 +143,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> Codec<T, IN, OUT, CFG> getCodec(Class<T> clazz) {
         return getCodec(
-                ClassKey.valueOf(config().remapType(clazz)),
+                ClassKey.valueOf(config().mapToProxy(clazz)),
                 () -> createCodec(clazz)
         );
     }

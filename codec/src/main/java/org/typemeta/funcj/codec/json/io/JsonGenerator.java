@@ -1,13 +1,13 @@
 package org.typemeta.funcj.codec.json.io;
 
-import java.io.IOException;
-import java.io.Writer;
+import org.typemeta.funcj.codec.json.JsonCodec;
+
+import java.io.*;
 import java.math.BigDecimal;
 
-import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.raiseWriteFailure;
-import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.write;
+import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.*;
 
-public class JsonGenerator implements JsonIO.Output {
+public class JsonGenerator implements JsonCodec.Output {
 
     private final Writer writer;
 
@@ -67,7 +67,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNull() {
+    public JsonCodec.Output writeNull() {
         if (pendingComma) {
             writeComma();
         }
@@ -76,7 +76,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeBoolean(boolean value) {
+    public JsonCodec.Output writeBoolean(boolean value) {
         if (pendingComma) {
             writeComma();
         }
@@ -85,7 +85,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeString(String value) {
+    public JsonCodec.Output writeString(String value) {
         if (pendingComma) {
             writeComma();
         }
@@ -94,7 +94,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeChar(char value) {
+    public JsonCodec.Output writeChar(char value) {
         if (pendingComma) {
             writeComma();
         }
@@ -103,7 +103,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeByte(byte value) {
+    public JsonCodec.Output writeByte(byte value) {
         if (pendingComma) {
             writeComma();
         }
@@ -112,7 +112,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeShort(short value) {
+    public JsonCodec.Output writeShort(short value) {
         if (pendingComma) {
             writeComma();
         }
@@ -121,7 +121,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeint(int value) {
+    public JsonCodec.Output writeint(int value) {
         if (pendingComma) {
             writeComma();
         }
@@ -130,7 +130,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeLong(long value) {
+    public JsonCodec.Output writeLong(long value) {
         if (pendingComma) {
             writeComma();
         }
@@ -139,7 +139,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeFloat(float value) {
+    public JsonCodec.Output writeFloat(float value) {
         if (pendingComma) {
             writeComma();
         }
@@ -148,7 +148,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeDouble(double value) {
+    public JsonCodec.Output writeDouble(double value) {
         if (pendingComma) {
             writeComma();
         }
@@ -157,7 +157,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeNumber(Number value) {
+    public JsonCodec.Output writeNumber(Number value) {
         if (pendingComma) {
             writeComma();
         }
@@ -166,7 +166,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeBigDecimal(BigDecimal value) {
+    public JsonCodec.Output writeBigDecimal(BigDecimal value) {
         if (pendingComma) {
             writeComma();
         }
@@ -175,7 +175,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeStringNumber(String value) {
+    public JsonCodec.Output writeStringNumber(String value) {
         if (pendingComma) {
             writeComma();
         }
@@ -184,7 +184,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output startObject() {
+    public JsonCodec.Output startObject() {
         if (pendingComma) {
             writeComma();
             pendingComma = false;
@@ -193,7 +193,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output writeField(String name) {
+    public JsonCodec.Output writeField(String name) {
         if (pendingComma) {
             writeComma();
             pendingComma = false;
@@ -203,13 +203,13 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output endObject() {
+    public JsonCodec.Output endObject() {
         pendingComma = true;
         return writeUnquotedString('}');
     }
 
     @Override
-    public JsonIO.Output startArray() {
+    public JsonCodec.Output startArray() {
         if (pendingComma) {
             writeComma();
             pendingComma = false;
@@ -218,7 +218,7 @@ public class JsonGenerator implements JsonIO.Output {
     }
 
     @Override
-    public JsonIO.Output endArray() {
+    public JsonCodec.Output endArray() {
         pendingComma = true;
         return writeUnquotedString(']');
     }

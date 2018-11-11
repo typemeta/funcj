@@ -1,18 +1,18 @@
-package org.typemeta.funcj.codec.json;
+package org.typemeta.funcj.codec.json.io;
 
+import org.typemeta.funcj.codec.json.JsonCodec;
 import org.typemeta.funcj.codec.json.io.*;
 
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * Connect a JSON input to a JSON output.
  */
 public class JsonBridge {
-    private final JsonIO.Input input;
-    private final JsonIO.Output output;
+    private final JsonCodec.Input input;
+    private final JsonCodec.Output output;
 
-    public JsonBridge(JsonIO.Input input, JsonIO.Output output) {
+    public JsonBridge(JsonCodec.Input input, JsonCodec.Output output) {
         this.input = input;
         this.output = output;
     }

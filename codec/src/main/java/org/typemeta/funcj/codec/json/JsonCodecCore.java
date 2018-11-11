@@ -1,12 +1,9 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.json.io.JsonIO;
-import org.typemeta.funcj.codec.json.io.JsonIO.Input;
-import org.typemeta.funcj.codec.json.io.JsonIO.Output;
+import org.typemeta.funcj.codec.json.JsonCodec.*;
 
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * Interface for classes which implement an encoding via JSON.
@@ -22,7 +19,7 @@ public class JsonCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     }
 
     public JsonCodecCore() {
-        this(new ConfigImpl());
+        this(new JsonConfigImpl());
     }
 
     /**
@@ -35,7 +32,7 @@ public class JsonCodecCore extends CodecCoreDelegate<Input, Output, Config> {
      * @param <T>       the static type of the value
      */
     public <T> void encode(Class<? super T> type, T value, Writer writer) {
-        delegate.encode(type, value, JsonIO.outputOf(writer));
+        delegate.encode(type, value, JsonCodec.outputOf(writer));
     }
 
     /**
@@ -58,6 +55,6 @@ public class JsonCodecCore extends CodecCoreDelegate<Input, Output, Config> {
      * @return          the decoded value
      */
     public <T> T decode(Class<T> type, Reader reader) {
-        return delegate.decode(type, JsonIO.inputOf(reader));
+        return delegate.decode(type, JsonCodec.inputOf(reader));
     }
 }

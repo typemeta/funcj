@@ -1,7 +1,6 @@
 package org.typemeta.funcj.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.typemeta.funcj.control.State;
 import org.typemeta.funcj.data.IList;
 

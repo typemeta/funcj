@@ -1,8 +1,20 @@
-package org.typemeta.funcj.codec.bytes.io;
+package org.typemeta.funcj.codec.bytes;
+
+import org.typemeta.funcj.codec.CodecConfig;
+import org.typemeta.funcj.codec.bytes.io.*;
 
 import java.io.*;
 
-public abstract class ByteIO {
+public abstract class BytesCodec {
+
+    /**
+     * Interface for classes which provide configuration information
+     * for {@link BytesCodecCore} implementations.
+     */
+    public interface Config extends CodecConfig {
+    }
+
+
     public static Input inputOf(InputStream is) {
         return new InputImpl(new DataInputStream(is));
     }
