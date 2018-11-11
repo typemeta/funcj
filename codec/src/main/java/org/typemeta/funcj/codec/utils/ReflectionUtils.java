@@ -66,7 +66,7 @@ public abstract class ReflectionUtils {
     }
 
     /**
-     * Inspect the given field. If it implements the supplied generic interface
+     * Inspect the given field. If it implements the given generic interface
      * then extract and return the type arguments.
      * @param field     the field to inspect
      * @param iface     the generic interface
@@ -104,7 +104,7 @@ public abstract class ReflectionUtils {
     }
 
     /**
-     * Inspect the supplied type. If it implements the supplied generic interface
+     * Inspect the given type. If it implements the given generic interface
      * then extract and return the type arguments.
      * @param implClass the type to inspect
      * @param iface     the generic interface

@@ -266,10 +266,10 @@ public interface Either<E, S> {
 
     /**
      * Either return the wrapped value if it's a {@code Right},
-     * otherwise return the supplied default value.
+     * otherwise return the given default value.
      * @param defaultValue value to be returned if this is a {@code Left} value.
      * @return          the success result value if it's a {@code Right},
-     *                  otherwise return the supplied default value.
+     *                  otherwise return the given default value.
      */
     S getOrElse(S defaultValue);
 

@@ -1019,10 +1019,10 @@ public abstract class Functions {
         }
 
         /**
-         * Return a {@code Predicate} that checks if a value is equal to the supplied value
+         * Return a {@code Predicate} that checks if a value is equal to the given value
          * @param lhs       the value to compare against
          * @param <T>       the operand type
-         * @return          a {@code Predicate} that checks if a value is equal to the supplied value
+         * @return          a {@code Predicate} that checks if a value is equal to the given value
          */
         static <T> Predicate<T> isEqual(Object lhs) {
             return (lhs == null)

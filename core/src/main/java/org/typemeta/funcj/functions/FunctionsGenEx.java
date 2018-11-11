@@ -1040,11 +1040,11 @@ public abstract class FunctionsGenEx {
         }
 
         /**
-         * Return a {@code Predicate} that checks if a value is equal to the supplied value
+         * Return a {@code Predicate} that checks if a value is equal to the given value
          * @param lhs       the value to compare against
          * @param <T>       the operand type
          * @param <X>       the exception type
-         * @return          a {@code Predicate} that checks if a value is equal to the supplied value
+         * @return          a {@code Predicate} that checks if a value is equal to the given value
          */
         static <T, X extends Exception> Predicate<T, X> isEqual(Object lhs) {
             return (lhs == null)

@@ -22,7 +22,7 @@ public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     }
 
     /**
-     * Encode the supplied value into XML and write the results to the {@link Writer} object.
+     * Encode the given value into XML and write the results to the {@link Writer} object.
      * The static type determines whether type information is written to recover the value's
      * dynamic type.
      * @param type      the static type of the value
@@ -38,7 +38,7 @@ public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     }
 
     /**
-     * Encode the supplied value into XML and write the results to the {@link Writer} object.
+     * Encode the given value into XML and write the results to the {@link Writer} object.
      * @param value     the value to be encoded
      * @param writer    the output stream to which the XML is written
      * @param rootElemName the name of the root element under which the output data is written
@@ -50,7 +50,7 @@ public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     }
 
     /**
-     * Decode a value by reading JSON from the supplied {@link Reader} object.
+     * Decode a value by reading JSON from the given {@link Reader} object.
      * @param type      the static type of the value to be decoded.
      * @param reader    the input stream from which JSON is read
      * @param rootElemName the name of the root element under which the output data is written
@@ -62,7 +62,7 @@ public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     }
 
     /**
-     * Decode a value by reading JSON from the supplied {@link Reader} object.
+     * Decode a value by reading JSON from the given {@link Reader} object.
      * @param reader    the input stream from which JSON is read
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value

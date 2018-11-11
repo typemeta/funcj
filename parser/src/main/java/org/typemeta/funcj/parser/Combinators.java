@@ -59,24 +59,24 @@ public abstract class Combinators {
     }
 
     /**
-     * A parser that succeeds if the next input symbol equals the supplied {@code value},
+     * A parser that succeeds if the next input symbol equals the given {@code value},
      * and returns the value.
      * @param val       the value expected by the parser
      * @param <I>       the input stream symbol type
-     * @return          as parser that succeeds if the next input symbol equals the supplied {@code value}
+     * @return          as parser that succeeds if the next input symbol equals the given {@code value}
      */
     public static <I> Parser<I, I> value(I val) {
         return value(val, val);
     }
 
     /**
-     * A parser that succeeds if the next input symbol equals the supplied {@code value},
-     * and returns the supplied {@code res} value.
+     * A parser that succeeds if the next input symbol equals the given {@code value},
+     * and returns the given {@code res} value.
      * @param val       the value expected by the parser
      * @param res       the value returned by the parser
      * @param <I>       the input stream symbol type
      * @param <A>       the parser result type
-     * @return          a parser that succeeds if the next input symbol equals the supplied {@code value}
+     * @return          a parser that succeeds if the next input symbol equals the given {@code value}
      */
     public static <I, A> Parser<I, A> value(I val, A res) {
         return new ParserImpl<I, A>(LFALSE, () -> SymSet.value(val)) {
@@ -88,11 +88,11 @@ public abstract class Combinators {
     }
 
     /**
-     * A parser that succeeds if the next input symbol satisfies the supplied predicate.
+     * A parser that succeeds if the next input symbol satisfies the given predicate.
      * @param name      a name for the parser (used for error messages)
      * @param pred      the predicate to be applied to the next input
      * @param <I>       the input stream symbol type
-     * @return          a parser that succeeds if the next input symbol satisfies the supplied predicate.
+     * @return          a parser that succeeds if the next input symbol satisfies the given predicate.
      */
     public static <I> Parser<I, I> satisfy(String name, Functions.Predicate<I> pred) {
         return new ParserImpl<I, I>(LFALSE, () -> SymSet.pred(name, pred)) {

@@ -42,11 +42,11 @@ public interface Parser<I, A> {
 
     /**
      * Applicative unit/pure function.
-     * Construct a parser that always returns the supplied value, without consuming any input.
+     * Construct a parser that always returns the given value, without consuming any input.
      * @param a         the value
      * @param <I>       the input stream symbol type
      * @param <A>       the parser result type
-     * @return          a parser that always returns the supplied value
+     * @return          a parser that always returns the given value
      */
     static <I, A> Parser<I, A> pure(A a) {
         return new ParserImpl<I, A>(LTRUE, SymSet::empty) {

@@ -10,19 +10,19 @@ import static org.typemeta.funcj.parser.Combinators.*;
 public abstract class Text {
     /**
      * Specialisation of {@link Parser#pure(Object)} for {@code Chr}.
-     * Construct a parser that always returns the supplied value, without consuming any input.
+     * Construct a parser that always returns the given value, without consuming any input.
      * @param c         the char value
-     * @return          a parser that always returns the supplied char
+     * @return          a parser that always returns the given char
      */
     public static Parser<Chr, Chr> pure(char c) {
         return Parser.pure(Chr.valueOf(c));
     }
 
     /**
-     * A parser that succeeds if the next input symbol equals the supplied char {@code c},
+     * A parser that succeeds if the next input symbol equals the given char {@code c},
      * and returns the value.
      * @param c         the value expected by the parser
-     * @return          as parser that succeeds if the next input symbol equals the supplied char {@code c}
+     * @return          as parser that succeeds if the next input symbol equals the given char {@code c}
      */
     public static Parser<Chr, Chr> chr(char c) {
         return value(Chr.valueOf(c));
@@ -136,9 +136,9 @@ public abstract class Text {
                     });
 
     /**
-     * A parser that succeeds if it can extract the supplied string from the input.
+     * A parser that succeeds if it can extract the given string from the input.
      * @param s         the expected string
-     * @return          a parser for the supplied string value
+     * @return          a parser for the given string value
      */
     public static Parser<Chr, String> string(String s) {
         switch (s.length()) {

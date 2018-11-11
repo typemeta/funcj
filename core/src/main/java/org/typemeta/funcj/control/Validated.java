@@ -224,10 +224,10 @@ public interface Validated<E, T> {
 
     /**
      * Either return the wrapped value if it's a {@code Success},
-     * otherwise return the supplied default value.
+     * otherwise return the given default value.
      * @param defaultValue value to be returned if this is a failure value.
      * @return          the success result value if it's a {@code Success},
-     *                  otherwise return the supplied default value.
+     *                  otherwise return the given default value.
      */
     T getOrElse(T defaultValue);
 

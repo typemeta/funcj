@@ -246,9 +246,9 @@ public interface Option<T> {
     Optional<T> asOptional();
 
     /**
-     * Either return the wrapped value if it's a {@code Some}, otherwise return the supplied default value.
+     * Either return the wrapped value if it's a {@code Some}, otherwise return the given default value.
      * @param defaultValue value to be returned if this is a failure value.
-     * @return          the success result value if it's a {@code Some}, otherwise return the supplied default value.
+     * @return          the success result value if it's a {@code Some}, otherwise return the given default value.
      */
     T getOrElse(T defaultValue);
 

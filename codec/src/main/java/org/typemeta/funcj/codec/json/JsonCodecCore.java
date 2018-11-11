@@ -23,7 +23,7 @@ public class JsonCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     }
 
     /**
-     * Encode the supplied value into JSON and write the results to the {@link Writer} object.
+     * Encode the given value into JSON and write the results to the {@link Writer} object.
      * The static type determines whether type information is written to recover the value's
      * dynamic type.
      * @param type      the static type of the value
@@ -36,7 +36,7 @@ public class JsonCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     }
 
     /**
-     * Encode the supplied value into JSON and write the results to the {@link Writer} object.
+     * Encode the given value into JSON and write the results to the {@link Writer} object.
      * The static type determines whether type information is written to recover the value's
      * dynamic type.
      * @param value     the value to be encoded
@@ -48,7 +48,7 @@ public class JsonCodecCore extends CodecCoreDelegate<Input, Output, Config> {
     }
 
     /**
-     * Decode a value by reading JSON from the supplied {@link Reader} object.
+     * Decode a value by reading JSON from the given {@link Reader} object.
      * @param type      the static type of the value to be decoded.
      * @param reader    the input stream from which JSON is read
      * @param <T>       the static type of the value

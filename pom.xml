@@ -76,10 +76,11 @@
         <site-maven-plugin.version>0.11</site-maven-plugin.version>
 
         <!-- Library versions -->
-        <immutables.version>2.5.5</immutables.version>
-        <jmh.version>1.19</jmh.version>
+        <immutables.version>2.7.3</immutables.version>
+        <jmh.version>1.21</jmh.version>
         <junit.version>4.12</junit.version>
-        <junit-quickcheck.version>0.7</junit-quickcheck.version>
+        <junit-quickcheck.version>0.8.1</junit-quickcheck.version>
+        <slf4j.version>1.7.25</slf4j.version>
     </properties>
 
     <dependencyManagement>
@@ -115,6 +116,12 @@
                 <artifactId>junit-quickcheck-generators</artifactId>
                 <version>${junit-quickcheck.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-nop</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
 
         </dependencies>

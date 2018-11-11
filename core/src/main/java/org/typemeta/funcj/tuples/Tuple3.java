@@ -14,7 +14,7 @@ import java.util.*;
  */
 final public class Tuple3<A, B, C> {
     /**
-     * Create a new {@code Tuple3} comprised of the supplied values
+     * Create a new {@code Tuple3} from the given values.
      * @param a         the first value
      * @param b         the second value
      * @param c         the third value
@@ -71,7 +71,7 @@ final public class Tuple3<A, B, C> {
     public final C _3;
 
     /**
-     * Create a new {@code Tuple3} comprised of the supplied values
+     * Create a new {@code Tuple3} from the given values.
      * @param a         the first value
      * @param b         the second value
      * @param c         the third value
@@ -109,7 +109,7 @@ final public class Tuple3<A, B, C> {
 
     /**
      * Return a new {@code Tuple3} which is a copy of this one,
-     * but with the first value replaced with the supplied argument {@code t}
+     * but with the first value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple3}
@@ -120,7 +120,7 @@ final public class Tuple3<A, B, C> {
 
     /**
      * Return a new {@code Tuple3} which is a copy of this one,
-     * but with the second value replaced with the supplied argument {@code t}
+     * but with the second value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple3}
@@ -131,7 +131,7 @@ final public class Tuple3<A, B, C> {
 
     /**
      * Return a new {@code Tuple3} which is a copy of this one,
-     * but with the third value replaced with the supplied argument {@code t}
+     * but with the third value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple3}
@@ -153,7 +153,7 @@ final public class Tuple3<A, B, C> {
 
     /**
      * Create a new {@code Tuple3} which is a copy of this one,
-     * but with the first value replaced with the result of applying the supplied function
+     * but with the first value replaced with the result of applying the given function
      * to the first value.
      * @param f         the function
      * @param <T>       the function return type
@@ -165,7 +165,7 @@ final public class Tuple3<A, B, C> {
 
     /**
      * Create a new {@code Tuple3} which is a copy of this one,
-     * but with the second value replaced with the result of applying the supplied function
+     * but with the second value replaced with the result of applying the given function
      * to the second value.
      * @param f         the function
      * @param <T>       the function return type
@@ -177,7 +177,7 @@ final public class Tuple3<A, B, C> {
 
     /**
      * Create a new {@code Tuple3} which is a copy of this one,
-     * but with the third value replaced with the result of applying the supplied function
+     * but with the third value replaced with the result of applying the given function
      * to the third value.
      * @param f         the function
      * @param <T>       the function return type

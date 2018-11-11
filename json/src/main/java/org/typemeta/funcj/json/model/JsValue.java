@@ -30,7 +30,7 @@ public interface JsValue {
     }
 
     /**
-     * Write this value into the supplied {@code StringBuilder}.
+     * Write this value into the given {@code StringBuilder}.
      * @param sb        the {@code StringBuilder}
      * @return          the {@code StringBuilder}
      */
@@ -45,7 +45,7 @@ public interface JsValue {
     Type type();
 
     /**
-     * Select the one supplied function that corresponds to the type of this value,
+     * Select the one given function that corresponds to the type of this value,
      * and return the result of applying the function to this value.
      * @param fNull     the function to be applied to a {@link JsNull} value
      * @param fBool     the function to be applied to a {@link JsBool} value

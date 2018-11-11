@@ -17,7 +17,7 @@ import java.util.*;
  */
 final public class Tuple6<A, B, C, D, E, F> {
     /**
-     * Create a new {@code Tuple6} comprised of the supplied values
+     * Create a new {@code Tuple6} from the given values.
      * @param a         the first value
      * @param b         the second value
      * @param c         the third value
@@ -116,7 +116,7 @@ final public class Tuple6<A, B, C, D, E, F> {
     public final F _6;
 
     /**
-     * Create a new {@code Tuple6} comprised of the supplied values
+     * Create a new {@code Tuple6} from the given values.
      * @param a         the first value
      * @param b         the second value
      * @param c         the third value
@@ -184,7 +184,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Return a new {@code Tuple6} which is a copy of this one,
-     * but with the first value replaced with the supplied argument {@code t}
+     * but with the first value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple6}
@@ -195,7 +195,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Return a new {@code Tuple6} which is a copy of this one,
-     * but with the second value replaced with the supplied argument {@code t}
+     * but with the second value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple6}
@@ -206,7 +206,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Return a new {@code Tuple6} which is a copy of this one,
-     * but with the third value replaced with the supplied argument {@code t}
+     * but with the third value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple6}
@@ -217,7 +217,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Return a new {@code Tuple6} which is a copy of this one,
-     * but with the fourth value replaced with the supplied argument {@code t}
+     * but with the fourth value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple6}
@@ -228,7 +228,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Return a new {@code Tuple6} which is a copy of this one,
-     * but with the fifth value replaced with the supplied argument {@code t}
+     * but with the fifth value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple6}
@@ -239,7 +239,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Return a new {@code Tuple6} which is a copy of this one,
-     * but with the sixth value replaced with the supplied argument {@code t}
+     * but with the sixth value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple6}
@@ -261,7 +261,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Create a new {@code Tuple6} which is a copy of this one,
-     * but with the first value replaced with the result of applying the supplied function
+     * but with the first value replaced with the result of applying the given function
      * to the first value.
      * @param f         the function
      * @param <T>       the function return type
@@ -273,7 +273,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Create a new {@code Tuple6} which is a copy of this one,
-     * but with the second value replaced with the result of applying the supplied function
+     * but with the second value replaced with the result of applying the given function
      * to the second value.
      * @param f         the function
      * @param <T>       the function return type
@@ -285,7 +285,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Create a new {@code Tuple6} which is a copy of this one,
-     * but with the third value replaced with the result of applying the supplied function
+     * but with the third value replaced with the result of applying the given function
      * to the third value.
      * @param f         the function
      * @param <T>       the function return type
@@ -297,7 +297,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Create a new {@code Tuple6} which is a copy of this one,
-     * but with the fourth value replaced with the result of applying the supplied function
+     * but with the fourth value replaced with the result of applying the given function
      * to the fourth value.
      * @param f         the function
      * @param <T>       the function return type
@@ -309,7 +309,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Create a new {@code Tuple6} which is a copy of this one,
-     * but with the fifth value replaced with the result of applying the supplied function
+     * but with the fifth value replaced with the result of applying the given function
      * to the fifth value.
      * @param f         the function
      * @param <T>       the function return type
@@ -321,7 +321,7 @@ final public class Tuple6<A, B, C, D, E, F> {
 
     /**
      * Create a new {@code Tuple6} which is a copy of this one,
-     * but with the sixth value replaced with the result of applying the supplied function
+     * but with the sixth value replaced with the result of applying the given function
      * to the sixth value.
      * @param f         the function
      * @param <T>       the function return type

@@ -13,7 +13,7 @@ import java.util.*;
  */
 final public class Tuple2<A, B> {
     /**
-     * Create a new {@code Tuple2} comprised of the supplied values.
+     * Create a new {@code Tuple2} from the given values.
      * @param a         the first value
      * @param b         the second value
      * @param <A>       the first value type
@@ -54,7 +54,7 @@ final public class Tuple2<A, B> {
     public final B _2;
 
     /**
-     * Create a new {@code Tuple2} comprised of the supplied values.
+     * Create a new {@code Tuple2} from the given values.
      * @param a         the first value
      * @param b         the second value
      * @throws          NullPointerException if any of the tuple values is null
@@ -82,7 +82,7 @@ final public class Tuple2<A, B> {
 
     /**
      * Return a new {@code Tuple2} which is a copy of this one,
-     * but with the first value replaced with the supplied argument {@code t}
+     * but with the first value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple2}
@@ -94,7 +94,7 @@ final public class Tuple2<A, B> {
 
     /**
      * Return a new {@code Tuple2} which is a copy of this one,
-     * but with the second value replaced with the supplied argument {@code t}
+     * but with the second value replaced with the given argument {@code t}
      * @param t         the replacement value
      * @param <T>       the replacement value type
      * @return          the new {@code Tuple2}
@@ -116,7 +116,7 @@ final public class Tuple2<A, B> {
 
     /**
      * Create a new {@code Tuple2} which is a copy of this one,
-     * but with the first value replaced with the result of applying the supplied function
+     * but with the first value replaced with the result of applying the given function
      * to the first value.
      * @param f         the function
      * @param <T>       the function return type
@@ -128,7 +128,7 @@ final public class Tuple2<A, B> {
 
     /**
      * Create a new {@code Tuple2} which is a copy of this one,
-     * but with the second value replaced with the result of applying the supplied function
+     * but with the second value replaced with the result of applying the given function
      * to the second value.
      * @param f         the function
      * @param <T>       the function return type

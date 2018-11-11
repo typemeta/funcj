@@ -75,7 +75,7 @@ public interface CodecConfig {
      * @param field     the field
      * @param depth     the inheritance depth (increases as we go up the hierarchy)
      * @param existingNames the set of existing field names
-     * @return
+     * @return          the field name
      */
     String getFieldName(Field field, int depth, Set<String> existingNames);
 

@@ -62,7 +62,7 @@ public interface State<S, A> {
     }
 
     /**
-     * Construct a {@code State} which leaves the state value unchanged and sets the result to the supplied value.
+     * Construct a {@code State} which leaves the state value unchanged and sets the result to the given value.
      * @param <S>       the state type
      * @return          the new {@code State} instance
      */
