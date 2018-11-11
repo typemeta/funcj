@@ -84,4 +84,13 @@ public interface CodecConfig {
      * @return          the default size for arrays
      */
     int defaultArraySize();
+
+    /**
+     * Check whether two types match or not.
+     * @param dynClass  the dynamic type
+     * @param stcClass  the static type
+     * @param <T>       the type type
+     * @return          true if the types match
+     */
+    <T> boolean dynamicTypeMatch(Class<T> dynClass, Class<T> stcClass);
 }

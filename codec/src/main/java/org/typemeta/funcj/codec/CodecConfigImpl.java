@@ -116,4 +116,15 @@ public class CodecConfigImpl implements CodecConfig {
     public int defaultArraySize() {
         return 16;
     }
+
+    @Override
+    public <T> boolean dynamicTypeMatch(Class<T> dynClass, Class<T> stcClass) {
+        if (dynClass == stcClass) {
+            return true;
+        } else if (stcClass.isEnum()) {
+            return dynClass.getSuperclass() == stcClass;
+        } else {
+            return false;
+        }
+    }
 }

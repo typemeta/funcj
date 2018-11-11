@@ -53,7 +53,7 @@ public class XmlCodecFormat implements CodecFormat<Input, Output, Config> {
             Output out,
             Functions.F<Class<T>, Codec<T, Input, Output, Config>> getDynCodec) {
         final Class<T> dynType = (Class<T>) val.getClass();
-        if (dynType.equals(codec.type())) {
+        if (config().dynamicTypeMatch(dynType, codec.type())) {
             return false;
         } else {
             final Codec<T, Input, Output, Config> dynCodec = getDynCodec.apply(dynType);
