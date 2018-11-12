@@ -7,7 +7,7 @@ import org.typemeta.funcj.codec.xml.XmlCodecCore;
 import org.typemeta.funcj.functions.Functions.F;
 
 import java.time.*;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Factory methods for creating CodecCore instances.
@@ -40,6 +40,8 @@ public abstract class Codecs {
 
     public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>> CORE registerAll(CORE core) {
 
+        // Register allowed packages and classes.
+
         for (Class<?> clazz : new Class<?>[]{
                 Boolean.class, Byte.class, Character.class, Double.class, Float.class, Integer.class, Long.class, Short.class,
                 boolean.class, byte.class, char.class, double.class, float.class, int.class, long.class, short.class,
@@ -52,6 +54,13 @@ public abstract class Codecs {
         core.config().registerAllowedPackage(java.util.Collection.class.getPackage());
         core.config().registerAllowedPackage(java.time.LocalDate.class.getPackage());
 
+        // Register default sub-types.
+        core.config().registerDefaultSubType(List.class, ArrayList.class);
+        core.config().registerDefaultSubType(Set.class, HashSet.class);
+        core.config().registerDefaultSubType(Map.class, HashMap.class);
+
+        // Register constructors.
+
         core.registerArgArrayCtor(
                 ReflectionUtils.classForName("java.util.Collections$SingletonList"),
                 args -> Collections.singletonList(args[0]));
@@ -60,13 +69,21 @@ public abstract class Codecs {
                 ReflectionUtils.classForName("java.util.Collections$SingletonSet"),
                 args -> Collections.singleton(args[0]));
 
+        core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Collections$SingletonMap"),
+                args -> Collections.singletonMap(args[0], args[1]));
+
+        // Register codec for Class.
         core.registerStringProxyCodec(
                 Class.class,
                 core.config()::classToName,
                 core.config()::nameToClass
         );
 
+        // Register a type proxy for ZoneRegion.
         core.config().registerTypeProxy(ReflectionUtils.classForName("java.time.ZoneRegion"), ZoneId.class);
+
+        // Register codecs for Java 8 date/time classes.
 
         core.registerCodec(LocalDate.class)
                 .field("year", LocalDate::getYear, Integer.class)

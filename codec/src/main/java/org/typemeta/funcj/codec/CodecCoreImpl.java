@@ -27,7 +27,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
      * As and when new classes are encountered, they are inspected via Reflection,
      * and a {@code Codec} is constructed and registered.
      */
-    protected final ConcurrentMap<ClassKey, Codec<?, IN, OUT, CFG>> codecRegistry = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<ClassKey<?>, Codec<?, IN, OUT, CFG>> codecRegistry = new ConcurrentHashMap<>();
 
     /**
      * A map that associates a class with a {@code NoArgsCtor}.
@@ -36,9 +36,9 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
      * As and when new classes are encountered, they are inspected via Reflection,
      * and a {@code TypeConstructor} is constructed and registered.
      */
-    protected final ConcurrentMap<ClassKey, NoArgsTypeCtor<?>> noArgsCtorRegistry = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<ClassKey<?>, NoArgsTypeCtor<?>> noArgsCtorRegistry = new ConcurrentHashMap<>();
 
-    protected final ConcurrentMap<ClassKey, ArgArrayTypeCtor<?>> argArrayCtorRegistry = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<ClassKey<?>, ArgArrayTypeCtor<?>> argArrayCtorRegistry = new ConcurrentHashMap<>();
 
     protected final CodecFormat<IN, OUT, CFG> format;
 
@@ -106,7 +106,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
 
     @Override
     public <T> Optional<NoArgsTypeCtor<T>> getNoArgsCtorOpt(Class<T> clazz) {
-        final ClassKey key = ClassKey.valueOf(clazz);
+        final ClassKey<?> key = ClassKey.valueOf(clazz);
         NoArgsTypeCtor<T> ctor = (NoArgsTypeCtor<T>)noArgsCtorRegistry.get(key);
 
         if (ctor == null) {
@@ -150,7 +150,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
 
     @Override
     public <T> Codec<T, IN, OUT, CFG> getCodec(
-            ClassKey key,
+            ClassKey<?> key,
             Supplier<Codec<T, IN, OUT, CFG>> codecSupp) {
         // First attempt, without locking.
         if (codecRegistry.containsKey(key)) {
@@ -179,7 +179,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(
             Class<Collection<T>> collType,
             Codec<T, IN, OUT, CFG> elemCodec) {
-        final ClassKey key = ClassKey.valueOf(collType, elemCodec.type());
+        final ClassKey<?> key = ClassKey.valueOf(collType, elemCodec.type());
         return getCodec(key, () -> format().createCollCodec(collType, elemCodec));
     }
 
@@ -188,7 +188,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
             Class<Map<K, V>> mapType,
             Class<K> keyType,
             Class<V> valType) {
-        final ClassKey key = ClassKey.valueOf(mapType, keyType, valType);
+        final ClassKey<?> key = ClassKey.valueOf(mapType, keyType, valType);
         return getCodec(key, () -> createMapCodec(mapType, keyType, valType));
     }
 
@@ -197,7 +197,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
             Class<Map<K, V>> mapType,
             Codec<K, IN, OUT, CFG> keyCodec,
             Codec<V, IN, OUT, CFG> valueCodec) {
-        final ClassKey key = ClassKey.valueOf(mapType, keyCodec.type(), valueCodec.type());
+        final ClassKey<?> key = ClassKey.valueOf(mapType, keyCodec.type(), valueCodec.type());
         return getCodec(key, () -> format().createMapCodec(mapType, keyCodec, valueCodec));
     }
 
@@ -205,7 +205,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <V> Codec<Map<String, V>, IN, OUT, CFG> getMapCodec(
             Class<Map<String, V>> mapType,
             Codec<V, IN, OUT, CFG> valueCodec) {
-        final ClassKey key = ClassKey.valueOf(mapType, String.class, valueCodec.type());
+        final ClassKey<?> key = ClassKey.valueOf(mapType, String.class, valueCodec.type());
         return getCodec(key, () -> format().createMapCodec(mapType, valueCodec));
     }
 

@@ -55,7 +55,13 @@ public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
             if (val != null) {
                 return val;
             } else {
-                return decode(core, in);
+                final Class<Collection<T>> dynClass = core.config().getDefaultSubType(type());
+                if (dynClass != null) {
+                    final Codec<Collection<T>, IN, OUT, CFG> codec = getCodec(core, dynClass);
+                    return codec.decode(core, in);
+                } else {
+                    return decode(core, in);
+                }
             }
         }
     }

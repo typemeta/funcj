@@ -891,9 +891,11 @@ public abstract class TestTypes {
     static class EmptyOrSingletonCollections {
         final List<String> emptyList = Collections.emptyList();
         final Set<String> emptySet = Collections.emptySet();
+        final Map<String, Integer> emptyMap = Collections.emptyMap();
 
         final List<String> singletonList = Collections.singletonList("abcd");
         final Set<String> singletonSet = Collections.singleton("abcd");
+        //final Map<String, Integer> singletonMap = Collections.singletonMap("ghij", 1234);
 
         @Override
         public boolean equals(Object rhs) {
@@ -905,8 +907,10 @@ public abstract class TestTypes {
                 EmptyOrSingletonCollections that = (EmptyOrSingletonCollections) rhs;
                 return Objects.equals(emptyList, that.emptyList) &&
                         Objects.equals(emptySet, that.emptySet) &&
+                        Objects.equals(emptyMap, that.emptyMap) &&
                         Objects.equals(singletonList, that.singletonList) &&
-                        Objects.equals(singletonSet, that.singletonSet);
+                        Objects.equals(singletonSet, that.singletonSet); // &&
+                        //Objects.equals(singletonMap, that.singletonMap);
             }
         }
     }

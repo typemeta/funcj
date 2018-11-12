@@ -306,7 +306,7 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
         if (core.format().decodeNull(in)) {
             return null;
         } else {
-            final T value = core.decodeDynamicType(in);
+            final T value = core.decodeDynamicType(type(), in);
             if (value != null) {
                 return value;
             } else {

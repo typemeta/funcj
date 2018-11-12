@@ -25,8 +25,16 @@ public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig>
         return format().encodeDynamicType(this, codec, val, out, this::getCodec);
     }
 
-    default <T> T decodeDynamicType(IN in) {
-        return format().decodeDynamicType(this, in);
+    default <T> T decodeDynamicType(Class<T> clazz, IN in) {
+        final T val = format().decodeDynamicType(this, in);
+        if (val == null) {
+            final Class<T> dynClass = config().getDefaultSubType(clazz);
+            if (dynClass != null) {
+                final Codec<T, IN, OUT, CFG> codec = getCodec(dynClass);
+                return codec.decode(this, in);
+            }
+        }
+        return val;
     }
 
     /**
@@ -50,7 +58,7 @@ public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig>
      * @return          the {@code Codec} for the specified name
      */
     <T> Codec<T, IN, OUT, CFG> getCodec(
-            ClassKey key,
+            ClassKey<?> key,
             Supplier<Codec<T, IN, OUT, CFG>> codecSupp);
 
     <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(

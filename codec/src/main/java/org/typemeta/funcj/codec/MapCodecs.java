@@ -53,7 +53,13 @@ public abstract class MapCodecs {
                 if (val != null) {
                     return val;
                 } else {
-                    return decode(core, in);
+                    final Class<Map<K, V>> dynClass = core.config().getDefaultSubType(type());
+                    if (dynClass != null) {
+                        final Codec<Map<K, V>, IN, OUT, CFG> codec = getCodec(core, dynClass);
+                        return codec.decode(core, in);
+                    } else {
+                        return decode(core, in);
+                    }
                 }
             }
         }
@@ -107,7 +113,13 @@ public abstract class MapCodecs {
                 if (val != null) {
                     return val;
                 } else {
-                    return decode(core, in);
+                    final Class<Map<String, V>> dynClass = core.config().getDefaultSubType(type());
+                    if (dynClass != null) {
+                        final Codec<Map<String, V>, IN, OUT, CFG> codec = getCodec(core, dynClass);
+                        return codec.decode(core, in);
+                    } else {
+                        return decode(core, in);
+                    }
                 }
             }
         }
