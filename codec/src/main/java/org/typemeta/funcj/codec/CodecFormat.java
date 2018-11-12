@@ -26,9 +26,11 @@ public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
             OUT out,
             Functions.F<Class<T>, Codec<T, IN, OUT, CFG>> getDynCodec);
 
-    <T> T decodeDynamicType(IN in, Functions.F<String, T> decoder);
+    default <T> T decodeDynamicType(CodecCoreEx<IN, OUT, CFG> core, IN in) {
+        return decodeDynamicType(in, name -> core.getCodec(this.config().<T>nameToClass(name)).decode(core, in));
+    }
 
-    <T> T decodeDynamicType(CodecCoreEx<IN, OUT, CFG> core, IN in);
+    <T> T decodeDynamicType(IN in, Functions.F<String, T> decoder);
 
     Codec.BooleanCodec<IN, OUT, CFG> booleanCodec();
 

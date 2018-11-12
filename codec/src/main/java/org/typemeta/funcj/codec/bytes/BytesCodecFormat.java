@@ -49,7 +49,7 @@ public class BytesCodecFormat implements CodecFormat<Input, Output, Config> {
             Output out,
             Functions.F<Class<T>, Codec<T, Input, Output, Config>> getDynCodec) {
         final Class<T> dynType = (Class<T>) val.getClass();
-        if (config().dynamicTypeMatch(dynType, codec.type())) {
+        if (config().dynamicTypeMatch(codec.type(), dynType) || config().getDefaultSubType(codec.type()) == dynType) {
             out.writeBoolean(false);
             return false;
         } else {
@@ -69,11 +69,6 @@ public class BytesCodecFormat implements CodecFormat<Input, Output, Config> {
         } else {
             return null;
         }
-    }
-
-    @Override
-    public <T> T decodeDynamicType(CodecCoreEx<Input, Output, Config> core, Input in) {
-        return decodeDynamicType(in, name -> core.getCodec(this.config().<T>nameToClass(name)).decode(core, in));
     }
 
     protected final Codec.BooleanCodec<Input, Output, Config> booleanCodec =

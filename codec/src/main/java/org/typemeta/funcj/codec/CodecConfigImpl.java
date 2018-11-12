@@ -17,6 +17,8 @@ public class CodecConfigImpl implements CodecConfig {
 
     protected final Map<String, Class<?>> nameToClassMap = new HashMap<>();
 
+    protected final Map<Class<?>, Class<?>> defaultDynamicTypeMap = new TreeMap<>(Comparator.comparing(Class::getName));
+
     /**
      * A map that associates a class with its proxy.
      * Where a class has a proxy, the codec for the proxy will be used for the class.
@@ -118,7 +120,18 @@ public class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
-    public <T> boolean dynamicTypeMatch(Class<T> dynClass, Class<T> stcClass) {
+    public <T> void registerDefaultSubType(Class<T> stcClass, Class<? extends T> dynClass) {
+        defaultDynamicTypeMap.put(stcClass, dynClass);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T, U extends T> Class<U> getDefaultSubType(Class<T> stcClass) {
+        return (Class<U>)defaultDynamicTypeMap.get(stcClass);
+    }
+
+    @Override
+    public <T> boolean dynamicTypeMatch(Class<T> stcClass, Class<? extends T> dynClass) {
         if (dynClass == stcClass) {
             return true;
         } else if (stcClass.isEnum()) {

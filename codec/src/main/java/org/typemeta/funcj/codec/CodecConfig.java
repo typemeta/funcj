@@ -85,12 +85,16 @@ public interface CodecConfig {
      */
     int defaultArraySize();
 
+    <T> void registerDefaultSubType(Class<T> stcClass, Class<? extends T> dynClass);
+
+    <T, U extends T> Class<U> getDefaultSubType(Class<T> stcClass);
+
     /**
      * Check whether two types match or not.
-     * @param dynClass  the dynamic type
      * @param stcClass  the static type
+     * @param dynClass  the dynamic type
      * @param <T>       the type type
      * @return          true if the types match
      */
-    <T> boolean dynamicTypeMatch(Class<T> dynClass, Class<T> stcClass);
+    <T> boolean dynamicTypeMatch(Class<T> stcClass, Class<? extends T> dynClass);
 }
