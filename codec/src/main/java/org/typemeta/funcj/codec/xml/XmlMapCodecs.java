@@ -11,10 +11,10 @@ public abstract class XmlMapCodecs {
     public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Input, Output, Config> {
 
         public MapCodec(
-                Class<Map<K, V>> type,
+                Class<Map<K, V>> mapType,
                 Codec<K, Input, Output, Config> keyCodec,
                 Codec<V, Input, Output, Config> valueCodec) {
-            super(type, keyCodec, valueCodec);
+            super(mapType, keyCodec, valueCodec);
         }
 
         @Override
@@ -36,7 +36,7 @@ public abstract class XmlMapCodecs {
 
         @Override
         public Map<K, V> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
-            final Map<K, V> map = core.getNoArgsCtor(type).construct();
+            final MapProxy<K, V> mapProxy = getMapProxy(core);
 
             while(in.hasNext()) {
                 if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
@@ -51,10 +51,10 @@ public abstract class XmlMapCodecs {
                 final V val = valueCodec.decodeWithCheck(core, in);
                 in.endElement();
                 in.endElement();
-                map.put(key, val);
+                mapProxy.put(key, val);
             }
 
-            return map;
+            return mapProxy.construct();
         }
     }
 
@@ -78,7 +78,7 @@ public abstract class XmlMapCodecs {
 
         @Override
         public Map<String, V> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
-            final Map<String, V> map = core.getNoArgsCtor(type).construct();
+            final MapProxy<String, V> mapProxy = getMapProxy(core);
 
             while (in.hasNext()) {
                 if (!in.type().equals(XmlCodec.Input.Type.START_ELEMENT)) {
@@ -88,10 +88,10 @@ public abstract class XmlMapCodecs {
                 final String key = in.startElement();
                 final V val = valueCodec.decodeWithCheck(core, in);
                 in.endElement();
-                map.put(key, val);
+                mapProxy.put(key, val);
             }
 
-            return map;
+            return mapProxy.construct();
         }
     }
 }

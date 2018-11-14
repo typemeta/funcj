@@ -13,10 +13,19 @@ import java.util.*;
 public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
         implements Codec<Collection<T>, IN, OUT, CFG> {
 
+    protected final Class<Collection<T>> collType;
     protected final Codec<T, IN, OUT, CFG> elemCodec;
 
-    protected CollectionCodec(Codec<T, IN, OUT, CFG> elemCodec) {
+    protected CollectionCodec(
+            Class<Collection<T>> collType,
+            Codec<T, IN, OUT, CFG> elemCodec) {
+        this.collType = collType;
         this.elemCodec = elemCodec;
+    }
+
+    @Override
+    public Class<Collection<T>> type() {
+        return collType;
     }
 
     private Codec<Collection<T>, IN, OUT, CFG> getCodec(
@@ -66,6 +75,20 @@ public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
         }
     }
 
+    protected CollProxy<T> getCollectionProxy(CodecCoreEx<IN, OUT, CFG> core) {
+        final Optional<NoArgsTypeCtor<Collection<T>>> noaCtorOpt = core.getNoArgsCtorOpt(collType);
+        if (noaCtorOpt.isPresent()) {
+            return new CollProxy1<T>(noaCtorOpt.get().construct());
+        } else {
+            final ArgArrayTypeCtor<Collection<T>> argArrCtor =
+                    core.getArgArrayCtorOpt(collType)
+                            .orElseThrow(() -> new CodecException(
+                                    "Could not find suitable constructor for " + collType));
+
+            return new CollProxy2<T>(elemCodec.type(), argArrCtor);
+        }
+    }
+
     protected interface CollProxy<T> {
         void add(T elem);
         Collection<T> construct();
@@ -112,22 +135,6 @@ public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
             final T[] arr = (T[]) Array.newInstance(elemType, args.size());
             args.toArray(arr);
             return argArrCtor.construct(arr);
-        }
-    }
-
-    protected CollProxy<T> getCollectionProxy(
-            CodecCoreEx<IN, OUT, CFG> core,
-            Class<Collection<T>> collType) {
-        final Optional<NoArgsTypeCtor<Collection<T>>> noaCtorOpt = core.getNoArgsCtorOpt(collType);
-        if (noaCtorOpt.isPresent()) {
-            return new CollProxy1<T>(noaCtorOpt.get().construct());
-        } else {
-            final ArgArrayTypeCtor<Collection<T>> argArrCtor =
-                    core.getArgArrayCtorOpt(collType)
-                            .orElseThrow(() -> new CodecException(
-                                    "Could not find suitable constructor for " + collType));
-
-            return new CollProxy2<T>(elemCodec.type(), argArrCtor);
         }
     }
 }

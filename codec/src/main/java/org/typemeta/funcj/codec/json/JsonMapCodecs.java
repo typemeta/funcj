@@ -11,10 +11,10 @@ public abstract class JsonMapCodecs {
     public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Input, Output, Config> {
 
         public MapCodec(
-                Class<Map<K, V>> type,
+                Class<Map<K, V>> mapType,
                 Codec<K, Input, Output, Config> keyCodec,
                 Codec<V, Input, Output, Config> valueCodec) {
-            super(type, keyCodec, valueCodec);
+            super(mapType, keyCodec, valueCodec);
         }
 
         @Override
@@ -41,7 +41,7 @@ public abstract class JsonMapCodecs {
             final String keyFieldName = core.config().keyFieldName();
             final String valueFieldName = core.config().valueFieldName();
 
-            final Map<K, V> map = core.getNoArgsCtor(type).construct();
+            final MapProxy<K, V> mapProxy = getMapProxy(core);
 
             in.startArray();
 
@@ -68,14 +68,14 @@ public abstract class JsonMapCodecs {
                     }
                 }
 
-                map.put(key, val);
+                mapProxy.put(key, val);
 
                 in.endObject();
             }
 
             in.endArray();
 
-            return map;
+            return mapProxy.construct();
         }
     }
 
@@ -103,17 +103,17 @@ public abstract class JsonMapCodecs {
         public Map<String, V> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
             in.startObject();
 
-            final Map<String, V> map = core.getNoArgsCtor(type).construct();
+            final MapProxy<String, V> mapProxy = getMapProxy(core);
 
             while(in.notEOF() && in.currentEventType() == JsonCodec.Input.Event.Type.FIELD_NAME) {
                 final String key = in.readFieldName();
                 final V val = valueCodec.decodeWithCheck(core, in);
-                map.put(key, val);
+                mapProxy.put(key, val);
             }
 
             in.endObject();
 
-            return map;
+            return mapProxy.construct();
         }
     }
 }

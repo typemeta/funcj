@@ -620,11 +620,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
     public <T> Codec<Collection<T>, Input, Output, Config> createCollCodec(
             Class<Collection<T>> collType,
             Codec<T, Input, Output, Config> elemCodec) {
-        return new CollectionCodec<T, Input, Output, Config>(elemCodec) {
-            @Override
-            public Class<Collection<T>> type() {
-                return collType;
-            }
+        return new CollectionCodec<T, Input, Output, Config>(collType, elemCodec) {
 
             @Override
             public Output encode(CodecCoreEx<Input, Output, Config> core, Collection<T> value, Output out) {
@@ -637,7 +633,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
 
             @Override
             public Collection<T> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
-                final CollProxy<T> collProxy = getCollectionProxy(core, collType);
+                final CollProxy<T> collProxy = getCollectionProxy(core);
 
                 in.startArray();
 

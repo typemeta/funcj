@@ -895,7 +895,7 @@ public abstract class TestTypes {
 
         final List<String> singletonList = Collections.singletonList("abcd");
         final Set<String> singletonSet = Collections.singleton("abcd");
-        //final Map<String, Integer> singletonMap = Collections.singletonMap("ghij", 1234);
+        final Map<String, Integer> singletonMap = Collections.singletonMap("ghij", 1234);
 
         @Override
         public boolean equals(Object rhs) {
@@ -909,8 +909,8 @@ public abstract class TestTypes {
                         Objects.equals(emptySet, that.emptySet) &&
                         Objects.equals(emptyMap, that.emptyMap) &&
                         Objects.equals(singletonList, that.singletonList) &&
-                        Objects.equals(singletonSet, that.singletonSet); // &&
-                        //Objects.equals(singletonMap, that.singletonMap);
+                        Objects.equals(singletonSet, that.singletonSet)  &&
+                        Objects.equals(singletonMap, that.singletonMap);
             }
         }
     }
