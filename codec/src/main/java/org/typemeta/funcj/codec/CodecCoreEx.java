@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 /**
- * Internal interface for {@link CodecCore} implementations.
+ * Extended internal interface for {@link CodecCore} implementations.
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
  * @param <CFG>     the config type

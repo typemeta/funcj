@@ -28,16 +28,8 @@ public class JsonCodec {
         return new JsonParser(reader, MAX_PARSER_LOOKAHEAD);
     }
 
-    public static Input inputOf(InputStream is) {
-        return new JsonParser(new InputStreamReader(is), MAX_PARSER_LOOKAHEAD);
-    }
-
     public static Output outputOf(Writer writer) {
         return new JsonGenerator(writer);
-    }
-
-    public static Output outputOf(OutputStream os) {
-        return new JsonGenerator(new OutputStreamWriter(os));
     }
 
     public interface Input  {

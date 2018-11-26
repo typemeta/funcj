@@ -35,12 +35,20 @@ public class XmlCodec {
         return InputImpl.inputOf(reader, rootElemName);
     }
 
+    public static Input inputOf(InputStream is, String rootElemName) {
+        return InputImpl.inputOf(is, rootElemName);
+    }
+
     public static Output outputOf(XMLStreamWriter writer) {
         return OutputImpl.outputOf(writer);
     }
 
     public static Output outputOf(Writer writer, String rootElemName) {
         return OutputImpl.outputOf(writer, rootElemName);
+    }
+
+    public static Output outputOf(OutputStream os, String rootElemName) {
+        return OutputImpl.outputOf(os, rootElemName);
     }
 
     public interface Input {

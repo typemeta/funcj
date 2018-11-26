@@ -4,6 +4,7 @@ import org.typemeta.funcj.codec.CodecException;
 import org.typemeta.funcj.codec.xml.XmlCodec;
 
 import javax.xml.stream.*;
+import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.text.*;
@@ -24,13 +25,28 @@ public class InputImpl implements XmlCodec.Input {
             final XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
             xmlInFact.setProperty(XMLInputFactory.IS_COALESCING, true);
             final XMLStreamReader xrdr = xmlInFact.createXMLStreamReader(reader);
-            final XmlCodec.Input in = inputOf(xrdr);
-            in.startDocument();
-            in.startElement(rootElemName);
-            return in;
+            return inputOf(xrdr, rootElemName);
         } catch (XMLStreamException ex) {
             throw new CodecException(ex);
         }
+    }
+
+    public static XmlCodec.Input inputOf(InputStream os, String rootElemName) {
+        try {
+            final XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
+            xmlInFact.setProperty(XMLInputFactory.IS_COALESCING, true);
+            final XMLStreamReader xrdr = xmlInFact.createXMLStreamReader(os);
+            return inputOf(xrdr, rootElemName);
+        } catch (XMLStreamException ex) {
+            throw new CodecException(ex);
+        }
+    }
+
+    public static XmlCodec.Input inputOf(XMLStreamReader xrdr, String rootElemName) {
+        final XmlCodec.Input in = inputOf(xrdr);
+        in.startDocument();
+        in.startElement(rootElemName);
+        return in;
     }
 
     protected static class AttributeMapImpl implements AttributeMap {

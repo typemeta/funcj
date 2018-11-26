@@ -8,7 +8,9 @@ import java.io.*;
 /**
  * Interface for classes which implement an encoding via JSON.
  */
-public class JsonCodecCore extends CodecCoreDelegate<Input, Output, Config> {
+public class JsonCodecCore
+        extends CodecCoreDelegate<Input, Output, Config>
+        implements CodecAPI {
 
     public JsonCodecCore(JsonCodecFormat format) {
         super(new CodecCoreImpl<>(format));
@@ -22,39 +24,13 @@ public class JsonCodecCore extends CodecCoreDelegate<Input, Output, Config> {
         this(new JsonConfigImpl());
     }
 
-    /**
-     * Encode the given value into JSON and write the results to the {@link Writer} object.
-     * The static type determines whether type information is written to recover the value's
-     * dynamic type.
-     * @param type      the static type of the value
-     * @param value     the value to be encoded
-     * @param writer    the output stream to which the JSON is written
-     * @param <T>       the static type of the value
-     */
+    @Override
     public <T> void encode(Class<? super T> type, T value, Writer writer) {
-        delegate.encode(type, value, JsonCodec.outputOf(writer));
+        encode(type, value, JsonCodec.outputOf(writer));
     }
 
-    /**
-     * Encode the given value into JSON and write the results to the {@link Writer} object.
-     * The static type determines whether type information is written to recover the value's
-     * dynamic type.
-     * @param value     the value to be encoded
-     * @param writer    the output stream to which the JSON is written
-     * @param <T>       the static type of the value
-     */
-    public <T> void encode(T value, Writer writer) {
-        encode(Object.class, value, writer);
-    }
-
-    /**
-     * Decode a value by reading JSON from the given {@link Reader} object.
-     * @param type      the static type of the value to be decoded.
-     * @param reader    the input stream from which JSON is read
-     * @param <T>       the static type of the value
-     * @return          the decoded value
-     */
-    public <T> T decode(Class<T> type, Reader reader) {
-        return delegate.decode(type, JsonCodec.inputOf(reader));
+    @Override
+    public <T> T decode(Class<? super T> type, Reader reader) {
+        return decode(type, JsonCodec.inputOf(reader));
     }
 }

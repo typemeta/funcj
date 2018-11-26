@@ -71,17 +71,17 @@ public interface CodecCore<IN, OUT, CFG extends CodecConfig> {
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.
      * @param clazz     the class of the decoded value
-     * @param val       the value to encode
+     * @param value     the value to encode
      * @param out       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
-     * @return          the encoded value
+     * @return          the encoded output
      */
-    <T> OUT encode(Class<? super T> clazz, T val, OUT out);
+    <T> OUT encode(Class<? super T> clazz, T value, OUT out);
 
     /**
      * Decode a value of type {@code T} from encoded value of type {@code E}.
      * @param clazz     the type of the decoded value
-     * @param in        the value to decode
+     * @param in        the input to decode
      * @param <T>       the decoded value type
      * @return          the decoded value
      */

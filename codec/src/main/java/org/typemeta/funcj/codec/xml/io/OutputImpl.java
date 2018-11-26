@@ -5,6 +5,7 @@ import org.typemeta.funcj.codec.xml.XmlCodec;
 import org.typemeta.funcj.functions.SideEffectGenEx;
 
 import javax.xml.stream.*;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.math.BigDecimal;
 
@@ -23,16 +24,31 @@ public class OutputImpl implements XmlCodec.Output {
             final XMLOutputFactory xmlOutFact = XMLOutputFactory.newInstance();
             xmlOutFact.setProperty("escapeCharacters", false);
             final XMLStreamWriter xwtr = xmlOutFact.createXMLStreamWriter(writer);
-            xwtr.writeStartDocument();
-            xwtr.writeStartElement(rootElemName);
-
-            return new OutputImpl(xwtr, out -> {
-                xwtr.writeEndElement();
-                xwtr.writeEndDocument();
-            });
+            return outputOf(xwtr, rootElemName);
         } catch (XMLStreamException ex) {
             throw new CodecException(ex);
         }
+    }
+
+    public static XmlCodec.Output outputOf(OutputStream os, String rootElemName) {
+        try {
+            final XMLOutputFactory xmlOutFact = XMLOutputFactory.newInstance();
+            xmlOutFact.setProperty("escapeCharacters", false);
+            final XMLStreamWriter xwtr = xmlOutFact.createXMLStreamWriter(os);
+            return outputOf(xwtr, rootElemName);
+        } catch (XMLStreamException ex) {
+            throw new CodecException(ex);
+        }
+    }
+
+    public static XmlCodec.Output outputOf(XMLStreamWriter xwtr, String rootElemName) throws XMLStreamException {
+        xwtr.writeStartDocument();
+        xwtr.writeStartElement(rootElemName);
+
+        return new OutputImpl(xwtr, out -> {
+            xwtr.writeEndElement();
+            xwtr.writeEndDocument();
+        });
     }
 
     private final XMLStreamWriter wtr;

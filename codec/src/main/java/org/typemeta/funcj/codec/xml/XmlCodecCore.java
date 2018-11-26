@@ -8,7 +8,10 @@ import java.io.*;
 /**
  * Interface for classes which implement an encoding via XML.
  */
-public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
+public class XmlCodecCore
+        extends CodecCoreDelegate<Input, Output, Config>
+        implements CodecAPI {
+
     public XmlCodecCore(XmlCodecFormat format) {
         super(new CodecCoreImpl<>(format));
     }
@@ -70,5 +73,25 @@ public class XmlCodecCore extends CodecCoreDelegate<Input, Output, Config> {
      */
     public <T> T decode(Reader reader, String rootElemName) {
         return decode(Object.class, reader, rootElemName);
+    }
+
+    @Override
+    public <T> void encode(Class<? super T> clazz, T value, Writer wtr) {
+        encode(clazz, value, XmlCodec.outputOf(wtr, clazz.getSimpleName()));
+    }
+
+    @Override
+    public <T> T decode(Class<? super T> clazz, Reader rdr) {
+        return decode(clazz, XmlCodec.inputOf(rdr, clazz.getSimpleName()));
+    }
+
+    @Override
+    public <T> void encode(Class<? super T> clazz, T value, OutputStream os) {
+        encode(clazz, value, XmlCodec.outputOf(os, clazz.getSimpleName()));
+    }
+
+    @Override
+    public <T> T decode(Class<? super T> clazz, InputStream is) {
+        return decode(clazz, XmlCodec.inputOf(is, clazz.getSimpleName()));
     }
 }
