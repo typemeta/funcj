@@ -277,19 +277,28 @@ public interface Option<T> {
 
     /**
      * Push the result to a {@link SideEffect.F}.
-     * @param none   the side-effect to be applied to {@code None} values
-     * @param some   the side-effect to be applied to {@code Some} values
+     * @param noneF     the side-effect to be applied to {@code None} values
+     * @param someF     the side-effect to be applied to {@code Some} values
      */
-    void handle(SideEffect.F0 none, SideEffect.F<Some<T>> some);
+    void handle(SideEffect.F0 noneF, SideEffect.F<Some<T>> someF);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
-     * @param none   the function to be applied to {@code None} values
-     * @param some   the function to be applied to {@code Some} values
+     * @param noneF     the function to be applied to the {@code None} value
+     * @param someF     the function to be applied to the {@code Some} value
      * @param <R>       the return type of functions
      * @return          the result of applying either function
      */
-    <R> R match(F0<? extends R> none, F<Some<T>, ? extends R> some);
+    <R> R match(F0<? extends R> noneF, F<Some<T>, ? extends R> someF);
+
+    /**
+     * Apply one of two functions to this value, according to the type of value.
+     * @param noneF     the function to be applied to the {@code None} value
+     * @param someF     the function to be applied to the {@code Some} value
+     * @param <R>       the return type of functions
+     * @return          the result of applying either function
+     */
+    <R> R fold(F0<? extends R> noneF, F<? super T, ? extends R> someF);
 
     /**
      * Functor function application.
@@ -410,13 +419,18 @@ public interface Option<T> {
         }
 
         @Override
-        public void handle(SideEffect.F0 none, SideEffect.F<Some<T>> some) {
-            some.apply(this);
+        public void handle(SideEffect.F0 noneF, SideEffect.F<Some<T>> someF) {
+            someF.apply(this);
         }
 
         @Override
-        public <R> R match(F0<? extends R> none, F<Some<T>, ? extends R> some) {
-            return some.apply(this);
+        public <R> R match(F0<? extends R> noneF, F<Some<T>, ? extends R> someF) {
+            return someF.apply(this);
+        }
+
+        @Override
+        public <R> R fold(F0<? extends R> noneF, F<? super T, ? extends R> someF) {
+            return someF.apply(value);
         }
 
         @Override
@@ -501,13 +515,18 @@ public interface Option<T> {
         }
 
         @Override
-        public void handle(SideEffect.F0 none, SideEffect.F<Some<T>> some) {
-            none.apply();
+        public void handle(SideEffect.F0 noneF, SideEffect.F<Some<T>> someF) {
+            noneF.apply();
         }
 
         @Override
-        public <R> R match(F0<? extends R> none, F<Some<T>, ? extends R> some) {
-            return none.apply();
+        public <R> R match(F0<? extends R> noneF, F<Some<T>, ? extends R> someF) {
+            return noneF.apply();
+        }
+
+        @Override
+        public <R> R fold(F0<? extends R> noneF, F<? super T, ? extends R> someF) {
+            return noneF.apply();
         }
 
         @Override

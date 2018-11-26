@@ -240,19 +240,28 @@ public interface Validated<E, T> {
 
     /**
      * Push the result to a {@link SideEffect.F}.
-     * @param failure   the side-effect to be applied to {@code Failure} values
-     * @param success   the side-effect to be applied to {@code Success} values
+     * @param failF     the side-effect to be applied to the {@code Failure} value
+     * @param succF     the side-effect to be applied to the {@code Success} value
      */
-    void handle(SideEffect.F<Failure<E, T>> failure, SideEffect.F<Success<E, T>> success);
+    void handle(SideEffect.F<Failure<E, T>> failF, SideEffect.F<Success<E, T>> succF);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
-     * @param failure   the function to be applied to {@code Failure} values
-     * @param success   the function to be applied to {@code Success} values
+     * @param failF     the function to be applied to the {@code Failure} value
+     * @param succF     the function to be applied to the {@code Success} value
      * @param <R>       the return type of functions
      * @return          the result of applying either function
      */
-    <R> R match(F<Failure<E, T>, R> failure, F<Success<E, T>, R> success);
+    <R> R match(F<Failure<E, T>, ? extends R> failF, F<Success<E, T>, ? extends R> succF);
+
+    /**
+     * Apply one of two functions to this value, according to the type of value.
+     * @param failF     the function to be applied to the {@code Failure} value
+     * @param succF     the function to be applied to the {@code Success} value
+     * @param <R>       the return type of functions
+     * @return          the result of applying either function
+     */
+    <R> R fold(F<IList<E>, ? extends R> failF, F<? super T, ? extends R> succF);
 
     /**
      * Functor function application.
@@ -343,13 +352,18 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public void handle(SideEffect.F<Failure<E, T>> failure, SideEffect.F<Success<E, T>> success) {
-            success.apply(this);
+        public void handle(SideEffect.F<Failure<E, T>> failF, SideEffect.F<Success<E, T>> succF) {
+            succF.apply(this);
         }
 
         @Override
-        public <R> R match(F<Failure<E, T>, R> failure, F<Success<E, T>, R> success) {
-            return success.apply(this);
+        public <R> R fold(F<IList<E>, ? extends R> failF, F<? super T, ? extends R> succF) {
+            return succF.apply(value);
+        }
+
+        @Override
+        public <R> R match(F<Failure<E, T>, ? extends R> failF, F<Success<E, T>, ? extends R> succF) {
+            return succF.apply(this);
         }
 
         @Override
@@ -423,13 +437,19 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public void handle(SideEffect.F<Failure<E, T>> failure, SideEffect.F<Success<E, T>> success) {
-            failure.apply(this);
+        public void handle(SideEffect.F<Failure<E, T>> failF, SideEffect.F<Success<E, T>> succF) {
+            failF.apply(this);
         }
 
         @Override
-        public <R> R match(F<Failure<E, T>, R> failure, F<Success<E, T>, R> success) {
-            return failure.apply(this);
+        public <R> R fold(F<IList<E>, ? extends R> failF, F<? super T, ? extends R> succF) {
+            return failF.apply(errors);
+        }
+
+
+        @Override
+        public <R> R match(F<Failure<E, T>, ? extends R> failF, F<Success<E, T>, ? extends R> succF) {
+            return failF.apply(this);
         }
 
         @Override

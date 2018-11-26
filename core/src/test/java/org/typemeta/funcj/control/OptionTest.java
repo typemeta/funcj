@@ -37,6 +37,11 @@ public class OptionTest {
     }
 
     @Property
+    public void fold(char c) {
+        assertTrue(Option.some(c).fold(() -> false, r -> true));
+        assertFalse(Option.none().fold(() -> false, r -> true));
+    }
+    @Property
     public void map(char c) {
         assertEquals(Option.some(String.valueOf(c)), Option.some(c).map(Object::toString));
         assertEquals(Option.none(), Option.none().map(Object::toString));

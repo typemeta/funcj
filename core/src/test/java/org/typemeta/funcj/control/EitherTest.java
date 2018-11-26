@@ -30,6 +30,11 @@ public class EitherTest {
     }
 
     @Property
+    public void fold(char c) {
+        assertTrue(Either.right(c).fold(l -> false, r -> true));
+        assertFalse(Either.left(c).fold(l -> false, r -> true));
+    }
+    @Property
     public void map(char c) {
         assertEquals(Either.right(String.valueOf(c)), Either.right(c).map(Object::toString));
         assertEquals(Either.left(c), Either.left(c).map(Object::toString));

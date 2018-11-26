@@ -282,19 +282,28 @@ public interface Either<E, S> {
 
     /**
      * Push the result to a {@link SideEffect.F}.
-     * @param left      the side-effect to be applied to {@code Left} values
-     * @param right     the side-effect to be applied to {@code Right} values
+     * @param leftF     the side-effect to be applied to the {@code Left} value
+     * @param rightF    the side-effect to be applied to the {@code Right} value
      */
-    void handle(SideEffect.F<Left<E, S>> left, SideEffect.F<Right<E, S>> right);
+    void handle(SideEffect.F<Left<E, S>> leftF, SideEffect.F<Right<E, S>> rightF);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
-     * @param left      the function to be applied to {@code Left} values
-     * @param right     the function to be applied to {@code Right} values
+     * @param leftF     the function to be applied if this is a {@code Left} value
+     * @param rightF    the function to be applied if this is a  {@code Right} value
      * @param <R>       the return type of functions
      * @return          the result of applying either function
      */
-    <R> R match(F<Left<E, S>, ? extends R> left, F<Right<E, S>, ? extends R> right);
+    <R> R match(F<Left<E, S>, ? extends R> leftF, F<Right<E, S>, ? extends R> rightF);
+
+    /**
+     * Apply one of two functions to this value, according to the type of value.
+     * @param leftF     the function to be applied if this is a {@code Left} value
+     * @param rightF    the function to be applied if this is a  {@code Right} value
+     * @param <R>       the return type of functions
+     * @return          the result of applying either function
+     */
+    <R> R fold(F<E, ? extends R> leftF, F<S, ? extends R> rightF);
 
     /**
      * Functor function application.
@@ -410,13 +419,18 @@ public interface Either<E, S> {
         }
 
         @Override
-        public void handle(SideEffect.F<Left<E, S>> left, SideEffect.F<Right<E, S>> right) {
-            left.apply(this);
+        public void handle(SideEffect.F<Left<E, S>> leftF, SideEffect.F<Right<E, S>> rightF) {
+            leftF.apply(this);
         }
 
         @Override
-        public <T> T match(F<Left<E, S>, ? extends T> left, F<Right<E, S>, ? extends T> right) {
-            return left.apply(this);
+        public <T> T match(F<Left<E, S>, ? extends T> leftF, F<Right<E, S>, ? extends T> rightF) {
+            return leftF.apply(this);
+        }
+
+        @Override
+        public <R> R fold(F<E, ? extends R> leftF, F<S, ? extends R> rightF) {
+            return leftF.apply(value);
         }
 
         @Override
@@ -507,13 +521,18 @@ public interface Either<E, S> {
         }
 
         @Override
-        public void handle(SideEffect.F<Left<E, S>> left, SideEffect.F<Right<E, S>> right) {
-            right.apply(this);
+        public void handle(SideEffect.F<Left<E, S>> leftF, SideEffect.F<Right<E, S>> rightF) {
+            rightF.apply(this);
         }
 
         @Override
-        public <T> T match(F<Left<E, S>, ? extends T> left, F<Right<E, S>, ? extends T> right) {
-            return right.apply(this);
+        public <T> T match(F<Left<E, S>, ? extends T> leftF, F<Right<E, S>, ? extends T> rightF) {
+            return rightF.apply(this);
+        }
+
+        @Override
+        public <R> R fold(F<E, ? extends R> leftF, F<S, ? extends R> rightF) {
+            return rightF.apply(value);
         }
 
         @SuppressWarnings("unchecked")

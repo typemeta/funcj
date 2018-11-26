@@ -272,19 +272,28 @@ public interface Try<T> {
 
     /**
      * Push the result to a {@link SideEffect.F}.
-     * @param failure   the side-effect to be applied to {@code Failure} values
-     * @param success   the side-effect to be applied to {@code Success} values
+     * @param failF     the side-effect to be applied the {@code Failure} value
+     * @param succF     the side-effect to be applied the {@code Success} value
      */
-    void handle(SideEffect.F<Failure<T>> failure, SideEffect.F<Success<T>> success);
+    void handle(SideEffect.F<Failure<T>> failF, SideEffect.F<Success<T>> succF);
 
     /**
      * Apply one of two functions to this value, according to the type of value.
-     * @param failure   the function to be applied to {@code Failure} values
-     * @param success   the function to be applied to {@code Success} values
+     * @param failF     the function to be applied the {@code Failure} value
+     * @param succF     the function to be applied the {@code Success} value
      * @param <R>       the return type of functions
      * @return          the result of applying either function
      */
-    <R> R match(F<Failure<T>, ? extends R> failure, F<Success<T>, ? extends R> success);
+    <R> R match(F<Failure<T>, ? extends R> failF, F<Success<T>, ? extends R> succF);
+
+    /**
+     * Apply one of two functions to this value, according to the type of value.
+     * @param failF     the function to be applied the {@code Failure} value
+     * @param succF     the function to be applied the {@code Success} value
+     * @param <R>       the return type of functions
+     * @return          the result of applying either function
+     */
+    <R> R fold(F<Throwable, ? extends R> failF, F<? super T, ? extends R> succF);
 
     /**
      * Functor function application.
@@ -400,13 +409,18 @@ public interface Try<T> {
         }
 
         @Override
-        public void handle(SideEffect.F<Failure<T>> failure, SideEffect.F<Success<T>> success) {
-            success.apply(this);
+        public void handle(SideEffect.F<Failure<T>> failF, SideEffect.F<Success<T>> succF) {
+            succF.apply(this);
         }
 
         @Override
-        public <R> R match(F<Failure<T>, ? extends R> failure, F<Success<T>, ? extends R> success) {
-            return success.apply(this);
+        public <R> R match(F<Failure<T>, ? extends R> failF, F<Success<T>, ? extends R> succF) {
+            return succF.apply(this);
+        }
+
+        @Override
+        public <R> R fold(F<Throwable, ? extends R> failF, F<? super T, ? extends R> succF) {
+            return succF.apply(value);
         }
 
         @Override
@@ -495,13 +509,18 @@ public interface Try<T> {
         }
 
         @Override
-        public void handle(SideEffect.F<Failure<T>> failure, SideEffect.F<Success<T>> success) {
-            failure.apply(this);
+        public void handle(SideEffect.F<Failure<T>> failF, SideEffect.F<Success<T>> succF) {
+            failF.apply(this);
         }
 
         @Override
-        public <R> R match(F<Failure<T>, ? extends R> failure, F<Success<T>, ? extends R> success) {
-            return failure.apply(this);
+        public <R> R match(F<Failure<T>, ? extends R> failF, F<Success<T>, ? extends R> succF) {
+            return failF.apply(this);
+        }
+
+        @Override
+        public <R> R fold(F<Throwable, ? extends R> failF, F<? super T, ? extends R> succF) {
+            return failF.apply(error);
         }
 
         @Override

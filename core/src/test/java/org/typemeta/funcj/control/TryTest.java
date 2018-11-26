@@ -34,6 +34,12 @@ public class TryTest {
     }
 
     @Property
+    public void fold(char c) {
+        assertTrue(Try.success(c).fold(l -> false, r -> true));
+        assertFalse(failure("fail").fold(l -> false, r -> true));
+    }
+
+    @Property
     public void map(char c) {
         assertEquals(Try.success(String.valueOf(c)), Try.success(c).map(Object::toString));
         assertEquals(failure("fail"), failure("fail").map(Object::toString));

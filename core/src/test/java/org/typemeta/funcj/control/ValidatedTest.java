@@ -82,6 +82,12 @@ public class ValidatedTest {
     }
 
     @Property
+    public void fold(char c) {
+        assertTrue(Validated.success(c).fold(l -> false, r -> true));
+        assertFalse(failure("fail").fold(l -> false, r -> true));
+    }
+
+    @Property
     public void map(char c) {
         assertEquals(Validated.success(String.valueOf(c)), Validated.success(c).map(Object::toString));
         assertEquals(failure("fail"), failure("fail").map(Object::toString));
