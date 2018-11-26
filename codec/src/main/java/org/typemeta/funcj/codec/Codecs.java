@@ -6,6 +6,8 @@ import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
 import org.typemeta.funcj.functions.Functions.F;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.*;
 import java.util.*;
 
@@ -59,7 +61,21 @@ public abstract class Codecs {
         core.config().registerDefaultSubType(Set.class, HashSet.class);
         core.config().registerDefaultSubType(Map.class, HashMap.class);
 
-        // Register constructors.
+        // Register string proxies for big numbers.
+
+        core.registerStringProxyCodec(
+                BigInteger.class,
+                BigInteger::toString,
+                BigInteger::new
+        );
+
+        core.registerStringProxyCodec(
+                BigDecimal.class,
+                BigDecimal::toString,
+                BigDecimal::new
+        );
+
+        // Register arg-array constructors for singleton collections..
 
         core.registerArgArrayCtor(
                 ReflectionUtils.classForName("java.util.Collections$SingletonList"),

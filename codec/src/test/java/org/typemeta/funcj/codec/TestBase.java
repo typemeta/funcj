@@ -124,6 +124,26 @@ public abstract class TestBase {
     }
 
     @Test
+    public void testBigIntegerNulls() throws Exception {
+        roundTrip(new TestTypes.BigIntegerData(), TestTypes.BigIntegerData.class);
+    }
+
+    @Test
+    public void testBigInteger() throws Exception {
+        roundTrip(new TestTypes.BigIntegerData(TestTypes.Init.INIT), TestTypes.BigIntegerData.class);
+    }
+
+    @Test
+    public void testBigDecimalNulls() throws Exception {
+        roundTrip(new TestTypes.BigDecimalData(), TestTypes.BigDecimalData.class);
+    }
+
+    @Test
+    public void testBigDecimal() throws Exception {
+        roundTrip(new TestTypes.BigDecimalData(TestTypes.Init.INIT), TestTypes.BigDecimalData.class);
+    }
+
+    @Test
     public void testOptionalNulls() throws Exception {
         roundTrip(TestTypes.HasOptional.<Integer>create(), TestTypes.HasOptional.class);
     }

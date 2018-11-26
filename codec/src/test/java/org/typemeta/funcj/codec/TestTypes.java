@@ -1,5 +1,7 @@
 package org.typemeta.funcj.codec;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -656,6 +658,258 @@ public abstract class TestTypes {
         @Override
         public String toString() {
             return "DoubleData{" +
+                    "val=" + val +
+                    ", valArr=" + Arrays.toString(valArr) +
+                    ", valArrArr=" + Arrays.deepToString(valArrArr) +
+                    ", listVal=" + listVal +
+                    ", mapStrVal=" + mapStrVal +
+                    "} " + super.toString();
+        }
+    }
+
+    public static class NumberData<T extends Number> extends Base<T> {
+
+        final T valT;
+        final T[] valArrT;
+        final T[][] valArrArrT;
+        final List<T> listValT;
+        final Map<String, T> mapStrValT;
+
+        public NumberData() {
+            this.valT = null;
+            this.valArrT = null;
+            this.valArrArrT = null;
+            this.listValT = null;
+            this.mapStrValT = null;
+        }
+
+        public NumberData(
+                T val,
+                Object obj,
+                T[] valArr,
+                Object[] objArr,
+                List<T> listVal,
+                Set<T> setVal,
+                Map<String, T> mapStrVal,
+                Map<String, Object> mapStrObj,
+                HashMap<String, Object> hashMapStrObj,
+                Map<String, Object> objMap,
+                Optional<T> optValE,
+                Optional<T> optValF,
+                T valT,
+                T[] valArrT,
+                T[][] valArrArrT,
+                List<T> listValT,
+                Map<String, T> mapStrValT
+        ) {
+            super(
+                    val,
+                    obj,
+                    valArr,
+                    objArr,
+                    listVal,
+                    setVal,
+                    mapStrVal,
+                    mapStrObj,
+                    hashMapStrObj,
+                    objMap,
+                    optValE,
+                    optValF);
+            this.valT = valT;
+            this.valArrT = valArrT;
+            this.valArrArrT = valArrArrT;
+            this.listValT = listValT;
+            this.mapStrValT = mapStrValT;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            NumberData<T> rhs = (NumberData<T>) obj;
+            if (!Objects.equals(valT, rhs.valT)) return false;
+            if (!Arrays.equals(valArrT, rhs.valArrT)) return false;
+            if (!Arrays.deepEquals(valArrArrT, rhs.valArrArrT)) return false;
+            if (!Objects.equals(listValT, rhs.listValT)) return false;
+            if (!Objects.equals(mapStrValT, rhs.mapStrValT)) return false;
+            return super.equals(rhs);
+        }
+
+        @Override
+        public String toString() {
+            return "NumberData{" +
+                    "val=" + valT +
+                    ", valArr=" + Arrays.toString(valArrT) +
+                    ", valArrArr=" + Arrays.deepToString(valArrArrT) +
+                    ", listVal=" + listValT +
+                    ", mapStrVal=" + mapStrValT +
+                    "} " + super.toString();
+        }
+    }
+
+    public static class BigIntegerData extends NumberData<BigInteger> {
+
+        final BigInteger val;
+        final BigInteger[] valArr;
+        final BigInteger[][] valArrArr;
+        final List<BigInteger> listVal;
+        final Map<String, BigInteger> mapStrVal;
+
+        public BigIntegerData() {
+            this.val = BigInteger.ZERO;
+            this.valArr = null;
+            this.valArrArr = null;
+            this.listVal = null;
+            this.mapStrVal = null;
+        }
+
+        public BigIntegerData(Init init) {
+            super(
+                    BigInteger.valueOf(10),
+                    BigInteger.valueOf(-1000),
+                    new BigInteger[]{BigInteger.valueOf(10), BigInteger.valueOf(20)},
+                    new BigInteger[]{BigInteger.valueOf(123456)},
+                    arrayList(
+                            BigInteger.valueOf(0),
+                            BigInteger.valueOf(-1),
+                            BigInteger.valueOf(-2),
+                            BigInteger.valueOf(-3),
+                            null),
+                    treeSet(
+                            BigInteger.valueOf(-1000),
+                            BigInteger.valueOf(101),
+                            BigInteger.valueOf(1000)),
+                    treeMap("a", BigInteger.valueOf(1), "b", BigInteger.valueOf(2)),
+                    hashMap("c", BigInteger.valueOf(3), "d", BigInteger.valueOf(4)),
+                    hashMap("c", BigInteger.valueOf(-1), "d", BigInteger.valueOf(-2)),
+                    treeMap("e", BigInteger.valueOf(-200), "f", BigInteger.valueOf(-300)),
+                    Optional.empty(),
+                    Optional.of(BigInteger.valueOf(99)),
+                    BigInteger.valueOf(-999),
+                    new BigInteger[]{BigInteger.valueOf(1234), BigInteger.valueOf(5678)},
+                    new BigInteger[][]{
+                            {BigInteger.valueOf(12), BigInteger.valueOf(34)},
+                            {BigInteger.valueOf(56), BigInteger.valueOf(78)}, null},
+                    arrayList(BigInteger.valueOf(0), BigInteger.valueOf(1), BigInteger.valueOf(2),
+                              BigInteger.valueOf(3)),
+                    treeMap(
+                            "f", BigInteger.valueOf(321),
+                            "g", BigInteger.valueOf(654))
+            );
+            this.val = BigInteger.valueOf(-999);
+            this.valArr = new BigInteger[]{BigInteger.valueOf(1234), BigInteger.valueOf(5678)};
+            this.valArrArr = new BigInteger[][]{
+                    {BigInteger.valueOf(12), BigInteger.valueOf(34)},
+                    {BigInteger.valueOf(56), BigInteger.valueOf(78)}, null};
+            this.listVal = arrayList(BigInteger.valueOf(0), BigInteger.valueOf(1), BigInteger.valueOf(2),
+                                     BigInteger.valueOf(3));
+            this.mapStrVal = treeMap(
+                    "f", BigInteger.valueOf(321),
+                    "g", BigInteger.valueOf(654));
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            BigIntegerData rhs = (BigIntegerData) obj;
+            if (!Objects.equals(val, rhs.val)) return false;
+            if (!Arrays.equals(valArr, rhs.valArr)) return false;
+            if (!Arrays.deepEquals(valArrArr, rhs.valArrArr)) return false;
+            if (!Objects.equals(listVal, rhs.listVal)) return false;
+            if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
+            return super.equals(rhs);
+        }
+
+        @Override
+        public String toString() {
+            return "BigIntegerData{" +
+                    "val=" + val +
+                    ", valArr=" + Arrays.toString(valArr) +
+                    ", valArrArr=" + Arrays.deepToString(valArrArr) +
+                    ", listVal=" + listVal +
+                    ", mapStrVal=" + mapStrVal +
+                    "} " + super.toString();
+        }
+    }
+
+    public static class BigDecimalData extends NumberData<BigDecimal> {
+
+        final BigDecimal val;
+        final BigDecimal[] valArr;
+        final BigDecimal[][] valArrArr;
+        final List<BigDecimal> listVal;
+        final Map<String, BigDecimal> mapStrVal;
+
+        public BigDecimalData() {
+            this.val = BigDecimal.ZERO;
+            this.valArr = null;
+            this.valArrArr = null;
+            this.listVal = null;
+            this.mapStrVal = null;
+        }
+
+        public BigDecimalData(Init init) {
+            super(
+                    new BigDecimal(10.45),
+                    new BigDecimal(-1000),
+                    new BigDecimal[]{new BigDecimal(10.1), new BigDecimal(20.2)},
+                    new BigDecimal[]{new BigDecimal(123456.5678)},
+                    arrayList(
+                            new BigDecimal(0.1d),
+                            new BigDecimal(-1.2d),
+                            new BigDecimal(-2.3d),
+                            new BigDecimal(-3.4d),
+                            null),
+                    treeSet(
+                            new BigDecimal(-1000.1d),
+                            new BigDecimal(101d),
+                            new BigDecimal(1000.1d)),
+                    treeMap("a", new BigDecimal(1.5d), "b", new BigDecimal(2.5d)),
+                    hashMap("c", new BigDecimal(3d), "d", new BigDecimal(4d)),
+                    hashMap("c", new BigDecimal(-1d), "d", new BigDecimal(-2d)),
+                    treeMap("e", new BigDecimal(-200d), "f", new BigDecimal(-300d)),
+                    Optional.empty(),
+                    Optional.of(new BigDecimal(99.99d)),
+                    new BigDecimal(-999d),
+                    new BigDecimal[]{new BigDecimal(1234d), new BigDecimal(5678d)},
+                    new BigDecimal[][]{
+                            {new BigDecimal(12d), new BigDecimal(34d)},
+                            {new BigDecimal(56d), new BigDecimal(78d)}, null},
+                    arrayList(new BigDecimal(0.1d), new BigDecimal(1.2d), new BigDecimal(2.3d),
+                              new BigDecimal(3.4d)),
+                    treeMap(
+                            "f", new BigDecimal(321.9d),
+                            "g", new BigDecimal(654.3d))
+            );
+            this.val = new BigDecimal(-999d);
+            this.valArr = new BigDecimal[]{new BigDecimal(1234d), new BigDecimal(5678d)};
+            this.valArrArr = new BigDecimal[][]{
+                    {new BigDecimal(12d), new BigDecimal(34d)},
+                    {new BigDecimal(56d), new BigDecimal(78d)}, null};
+            this.listVal = arrayList(new BigDecimal(0.1d), new BigDecimal(1.2d), new BigDecimal(2.3d),
+                                     new BigDecimal(3.4d));
+            this.mapStrVal = treeMap(
+                    "f", new BigDecimal(321.9d),
+                    "g", new BigDecimal(654.3d));
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            BigDecimalData rhs = (BigDecimalData) obj;
+            if (!Objects.equals(val, rhs.val)) return false;
+            if (!Arrays.equals(valArr, rhs.valArr)) return false;
+            if (!Arrays.deepEquals(valArrArr, rhs.valArrArr)) return false;
+            if (!Objects.equals(listVal, rhs.listVal)) return false;
+            if (!Objects.equals(mapStrVal, rhs.mapStrVal)) return false;
+            return super.equals(rhs);
+        }
+
+        @Override
+        public String toString() {
+            return "BigDecimalData{" +
                     "val=" + val +
                     ", valArr=" + Arrays.toString(valArr) +
                     ", valArrArr=" + Arrays.deepToString(valArrArr) +
