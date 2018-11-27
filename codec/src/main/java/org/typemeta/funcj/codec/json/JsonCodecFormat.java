@@ -7,7 +7,6 @@ import org.typemeta.funcj.functions.Functions;
 import java.lang.reflect.*;
 import java.util.*;
 
-import static org.typemeta.funcj.codec.json.JsonCodec.*;
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 
 /**
@@ -100,9 +99,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         return null;
     }
 
-    protected final Codec.BooleanCodec<Input, Output, Config> booleanCodec =
-            new Codec.BooleanCodec<Input, Output, Config>() {
-
+    private static class BooleanCodec implements Codec.BooleanCodec<Input, Output, Config> {
 
         @Override
         public Output encodePrim(boolean val, Output out) {
@@ -113,7 +110,10 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         public boolean decodePrim(Input in) {
             return in.readBoolean();
         }
-    };
+    }
+
+
+    protected final Codec.BooleanCodec<Input, Output, Config> booleanCodec = new BooleanCodec();
 
     @Override
     public Codec.BooleanCodec<Input, Output, Config> booleanCodec() {
@@ -158,8 +158,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         return booleanArrayCodec;
     }
 
-    protected final Codec.ByteCodec<Input, Output, Config> byteCodec =
-            new Codec.ByteCodec<Input, Output, Config>() {
+    private static class ByteCodec implements Codec.ByteCodec<Input, Output, Config> {
 
         @Override
         public Output encodePrim(byte val, Output out) {
@@ -170,7 +169,9 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         public byte decodePrim(Input in) {
             return in.readByte();
         }
-    };
+    }
+
+    protected final Codec.ByteCodec<Input, Output, Config> byteCodec = new ByteCodec();
 
     @Override
     public Codec.ByteCodec<Input, Output, Config> byteCodec() {
@@ -215,8 +216,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         return byteArrayCodec;
     }
 
-    protected final Codec.CharCodec<Input, Output, Config> charCodec =
-            new Codec.CharCodec<Input, Output, Config>() {
+    private static class CharCodec implements Codec.CharCodec<Input, Output, Config> {
 
         @Override
         public Output encodePrim(char val, Output out) {
@@ -227,7 +227,9 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         public char decodePrim(Input in ) {
             return in.readChar();
         }
-    };
+    }
+
+    protected final Codec.CharCodec<Input, Output, Config> charCodec = new CharCodec();
 
     @Override
     public Codec.CharCodec<Input, Output, Config> charCodec() {
@@ -272,8 +274,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         return charArrayCodec;
     }
 
-    protected final Codec.ShortCodec<Input, Output, Config> shortCodec =
-            new Codec.ShortCodec<Input, Output, Config>() {
+    private static class ShortCodec implements Codec.ShortCodec<Input, Output, Config> {
 
         @Override
         public Output encodePrim(short val, Output out) {
@@ -284,7 +285,9 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         public short decodePrim(Input in ) {
             return in.readShort();
         }
-    };
+    }
+
+    protected final Codec.ShortCodec<Input, Output, Config> shortCodec = new ShortCodec();
 
     @Override
     public Codec.ShortCodec<Input, Output, Config> shortCodec() {
@@ -329,8 +332,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         return shortArrayCodec;
     }
 
-    protected final Codec.IntCodec<Input, Output, Config> intCodec =
-            new Codec.IntCodec<Input, Output, Config>() {
+    private static class IntCodec implements Codec.IntCodec<Input, Output, Config> {
 
         @Override
         public Output encodePrim(int val, Output out) {
@@ -341,7 +343,9 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         public int decodePrim(Input in ) {
             return in.readInt();
         }
-    };
+    }
+
+    protected final Codec.IntCodec<Input, Output, Config> intCodec = new IntCodec();
 
     @Override
     public Codec.IntCodec<Input, Output, Config> intCodec() {
@@ -385,9 +389,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
     public Codec<int[], Input, Output, Config> intArrayCodec() {
         return intArrayCodec;
     }
-
-    protected final Codec.LongCodec<Input, Output, Config> longCodec =
-            new Codec.LongCodec<Input, Output, Config>() {
+    private static class LongCodec implements Codec.LongCodec<Input, Output, Config> {
 
         @Override
         public Output encodePrim(long val, Output out) {
@@ -398,7 +400,9 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         public long decodePrim(Input in) {
             return in.readLong();
         }
-    };
+    }
+
+    protected final Codec.LongCodec<Input, Output, Config> longCodec = new LongCodec();
 
     @Override
     public Codec.LongCodec<Input, Output, Config> longCodec() {
@@ -443,8 +447,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         return longArrayCodec;
     }
 
-    protected final Codec.FloatCodec<Input, Output, Config> floatCodec =
-            new Codec.FloatCodec<Input, Output, Config>() {
+    private static class FloatCodec implements Codec.FloatCodec<Input, Output, Config> {
 
         @Override
         public Output encodePrim(float val, Output out) {
@@ -455,7 +458,9 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         public float decodePrim(Input in ) {
             return in.readFloat();
         }
-    };
+    }
+
+    protected final Codec.FloatCodec<Input, Output, Config> floatCodec = new FloatCodec();
 
     @Override
     public Codec.FloatCodec<Input, Output, Config> floatCodec() {
@@ -500,8 +505,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         return floatArrayCodec;
     }
 
-    protected final Codec.DoubleCodec<Input, Output, Config> doubleCodec =
-            new Codec.DoubleCodec<Input, Output, Config>() {
+    private static class DoubleCodec implements Codec.DoubleCodec<Input, Output, Config> {
 
         @Override
         public Output encodePrim(double value, Output out) {
@@ -512,7 +516,9 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         public double decodePrim(Input in ) {
             return in.readDouble();
         }
-    };
+    }
+
+    protected final Codec.DoubleCodec<Input, Output, Config> doubleCodec = new DoubleCodec();
 
     @Override
     public Codec.DoubleCodec<Input, Output, Config> doubleCodec() {
@@ -557,8 +563,7 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         return doubleArrayCodec;
     }
 
-    protected final Codec<String, Input, Output, Config> stringCodec =
-            new Codec<String, Input, Output, Config>() {
+    private static class StringCodec implements Codec<String, Input, Output, Config> {
 
         @Override
         public Class<String> type() {
@@ -574,7 +579,9 @@ public class JsonCodecFormat implements CodecFormat<Input, Output, Config> {
         public String decode(CodecCoreEx<Input, Output, Config> core, Input in) {
             return in.readString();
         }
-    };
+    }
+
+    protected final Codec<String, Input, Output, Config> stringCodec = new StringCodec();
 
     @Override
     public Codec<String, Input, Output, Config> stringCodec() {
