@@ -49,8 +49,14 @@ public class IListTest {
 
     @Test
     public void testMap() {
-        assertEquals("map for an empty list", IList.of(), empty.map(x -> null));
+        assertEquals("map for an empty list", IList.of(), empty.map(x -> x * 2));
         assertEquals("map for a non-empty list", IList.of(-1, -2, -3, -4), l.map(i -> -i));
+    }
+
+    @Test
+    public void testFlatMap() {
+        assertEquals("flatmap for an empty list", IList.of(), empty.flatMap(x -> IList.of(x, -x)));
+        assertEquals("map for a non-empty list", IList.of(1, -1, 2, -2, 3, -3, 4, -4), l.flatMap(x ->  IList.of(x, -x)));
     }
 
     @Test
