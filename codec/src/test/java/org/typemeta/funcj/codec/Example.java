@@ -1,9 +1,11 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.json.*;
+import org.typemeta.funcj.codec.json.JsonCodecCore;
+import org.typemeta.funcj.codec.json.JsonTypes;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
 
-import java.io.*;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.time.*;
 import java.util.*;
 
@@ -49,7 +51,7 @@ public class Example {
     }
 
     static class ZonedDateTimeJsonCodec
-            implements Codec.FinalCodec<ZonedDateTime, JsonCodec.Input, JsonCodec.Output, JsonCodec.Config> {
+            implements Codec.FinalCodec<ZonedDateTime, JsonTypes.InStream, JsonTypes.OutStream, JsonTypes.Config> {
 
         @Override
         public Class<ZonedDateTime> type() {
@@ -57,7 +59,7 @@ public class Example {
         }
 
         @Override
-        public JsonCodec.Output encode(CodecCoreEx<JsonCodec.Input, JsonCodec.Output, JsonCodec.Config> core, ZonedDateTime value, JsonCodec.Output out) {
+        public JsonTypes.OutStream encode(CodecCoreEx<JsonTypes.InStream, JsonTypes.OutStream, JsonTypes.Config> core, ZonedDateTime value, JsonTypes.OutStream out) {
             out.startObject();
 
             out.writeField("dateTime");
@@ -71,7 +73,7 @@ public class Example {
         }
 
         @Override
-        public ZonedDateTime decode(CodecCoreEx<JsonCodec.Input, JsonCodec.Output, JsonCodec.Config> core, JsonCodec.Input in) {
+        public ZonedDateTime decode(CodecCoreEx<JsonTypes.InStream, JsonTypes.OutStream, JsonTypes.Config> core, JsonTypes.InStream in) {
             in.startObject();
 
             in.readFieldName("dateTime");
@@ -123,7 +125,6 @@ public class Example {
                 ZonedDateTime.class,
                 ZonedDateTime::toString,
                 ZonedDateTime::parse);
-
 
         // Encode to XML.
         final StringWriter wtr = new StringWriter();

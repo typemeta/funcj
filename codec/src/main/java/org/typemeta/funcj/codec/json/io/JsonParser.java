@@ -1,12 +1,14 @@
 package org.typemeta.funcj.codec.json.io;
 
 import org.typemeta.funcj.codec.CodecException;
-import org.typemeta.funcj.codec.json.JsonCodec;
+import org.typemeta.funcj.codec.json.JsonTypes;
 
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.text.*;
-import java.util.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -14,7 +16,7 @@ import java.util.function.Supplier;
  * The caller calls methods on the parser to extract JSON events.
  * We implement our own parser here as we need the ability to lookahead.
  */
-public class JsonParser implements JsonCodec.Input {
+public class JsonParser implements JsonTypes.InStream {
     enum State {
         OBJECT_NAME,
         OBJECT_COLON,

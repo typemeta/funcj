@@ -1,9 +1,14 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.CodecFormat.Input;
+import org.typemeta.funcj.codec.CodecFormat.Output;
 import org.typemeta.funcj.functions.Functions;
 
-public class CodecCoreDelegate<IN, OUT, CFG extends CodecConfig>
-        implements CodecCore<IN, OUT, CFG> {
+public class CodecCoreDelegate<
+        IN extends Input<IN>,
+        OUT extends Output<OUT>,
+        CFG extends CodecConfig
+        > implements CodecCore<IN, OUT, CFG> {
 
     protected final CodecCore<IN, OUT, CFG> delegate;
 

@@ -1,15 +1,16 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.json.JsonCodec.*;
+import org.typemeta.funcj.codec.json.JsonTypes.*;
 
-import java.io.*;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * Interface for classes which implement an encoding via JSON.
  */
 public class JsonCodecCore
-        extends CodecCoreDelegate<Input, Output, Config>
+        extends CodecCoreDelegate<InStream, OutStream, Config>
         implements CodecAPI {
 
     public JsonCodecCore(JsonCodecFormat format) {
@@ -26,11 +27,11 @@ public class JsonCodecCore
 
     @Override
     public <T> void encode(Class<? super T> type, T value, Writer writer) {
-        encode(type, value, JsonCodec.outputOf(writer));
+        encode(type, value, JsonTypes.outputOf(writer));
     }
 
     @Override
     public <T> T decode(Class<? super T> type, Reader reader) {
-        return decode(type, JsonCodec.inputOf(reader));
+        return decode(type, JsonTypes.inputOf(reader));
     }
 }

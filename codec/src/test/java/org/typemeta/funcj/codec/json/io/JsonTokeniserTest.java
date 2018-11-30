@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.json.io;
 
 import org.junit.Test;
-import org.typemeta.funcj.codec.json.JsonCodec;
+import org.typemeta.funcj.codec.json.JsonTypes;
 
 public class JsonTokeniserTest {
     @Test
@@ -9,8 +9,8 @@ public class JsonTokeniserTest {
         FileUtils.openResource("/example.json")
                 .map(JsonTokeniser::new)
                 .map(jt -> {
-                    JsonCodec.Input.Event ev;
-                    while ((ev = jt.getNextEvent()) != JsonCodec.Input.Event.Type.EOF) {
+                    JsonTypes.InStream.Event ev;
+                    while ((ev = jt.getNextEvent()) != JsonTypes.InStream.Event.Type.EOF) {
                         //System.out.println(ev);
                     }
                     return 0;

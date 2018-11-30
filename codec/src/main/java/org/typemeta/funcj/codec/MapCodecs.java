@@ -1,11 +1,20 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.CodecFormat.Input;
+import org.typemeta.funcj.codec.CodecFormat.Output;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
 public abstract class MapCodecs {
 
-    public static abstract class AbstractMapCodec<K, V, IN, OUT, CFG extends CodecConfig>
+    public static abstract class AbstractMapCodec<
+            K,
+            V,
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            >
             implements Codec<Map<K, V>, IN, OUT, CFG> {
         protected final Class<Map<K, V>> mapType;
         protected final Codec<K, IN, OUT, CFG> keyCodec;
@@ -80,7 +89,12 @@ public abstract class MapCodecs {
         }
     }
 
-    public static abstract class AbstractStringMapCodec<V, IN, OUT, CFG extends CodecConfig>
+    public static abstract class AbstractStringMapCodec<
+            V,
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            >
             implements Codec<Map<String, V>, IN, OUT, CFG> {
         protected final Class<Map<String, V>> mapType;
         protected final Codec<V, IN, OUT, CFG> valueCodec;

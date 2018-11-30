@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.xml.XmlCodec.*;
+import org.typemeta.funcj.codec.xml.XmlTypes.*;
 
 import java.io.*;
 
@@ -9,7 +9,7 @@ import java.io.*;
  * Interface for classes which implement an encoding via XML.
  */
 public class XmlCodecCore
-        extends CodecCoreDelegate<Input, Output, Config>
+        extends CodecCoreDelegate<InStream, OutStream, Config>
         implements CodecAPI {
 
     public XmlCodecCore(XmlCodecFormat format) {
@@ -35,8 +35,8 @@ public class XmlCodecCore
      * @param <T>       the static type of the value
      * @return          the output stream
      */
-    public <T> Output encode(Class<? super T> type, T value, Writer writer, String rootElemName) {
-        final Output out = encode(type, value, XmlCodec.outputOf(writer, rootElemName));
+    public <T> OutStream encode(Class<? super T> type, T value, Writer writer, String rootElemName) {
+        final OutStream out = encode(type, value, XmlTypes.outputOf(writer, rootElemName));
         return out.close();
     }
 
@@ -48,7 +48,7 @@ public class XmlCodecCore
      * @param <T>       the static type of the value
      * @return          the output stream
      */
-    public <T> Output encode(T value, Writer writer, String rootElemName) {
+    public <T> OutStream encode(T value, Writer writer, String rootElemName) {
         return encode(Object.class, value, writer, rootElemName);
     }
 
@@ -61,7 +61,7 @@ public class XmlCodecCore
      * @return          the decoded value
      */
     public <T> T decode(Class<? super T> type, Reader reader, String rootElemName) {
-        return decode(type, XmlCodec.inputOf(reader, rootElemName));
+        return decode(type, XmlTypes.inputOf(reader, rootElemName));
     }
 
     /**
@@ -77,21 +77,21 @@ public class XmlCodecCore
 
     @Override
     public <T> void encode(Class<? super T> clazz, T value, Writer wtr) {
-        encode(clazz, value, XmlCodec.outputOf(wtr, clazz.getSimpleName()));
+        encode(clazz, value, XmlTypes.outputOf(wtr, clazz.getSimpleName()));
     }
 
     @Override
     public <T> T decode(Class<? super T> clazz, Reader rdr) {
-        return decode(clazz, XmlCodec.inputOf(rdr, clazz.getSimpleName()));
+        return decode(clazz, XmlTypes.inputOf(rdr, clazz.getSimpleName()));
     }
 
     @Override
     public <T> void encode(Class<? super T> clazz, T value, OutputStream os) {
-        encode(clazz, value, XmlCodec.outputOf(os, clazz.getSimpleName()));
+        encode(clazz, value, XmlTypes.outputOf(os, clazz.getSimpleName()));
     }
 
     @Override
     public <T> T decode(Class<? super T> clazz, InputStream is) {
-        return decode(clazz, XmlCodec.inputOf(is, clazz.getSimpleName()));
+        return decode(clazz, XmlTypes.inputOf(is, clazz.getSimpleName()));
     }
 }

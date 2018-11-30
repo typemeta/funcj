@@ -85,6 +85,13 @@ public interface CodecConfig {
      */
     int defaultArraySize();
 
+    /**
+     * Return the new size for arrays that are full.
+     * @param size      the current size of the array to be re-sized
+     * @return          the new array size
+     */
+    int resizeArray(int size);
+
     <T> void registerDefaultSubType(Class<T> stcClass, Class<? extends T> dynClass);
 
     <T, U extends T> Class<U> getDefaultSubType(Class<T> stcClass);

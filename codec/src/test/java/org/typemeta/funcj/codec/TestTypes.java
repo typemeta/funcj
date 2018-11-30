@@ -726,6 +726,7 @@ public abstract class TestTypes {
         public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null || getClass() != obj.getClass()) return false;
+            @SuppressWarnings("unchecked")
             NumberData<T> rhs = (NumberData<T>) obj;
             if (!Objects.equals(valT, rhs.valT)) return false;
             if (!Arrays.equals(valArrT, rhs.valArrT)) return false;

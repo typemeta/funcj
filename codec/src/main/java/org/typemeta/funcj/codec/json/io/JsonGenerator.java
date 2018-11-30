@@ -1,13 +1,15 @@
 package org.typemeta.funcj.codec.json.io;
 
-import org.typemeta.funcj.codec.json.JsonCodec;
+import org.typemeta.funcj.codec.json.JsonTypes;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 
-import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.*;
+import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.raiseWriteFailure;
+import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.write;
 
-public class JsonGenerator implements JsonCodec.Output {
+public class JsonGenerator implements JsonTypes.OutStream {
 
     private final Writer writer;
 
@@ -67,7 +69,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeNull() {
+    public JsonGenerator writeNull() {
         if (pendingComma) {
             writeComma();
         }
@@ -76,7 +78,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeBoolean(boolean value) {
+    public JsonGenerator writeBoolean(boolean value) {
         if (pendingComma) {
             writeComma();
         }
@@ -85,7 +87,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeString(String value) {
+    public JsonGenerator writeString(String value) {
         if (pendingComma) {
             writeComma();
         }
@@ -94,7 +96,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeChar(char value) {
+    public JsonGenerator writeChar(char value) {
         if (pendingComma) {
             writeComma();
         }
@@ -103,7 +105,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeByte(byte value) {
+    public JsonGenerator writeByte(byte value) {
         if (pendingComma) {
             writeComma();
         }
@@ -112,7 +114,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeShort(short value) {
+    public JsonGenerator writeShort(short value) {
         if (pendingComma) {
             writeComma();
         }
@@ -121,7 +123,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeint(int value) {
+    public JsonGenerator writeInt(int value) {
         if (pendingComma) {
             writeComma();
         }
@@ -130,7 +132,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeLong(long value) {
+    public JsonGenerator writeLong(long value) {
         if (pendingComma) {
             writeComma();
         }
@@ -139,7 +141,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeFloat(float value) {
+    public JsonGenerator writeFloat(float value) {
         if (pendingComma) {
             writeComma();
         }
@@ -148,7 +150,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeDouble(double value) {
+    public JsonGenerator writeDouble(double value) {
         if (pendingComma) {
             writeComma();
         }
@@ -157,7 +159,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeNumber(Number value) {
+    public JsonGenerator writeNumber(Number value) {
         if (pendingComma) {
             writeComma();
         }
@@ -166,7 +168,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeBigDecimal(BigDecimal value) {
+    public JsonGenerator writeBigDecimal(BigDecimal value) {
         if (pendingComma) {
             writeComma();
         }
@@ -175,7 +177,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeStringNumber(String value) {
+    public JsonGenerator writeStringNumber(String value) {
         if (pendingComma) {
             writeComma();
         }
@@ -184,7 +186,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output startObject() {
+    public JsonGenerator startObject() {
         if (pendingComma) {
             writeComma();
             pendingComma = false;
@@ -193,7 +195,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output writeField(String name) {
+    public JsonGenerator writeField(String name) {
         if (pendingComma) {
             writeComma();
             pendingComma = false;
@@ -203,13 +205,13 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output endObject() {
+    public JsonGenerator endObject() {
         pendingComma = true;
         return writeUnquotedString('}');
     }
 
     @Override
-    public JsonCodec.Output startArray() {
+    public JsonGenerator startArray() {
         if (pendingComma) {
             writeComma();
             pendingComma = false;
@@ -218,7 +220,7 @@ public class JsonGenerator implements JsonCodec.Output {
     }
 
     @Override
-    public JsonCodec.Output endArray() {
+    public JsonGenerator endArray() {
         pendingComma = true;
         return writeUnquotedString(']');
     }

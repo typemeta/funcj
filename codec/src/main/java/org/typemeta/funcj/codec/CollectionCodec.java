@@ -1,5 +1,8 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.CodecFormat.Input;
+import org.typemeta.funcj.codec.CodecFormat.Output;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -10,8 +13,12 @@ import java.util.*;
  * @param <OUT>     the encoded output type
  * @param <CFG>     the config type
  */
-public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
-        implements Codec<Collection<T>, IN, OUT, CFG> {
+public abstract class CollectionCodec<
+        T,
+        IN extends Input<IN>,
+        OUT extends Output<OUT>,
+        CFG extends CodecConfig
+        > implements Codec<Collection<T>, IN, OUT, CFG> {
 
     protected final Class<Collection<T>> collType;
     protected final Codec<T, IN, OUT, CFG> elemCodec;

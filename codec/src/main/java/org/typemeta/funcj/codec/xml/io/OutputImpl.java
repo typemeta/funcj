@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.xml.io;
 
 import org.typemeta.funcj.codec.CodecException;
-import org.typemeta.funcj.codec.xml.XmlCodec;
+import org.typemeta.funcj.codec.xml.XmlTypes;
 import org.typemeta.funcj.functions.SideEffectGenEx;
 
 import javax.xml.stream.*;
@@ -9,9 +9,9 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.math.BigDecimal;
 
-public class OutputImpl implements XmlCodec.Output {
+public class OutputImpl implements XmlTypes.OutStream {
 
-    public static XmlCodec.Output outputOf(XMLStreamWriter writer) {
+    public static XmlTypes.OutStream outputOf(XMLStreamWriter writer) {
         if (writer.getProperty("escapeCharacters") != Boolean.TRUE) {
             throw new CodecException("XMLStreamWriter must have the 'escapeCharacters' property set to true");
         } else {
@@ -19,7 +19,7 @@ public class OutputImpl implements XmlCodec.Output {
         }
     }
 
-    public static XmlCodec.Output outputOf(Writer writer, String rootElemName) {
+    public static OutputImpl outputOf(Writer writer, String rootElemName) {
         try {
             final XMLOutputFactory xmlOutFact = XMLOutputFactory.newInstance();
             xmlOutFact.setProperty("escapeCharacters", false);
@@ -30,7 +30,7 @@ public class OutputImpl implements XmlCodec.Output {
         }
     }
 
-    public static XmlCodec.Output outputOf(OutputStream os, String rootElemName) {
+    public static OutputImpl outputOf(OutputStream os, String rootElemName) {
         try {
             final XMLOutputFactory xmlOutFact = XMLOutputFactory.newInstance();
             xmlOutFact.setProperty("escapeCharacters", false);
@@ -41,7 +41,7 @@ public class OutputImpl implements XmlCodec.Output {
         }
     }
 
-    public static XmlCodec.Output outputOf(XMLStreamWriter xwtr, String rootElemName) throws XMLStreamException {
+    public static OutputImpl outputOf(XMLStreamWriter xwtr, String rootElemName) throws XMLStreamException {
         xwtr.writeStartDocument();
         xwtr.writeStartElement(rootElemName);
 
@@ -64,7 +64,7 @@ public class OutputImpl implements XmlCodec.Output {
     }
 
     @Override
-    public XmlCodec.Output close() {
+    public OutputImpl close() {
         try {
             closeF.apply(this);
             wtr.close();
@@ -75,7 +75,7 @@ public class OutputImpl implements XmlCodec.Output {
     }
 
     @Override
-    public XmlCodec.Output startDocument() {
+    public OutputImpl startDocument() {
         try {
             wtr.writeStartDocument();
             return this;
@@ -85,7 +85,7 @@ public class OutputImpl implements XmlCodec.Output {
     }
 
     @Override
-    public XmlCodec.Output endDocument() {
+    public OutputImpl endDocument() {
         try {
             wtr.writeEndDocument();
             return this;
@@ -95,7 +95,7 @@ public class OutputImpl implements XmlCodec.Output {
     }
 
     @Override
-    public XmlCodec.Output startElement(String localName) {
+    public OutputImpl startElement(String localName) {
         try {
             wtr.writeStartElement(localName);
             return this;
@@ -105,7 +105,7 @@ public class OutputImpl implements XmlCodec.Output {
     }
 
     @Override
-    public XmlCodec.Output emptyElement(String localName) {
+    public OutputImpl emptyElement(String localName) {
         try {
             wtr.writeEmptyElement(localName);
             return this;
@@ -115,7 +115,7 @@ public class OutputImpl implements XmlCodec.Output {
     }
 
     @Override
-    public XmlCodec.Output endElement() {
+    public OutputImpl endElement() {
         try {
             wtr.writeEndElement();
             return this;
@@ -125,7 +125,7 @@ public class OutputImpl implements XmlCodec.Output {
     }
 
     @Override
-    public XmlCodec.Output attribute(String localName, String value) {
+    public OutputImpl attribute(String localName, String value) {
         try {
             wtr.writeAttribute(localName, value);
             return this;
@@ -134,7 +134,7 @@ public class OutputImpl implements XmlCodec.Output {
         }
     }
 
-    private XmlCodec.Output writeCharacters(String text) {
+    private OutputImpl writeCharacters(String text) {
         try {
             wtr.writeCharacters(text);
             return this;
@@ -144,62 +144,62 @@ public class OutputImpl implements XmlCodec.Output {
     }
 
     @Override
-    public XmlCodec.Output writeBoolean(boolean value) {
+    public OutputImpl writeBoolean(boolean value) {
         return writeCharacters(Boolean.toString(value));
     }
 
     @Override
-    public XmlCodec.Output writeString(String value) {
+    public OutputImpl writeString(String value) {
         return writeCharacters(XmlUtils.escapeXml(value));
     }
 
     @Override
-    public XmlCodec.Output writeChar(char value) {
+    public OutputImpl writeChar(char value) {
         return writeCharacters(XmlUtils.escapeXml(Character.toString(value)));
     }
 
     @Override
-    public XmlCodec.Output writeByte(byte value) {
+    public OutputImpl writeByte(byte value) {
         return writeCharacters(Byte.toString(value));
     }
 
     @Override
-    public XmlCodec.Output writeShort(short value) {
+    public OutputImpl writeShort(short value) {
         return writeCharacters(Short.toString(value));
     }
 
     @Override
-    public XmlCodec.Output writeInt(int value) {
+    public OutputImpl writeInt(int value) {
         return writeCharacters(Integer.toString(value));
     }
 
     @Override
-    public XmlCodec.Output writeLong(long value) {
+    public OutputImpl writeLong(long value) {
         return writeCharacters(Long.toString(value));
     }
 
     @Override
-    public XmlCodec.Output writeFloat(float value) {
+    public OutputImpl writeFloat(float value) {
         return writeCharacters(Float.toString(value));
     }
 
     @Override
-    public XmlCodec.Output writeDouble(double value) {
+    public OutputImpl writeDouble(double value) {
         return writeCharacters(Double.toString(value));
     }
 
     @Override
-    public XmlCodec.Output writeNumber(Number value) {
+    public OutputImpl writeNumber(Number value) {
         return writeCharacters(value.toString());
     }
 
     @Override
-    public XmlCodec.Output writeBigDecimal(BigDecimal value) {
+    public OutputImpl writeBigDecimal(BigDecimal value) {
         return writeCharacters(value.toString());
     }
 
     @Override
-    public XmlCodec.Output writeStringNumber(String value) {
+    public OutputImpl writeStringNumber(String value) {
         return writeCharacters(XmlUtils.escapeXml(value));
     }
 }

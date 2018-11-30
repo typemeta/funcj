@@ -1,5 +1,7 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.CodecFormat.Input;
+import org.typemeta.funcj.codec.CodecFormat.Output;
 import org.typemeta.funcj.functions.Functions;
 
 /**
@@ -9,7 +11,11 @@ import org.typemeta.funcj.functions.Functions;
  * @param <OUT>     the encoded output type
  * @param <CFG>     the config type
  */
-public interface CodecCore<IN, OUT, CFG extends CodecConfig> {
+public interface CodecCore<
+        IN extends Input<IN>,
+        OUT extends Output<OUT>,
+        CFG extends CodecConfig
+        > {
 
     /**
      * Return the config object associated with this {@code CodecCore}.

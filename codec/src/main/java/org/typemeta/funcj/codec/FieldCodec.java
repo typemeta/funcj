@@ -1,6 +1,10 @@
 package org.typemeta.funcj.codec;
 
-import java.lang.reflect.*;
+import org.typemeta.funcj.codec.CodecFormat.Input;
+import org.typemeta.funcj.codec.CodecFormat.Output;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 /**
@@ -11,9 +15,17 @@ import java.util.Objects;
  * @param <CFG>     the config type
  */
 @SuppressWarnings("unchecked")
-public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
+public interface FieldCodec<
+        IN extends Input<IN>,
+        OUT extends Output<OUT>,
+        CFG extends CodecConfig
+        > {
 
-    abstract class Impl<IN, OUT, CFG extends CodecConfig> implements FieldCodec<IN, OUT, CFG> {
+    abstract class Impl<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > implements FieldCodec<IN, OUT, CFG> {
 
         protected final Field field;
 
@@ -32,7 +44,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class BooleanFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class BooleanFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec.BooleanCodec<IN, OUT, CFG> codec;
 
@@ -58,7 +74,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class BooleanArrayFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class BooleanArrayFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<boolean[], IN, OUT, CFG> codec;
 
@@ -84,7 +104,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class ByteFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class ByteFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec.ByteCodec<IN, OUT, CFG> codec;
 
@@ -110,7 +134,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class ByteArrayFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class ByteArrayFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<byte[], IN, OUT, CFG> codec;
 
@@ -136,7 +164,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class CharFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class CharFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec.CharCodec<IN, OUT, CFG> codec;
 
@@ -162,7 +194,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class CharArrayFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class CharArrayFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<char[], IN, OUT, CFG> codec;
 
@@ -188,7 +224,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class ShortFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class ShortFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec.ShortCodec<IN, OUT, CFG> codec;
 
@@ -214,7 +254,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class ShortArrayFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class ShortArrayFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<short[], IN, OUT, CFG> codec;
 
@@ -240,7 +284,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class IntegerFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class IntegerFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec.IntCodec<IN, OUT, CFG> codec;
 
@@ -265,7 +313,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class IntegerArrayFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class IntegerArrayFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<int[], IN, OUT, CFG> codec;
 
@@ -291,7 +343,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class LongFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class LongFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec.LongCodec<IN, OUT, CFG> codec;
 
@@ -317,7 +373,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class LongArrayFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class LongArrayFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<long[], IN, OUT, CFG> codec;
 
@@ -343,7 +403,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class FloatFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class FloatFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec.FloatCodec<IN, OUT, CFG> codec;
 
@@ -369,7 +433,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class FloatArrayFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class FloatArrayFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<float[], IN, OUT, CFG> codec;
 
@@ -395,7 +463,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class DoubleFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class DoubleFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec.DoubleCodec<IN, OUT, CFG> codec;
 
@@ -421,7 +493,11 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class DoubleArrayFieldCodec<IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class DoubleArrayFieldCodec<
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<double[], IN, OUT, CFG> codec;
 
@@ -447,7 +523,12 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class ObjectFieldCodec<T, IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class ObjectFieldCodec<
+            T,
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<T, IN, OUT, CFG> codec;
 
@@ -474,7 +555,12 @@ public interface FieldCodec<IN, OUT, CFG extends CodecConfig> {
         }
     }
 
-    class ObjectArrayFieldCodec<T, IN, OUT, CFG extends CodecConfig> extends Impl<IN, OUT, CFG> {
+    class ObjectArrayFieldCodec<
+            T,
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > extends Impl<IN, OUT, CFG> {
 
         protected final Codec<T[], IN, OUT, CFG> codec;
 

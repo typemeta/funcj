@@ -120,6 +120,11 @@ public class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
+    public int resizeArray(int size) {
+        return size + (size >> 1);
+    }
+
+    @Override
     public <T> void registerDefaultSubType(Class<T> stcClass, Class<? extends T> dynClass) {
         defaultDynamicTypeMap.put(stcClass, dynClass);
     }

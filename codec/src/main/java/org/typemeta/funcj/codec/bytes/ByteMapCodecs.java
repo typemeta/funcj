@@ -1,24 +1,25 @@
 package org.typemeta.funcj.codec.bytes;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codec;
+import org.typemeta.funcj.codec.CodecCoreEx;
 import org.typemeta.funcj.codec.MapCodecs.*;
-import org.typemeta.funcj.codec.bytes.BytesCodec.*;
+import org.typemeta.funcj.codec.bytes.ByteTypes.*;
 
 import java.util.Map;
 
-public abstract class BytesMapCodecs {
+public abstract class ByteMapCodecs {
 
-    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Input, Output, Config> {
+    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, InStream, OutStream, Config> {
 
         public MapCodec(
                 Class<Map<K, V>> mapType,
-                Codec<K, Input, Output, Config> keyCodec,
-                Codec<V, Input, Output, Config> valueCodec) {
+                Codec<K, InStream, OutStream, Config> keyCodec,
+                Codec<V, InStream, OutStream, Config> valueCodec) {
             super(mapType, keyCodec, valueCodec);
         }
 
         @Override
-        public Output encode(CodecCoreEx<Input, Output, Config> core, Map<K, V> value, Output out) {
+        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Map<K, V> value, OutStream out) {
             core.format().intCodec().encodePrim(value.size(), out);
 
             for (Map.Entry<K, V> entry : value.entrySet()) {
@@ -30,7 +31,7 @@ public abstract class BytesMapCodecs {
         }
 
         @Override
-        public Map<K, V> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
+        public Map<K, V> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
             final int l = core.format().intCodec().decodePrim(in);
 
             final MapProxy<K, V> mapProxy = getMapProxy(core);
@@ -45,16 +46,16 @@ public abstract class BytesMapCodecs {
         }
     }
 
-    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, Input, Output, Config> {
+    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, InStream, OutStream, Config> {
 
         public StringMapCodec(
                 Class<Map<String, V>> type,
-                Codec<V, Input, Output, Config> valueCodec) {
+                Codec<V, InStream, OutStream, Config> valueCodec) {
             super(type, valueCodec);
         }
 
         @Override
-        public Output encode(CodecCoreEx<Input, Output, Config> core, Map<String, V> value, Output out) {
+        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Map<String, V> value, OutStream out) {
             core.format().intCodec().encodePrim(value.size(), out);
 
             for (Map.Entry<String, V> entry : value.entrySet()) {
@@ -66,7 +67,7 @@ public abstract class BytesMapCodecs {
         }
 
         @Override
-        public Map<String, V> decode(CodecCoreEx<Input, Output, Config> core, Input in) {
+        public Map<String, V> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
             final int l = core.format().intCodec().decodePrim(in);
 
             final MapProxy<String, V> mapProxy = getMapProxy(core);

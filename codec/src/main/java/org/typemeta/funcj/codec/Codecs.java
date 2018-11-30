@@ -1,6 +1,8 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.bytes.BytesCodecCore;
+import org.typemeta.funcj.codec.CodecFormat.Input;
+import org.typemeta.funcj.codec.CodecFormat.Output;
+import org.typemeta.funcj.codec.bytes.ByteCodecCore;
 import org.typemeta.funcj.codec.json.JsonCodecCore;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
@@ -33,14 +35,19 @@ public abstract class Codecs {
     }
 
     /**
-     * Construct and return a new instance of a {@link BytesCodecCore}.
+     * Construct and return a new instance of a {@link ByteCodecCore}.
      * @return the new {@code ByteCodecCore}
      */
-    public static BytesCodecCore byteCodec() {
-        return registerAll(new BytesCodecCore());
+    public static ByteCodecCore byteCodec() {
+        return registerAll(new ByteCodecCore());
     }
 
-    public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>> CORE registerAll(CORE core) {
+    public static <
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig,
+            CORE extends CodecCore<IN, OUT, CFG>
+            > CORE registerAll(CORE core) {
 
         // Register allowed packages and classes.
 
@@ -149,11 +156,16 @@ public abstract class Codecs {
     /**
      * Utility class for creating a {@code Codec} that encodes a type
      * as a {@code String}.
-     * @param <T> the raw type to be encoded/decoded
+     * @param <T>       the raw type to be encoded/decoded
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    public static class StringProxyCodec<T, IN, OUT, CFG extends CodecConfig> implements Codec<T, IN, OUT, CFG> {
+    public static class StringProxyCodec<
+            T,
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig
+            > implements Codec<T, IN, OUT, CFG> {
 
         protected final Class<T> type;
         protected final F<T, String> encode;

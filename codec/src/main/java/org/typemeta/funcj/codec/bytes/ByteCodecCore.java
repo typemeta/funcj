@@ -1,27 +1,27 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.bytes.BytesCodec.*;
+import org.typemeta.funcj.codec.bytes.ByteTypes.*;
 
 import java.io.*;
 
 /**
  * Interface for classes which implement an encoding via byte streams.
  */
-public class BytesCodecCore
-        extends CodecCoreDelegate<Input, Output, Config>
+public class ByteCodecCore
+        extends CodecCoreDelegate<InStream, OutStream, Config>
         implements CodecAPI {
 
-    public BytesCodecCore(BytesCodecFormat format) {
+    public ByteCodecCore(ByteCodecFormat format) {
         super(new CodecCoreImpl<>(format));
     }
 
-    public BytesCodecCore(Config config) {
-        this(new BytesCodecFormat(config));
+    public ByteCodecCore(Config config) {
+        this(new ByteCodecFormat(config));
     }
 
-    public BytesCodecCore() {
-        this(new BytesConfigImpl());
+    public ByteCodecCore() {
+        this(new ByteConfigImpl());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class BytesCodecCore
      * @param <T>       the static type of the value
      */
     public <T> void encode(Class<? super T> type, T value, OutputStream os) {
-        encode(type, value, BytesCodec.outputOf(os));
+        encode(type, value, ByteTypes.outputOf(os));
     }
 
     /**
@@ -56,6 +56,6 @@ public class BytesCodecCore
      */
     @Override
     public <T> T decode(Class<? super T> type, InputStream is) {
-        return decode(type, BytesCodec.inputOf(is));
+        return decode(type, ByteTypes.inputOf(is));
     }
 }

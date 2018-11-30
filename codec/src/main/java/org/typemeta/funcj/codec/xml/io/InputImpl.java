@@ -1,17 +1,19 @@
 package org.typemeta.funcj.codec.xml.io;
 
 import org.typemeta.funcj.codec.CodecException;
-import org.typemeta.funcj.codec.xml.XmlCodec;
+import org.typemeta.funcj.codec.xml.XmlTypes;
 
 import javax.xml.stream.*;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.text.*;
-import java.util.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Map;
+import java.util.TreeMap;
 
-public class InputImpl implements XmlCodec.Input {
-    public static XmlCodec.Input inputOf(XMLStreamReader reader) {
+public class InputImpl implements XmlTypes.InStream {
+    public static XmlTypes.InStream inputOf(XMLStreamReader reader) {
         if (reader.getProperty(XMLInputFactory.IS_COALESCING) != Boolean.TRUE) {
             throw new CodecException("XMLStreamReader must have the '" + XMLInputFactory.IS_COALESCING + "' " +
                     " property set to true");
@@ -20,7 +22,7 @@ public class InputImpl implements XmlCodec.Input {
         }
     }
 
-    public static XmlCodec.Input inputOf(Reader reader, String rootElemName) {
+    public static XmlTypes.InStream inputOf(Reader reader, String rootElemName) {
         try {
             final XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
             xmlInFact.setProperty(XMLInputFactory.IS_COALESCING, true);
@@ -31,7 +33,7 @@ public class InputImpl implements XmlCodec.Input {
         }
     }
 
-    public static XmlCodec.Input inputOf(InputStream os, String rootElemName) {
+    public static XmlTypes.InStream inputOf(InputStream os, String rootElemName) {
         try {
             final XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
             xmlInFact.setProperty(XMLInputFactory.IS_COALESCING, true);
@@ -42,8 +44,8 @@ public class InputImpl implements XmlCodec.Input {
         }
     }
 
-    public static XmlCodec.Input inputOf(XMLStreamReader xrdr, String rootElemName) {
-        final XmlCodec.Input in = inputOf(xrdr);
+    public static XmlTypes.InStream inputOf(XMLStreamReader xrdr, String rootElemName) {
+        final XmlTypes.InStream in = inputOf(xrdr);
         in.startDocument();
         in.startElement(rootElemName);
         return in;

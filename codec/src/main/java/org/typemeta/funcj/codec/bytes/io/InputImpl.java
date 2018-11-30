@@ -1,11 +1,12 @@
 package org.typemeta.funcj.codec.bytes.io;
 
 import org.typemeta.funcj.codec.CodecException;
-import org.typemeta.funcj.codec.bytes.BytesCodec;
+import org.typemeta.funcj.codec.bytes.ByteTypes;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.IOException;
 
-public final class InputImpl implements BytesCodec.Input {
+public final class InputImpl implements ByteTypes.InStream {
     private final DataInput input;
 
     public InputImpl(DataInput input) {
@@ -84,6 +85,7 @@ public final class InputImpl implements BytesCodec.Input {
         }
     }
 
+    @Override
     public String readString() {
         try {
             final int len = input.readInt();

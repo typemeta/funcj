@@ -1,13 +1,16 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.CodecConfig;
-import org.typemeta.funcj.codec.json.io.*;
+import org.typemeta.funcj.codec.CodecFormat;
+import org.typemeta.funcj.codec.json.io.JsonGenerator;
+import org.typemeta.funcj.codec.json.io.JsonParser;
 
-import java.io.*;
+import java.io.Reader;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class JsonCodec {
+public class JsonTypes {
 
     /**
      * Interface for classes which provide configuration information
@@ -22,17 +25,10 @@ public class JsonCodec {
         String valueFieldName();
     }
 
-    private static final int MAX_PARSER_LOOKAHEAD = 3;
-
-    public static Input inputOf(Reader reader) {
-        return new JsonParser(reader, MAX_PARSER_LOOKAHEAD);
-    }
-
-    public static Output outputOf(Writer writer) {
-        return new JsonGenerator(writer);
-    }
-
-    public interface Input  {
+    /**
+     * Interface for classes which implement an input stream of JSON events
+     */
+    public interface InStream extends CodecFormat.Input<InStream> {
         interface Event {
             Type type();
 
@@ -171,21 +167,9 @@ public class JsonCodec {
 
         <T> T readNull();
 
-        boolean readBoolean();
-
-        char readChar();
-
-        byte readByte();
-        short readShort();
-        int readInt();
-        long readLong();
-        float readFloat();
-        double readDouble();
         Number readNumber();
         BigDecimal readBigDecimal();
         String readStringNumber();
-
-        String readString();
 
         void startObject();
         String readFieldName();
@@ -196,33 +180,34 @@ public class JsonCodec {
         void endArray();
     }
 
-    public interface Output {
+    /**
+     * Interface for classes which implement an output stream of JSON events
+     */
+    public interface OutStream extends CodecFormat.Output<OutStream> {
 
-        Output writeNull();
+        OutStream writeNull();
 
-        Output writeBoolean(boolean value);
+        OutStream writeNumber(Number value);
+        OutStream writeBigDecimal(BigDecimal value);
+        OutStream writeStringNumber(String value);
 
-        Output writeChar(char value);
+        OutStream startObject();
+        OutStream writeField(String name);
+        OutStream endObject();
 
-        Output writeByte(byte value);
-        Output writeShort(short value);
-        Output writeint(int value);
-        Output writeLong(long value);
-        Output writeFloat(float value);
-        Output writeDouble(double value);
-        Output writeNumber(Number value);
-        Output writeBigDecimal(BigDecimal value);
-        Output writeStringNumber(String value);
-
-        Output writeString(String value);
-
-        Output startObject();
-        Output writeField(String name);
-        Output endObject();
-
-        Output startArray();
-        Output endArray();
+        OutStream startArray();
+        OutStream endArray();
 
         void close();
+    }
+
+    private static final int MAX_PARSER_LOOKAHEAD = 3;
+
+    public static JsonParser inputOf(Reader reader) {
+        return new JsonParser(reader, MAX_PARSER_LOOKAHEAD);
+    }
+
+    public static JsonGenerator outputOf(Writer writer) {
+        return new JsonGenerator(writer);
     }
 }

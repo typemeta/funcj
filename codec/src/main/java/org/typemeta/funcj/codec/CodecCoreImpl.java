@@ -1,11 +1,15 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.CodecFormat.Input;
+import org.typemeta.funcj.codec.CodecFormat.Output;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
@@ -17,8 +21,11 @@ import static java.util.stream.Collectors.toList;
  * @param <CFG>     the config type
  */
 @SuppressWarnings("unchecked")
-public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
-        implements CodecCoreEx<IN, OUT, CFG> {
+public class CodecCoreImpl<
+        IN extends Input<IN>,
+        OUT extends Output<OUT>,
+        CFG extends CodecConfig
+        > implements CodecCoreEx<IN, OUT, CFG> {
 
     /**
      * A map that associates a class with a {@code Codec}.

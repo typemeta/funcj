@@ -1,16 +1,18 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.junit.Assert;
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codecs;
+import org.typemeta.funcj.codec.TestBase;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 public class BytesCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final BytesCodecCore codec = prepareCodecCore(Codecs.byteCodec());
+        final ByteCodecCore codec = prepareCodecCore(Codecs.byteCodec());
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

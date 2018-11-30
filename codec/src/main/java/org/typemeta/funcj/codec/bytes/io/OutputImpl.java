@@ -1,11 +1,12 @@
 package org.typemeta.funcj.codec.bytes.io;
 
 import org.typemeta.funcj.codec.CodecException;
-import org.typemeta.funcj.codec.bytes.BytesCodec;
+import org.typemeta.funcj.codec.bytes.ByteTypes;
 
-import java.io.*;
+import java.io.DataOutput;
+import java.io.IOException;
 
-public final class OutputImpl implements BytesCodec.Output {
+public final class OutputImpl implements ByteTypes.OutStream {
     private final DataOutput output;
 
     public OutputImpl(DataOutput output) {
@@ -13,7 +14,7 @@ public final class OutputImpl implements BytesCodec.Output {
     }
 
     @Override
-    public BytesCodec.Output writeBoolean(boolean v) {
+    public OutputImpl writeBoolean(boolean v) {
         try {
             output.writeBoolean(v);
             return this;
@@ -23,7 +24,7 @@ public final class OutputImpl implements BytesCodec.Output {
     }
 
     @Override
-    public BytesCodec.Output writeByte(int v) {
+    public OutputImpl writeByte(byte v) {
         try {
             output.writeByte(v);
             return this;
@@ -33,7 +34,7 @@ public final class OutputImpl implements BytesCodec.Output {
     }
 
     @Override
-    public BytesCodec.Output writeChar(int v) {
+    public OutputImpl writeChar(char v) {
         try {
             output.writeChar(v);
             return this;
@@ -43,7 +44,7 @@ public final class OutputImpl implements BytesCodec.Output {
     }
 
     @Override
-    public BytesCodec.Output writeShort(int v) {
+    public OutputImpl writeShort(short v) {
         try {
             output.writeShort(v);
             return this;
@@ -53,7 +54,7 @@ public final class OutputImpl implements BytesCodec.Output {
     }
 
     @Override
-    public BytesCodec.Output writeInt(int v) {
+    public OutputImpl writeInt(int v) {
         try {
             output.writeInt(v);
             return this;
@@ -63,7 +64,7 @@ public final class OutputImpl implements BytesCodec.Output {
     }
 
     @Override
-    public BytesCodec.Output writeLong(long v) {
+    public OutputImpl writeLong(long v) {
         try {
             output.writeLong(v);
             return this;
@@ -73,7 +74,7 @@ public final class OutputImpl implements BytesCodec.Output {
     }
 
     @Override
-    public BytesCodec.Output writeFloat(float v) {
+    public OutputImpl writeFloat(float v) {
         try {
             output.writeFloat(v);
             return this;
@@ -83,7 +84,7 @@ public final class OutputImpl implements BytesCodec.Output {
     }
 
     @Override
-    public BytesCodec.Output writeDouble(double v) {
+    public OutputImpl writeDouble(double v) {
         try {
             output.writeDouble(v);
             return this;
@@ -92,7 +93,8 @@ public final class OutputImpl implements BytesCodec.Output {
         }
     }
 
-    public BytesCodec.Output writeString(String s) {
+    @Override
+    public OutputImpl writeString(String s) {
         try {
             output.writeInt(s.length());
             output.writeChars(s);

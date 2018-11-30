@@ -2,7 +2,8 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.functions.Functions;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Implementations of this interface represent encodings
@@ -11,7 +12,43 @@ import java.util.*;
  * @param <OUT>     the encoded output type
  * @param <CFG>     the config type
  */
-public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
+public interface CodecFormat<
+        IN extends CodecFormat.Input<IN>,
+        OUT extends CodecFormat.Output<OUT>,
+        CFG extends CodecConfig
+        > {
+
+    /**
+     * An abstraction for codec input, typically a stream of tokens.
+     * @param <IN>      the input type
+     */
+    interface Input<IN extends Input<IN>> {
+        boolean readBoolean();
+        char readChar();
+        byte readByte();
+        short readShort();
+        int readInt();
+        long readLong();
+        float readFloat();
+        double readDouble();
+        String readString();
+    }
+
+    /**
+     * An abstraction for codec output, typically a stream of tokens.
+     * @param <OUT>     the output type
+     */
+    interface Output<OUT extends Output<OUT>> {
+        OUT writeBoolean(boolean value);
+        OUT writeChar(char value);
+        OUT writeByte(byte value);
+        OUT writeShort(short value);
+        OUT writeInt(int value);
+        OUT writeLong(long value);
+        OUT writeFloat(float value);
+        OUT writeDouble(double value);
+        OUT writeString(String value);
+    }
 
     CFG config();
 
@@ -66,7 +103,24 @@ public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
 
     Codec<String, IN, OUT, CFG> stringCodec();
 
-    <EM extends Enum<EM>> Codec<EM, IN, OUT, CFG> enumCodec(Class<EM> enumType);
+    default <EM extends Enum<EM>> Codec<EM, IN, OUT, CFG> enumCodec(Class<EM> enumType) {
+        return new Codec<EM, IN, OUT, CFG>() {
+            @Override
+            public Class<EM> type() {
+                return enumType;
+            }
+
+            @Override
+            public OUT encode(CodecCoreEx<IN, OUT, CFG> core, EM value, OUT out) {
+                return out.writeString(value.name());
+            }
+
+            @Override
+            public EM decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
+                return EM.valueOf(type(), in.readString());
+            }
+        };
+    }
 
     <V> Codec<Map<String, V>, IN, OUT, CFG> createMapCodec(
             Class<Map<String, V>> type,

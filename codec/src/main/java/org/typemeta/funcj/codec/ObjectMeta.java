@@ -1,9 +1,17 @@
 package org.typemeta.funcj.codec;
 
-import java.util.stream.*;
+import org.typemeta.funcj.codec.CodecFormat.Input;
+import org.typemeta.funcj.codec.CodecFormat.Output;
 
-public interface ObjectMeta<T, IN, OUT, RA extends ObjectMeta.ResultAccumlator<T>>
-        extends Iterable<ObjectMeta.Field<T, IN, OUT, RA>> {
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+public interface ObjectMeta<
+        T,
+        IN extends Input<IN>,
+        OUT extends Output<OUT>,
+        RA extends ObjectMeta.ResultAccumlator<T>
+        > extends Iterable<ObjectMeta.Field<T, IN, OUT, RA>> {
     interface ResultAccumlator<T> {
         T construct();
     }

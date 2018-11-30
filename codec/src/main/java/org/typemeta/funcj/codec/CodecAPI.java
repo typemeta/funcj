@@ -47,6 +47,9 @@ public interface CodecAPI {
 
     /**
      * Encode a value of type {@code T} into an {@link OutputStream}.
+     * The {@code clazz} parameter indicates the expected type when the data is decoded.
+     * If the type of the {@code value} differs then dynamic type information is added.
+     * type
      * @param clazz     the class of the decoded value
      * @param value     the value to encode
      * @param os        the output stream
@@ -58,6 +61,7 @@ public interface CodecAPI {
 
     /**
      * Decode a value of type {@code T} from an {@link InputStream}.
+     * The {@code clazz} parameter indicates the expected type when the data is decoded.
      * @param clazz     the type of the decoded value
      * @param is        the input stream
      * @param <T>       the decoded value type

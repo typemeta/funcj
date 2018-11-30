@@ -1,5 +1,7 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.CodecFormat.Input;
+import org.typemeta.funcj.codec.CodecFormat.Output;
 import org.typemeta.funcj.functions.Functions;
 
 import java.util.Objects;
@@ -12,9 +14,14 @@ import java.util.Objects;
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
  */
-public class CodecRef<T, IN, OUT, CFG extends CodecConfig> implements Codec<T, IN, OUT, CFG> {
+public class CodecRef<
+        T,
+        IN extends Input<IN>,
+        OUT extends Output<OUT>,
+        CFG extends CodecConfig
+        > implements Codec<T, IN, OUT, CFG> {
 
-    private enum Uninitialised implements Codec<Object, Object, Object, CodecConfig> {
+    private enum Uninitialised implements Codec {
         INSTANCE;
 
         @Override
@@ -23,12 +30,17 @@ public class CodecRef<T, IN, OUT, CFG extends CodecConfig> implements Codec<T, I
         }
 
         @Override
-        public Object encode(CodecCoreEx<Object, Object, CodecConfig> core, Object value, Object in) {
+        public Output encode(
+                CodecCoreEx core,
+                Object value,
+                Output output) {
             throw error();
         }
 
         @Override
-        public Object decode(CodecCoreEx<Object, Object, CodecConfig> core, Object in) {
+        public Object decode(
+                CodecCoreEx core,
+                Input input) {
             throw error();
         }
 
@@ -36,18 +48,14 @@ public class CodecRef<T, IN, OUT, CFG extends CodecConfig> implements Codec<T, I
             return new RuntimeException("Uninitialised lazy Codec reference");
         }
 
-        @SuppressWarnings("unchecked")
-        static <T, IN, OUT, CFG extends CodecConfig> Codec<T, IN, OUT, CFG> of() {
-            return (Codec<T, IN, OUT, CFG>) INSTANCE;
+        static Codec of() {
+            return INSTANCE;
         }
     }
 
     private Codec<T, IN, OUT, CFG> impl;
 
-    CodecRef(Codec<T, IN, OUT, CFG> impl) {
-        this.impl = Objects.requireNonNull(impl);
-    }
-
+    @SuppressWarnings("unchecked")
     CodecRef() {
         this.impl = Uninitialised.of();
     }
