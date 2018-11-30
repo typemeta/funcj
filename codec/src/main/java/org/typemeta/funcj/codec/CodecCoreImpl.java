@@ -379,7 +379,7 @@ public class CodecCoreImpl<
         final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
             final T val;
 
-            ResultAccumlatorImpl(Class<T> clazz) {
+            ResultAccumlatorImpl() {
                 this.val = ctor.construct();
             }
 
@@ -423,7 +423,7 @@ public class CodecCoreImpl<
 
                         @Override
                         public ResultAccumlatorImpl startDecode() {
-                            return new ResultAccumlatorImpl(clazz);
+                            return new ResultAccumlatorImpl();
                         }
                 }
         );
@@ -479,7 +479,7 @@ public class CodecCoreImpl<
             final Object[] ctorArgs;
             int i = 0;
 
-            ResultAccumlatorImpl(Class<T> clazz) {
+            ResultAccumlatorImpl() {
                 this.ctorArgs = new Object[fieldCodecs.size()];
             }
 
@@ -523,7 +523,7 @@ public class CodecCoreImpl<
 
                         @Override
                         public ResultAccumlatorImpl startDecode() {
-                            return new ResultAccumlatorImpl(clazz);
+                            return new ResultAccumlatorImpl();
                         }
                 }
         );

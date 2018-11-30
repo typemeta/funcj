@@ -6,6 +6,13 @@ import org.typemeta.funcj.codec.CodecFormat.Output;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Abstraction for creating an object fby accumulating the fields that comprise it.
+ * @param <T>       the type of object being created
+ * @param <IN>      the encoded input type
+ * @param <OUT>     the encoded output type
+ * @param <RA>      the concrete implementation type for {@code ResultAccumlator}
+ */
 public interface ObjectMeta<
         T,
         IN extends Input<IN>,
