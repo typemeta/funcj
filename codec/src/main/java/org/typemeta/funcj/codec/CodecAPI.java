@@ -56,7 +56,11 @@ public interface CodecAPI {
      * @param <T>       the decoded value type
      */
     default <T> void encode(Class<? super T> clazz, T value, OutputStream os) {
-        encode(clazz, value, new OutputStreamWriter(os));
+        try(Writer wtr = new BufferedWriter(new OutputStreamWriter(os))) {
+            encode(clazz, value, wtr);
+        } catch (IOException ex) {
+            throw new CodecException(ex);
+        }
     }
 
     /**
@@ -68,7 +72,11 @@ public interface CodecAPI {
      * @return          the decoded value
      */
     default <T> T decode(Class<? super T> clazz, InputStream is) {
-        return decode(clazz, new InputStreamReader(is));
+        try(Reader wtr = new BufferedReader(new InputStreamReader(is))){
+            return decode(clazz, wtr);
+        } catch (IOException ex) {
+            throw new CodecException(ex);
+        }
     }
 
     /**
@@ -77,7 +85,7 @@ public interface CodecAPI {
      * @param os        the output stream
      */
     default void encode(Object value, OutputStream os) {
-        encode(Object.class, value, new OutputStreamWriter(os));
+        encode(Object.class, value, os);
     }
 
     /**
@@ -86,6 +94,6 @@ public interface CodecAPI {
      * @return          the decoded value
      */
     default Object decode(InputStream is) {
-        return decode(Object.class, new InputStreamReader(is));
+        return decode(Object.class, is);
     }
 }

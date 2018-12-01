@@ -22,7 +22,7 @@ public interface CodecFormat<
      * An abstraction for codec input, typically a stream of tokens.
      * @param <IN>      the input type
      */
-    interface Input<IN extends Input<IN>> {
+    interface Input<IN extends Input<IN>> extends AutoCloseable {
         boolean readBoolean();
         char readChar();
         byte readByte();
@@ -38,7 +38,7 @@ public interface CodecFormat<
      * An abstraction for codec output, typically a stream of tokens.
      * @param <OUT>     the output type
      */
-    interface Output<OUT extends Output<OUT>> {
+    interface Output<OUT extends Output<OUT>> extends AutoCloseable {
         OUT writeBoolean(boolean value);
         OUT writeChar(char value);
         OUT writeByte(byte value);

@@ -78,7 +78,7 @@ public class XmlTypes {
      * Interface for classes which implement an output stream of XML events
      */
     public interface OutStream extends CodecFormat.Output<OutStream> {
-        OutStream close();
+        void close();
 
         OutStream startDocument();
         OutStream endDocument();

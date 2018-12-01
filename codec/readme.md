@@ -127,13 +127,14 @@ To round trip the data via JSON:
 final JsonCodecCore codec = Codecs.jsonCodec();
 
 // Encode to JSON.
-final StringWriter wtr = new StringWriter();
-jsonCodecCore.encode(Person.class, person, wtr);
-System.out.println(wtr.toString());
+jsonCodecCore.encode(Person.class, person, System.out);
+
+System.out.flush();
 
 // Decode back to Java.
-final StringReader rdr = new StringReader(wtr.toString());
-final Person person2 = jsonCodecCore.decode(Person.class, rdr);
+final Person person2 = jsonCodecCore.decode(Person.class, System.in);
+
+// Check the object is the same.
 assert(person.equals(person2));
 ```
 
@@ -190,13 +191,14 @@ final XmlCodecCore codec = Codecs.xmlCodec();
 final String root = "person";
 
 // Encode to XML.
-final StringWriter wtr = new StringWriter();
-xmlCodecCore.encode(Person.class, person, wtr, root);
-System.out.println(wtr.toString());
+xmlCodecCore.encode(Person.class, person, System.out);
+
+System.out.flush();
 
 // Decode back to Java.
-final StringReader rdr = new StringReader(wtr.toString());
-final Person person2 = xmlCodecCore.decode(Person.class, rdr, root);
+final Person person2 = xmlCodecCore.decode(Person.class, System.in);
+
+// Check the object is the same.
 assert(person.equals(person2));
 ```
 
@@ -322,13 +324,9 @@ it has to be specialised for a specific encoding.
 For example, a custom JSON codec for the `ZonedDateTime` class could be written as follows:
 
 ```java
-static class ZonedDateTimeJsonCodec
-        extends Codecs.CodecBase<ZonedDateTime, JsonIO.Input, JsonIO.Output>
-        implements Codec.FinalCodec<ZonedDateTime, JsonIO.Input, JsonIO.Output> {
 
-    public ZonedDateTimeJsonCodec(JsonCodecCore core) {
-        super(core);
-    }
+static class ZonedDateTimeJsonCodec
+        implements Codec.FinalCodec<ZonedDateTime, JsonTypes.InStream, JsonTypes.OutStream, JsonTypes.Config> {
 
     @Override
     public Class<ZonedDateTime> type() {
@@ -336,7 +334,7 @@ static class ZonedDateTimeJsonCodec
     }
 
     @Override
-    public JsonIO.Output encode(ZonedDateTime value, JsonIO.Output out) {
+    public JsonTypes.OutStream encode(CodecCoreEx<JsonTypes.InStream, JsonTypes.OutStream, JsonTypes.Config> core, ZonedDateTime value, JsonTypes.OutStream out) {
         out.startObject();
 
         out.writeField("dateTime");
@@ -350,7 +348,7 @@ static class ZonedDateTimeJsonCodec
     }
 
     @Override
-    public ZonedDateTime decode(JsonIO.Input in) {
+    public ZonedDateTime decode(CodecCoreEx<JsonTypes.InStream, JsonTypes.OutStream, JsonTypes.Config> core, JsonTypes.InStream in) {
         in.startObject();
 
         in.readFieldName("dateTime");

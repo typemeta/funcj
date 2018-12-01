@@ -46,7 +46,7 @@ public class Example {
     }
 
     public static void main(String[] args) {
-        jsonTest();
+        //jsonTest();
         xmlTest();
     }
 
@@ -107,13 +107,13 @@ public class Example {
         jsonCodecCore.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec());
 
         // Encode to JSON.
-        final StringWriter wtr = new StringWriter();
-        jsonCodecCore.encode(Person.class, person, wtr);
-        System.out.println(wtr.toString());
+        jsonCodecCore.encode(Person.class, person, System.out);
+
+        System.out.flush();
 
         // Decode back to Java.
-        final StringReader rdr = new StringReader(wtr.toString());
-        final Person person2 = jsonCodecCore.decode(Person.class, rdr);
+        final Person person2 = jsonCodecCore.decode(Person.class, System.in);
+
         assert(person.equals(person2));
     }
 
@@ -127,13 +127,13 @@ public class Example {
                 ZonedDateTime::parse);
 
         // Encode to XML.
-        final StringWriter wtr = new StringWriter();
-        xmlCodecCore.encode(Person.class, person, wtr, root);
-        System.out.println(wtr.toString());
+        xmlCodecCore.encode(Person.class, person, System.out);
+
+        System.out.flush();
 
         // Decode back to Java.
-        final StringReader rdr = new StringReader(wtr.toString());
-        final Person person2 = xmlCodecCore.decode(Person.class, rdr, root);
+        final Person person2 = xmlCodecCore.decode(Person.class, System.in);
+
         assert(person.equals(person2));
     }
 }

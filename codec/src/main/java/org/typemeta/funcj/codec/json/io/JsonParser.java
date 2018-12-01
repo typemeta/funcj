@@ -3,7 +3,7 @@ package org.typemeta.funcj.codec.json.io;
 import org.typemeta.funcj.codec.CodecException;
 import org.typemeta.funcj.codec.json.JsonTypes;
 
-import java.io.Reader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -40,6 +40,10 @@ public class JsonParser implements JsonTypes.InStream {
 
     public JsonParser(Reader reader, int lookAhead) {
         this(new JsonTokeniser(reader), lookAhead);
+    }
+
+    @Override
+    public void close() {
     }
 
     private CodecException raiseError(String msg) {

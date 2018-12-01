@@ -64,11 +64,10 @@ public class OutputImpl implements XmlTypes.OutStream {
     }
 
     @Override
-    public OutputImpl close() {
+    public void close() {
         try {
             closeF.apply(this);
             wtr.close();
-            return this;
         } catch (XMLStreamException ex) {
             throw new CodecException(ex);
         }

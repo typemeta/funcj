@@ -33,11 +33,11 @@ public class XmlCodecCore
      * @param writer    the output stream to which the XML is written
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
-     * @return          the output stream
      */
-    public <T> OutStream encode(Class<? super T> type, T value, Writer writer, String rootElemName) {
-        final OutStream out = encode(type, value, XmlTypes.outputOf(writer, rootElemName));
-        return out.close();
+    public <T> void encode(Class<? super T> type, T value, Writer writer, String rootElemName) {
+        try(final OutStream out = XmlTypes.outputOf(writer, rootElemName)) {
+            encode(type, value, out);
+        }
     }
 
     /**
@@ -46,10 +46,9 @@ public class XmlCodecCore
      * @param writer    the output stream to which the XML is written
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
-     * @return          the output stream
      */
-    public <T> OutStream encode(T value, Writer writer, String rootElemName) {
-        return encode(Object.class, value, writer, rootElemName);
+    public <T> void encode(T value, Writer writer, String rootElemName) {
+        encode(Object.class, value, writer, rootElemName);
     }
 
     /**
@@ -61,7 +60,9 @@ public class XmlCodecCore
      * @return          the decoded value
      */
     public <T> T decode(Class<? super T> type, Reader reader, String rootElemName) {
-        return decode(type, XmlTypes.inputOf(reader, rootElemName));
+        try (final InStream in = XmlTypes.inputOf(reader, rootElemName)) {
+            return decode(type, in);
+        }
     }
 
     /**
@@ -77,21 +78,29 @@ public class XmlCodecCore
 
     @Override
     public <T> void encode(Class<? super T> clazz, T value, Writer wtr) {
-        encode(clazz, value, XmlTypes.outputOf(wtr, clazz.getSimpleName()));
+        try(final OutStream out = XmlTypes.outputOf(wtr, clazz.getSimpleName())) {
+            encode(clazz, value, out);
+        }
     }
 
     @Override
     public <T> T decode(Class<? super T> clazz, Reader rdr) {
-        return decode(clazz, XmlTypes.inputOf(rdr, clazz.getSimpleName()));
+        try(final InStream in = XmlTypes.inputOf(rdr, clazz.getSimpleName())) {
+            return decode(clazz, in);
+        }
     }
 
     @Override
     public <T> void encode(Class<? super T> clazz, T value, OutputStream os) {
-        encode(clazz, value, XmlTypes.outputOf(os, clazz.getSimpleName()));
+        try(final OutStream out = XmlTypes.outputOf(os, clazz.getSimpleName())) {
+            encode(clazz, value, out);
+        }
     }
 
     @Override
     public <T> T decode(Class<? super T> clazz, InputStream is) {
-        return decode(clazz, XmlTypes.inputOf(is, clazz.getSimpleName()));
+        try(final InStream in = XmlTypes.inputOf(is, clazz.getSimpleName())) {
+            return decode(clazz, in);
+        }
     }
 }

@@ -21,11 +21,6 @@ public class JsonGenerator implements JsonTypes.OutStream {
 
     @Override
     public void close() {
-        try {
-            writer.close();
-        } catch (IOException ex) {
-            throw raiseWriteFailure(ex);
-        }
     }
 
     private JsonGenerator writeUnquotedString(String value) {

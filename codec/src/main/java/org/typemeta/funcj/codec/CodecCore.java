@@ -80,9 +80,8 @@ public interface CodecCore<
      * @param value     the value to encode
      * @param out       the encoded parent (may be null for certain encodings)
      * @param <T>       the decoded value type
-     * @return          the encoded output
      */
-    <T> OUT encode(Class<? super T> clazz, T value, OUT out);
+    <T> void encode(Class<? super T> clazz, T value, OUT out);
 
     /**
      * Decode a value of type {@code T} from encoded value of type {@code E}.

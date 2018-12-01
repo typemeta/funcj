@@ -14,6 +14,10 @@ public final class OutputImpl implements ByteTypes.OutStream {
     }
 
     @Override
+    public void close() {
+    }
+
+    @Override
     public OutputImpl writeBoolean(boolean v) {
         try {
             output.writeBoolean(v);

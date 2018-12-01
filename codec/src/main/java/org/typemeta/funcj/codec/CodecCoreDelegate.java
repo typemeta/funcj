@@ -47,8 +47,8 @@ public class CodecCoreDelegate<
     }
 
     @Override
-    public <T> OUT encode(Class<? super T> clazz, T val, OUT out) {
-        return delegate.encode(clazz, val, out);
+    public <T> void encode(Class<? super T> clazz, T val, OUT out) {
+        delegate.encode(clazz, val, out);
     }
 
     @Override

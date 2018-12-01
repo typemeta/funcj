@@ -14,6 +14,10 @@ public final class InputImpl implements ByteTypes.InStream {
     }
 
     @Override
+    public void close() {
+    }
+
+    @Override
     public boolean readBoolean() {
         try {
             return input.readBoolean();
