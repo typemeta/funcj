@@ -105,7 +105,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, boolean[] value, OutStream out) {
             for (boolean val : value) {
-                booleanCodec().encode(core, val, out.startElement(config.entryElemName()));
+                booleanCodec().encodePrim(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -125,7 +125,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
                 }
 
                 in.startElement(config.entryElemName());
-                arr[i++] = booleanCodec().decode(core, in);
+                arr[i++] = booleanCodec().decodePrim(in);
                 in.endElement();
             }
             return Arrays.copyOf(arr, i);
@@ -168,7 +168,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, byte[] value, OutStream out) {
             for (byte val : value) {
-                byteCodec().encode(core, val, out.startElement(config.entryElemName()));
+                byteCodec().encodePrim(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -188,7 +188,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
                 }
 
                 in.startElement(config.entryElemName());
-                arr[i++] = byteCodec().decode(core, in);
+                arr[i++] = byteCodec().decodePrim(in);
                 in.endElement();
             }
             return Arrays.copyOf(arr, i);
@@ -231,7 +231,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, char[] value, OutStream out) {
             for (char val : value) {
-                charCodec().encode(core, val, out.startElement(config.entryElemName()));
+                charCodec().encodePrim(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -251,7 +251,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
                 }
 
                 in.startElement(config.entryElemName());
-                arr[i++] = charCodec().decode(core, in);
+                arr[i++] = charCodec().decodePrim(in);
                 in.endElement();
             }
             return Arrays.copyOf(arr, i);
@@ -294,7 +294,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, short[] value, OutStream out) {
             for (short val : value) {
-                shortCodec().encode(core, val, out.startElement(config.entryElemName()));
+                shortCodec().encodePrim(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -314,7 +314,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
                 }
 
                 in.startElement(config.entryElemName());
-                arr[i++] = shortCodec().decode(core, in);
+                arr[i++] = shortCodec().decodePrim(in);
                 in.endElement();
             }
             return Arrays.copyOf(arr, i);
@@ -357,7 +357,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, int[] value, OutStream out) {
             for (int val : value) {
-                intCodec().encode(core, val, out.startElement(config.entryElemName()));
+                intCodec().encodePrim(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -377,7 +377,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
                 }
 
                 in.startElement(config.entryElemName());
-                arr[i++] = intCodec().decode(core, in);
+                arr[i++] = intCodec().decodePrim(in);
                 in.endElement();
             }
             return Arrays.copyOf(arr, i);
@@ -420,7 +420,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, long[] value, OutStream out) {
             for (long val : value) {
-                longCodec().encode(core, val, out.startElement(config.entryElemName()));
+                longCodec().encodePrim(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -440,7 +440,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
                 }
 
                 in.startElement(config.entryElemName());
-                arr[i++] = longCodec().decode(core, in);
+                arr[i++] = longCodec().decodePrim(in);
                 in.endElement();
             }
             return Arrays.copyOf(arr, i);
@@ -483,7 +483,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, float[] value, OutStream out) {
             for (float val : value) {
-                floatCodec().encode(core, val, out.startElement(config.entryElemName()));
+                floatCodec().encodePrim(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -503,7 +503,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
                 }
 
                 in.startElement(config.entryElemName());
-                arr[i++] = floatCodec().decode(core, in);
+                arr[i++] = floatCodec().decodePrim(in);
                 in.endElement();
             }
             return Arrays.copyOf(arr, i);
@@ -545,7 +545,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, double[] value, OutStream out) {
             for (double val : value) {
-                doubleCodec().encode(core, val, out.startElement(config.entryElemName()));
+                doubleCodec().encodePrim(val, out.startElement(config.entryElemName()));
                 out.endElement();
             }
             return out;
@@ -565,7 +565,7 @@ public class XmlCodecFormat implements CodecFormat<InStream, OutStream, Config> 
                 }
 
                 in.startElement(config.entryElemName());
-                arr[i++] = doubleCodec().decode(core, in);
+                arr[i++] = doubleCodec().decodePrim(in);
                 in.endElement();
             }
             return Arrays.copyOf(arr, i);

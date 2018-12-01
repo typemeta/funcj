@@ -105,7 +105,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, boolean[] value, OutStream out) {
             out.writeInt(value.length);
             for (boolean val : value) {
-                booleanCodec().encode(core, val, out);
+                booleanCodec().encodePrim(val, out);
             }
             return out;
         }
@@ -116,7 +116,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
             final boolean[] vals = new boolean[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = booleanCodec().decode(core, in);
+                vals[i] = booleanCodec().decodePrim(in);
             }
 
             return vals;
@@ -160,7 +160,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, byte[] value, OutStream out) {
             out.writeInt(value.length);
             for (byte val : value) {
-                byteCodec().encode(core, val, out);
+                byteCodec().encodePrim(val, out);
             }
             return out;
         }
@@ -171,7 +171,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
             final byte[] vals = new byte[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = byteCodec().decode(core, in);
+                vals[i] = byteCodec().decodePrim(in);
             }
 
             return vals;
@@ -215,7 +215,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, char[] value, OutStream out) {
             out.writeInt(value.length);
             for (char val : value) {
-                charCodec().encode(core, val, out);
+                charCodec().encodePrim(val, out);
             }
             return out;
         }
@@ -226,7 +226,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
             final char[] vals = new char[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = charCodec().decode(core, in);
+                vals[i] = charCodec().decodePrim(in);
             }
 
             return vals;
@@ -270,7 +270,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, short[] value, OutStream out) {
             out.writeInt(value.length);
             for (short val : value) {
-                shortCodec().encode(core, val, out);
+                shortCodec().encodePrim(val, out);
             }
             return out;
         }
@@ -281,7 +281,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
             final short[] vals = new short[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = shortCodec().decode(core, in);
+                vals[i] = shortCodec().decodePrim(in);
             }
 
             return vals;
@@ -325,7 +325,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, int[] value, OutStream out) {
             out.writeInt(value.length);
             for (int val : value) {
-                intCodec().encode(core, val, out);
+                intCodec().encodePrim(val, out);
             }
             return out;
         }
@@ -336,7 +336,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
             final int[] vals = new int[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = intCodec().decode(core, in);
+                vals[i] = intCodec().decodePrim(in);
             }
 
             return vals;
@@ -380,7 +380,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, long[] value, OutStream out) {
             out.writeInt(value.length);
             for (long val : value) {
-                longCodec().encode(core, val, out);
+                longCodec().encodePrim(val, out);
             }
             return out;
         }
@@ -391,7 +391,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
             final long[] vals = new long[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = longCodec().decode(core, in);
+                vals[i] = longCodec().decodePrim(in);
             }
 
             return vals;
@@ -435,7 +435,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, float[] value, OutStream out) {
             out.writeInt(value.length);
             for (float val : value) {
-                floatCodec().encode(core, val, out);
+                floatCodec().encodePrim(val, out);
             }
             return out;
         }
@@ -446,7 +446,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
             final float[] vals = new float[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = floatCodec().decode(core, in);
+                vals[i] = floatCodec().decodePrim(in);
             }
 
             return vals;
@@ -490,7 +490,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, double[] value, OutStream out) {
             out.writeInt(value.length);
             for (double val : value) {
-                doubleCodec().encode(core, val, out);
+                doubleCodec().encodePrim(val, out);
             }
             return out;
         }
@@ -501,7 +501,7 @@ public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config>
             final double[] vals = new double[l];
 
             for (int i = 0; i < l; ++i) {
-                vals[i] = doubleCodec().decode(core, in);
+                vals[i] = doubleCodec().decodePrim(in);
             }
 
             return vals;

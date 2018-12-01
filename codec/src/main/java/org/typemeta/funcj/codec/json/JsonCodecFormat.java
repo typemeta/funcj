@@ -132,7 +132,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, boolean[] value, OutStream out) {
             out.startArray();
             for (boolean val : value) {
-                booleanCodec().encode(core, val, out);
+                booleanCodec().encodePrim(val, out);
             }
             return out.endArray();
         }
@@ -146,7 +146,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
-                arr[i++] = booleanCodec().decode(core, in);
+                arr[i++] = booleanCodec().decodePrim(in);
             }
             in.endArray();
             return Arrays.copyOf(arr, i);
@@ -190,7 +190,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, byte[] value, OutStream out) {
             out.startArray();
             for (byte val : value) {
-                byteCodec().encode(core, val, out);
+                byteCodec().encodePrim(val, out);
             }
             return out.endArray();
         }
@@ -204,7 +204,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
-                arr[i++] = byteCodec().decode(core, in);
+                arr[i++] = byteCodec().decodePrim(in);
             }
             in.endArray();
             return Arrays.copyOf(arr, i);
@@ -248,7 +248,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, char[] value, OutStream out) {
             out.startArray();
             for (char val : value) {
-                charCodec().encode(core, val, out);
+                charCodec().encodePrim(val, out);
             }
             return out.endArray();
         }
@@ -262,7 +262,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
-                arr[i++] = charCodec().decode(core, in);
+                arr[i++] = charCodec().decodePrim(in);
             }
             in.endArray();
             return Arrays.copyOf(arr, i);
@@ -306,7 +306,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, short[] value, OutStream out) {
             out.startArray();
             for (short val : value) {
-                shortCodec().encode(core, val, out);
+                shortCodec().encodePrim(val, out);
             }
             return out.endArray();
         }
@@ -320,7 +320,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
-                arr[i++] = shortCodec().decode(core, in);
+                arr[i++] = shortCodec().decodePrim(in);
             }
             in.endArray();
             return Arrays.copyOf(arr, i);
@@ -364,7 +364,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, int[] value, OutStream out) {
             out.startArray();
             for (int val : value) {
-                intCodec().encode(core, val, out);
+                intCodec().encodePrim(val, out);
             }
             return out.endArray();
         }
@@ -378,7 +378,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
-                arr[i++] = intCodec().decode(core, in);
+                arr[i++] = intCodec().decodePrim(in);
             }
             in.endArray();
             return Arrays.copyOf(arr, i);
@@ -422,7 +422,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, long[] value, OutStream out) {
             out.startArray();
             for (long val : value) {
-                longCodec().encode(core, val, out);
+                longCodec().encodePrim(val, out);
             }
             return out.endArray();
         }
@@ -436,7 +436,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
-                arr[i++] = longCodec().decode(core, in);
+                arr[i++] = longCodec().decodePrim(in);
             }
             in.endArray();
             return Arrays.copyOf(arr, i);
@@ -480,7 +480,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, float[] value, OutStream out) {
             out.startArray();
             for (float val : value) {
-                floatCodec().encode(core, val, out);
+                floatCodec().encodePrim(val, out);
             }
             return out.endArray();
         }
@@ -494,7 +494,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
-                arr[i++] = floatCodec().decode(core, in);
+                arr[i++] = floatCodec().decodePrim(in);
             }
             in.endArray();
             return Arrays.copyOf(arr, i);
@@ -538,7 +538,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, double[] value, OutStream out) {
             out.startArray();
             for (double val : value) {
-                doubleCodec().encode(core, val, out);
+                doubleCodec().encodePrim(val, out);
             }
             return out.endArray();
         }
@@ -552,7 +552,7 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
-                arr[i++] = doubleCodec().decode(core, in);
+                arr[i++] = doubleCodec().decodePrim(in);
             }
             in.endArray();
             return Arrays.copyOf(arr, i);
