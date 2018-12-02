@@ -42,6 +42,7 @@ public abstract class Codecs {
         return registerAll(new ByteCodecCore());
     }
 
+    @SuppressWarnings("unchecked")
     public static <
             IN extends Input<IN>,
             OUT extends Output<OUT>,
@@ -95,6 +96,104 @@ public abstract class Codecs {
         core.registerArgArrayCtor(
                 ReflectionUtils.classForName("java.util.Collections$SingletonMap"),
                 args -> Collections.singletonMap(args[0], args[1]));
+
+        core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Collections$UnmodifiableRandomAccessList"),
+                args -> Collections.unmodifiableList(Arrays.asList(args)));
+
+        core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Collections$UnmodifiableRandomAccessList"),
+                args -> Collections.unmodifiableList(Arrays.asList(args)));
+
+        core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Collections$UnmodifiableSet"),
+                args -> {
+                    if (args.length == 0) {
+                        return Collections.unmodifiableSet(Collections.emptySet());
+                    } else {
+                        final Set set;
+
+                        if (args[0] instanceof Comparable) {
+                            set = new TreeSet<>();
+                        } else {
+                            set = new HashSet<>();
+                        }
+
+                        Collections.addAll(set, args);
+                        return Collections.unmodifiableSet(set);
+                    }
+                });
+
+        core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Collections$UnmodifiableNavigableSet"),
+                args -> {
+                    if (args.length == 0) {
+                        return Collections.unmodifiableSet(Collections.emptySet());
+                    } else {
+                        final NavigableSet set = new TreeSet<>();
+                        Collections.addAll(set, args);
+                        return Collections.unmodifiableNavigableSet(set);
+                    }
+                });
+
+        core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Collections$UnmodifiableSortedSet"),
+                args -> {
+                    if (args.length == 0) {
+                        return Collections.unmodifiableSet(Collections.emptySet());
+                    } else {
+                        final SortedSet set = new TreeSet<>();
+                        Collections.addAll(set, args);
+                        return Collections.unmodifiableSortedSet(set);
+                    }
+                });
+
+        core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Collections$UnmodifiableMap"),
+                args -> {
+                    if (args.length == 0) {
+                        return Collections.unmodifiableMap(Collections.emptyMap());
+                    } else {
+                        final Map map;
+                        if (args[0] instanceof Comparable) {
+                            map = new TreeMap();
+                        } else {
+                            map = new HashMap();
+                        }
+                        for (int i = 0; i < args.length; i += 2) {
+                            map.put(args[i], args[i+1]);
+                        }
+                        return Collections.unmodifiableMap(map);
+                    }
+                });
+
+        core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Collections$UnmodifiableNavigableMap"),
+                args -> {
+                    if (args.length == 0) {
+                        return Collections.unmodifiableMap(Collections.emptyMap());
+                    } else {
+                        final NavigableMap map = new TreeMap();
+                        for (int i = 0; i < args.length; i += 2) {
+                            map.put(args[i], args[i+1]);
+                        }
+                        return Collections.unmodifiableNavigableMap(map);
+                    }
+                });
+
+        core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Collections$UnmodifiableSortedMap"),
+                args -> {
+                    if (args.length == 0) {
+                        return Collections.unmodifiableMap(Collections.emptyMap());
+                    } else {
+                        final NavigableMap map = new TreeMap();
+                        for (int i = 0; i < args.length; i += 2) {
+                            map.put(args[i], args[i+1]);
+                        }
+                        return Collections.unmodifiableSortedMap(map);
+                    }
+                });
 
         // Register codec for Class.
         core.registerStringProxyCodec(

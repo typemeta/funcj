@@ -25,6 +25,13 @@ public interface ClassKey<T> extends Comparable<ClassKey<T>> {
         }
 
         @Override
+        public String toString() {
+            return "Single{" +
+                    "clazz=" + clazz +
+                    '}';
+        }
+
+        @Override
         public boolean equals(Object rhs) {
             if (this == rhs) {
                 return true;
@@ -63,6 +70,14 @@ public interface ClassKey<T> extends Comparable<ClassKey<T>> {
         public Double(Class<?> clazz, Class<?> clazzA) {
             this.clazz = clazz;
             this.clazzA = clazzA;
+        }
+
+        @Override
+        public String toString() {
+            return "Double{" +
+                    "clazz=" + clazz +
+                    "clazzA=" + clazzA +
+                    '}';
         }
 
         @Override
@@ -110,6 +125,15 @@ public interface ClassKey<T> extends Comparable<ClassKey<T>> {
             this.clazz = clazz;
             this.clazzA = clazzA;
             this.clazzB = clazzB;
+        }
+
+        @Override
+        public String toString() {
+            return "Triple{" +
+                    "clazz=" + clazz +
+                    "clazzA=" + clazzA +
+                    "clazzB=" + clazzB +
+                    '}';
         }
 
         @Override

@@ -454,7 +454,12 @@ public class CodecCoreImpl<
             Field field,
             Codec<FT, IN, OUT, CFG> codec) {
         return new ObjectCodecBuilder.FieldCodec<>(
-                t -> CodecException.wrap(() -> (FT)field.get(t)),
+                t -> CodecException.wrap(() -> {
+                    field.setAccessible(true);
+                    final FT fv = (FT)field.get(t);
+                    field.setAccessible(false);
+                    return fv;
+                }),
                 codec
         );
     }

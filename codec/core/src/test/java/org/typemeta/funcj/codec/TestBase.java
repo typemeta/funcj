@@ -190,8 +190,8 @@ public abstract class TestBase {
     }
 
     @Test
-    public void testEmptyOrSingletonColls() throws Exception {
-        roundTrip(new TestTypes.EmptyOrSingletonCollections(), TestTypes.EmptyOrSingletonCollections.class);
+    public void testCollectionTypes() throws Exception {
+        roundTrip(new TestTypes.CollTypes(), TestTypes.CollTypes.class);
     }
 
     @Test

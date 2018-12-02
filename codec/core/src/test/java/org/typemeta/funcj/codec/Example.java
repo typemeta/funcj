@@ -4,8 +4,6 @@ import org.typemeta.funcj.codec.json.JsonCodecCore;
 import org.typemeta.funcj.codec.json.JsonTypes;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
 
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.time.*;
 import java.util.*;
 

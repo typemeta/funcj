@@ -1143,14 +1143,10 @@ public abstract class TestTypes {
         }
     }
 
-    static class EmptyOrSingletonCollections {
-        final List<String> emptyList = Collections.emptyList();
-        final Set<String> emptySet = Collections.emptySet();
-        final Map<String, Integer> emptyMap = Collections.emptyMap();
+    static class CollTypesz {
 
-        final List<String> singletonList = Collections.singletonList("abcd");
-        final Set<String> singletonSet = Collections.singleton("abcd");
-        final Map<String, Integer> singletonMap = Collections.singletonMap("ghij", 1234);
+        final Set<Integer> unmodSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(1, 2, 3, 4)));
+        final Set<Integer> unmodSet2 = Collections.unmodifiableSortedSet(new TreeSet<>(Arrays.asList(1, 2, 3, 4)));
 
         @Override
         public boolean equals(Object rhs) {
@@ -1159,13 +1155,55 @@ public abstract class TestTypes {
             } else if (rhs == null || getClass() != rhs.getClass()) {
                 return false;
             } else {
-                EmptyOrSingletonCollections that = (EmptyOrSingletonCollections) rhs;
+                CollTypesz that = (CollTypesz) rhs;
+                return Objects.equals(unmodSet, that.unmodSet) &&
+                        Objects.equals(unmodSet2, that.unmodSet2);
+            }
+        }
+    }
+
+    static class CollTypes {
+        final static TreeMap<String, Integer> m = new TreeMap<>();
+        static {
+            m.put("alpha", 1);
+            m.put("beta", 2);
+        }
+
+        final List<String> emptyList = Collections.emptyList();
+        final Set<String> emptySet = Collections.emptySet();
+        final Map<String, Integer> emptyMap = Collections.emptyMap();
+
+        final List<String> singletonList = Collections.singletonList("abcd");
+        final Set<String> singletonSet = Collections.singleton("abcd");
+        final Map<String, Integer> singletonMap = Collections.singletonMap("ghij", 1234);
+
+        final List<Integer> unmodList = Collections.unmodifiableList(Arrays.asList(1, 2, 3, 4));
+        final Set<Integer> unmodSet = Collections.unmodifiableSet(new HashSet<>(unmodList));
+        final Set<Integer> unmodSet2 = Collections.unmodifiableSortedSet(new TreeSet<>(unmodList));
+
+        final Map<String, Integer> unmodMap = Collections.unmodifiableMap(m);
+        final Map<String, Integer> unmodMap2 = Collections.unmodifiableNavigableMap(m);
+        final Map<String, Integer> unmodMap3 = Collections.unmodifiableSortedMap(m);
+
+        @Override
+        public boolean equals(Object rhs) {
+            if (this == rhs) {
+                return true;
+            } else if (rhs == null || getClass() != rhs.getClass()) {
+                return false;
+            } else {
+                CollTypes that = (CollTypes) rhs;
                 return Objects.equals(emptyList, that.emptyList) &&
                         Objects.equals(emptySet, that.emptySet) &&
                         Objects.equals(emptyMap, that.emptyMap) &&
                         Objects.equals(singletonList, that.singletonList) &&
-                        Objects.equals(singletonSet, that.singletonSet)  &&
-                        Objects.equals(singletonMap, that.singletonMap);
+                        Objects.equals(singletonSet, that.singletonSet) &&
+                        Objects.equals(singletonMap, that.singletonMap) &&
+                        Objects.equals(unmodSet, that.unmodSet) &&
+                        Objects.equals(unmodSet2, that.unmodSet2) &&
+                        Objects.equals(unmodMap, that.unmodMap) &&
+                        Objects.equals(unmodMap2, that.unmodMap2) &&
+                        Objects.equals(unmodMap3, that.unmodMap3);
             }
         }
     }
