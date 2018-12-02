@@ -30,7 +30,7 @@ and can then decode the data to reconstruct the original Java values.
 
 ## Features
 
-* Supports encoding via JSON, XML, and byte streams. Can be extended to support further formats.
+* Supports encoding via JSON, XML, MessagePack, raw byte streams and gzipped byte streams. Can be extended to support further formats.
 * Uses streaming to avoid building, for example, large DOM or JSON node graphs in memory.
 * Supports primitive types, generics, collections, nulls, as well as any Java class using field-based Reflection.
 * Should round-trip data perfectly, meaning that for example,
@@ -38,7 +38,7 @@ a `TreeMap` will be reconstructed as the same type (and not as a `HashMap`).
 * Is thread-safe.
 * The framework is relatively non-invasive - the only requirement imposed on your types are that they contain a default constructor -
 one that takes no arguments (the constructor can be private).
-  * Note, this requirement can be bypassed by providing a custom codec for the class.
+  * Note, this requirement can be bypassed by registering a custom constructor for the class, or by providing a custom codec for the class.
 * Encoding is driven by reflecting over the field members that comprise each class,
 consequently the encoded form mirrors the structure of the original Java data.
   * Static type information is used where possible
@@ -71,7 +71,17 @@ Add this dependency to your project pom.xml:
 ```xml
 <dependency>
     <groupId>org.typemeta</groupId>
-    <artifactId>funcj-codec</artifactId>
+    <artifactId>funcj-codec-core</artifactId>
+    <version>${funcj.codec.version}</version>
+</dependency>
+```
+
+For MessagePack support use:
+
+```xml
+<dependency>
+    <groupId>org.typemeta</groupId>
+    <artifactId>funcj-codec-mpack</artifactId>
     <version>${funcj.codec.version}</version>
 </dependency>
 ```
@@ -429,8 +439,8 @@ and re-used for any subsequent occurrences of that class.
 
 I was motivated to write this library after numerous failed attempts
 getting Jackson to serialise/deserialise classes based on their fields,
-and to round-trip data correctly,
-without heavily annotating the classes with Jackson annotations.
+and to round-trip data correctly
+without resorting to heavily annotating the classes with Jackson annotations.
 
 For example, if I run the tutorial's `Person` class through the Jackson `ObjectMapper`,
 I get the following error:

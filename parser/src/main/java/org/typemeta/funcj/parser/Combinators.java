@@ -109,7 +109,7 @@ public abstract class Combinators {
      * @return          a parser that succeeds on any input symbol
      */
     public static <I> Parser<I, I> any() {
-        return new ParserImpl<I, I>(LTRUE, SymSet::all) {
+        return new ParserImpl<I, I>(LFALSE, SymSet::all) {
             @Override
             public Result<I, I> apply(Input<I> in, SymSet<I> follow) {
                 return in.isEof() ?

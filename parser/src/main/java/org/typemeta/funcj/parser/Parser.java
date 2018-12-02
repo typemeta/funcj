@@ -333,9 +333,12 @@ public interface Parser<I, A> {
      * and then returns an {@link IList} of the results.
      * If this parser fails on the first attempt then the parser succeeds,
      * with an empty list of results.
-     * @return          a parser which applies {@code p} zero or more times until it fails
+     * @return          a parser which applies this parser zero or more times until it fails
      */
     default Parser<I, IList<A>> many() {
+        if (acceptsEmpty().apply()) {
+            throw new RuntimeException("Cannot construct a many parser from one that accepts empty");
+        }
         // We use an iterative implementation, in favour of a more concise recursive solution,
         // for performance, and to avoid StackOverflowExceptions.
         return new ParserImpl<I, IList<A>>(LTRUE, this.firstSet()) {
@@ -346,7 +349,52 @@ public interface Parser<I, A> {
                 while (true) {
                     if (!in.isEof()) {
                         final I i = in.get();
-                        if (firstSet().apply().matches(i)) {
+                        if (Parser.this.firstSet().apply().matches(i)) {
+                            final Result<I, A> r = Parser.this.apply(in, follow2);
+                            if (r.isSuccess()) {
+                                final Result.Success<I, A> succ = (Result.Success<I, A>) r;
+                                acc = acc.add(succ.value());
+                                in = succ.next();
+                                continue;
+                            } else {
+                                return ((Result.Failure<I, A>)r).cast();
+                            }
+                        }
+                    }
+                    return Result.success(acc.reverse(), in);
+                }
+            }
+        };
+    }
+
+    /**
+     * A parser which repeatedly applies this parser until the end parser succeeds,
+     * and then returns an {@link IList} of the results.
+     * @param end       the end parser
+     * @param <B>       the result type of the end parser
+     * @return          a parser which applies this parser zero or more times until end succeeds
+     */
+    @SuppressWarnings("unchecked")
+    default <B> Parser<I, IList<A>> manyTill(Parser<I, B> end) {
+        return new ParserImpl<I, IList<A>>(
+                end.acceptsEmpty(),
+                union(Parser.this.firstSet(), end.firstSet())) {
+            @Override
+            public Result<I, IList<A>> apply(Input<I> in, SymSet<I> follow) {
+                IList<A> acc = IList.of();
+                final SymSet<I> follow2 = combine(end.acceptsEmpty().apply(), end.firstSet().apply(), follow);
+                while (true) {
+                    if (!in.isEof()) {
+                        final I i = in.get();
+                        if (end.firstSet().apply().matches(i)) {
+                            final Result<I, B> r = end.apply(in, follow);
+                            if (r.isSuccess()) {
+                                final Result.Success<I, B> succ = (Result.Success<I, B>) r;
+                                in = succ.next();
+                            } else {
+                                return ((Result.Failure<I, A>)r).cast();
+                            }
+                        } else if (Parser.this.firstSet().apply().matches(i)) {
                             final Result<I, A> r = Parser.this.apply(in, follow2);
                             if (r.isSuccess()) {
                                 final Result.Success<I, A> succ = (Result.Success<I, A>) r;

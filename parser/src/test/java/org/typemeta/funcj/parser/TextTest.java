@@ -2,9 +2,9 @@ package org.typemeta.funcj.parser;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.junit.Assert;
+import org.junit.*;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.data.Chr;
+import org.typemeta.funcj.data.*;
 
 import java.io.StringReader;
 
@@ -143,4 +143,19 @@ public class TextTest {
         final Result<Chr, String> r = p.parse(Input.of(s));
         assertEquals("string(" + s + ").parse(" + s + ")", s, r.getOrThrow());
     }
+//
+//    private static <T> Parser<Chr, T> manyTill(Parser<Chr, T> end) {
+//
+//    }
+//
+//    @Test
+//    public void testBlockComment() {
+//        final Parser<Chr, String> start = Text.string("/*");
+//        final Parser<Chr, String> end = Text.string("*/");
+//        final Result<Chr, Unit> p =
+//                start
+//                        .andR()
+//
+//
+//    }
 }

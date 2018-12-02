@@ -129,19 +129,24 @@ public class ParserTest {
     }
 
     @Property
-    public void manyMatchesMany(char c1, char c2) {
-        final String s = "" + c1 + c2;
-        final char[] ca = s.toCharArray();
+    public void manyMatches(char c1, char c2) {
+        Assume.assumeThat(c1, not(c2));
 
-        final Parser<Chr, String> parser = any(Chr.class).many().map(Chr::listToString);
+        final String s = "" + c1 + c1 + c1 + c1;
+        final char[] ca = (s + c2).toCharArray();
+
+        final Parser<Chr, String> parser =
+                Text.chr(c1).many()
+                        .andL(Text.chr(c2))
+                        .map(Chr::listToString);
 
         TestUtils.ParserCheck.parser(parser)
                 .withInput(Input.of(ca))
-                .succeedsWithResult(s, Input.of(ca).next().next());
+                .succeedsWithResult(s, Input.of(ca).next().next().next().next().next());
     }
 
     @Property
-    public void manySuccedsOnNonEmptyInput() {
+    public void manySucceedsOnNonEmptyInput() {
         final Input<Chr> input = Input.of("");
 
         final Parser<Chr, String> parser = any(Chr.class).many().map(Chr::listToString);
@@ -149,6 +154,22 @@ public class ParserTest {
         TestUtils.ParserCheck.parser(parser)
                 .withInput(input)
                 .succeedsWithResult("", input);
+    }
+
+    @Property
+    public void manyTillMatches(char c1, char c2) {
+        Assume.assumeThat(c1, not(c2));
+
+        final String s = "" + c1 + c1 + c1 + c1;
+        final char[] ca = (s + c2).toCharArray();
+
+        final Parser<Chr, String> parser =
+                Text.chr(c1).manyTill(Text.chr(c2))
+                        .map(Chr::listToString);
+
+        TestUtils.ParserCheck.parser(parser)
+                .withInput(Input.of(ca))
+                .succeedsWithResult(s, Input.of(ca).next().next().next().next().next());
     }
 
     @Property
