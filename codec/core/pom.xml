@@ -18,6 +18,7 @@
 
     <properties>
         <immutables.version>2.7.3</immutables.version>
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
     </properties>
 
     <dependencies>
@@ -68,6 +69,21 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Disable incremental compilation, as immutables solicits known Java bug
+             "endPosTable already set" -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <compilerVersion>1.8</compilerVersion>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <!-- Prevents an endPosTable exception during compilation -->
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
+                </configuration>
             </plugin>
         </plugins>
     </build>
