@@ -74,7 +74,10 @@ public interface CodecFormat<
             Functions.F<Class<T>, Codec<T, IN, OUT, CFG>> getDynCodec);
 
     default <T> T decodeDynamicType(CodecCoreEx<IN, OUT, CFG> core, IN in) {
-        return decodeDynamicType(in, name -> core.getCodec(this.config().<T>nameToClass(name)).decode(core, in));
+        return decodeDynamicType(
+                in,
+                name -> core.getCodec(this.config().<T>nameToClass(name)).decode(core, in)
+        );
     }
 
     <T> T decodeDynamicType(IN in, Functions.F<String, T> decoder);

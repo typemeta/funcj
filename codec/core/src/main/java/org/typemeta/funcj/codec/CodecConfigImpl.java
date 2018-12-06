@@ -33,7 +33,6 @@ public class CodecConfigImpl implements CodecConfig {
         allowedPackages.add(pkg);
     }
 
-
     @Override
     public void registerAllowedClass(Class<?> clazz) {
         allowedClasses.add(clazz);
