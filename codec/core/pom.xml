@@ -47,12 +47,12 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.immutables</groupId>
-            <artifactId>value</artifactId>
-            <version>${immutables.version}</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.immutables</groupId>-->
+            <!--<artifactId>value</artifactId>-->
+            <!--<version>${immutables.version}</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
@@ -84,18 +84,18 @@
 
             <!-- Disable incremental compilation, as Immutables solicits known Java bug
              "endPosTable already set" -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <compilerVersion>1.8</compilerVersion>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <!-- Prevents an endPosTable exception during compilation -->
-                    <useIncrementalCompilation>false</useIncrementalCompilation>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-compiler-plugin</artifactId>-->
+                <!--<version>${maven-compiler-plugin.version}</version>-->
+                <!--<configuration>-->
+                    <!--<compilerVersion>1.8</compilerVersion>-->
+                    <!--<source>1.8</source>-->
+                    <!--<target>1.8</target>-->
+                    <!--&lt;!&ndash; Prevents an endPosTable exception during compilation &ndash;&gt;-->
+                    <!--<useIncrementalCompilation>false</useIncrementalCompilation>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 

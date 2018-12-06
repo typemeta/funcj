@@ -3,7 +3,7 @@ package org.typemeta.funcj.codec;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class TestBase {
 
@@ -209,5 +209,14 @@ public abstract class TestBase {
     @Test
     public void testInterface() throws Exception {
         roundTrip(new TestTypes.SomeClass("bleh"), TestTypes.SomeInterface.class);
+    }
+
+    @Test
+    public void testMap() throws Exception {
+        final Map<String, Integer> map = new TreeMap<>();
+        map.put("one", 1);
+        map.put("two", 2);
+        map.put("three", 3);
+        roundTrip(map, Map.class);
     }
 }

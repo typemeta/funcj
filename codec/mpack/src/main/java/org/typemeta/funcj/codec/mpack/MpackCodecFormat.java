@@ -52,10 +52,10 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             out.writeBoolean(false);
             return false;
-        } else if (config().getDefaultSubType(codec.type()) == dynType) {
-            //getDynCodec.apply(dynType).encode(core, val, out);
-            out.writeBoolean(false);
-            return false;
+//        } else if (config().getDefaultSubType(codec.type()) == dynType) {
+//            getDynCodec.apply(dynType).encode(core, val, out);
+//            out.writeBoolean(false);
+//            return false;
         } else {
             out.writeBoolean(true);
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);

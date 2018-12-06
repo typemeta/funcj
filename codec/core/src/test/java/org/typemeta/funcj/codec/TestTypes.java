@@ -1190,7 +1190,6 @@ public abstract class TestTypes {
     }
 
     interface SomeInterface {
-
     }
 
     public static class SomeClass implements SomeInterface {
