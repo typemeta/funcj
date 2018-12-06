@@ -230,9 +230,39 @@ public class CodecCoreImpl<
         }
     }
 
+    private static class InterfaceCodec<
+            T,
+            IN extends Input<IN>,
+            OUT extends Output<OUT>,
+            CFG extends CodecConfig> implements Codec<T, IN, OUT, CFG> {
+
+    private final Class<T> clazz;
+
+        private InterfaceCodec(Class<T> clazz) {
+            this.clazz = clazz;
+        }
+
+        @Override
+        public Class<T> type() {
+            return clazz;
+        }
+
+        @Override
+        public OUT encode(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
+            throw new CodecException("Internal error - can't encode an interface");
+        }
+
+        @Override
+        public T decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
+            throw new CodecException("Internal error - can't decode an interface");
+        }
+    }
+
     @Override
     public <T> Codec<T, IN, OUT, CFG> createCodec(Class<T> clazz) {
-        if (clazz.isPrimitive()) {
+        if (clazz == Object.class || clazz.isInterface()) {
+            return new InterfaceCodec<T, IN, OUT, CFG>(clazz);
+        } else if (clazz.isPrimitive()) {
             if (clazz.equals(boolean.class)) {
                 return (Codec<T, IN, OUT, CFG>)format.booleanCodec();
             } else if (clazz.equals(byte.class)) {

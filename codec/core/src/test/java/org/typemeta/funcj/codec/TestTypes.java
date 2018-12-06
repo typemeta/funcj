@@ -1126,7 +1126,7 @@ public abstract class TestTypes {
             this.enumType = enumType;
         }
 
-        TypeWithEnum() {
+        private TypeWithEnum() {
             this.enumType = null;
         }
 
@@ -1139,25 +1139,6 @@ public abstract class TestTypes {
             } else {
                 TypeWithEnum that = (TypeWithEnum) rhs;
                 return enumType == that.enumType;
-            }
-        }
-    }
-
-    static class CollTypesz {
-
-        final Set<Integer> unmodSet = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(1, 2, 3, 4)));
-        final Set<Integer> unmodSet2 = Collections.unmodifiableSortedSet(new TreeSet<>(Arrays.asList(1, 2, 3, 4)));
-
-        @Override
-        public boolean equals(Object rhs) {
-            if (this == rhs) {
-                return true;
-            } else if (rhs == null || getClass() != rhs.getClass()) {
-                return false;
-            } else {
-                CollTypesz that = (CollTypesz) rhs;
-                return Objects.equals(unmodSet, that.unmodSet) &&
-                        Objects.equals(unmodSet2, that.unmodSet2);
             }
         }
     }
@@ -1205,6 +1186,34 @@ public abstract class TestTypes {
                         Objects.equals(unmodMap2, that.unmodMap2) &&
                         Objects.equals(unmodMap3, that.unmodMap3);
             }
+        }
+    }
+
+    interface SomeInterface {
+
+    }
+
+    public static class SomeClass implements SomeInterface {
+        public final String name;
+
+        public SomeClass(String name) {
+            this.name = name;
+        }
+
+        public SomeClass() {
+            this.name = null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            SomeClass someClass = (SomeClass) o;
+            return Objects.equals(name, someClass.name);
         }
     }
 }

@@ -175,6 +175,18 @@ public abstract class TestBase {
     }
 
     @Test
+    public void testRecursive() throws Exception {
+        final TestTypes.Recursive rec = new TestTypes.Recursive(null, 0);
+        roundTrip(rec, TestTypes.Recursive.class);
+
+        final TestTypes.Recursive rec2 = new TestTypes.Recursive(rec, 1);
+        roundTrip(rec2, TestTypes.Recursive.class);
+
+        final TestTypes.Recursive rec3 = new TestTypes.Recursive(rec2, 2);
+        roundTrip(rec3, TestTypes.Recursive.class);
+    }
+
+    @Test
     public void testCustomNulls() throws Exception {
         roundTrip(new TestTypes.Custom(), TestTypes.Custom.class);
     }
@@ -195,14 +207,7 @@ public abstract class TestBase {
     }
 
     @Test
-    public void testRecursive() throws Exception {
-        final TestTypes.Recursive rec = new TestTypes.Recursive(null, 0);
-        roundTrip(rec, TestTypes.Recursive.class);
-
-        final TestTypes.Recursive rec2 = new TestTypes.Recursive(rec, 1);
-        roundTrip(rec2, TestTypes.Recursive.class);
-
-        final TestTypes.Recursive rec3 = new TestTypes.Recursive(rec2, 2);
-        roundTrip(rec3, TestTypes.Recursive.class);
+    public void testInterface() throws Exception {
+        roundTrip(new TestTypes.SomeClass("bleh"), TestTypes.SomeInterface.class);
     }
 }
