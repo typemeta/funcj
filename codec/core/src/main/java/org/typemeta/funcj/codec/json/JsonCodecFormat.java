@@ -57,9 +57,6 @@ public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config>
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             return false;
-        } else if (config().getDefaultSubType(codec.type()) == dynType) {
-            getDynCodec.apply(dynType).encode(core, val, out);
-            return true;
         } else {
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             out.startObject();

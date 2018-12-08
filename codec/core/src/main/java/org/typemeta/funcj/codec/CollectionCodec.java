@@ -35,7 +35,7 @@ public abstract class CollectionCodec<
         return collType;
     }
 
-    private Codec<Collection<T>, IN, OUT, CFG> getCodec(
+    protected Codec<Collection<T>, IN, OUT, CFG> getCodec(
             CodecCoreEx<IN, OUT, CFG> core,
             Class<Collection<T>> type) {
         return core.getCollCodec(type, elemCodec);
@@ -45,17 +45,18 @@ public abstract class CollectionCodec<
     public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Collection<T> value, OUT out) {
         if (core.format().encodeNull(value, out)) {
             return out;
-        } else {
-            if (!core.format().encodeDynamicType(
+        } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
+            final Class<Collection<T>> implCollType = core.config().getDefaultCollectionType(type());
+            return getCodec(core, implCollType).encode(core, value, out);
+        } else if (!core.format().encodeDynamicType(
                     core,
                     this,
                     value,
                     out,
                     type -> getCodec(core, type))) {
-                return encode(core, value, out);
-            } else {
-                return out;
-            }
+            return encode(core, value, out);
+        } else {
+            return out;
         }
     }
 
@@ -68,10 +69,11 @@ public abstract class CollectionCodec<
                     in,
                     type -> getCodec(core, core.config().nameToClass(type)).decode(core, in)
             );
+
             if (val != null) {
                 return val;
             } else {
-                final Class<Collection<T>> dynClass = core.config().getDefaultSubType(type());
+                final Class<Collection<T>> dynClass = core.config().getDefaultCollectionType(type());
                 if (dynClass != null) {
                     final Codec<Collection<T>, IN, OUT, CFG> codec = getCodec(core, dynClass);
                     return codec.decode(core, in);

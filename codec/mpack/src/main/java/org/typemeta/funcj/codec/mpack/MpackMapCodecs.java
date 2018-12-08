@@ -18,6 +18,20 @@ public abstract class MpackMapCodecs {
         }
 
         @Override
+        public OutStream encodeWithCheck(
+                CodecCoreEx<InStream, OutStream, Config> core,
+                Map<K, V> value,
+                OutStream out) {
+            if (core.format().encodeNull(value, out)) {
+                return out;
+            } else if (!core.format().encodeDynamicType(core,this, value, out, clazz -> getCodec(core, clazz))) {
+                return encode(core, value, out);
+            } else {
+                return out;
+            }
+        }
+
+        @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Map<K, V> value, OutStream out) {
             out.startMap(value.size());
 
@@ -51,6 +65,20 @@ public abstract class MpackMapCodecs {
                 Class<Map<String, V>> type,
                 Codec<V, InStream, OutStream, Config> valueCodec) {
             super(type, valueCodec);
+        }
+
+        @Override
+        public OutStream encodeWithCheck(
+                CodecCoreEx<InStream, OutStream, Config> core,
+                Map<String, V> value,
+                OutStream out) {
+            if (core.format().encodeNull(value, out)) {
+                return out;
+            } else if (!core.format().encodeDynamicType(core, this, value, out, clazz -> getCodec(core, clazz))) {
+                return encode(core, value, out);
+            } else {
+                return out;
+            }
         }
 
         @Override

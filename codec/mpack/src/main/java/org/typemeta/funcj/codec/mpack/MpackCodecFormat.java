@@ -52,10 +52,6 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             out.writeBoolean(false);
             return false;
-//        } else if (config().getDefaultSubType(codec.type()) == dynType) {
-//            getDynCodec.apply(dynType).encode(core, val, out);
-//            out.writeBoolean(false);
-//            return false;
         } else {
             out.writeBoolean(true);
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
@@ -560,6 +556,25 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
             Class<Collection<T>> collType,
             Codec<T, InStream, OutStream, Config> elemCodec) {
         return new CollectionCodec<T, InStream, OutStream, Config>(collType, elemCodec) {
+
+            @Override
+            public OutStream encodeWithCheck(
+                    CodecCoreEx<InStream, OutStream, Config> core,
+                    Collection<T> value,
+                    OutStream out) {
+                if (core.format().encodeNull(value, out)) {
+                    return out;
+                } else if (!core.format().encodeDynamicType(
+                        core,
+                        this,
+                        value,
+                        out,
+                        type -> getCodec(core, type))) {
+                    return encode(core, value, out);
+                } else {
+                    return out;
+                }
+            }
 
             @Override
             public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Collection<T> value, OutStream out) {

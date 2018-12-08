@@ -64,10 +64,15 @@ public abstract class Codecs {
         core.config().registerAllowedPackage(java.util.Collection.class.getPackage());
         core.config().registerAllowedPackage(java.time.LocalDate.class.getPackage());
 
-        // Register default sub-types.
-        core.config().registerDefaultSubType(List.class, ArrayList.class);
-        core.config().registerDefaultSubType(Set.class, HashSet.class);
-        core.config().registerDefaultSubType(Map.class, HashMap.class);
+        // Register default collection types.
+        core.config().registerDefaultCollectionType(List.class, ArrayList.class);
+        core.config().registerDefaultCollectionType(Set.class, HashSet.class);
+        core.config().registerDefaultCollectionType(Map.class, HashMap.class);
+
+        core.config().registerDefaultCollectionType(
+                List.class,
+                (Class)ReflectionUtils.classForName("java.util.Arrays$ArrayList")
+        );
 
         // Register string proxies for big numbers.
 

@@ -260,9 +260,7 @@ public class CodecCoreImpl<
 
     @Override
     public <T> Codec<T, IN, OUT, CFG> createCodec(Class<T> clazz) {
-        if (clazz == Object.class || clazz.isInterface()) {
-            return new InterfaceCodec<T, IN, OUT, CFG>(clazz);
-        } else if (clazz.isPrimitive()) {
+        if (clazz.isPrimitive()) {
             if (clazz.equals(boolean.class)) {
                 return (Codec<T, IN, OUT, CFG>)format.booleanCodec();
             } else if (clazz.equals(byte.class)) {
@@ -364,6 +362,8 @@ public class CodecCoreImpl<
                     elemCodec = getCodec(Object.class);
                 }
                 return (Codec<T, IN, OUT, CFG>) getCollCodec((Class<Collection<Object>>) clazz, elemCodec);
+            } else if (clazz.isInterface()) {
+                return new InterfaceCodec<>(clazz);
             } else {
                 return createObjectCodec(clazz);
             }

@@ -32,15 +32,7 @@ public interface CodecCoreEx<
     }
 
     default <T> T decodeDynamicType(Class<T> clazz, IN in) {
-        final T val = format().decodeDynamicType(this, in);
-        if (val == null) {
-            final Class<T> dynClass = config().getDefaultSubType(clazz);
-            if (dynClass != null) {
-                final Codec<T, IN, OUT, CFG> codec = getCodec(dynClass);
-                return codec.decode(this, in);
-            }
-        }
-        return val;
+        return format().decodeDynamicType(this, in);
     }
 
     /**

@@ -4,6 +4,7 @@ import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ByteTypes.*;
 
 import java.io.*;
+import java.util.Collection;
 
 /**
  * Interface for classes which implement an encoding via byte streams.

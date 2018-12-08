@@ -17,7 +17,7 @@ public class CodecConfigImpl implements CodecConfig {
 
     protected final Map<String, Class<?>> nameToClassMap = new HashMap<>();
 
-    protected final Map<Class<?>, Class<?>> defaultDynamicTypeMap = new TreeMap<>(Comparator.comparing(Class::getName));
+    protected final Map<Class<?>, List<Class<?>>> defaultCollectionTypes = new TreeMap<>(Comparator.comparing(Class::getName));
 
     /**
      * A map that associates a class with its proxy.
@@ -124,15 +124,32 @@ public class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
-    public <T> void registerDefaultSubType(Class<T> stcClass, Class<? extends T> dynClass) {
-        defaultDynamicTypeMap.put(stcClass, dynClass);
+    public <T> void registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass) {
+        defaultCollectionTypes.computeIfAbsent(intfClass, u -> new ArrayList<>())
+                .add(implClass);
+    }
+
+    @Override
+    public boolean isDefaultCollectionType(Class<?> intfClass, Class<?> implClass) {
+        final List<Class<?>> implTypes = defaultCollectionTypes.get(intfClass);
+        if (implTypes == null) {
+            return false;
+        } else {
+            return implTypes.contains(implClass);
+        }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T, U extends T> Class<U> getDefaultSubType(Class<T> stcClass) {
-        return (Class<U>)defaultDynamicTypeMap.get(stcClass);
+    public <T, U> Class<U> getDefaultCollectionType(Class<T> intfClass) {
+        final List<Class<?>> implTypes = defaultCollectionTypes.get(intfClass);
+        if (implTypes == null) {
+            return null;
+        } else {
+            return (Class<U>)implTypes.get(0);
+        }
     }
+
 
     @Override
     public <T> boolean dynamicTypeMatch(Class<T> stcClass, Class<? extends T> dynClass) {

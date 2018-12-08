@@ -2,8 +2,7 @@ package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.CodecConfig;
 import org.typemeta.funcj.codec.CodecFormat;
-import org.typemeta.funcj.codec.bytes.io.InputImpl;
-import org.typemeta.funcj.codec.bytes.io.OutputImpl;
+import org.typemeta.funcj.codec.bytes.io.*;
 
 import java.io.*;
 
@@ -43,4 +42,32 @@ public abstract class ByteTypes {
     public static OutStream outputOf(DataOutput output) {
         return new OutputImpl(output);
     }
+//
+//    public static InStream inputOf(InputStream is) {
+//        return new Debug.InputImpl(
+//                new InputImpl(new DataInputStream(is)),
+//                System.out::println
+//        );
+//    }
+//
+//    public static InStream inputOf(DataInput input) {
+//        return new Debug.InputImpl(
+//                new InputImpl(input),
+//                System.out::println
+//        );
+//    }
+//
+//    public static OutStream outputOf(OutputStream os) {
+//        return new Debug.OutputImpl(
+//                new OutputImpl(new DataOutputStream(os)),
+//                System.out::println
+//        );
+//    }
+//
+//    public static OutStream outputOf(DataOutput output) {
+//        return new Debug.OutputImpl(
+//                new OutputImpl(output),
+//                System.out::println
+//        );
+//    }
 }

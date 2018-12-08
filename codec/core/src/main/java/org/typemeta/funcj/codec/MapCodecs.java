@@ -42,12 +42,13 @@ public abstract class MapCodecs {
         public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Map<K, V> value, OUT out) {
             if (core.format().encodeNull(value, out)) {
                 return out;
+            } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
+                final Class<Map<K, V>> implCollType = core.config().getDefaultCollectionType(type());
+                return getCodec(core, implCollType).encode(core, value, out);
+            } else if (!core.format().encodeDynamicType(core,this, value, out, clazz -> getCodec(core, clazz))) {
+                return encode(core, value, out);
             } else {
-                if (!core.format().encodeDynamicType(core,this, value, out, clazz -> getCodec(core, clazz))) {
-                    return encode(core, value, out);
-                } else {
-                    return out;
-                }
+                return out;
             }
         }
 
@@ -60,10 +61,11 @@ public abstract class MapCodecs {
                         in,
                         clazz -> getCodec(core, core.config().nameToClass(clazz)).decode(core, in)
                 );
+
                 if (val != null) {
                     return val;
                 } else {
-                    final Class<Map<K, V>> dynClass = core.config().getDefaultSubType(type());
+                    final Class<Map<K, V>> dynClass = core.config().getDefaultCollectionType(type());
                     if (dynClass != null) {
                         final Codec<Map<K, V>, IN, OUT, CFG> codec = getCodec(core, dynClass);
                         return codec.decode(core, in);
@@ -121,12 +123,13 @@ public abstract class MapCodecs {
         public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Map<String, V> value, OUT out) {
             if (core.format().encodeNull(value, out)) {
                 return out;
+            } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
+                final Class<Map<String, V>> implCollType = core.config().getDefaultCollectionType(type());
+                return getCodec(core, implCollType).encode(core, value, out);
+            } else if (!core.format().encodeDynamicType(core, this, value, out, clazz -> getCodec(core, clazz))) {
+                return encode(core, value, out);
             } else {
-                if (!core.format().encodeDynamicType(core, this, value, out, clazz -> getCodec(core, clazz))) {
-                    return encode(core, value, out);
-                } else {
-                    return out;
-                }
+                return out;
             }
         }
 
@@ -139,10 +142,11 @@ public abstract class MapCodecs {
                         in,
                         clazz -> getCodec(core, core.config().nameToClass(clazz)).decode(core, in)
                 );
+
                 if (val != null) {
                     return val;
                 } else {
-                    final Class<Map<String, V>> dynClass = core.config().getDefaultSubType(type());
+                    final Class<Map<String, V>> dynClass = core.config().getDefaultCollectionType(type());
                     if (dynClass != null) {
                         final Codec<Map<String, V>, IN, OUT, CFG> codec = getCodec(core, dynClass);
                         return codec.decode(core, in);

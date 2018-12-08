@@ -92,9 +92,11 @@ public interface CodecConfig {
      */
     int resizeArray(int size);
 
-    <T> void registerDefaultSubType(Class<T> stcClass, Class<? extends T> dynClass);
+    <T> void registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass);
 
-    <T, U extends T> Class<U> getDefaultSubType(Class<T> stcClass);
+    boolean isDefaultCollectionType(Class<?> intfClass, Class<?> implClass);
+
+    <T, U> Class<U> getDefaultCollectionType(Class<T> intfClass);
 
     /**
      * Check whether two types match or not.
