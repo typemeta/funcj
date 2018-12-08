@@ -1,14 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.immutables.value.Value;
-import org.junit.*;
-import org.typemeta.funcj.codec.json.JsonCodecCore;
-
-import java.io.*;
-import java.util.*;
-
-import static org.typemeta.funcj.codec.TestBase.printSizes;
-
 //@Value.Enclosing
 public class ImmutablesTest {
 //

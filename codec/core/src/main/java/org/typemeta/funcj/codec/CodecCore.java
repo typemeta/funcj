@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.Input;
-import org.typemeta.funcj.codec.CodecFormat.Output;
+import org.typemeta.funcj.codec.CodecFormat.*;
+import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.functions.Functions;
 
 /**
@@ -73,6 +73,16 @@ public interface CodecCore<
     <T> void registerArgArrayCtor(
             Class<? extends T> clazz,
             ArgArrayTypeCtor<T> typeCtor);
+
+    /**
+     * Register a {@link ArgMapTypeCtor} for the specified class.
+     * @param clazz     the class to register the {@code ArgMapTypeCtor} against
+     * @param typeCtor  the {@code ArgMapTypeCtor}
+     * @param <T>       the type constructed by the {@code ArgMapTypeCtor}
+     */
+    <T> void registerArgMapTypeCtor(
+            Class<? extends T> clazz,
+            ArgMapTypeCtor<T> typeCtor);
 
     /**
      * Encode a value of type {@code T} into encoded form {@code E}.

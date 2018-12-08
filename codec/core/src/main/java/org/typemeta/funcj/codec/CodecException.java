@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.functions.FunctionsEx;
-import org.typemeta.funcj.functions.SideEffectEx;
+import org.typemeta.funcj.functions.*;
 
 /**
  * Exception class for encoding/decoding exceptions.

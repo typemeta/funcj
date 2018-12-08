@@ -1,15 +1,13 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.Input;
-import org.typemeta.funcj.codec.CodecFormat.Output;
+import org.typemeta.funcj.codec.CodecFormat.*;
+import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
@@ -46,6 +44,8 @@ public class CodecCoreImpl<
     protected final ConcurrentMap<ClassKey<?>, NoArgsTypeCtor<?>> noArgsCtorRegistry = new ConcurrentHashMap<>();
 
     protected final ConcurrentMap<ClassKey<?>, ArgArrayTypeCtor<?>> argArrayCtorRegistry = new ConcurrentHashMap<>();
+
+    protected final ConcurrentMap<ClassKey<?>, ArgMapTypeCtor<?>> argMapCtorRegistry = new ConcurrentHashMap<>();
 
     protected final CodecFormat<IN, OUT, CFG> format;
 
@@ -102,6 +102,12 @@ public class CodecCoreImpl<
     }
 
     @Override
+    public <T> void registerArgMapTypeCtor(Class<? extends T> clazz, ArgMapTypeCtor<T> typeCtor) {
+        config().registerAllowedClass(clazz);
+        argMapCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
+    }
+
+    @Override
     public <T> void encode(Class<? super T> clazz, T val, OUT out) {
         getCodec(clazz).encodeWithCheck(this, val, out);
     }
@@ -141,10 +147,14 @@ public class CodecCoreImpl<
                 );
     }
 
-
     @Override
     public <T> Optional<ArgArrayTypeCtor<T>> getArgArrayCtorOpt(Class<T> clazz) {
         return Optional.ofNullable((ArgArrayTypeCtor<T>)argArrayCtorRegistry.get(ClassKey.valueOf(clazz)));
+    }
+
+    @Override
+    public <T> Optional<ArgMapTypeCtor<T>> getArgMapTypeCtorOpt(Class<T> clazz) {
+        return Optional.ofNullable((ArgMapTypeCtor<T>)argMapCtorRegistry.get(ClassKey.valueOf(clazz)));
     }
 
     @Override
@@ -376,9 +386,17 @@ public class CodecCoreImpl<
         if (ctorOpt.isPresent()) {
             return createObjectCodec(clazz, ctorOpt.get());
         } else {
-            final ArgArrayTypeCtor<T> ctor = getArgArrayCtorOpt(clazz)
-                    .orElseThrow(() -> new CodecException("No suitable constructor was found for " + clazz));
-            return createObjectCodec(clazz, ctor);
+            Optional<ArgMapTypeCtor<T>> ctorOpt2 = getArgMapTypeCtorOpt(clazz);
+            if (ctorOpt2.isPresent()) {
+                return createObjectCodecWithArgMap(clazz, ctorOpt2.get());
+            } else {
+                Optional<ArgArrayTypeCtor<T>> ctorOpt3 = getArgArrayCtorOpt(clazz);
+                if (ctorOpt3.isPresent()) {
+                    return createObjectCodecWithArgArray(clazz, ctorOpt3.get());
+                } else {
+                    throw new CodecException("No suitable type constructor was found for " + clazz);
+                }
+            }
         }
     }
 
@@ -397,7 +415,6 @@ public class CodecCoreImpl<
             }
             clazz2 = clazz2.getSuperclass();
         }
-
         return createObjectCodec(clazz, fieldCodecs, ctor);
     }
 
@@ -459,9 +476,8 @@ public class CodecCoreImpl<
         );
     }
 
-    @Override
-    public <T> Codec<T, IN, OUT, CFG> createObjectCodec(Class<T> clazz, ArgArrayTypeCtor<T> ctor) {
-        Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs = new LinkedHashMap<>();
+    protected <T> Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> buildFieldCodecs(Class<T> clazz) {
+        final Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs = new LinkedHashMap<>();
         Class<?> clazz2 = clazz;
         for (int depth = 0; !clazz2.equals(Object.class); depth++) {
             final Field[] fields = clazz2.getDeclaredFields();
@@ -477,36 +493,83 @@ public class CodecCoreImpl<
             clazz2 = clazz2.getSuperclass();
         }
 
-        return createObjectCodec(clazz, fieldCodecs, ctor);
+        return fieldCodecs;
     }
 
-    protected <T, FT> ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG> createFieldCodec(
-            Field field,
-            Codec<FT, IN, OUT, CFG> codec) {
-        return new ObjectCodecBuilder.FieldCodec<>(
-                t -> CodecException.wrap(() -> {
-                    field.setAccessible(true);
-                    final FT fv = (FT)field.get(t);
-                    field.setAccessible(false);
-                    return fv;
-                }),
-                codec
+    @Override
+    public <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgMap(Class<T> clazz, ArgMapTypeCtor<T> ctor) {
+        final Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs = buildFieldCodecs(clazz);
+        return createObjectCodecWithArgMap(clazz, fieldCodecs, ctor);
+    }
+
+    @Override
+    public <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgMap(
+            Class<T> clazz,
+            Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs,
+            ArgMapTypeCtor<T> ctor) {
+        final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
+            final Map<String, Object> ctorArgs;
+
+            ResultAccumlatorImpl() {
+                this.ctorArgs = new HashMap<>();
+            }
+
+            @Override
+            public T construct() {
+                return ctor.construct(ctorArgs);
+            }
+        }
+
+        final List<ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>> fieldMetas =
+                fieldCodecs.entrySet().stream()
+                        .map(en -> {
+                            final String name = en.getKey();
+                            final ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG> codec = en.getValue();
+                            return new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
+                                @Override
+                                public String name() {
+                                    return name;
+                                }
+
+                                @Override
+                                public OUT encodeField(T val, OUT out) {
+                                    return codec.encodeField(CodecCoreImpl.this, val, out);
+                                }
+
+                                @Override
+                                public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN in) {
+                                    acc.ctorArgs.put(name, codec.decodeField(CodecCoreImpl.this, in));
+                                    return acc;
+                                }
+                            };
+                        }).collect(toList());
+
+        return format().createObjectCodec(
+                clazz,
+                new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
+                    @Override
+                    public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
+                        return fieldMetas.iterator();
+                    }
+
+                    @Override
+                    public ResultAccumlatorImpl startDecode() {
+                        return new ResultAccumlatorImpl();
+                    }
+                }
         );
     }
 
     @Override
-    public <T> ObjectCodecBuilder<T, IN, OUT, CFG> objectCodecDeferredRegister(Class<T> clazz) {
-        return new ObjectCodecBuilder<T, IN, OUT, CFG>(this, clazz) {
-            @Override
-            protected Codec<T, IN, OUT, CFG> registration(Codec<T, IN, OUT, CFG> codec) {
-                registerCodec(clazz, codec);
-                return codec;
-            }
-        };
+    public <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgArray(
+            Class<T> clazz,
+            ArgArrayTypeCtor<T> ctor) {
+        final Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs = buildFieldCodecs(clazz);
+        return createObjectCodecWithArgArray(clazz, fieldCodecs, ctor);
     }
 
     @Override
-    public <T> Codec<T, IN, OUT, CFG> createObjectCodec(
+    public <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgArray(
             Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs,
             ArgArrayTypeCtor<T> ctor) {
@@ -551,17 +614,42 @@ public class CodecCoreImpl<
         return format().createObjectCodec(
                 clazz,
                 new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
-                        @Override
-                        public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
-                            return fieldMetas.iterator();
-                        }
+                    @Override
+                    public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
+                        return fieldMetas.iterator();
+                    }
 
-                        @Override
-                        public ResultAccumlatorImpl startDecode() {
-                            return new ResultAccumlatorImpl();
-                        }
+                    @Override
+                    public ResultAccumlatorImpl startDecode() {
+                        return new ResultAccumlatorImpl();
+                    }
                 }
         );
+    }
+
+    protected <T, FT> ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG> createFieldCodec(
+            Field field,
+            Codec<FT, IN, OUT, CFG> codec) {
+        return new ObjectCodecBuilder.FieldCodec<>(
+                t -> CodecException.wrap(() -> {
+                    field.setAccessible(true);
+                    final FT fv = (FT)field.get(t);
+                    field.setAccessible(false);
+                    return fv;
+                }),
+                codec
+        );
+    }
+
+    @Override
+    public <T> ObjectCodecBuilder<T, IN, OUT, CFG> objectCodecDeferredRegister(Class<T> clazz) {
+        return new ObjectCodecBuilder<T, IN, OUT, CFG>(this, clazz) {
+            @Override
+            protected Codec<T, IN, OUT, CFG> registration(Codec<T, IN, OUT, CFG> codec) {
+                registerCodec(clazz, codec);
+                return codec;
+            }
+        };
     }
 
     @Override

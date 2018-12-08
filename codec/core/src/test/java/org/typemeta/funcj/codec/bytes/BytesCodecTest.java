@@ -1,12 +1,10 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.junit.Assert;
-import org.typemeta.funcj.codec.Codecs;
-import org.typemeta.funcj.codec.TestBase;
+import org.typemeta.funcj.codec.*;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 
 public class BytesCodecTest extends TestBase {
 

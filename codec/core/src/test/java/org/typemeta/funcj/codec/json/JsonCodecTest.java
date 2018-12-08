@@ -1,11 +1,9 @@
 package org.typemeta.funcj.codec.json;
 
 import org.junit.Assert;
-import org.typemeta.funcj.codec.Codecs;
-import org.typemeta.funcj.codec.TestBase;
+import org.typemeta.funcj.codec.*;
 
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 
 public class JsonCodecTest extends TestBase {
 

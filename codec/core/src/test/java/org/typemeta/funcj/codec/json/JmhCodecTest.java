@@ -1,6 +1,5 @@
 package org.typemeta.funcj.codec.json;
 
-import org.junit.Assert;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.*;
 import org.openjdk.jmh.runner.options.*;

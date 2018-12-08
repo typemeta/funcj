@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.Input;
-import org.typemeta.funcj.codec.CodecFormat.Output;
+import org.typemeta.funcj.codec.CodecFormat.*;
 import org.typemeta.funcj.functions.Functions;
 
 import java.util.Objects;

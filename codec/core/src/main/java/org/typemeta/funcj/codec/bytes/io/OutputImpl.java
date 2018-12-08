@@ -3,8 +3,7 @@ package org.typemeta.funcj.codec.bytes.io;
 import org.typemeta.funcj.codec.CodecException;
 import org.typemeta.funcj.codec.bytes.ByteTypes;
 
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 
 public final class OutputImpl implements ByteTypes.OutStream {
     private final DataOutput output;

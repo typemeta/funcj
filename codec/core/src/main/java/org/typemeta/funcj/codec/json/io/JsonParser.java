@@ -3,12 +3,10 @@ package org.typemeta.funcj.codec.json.io;
 import org.typemeta.funcj.codec.CodecException;
 import org.typemeta.funcj.codec.json.JsonTypes;
 
-import java.io.*;
+import java.io.Reader;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.*;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**

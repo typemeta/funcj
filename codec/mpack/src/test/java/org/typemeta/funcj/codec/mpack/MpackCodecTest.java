@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.mpack;
 
 import org.junit.Assert;
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.TestBase;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;

@@ -1,12 +1,9 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.CodecConfig;
-import org.typemeta.funcj.codec.CodecFormat;
-import org.typemeta.funcj.codec.json.io.JsonGenerator;
-import org.typemeta.funcj.codec.json.io.JsonParser;
+import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.json.io.*;
 
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 

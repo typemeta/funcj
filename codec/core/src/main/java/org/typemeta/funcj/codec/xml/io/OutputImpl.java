@@ -5,8 +5,7 @@ import org.typemeta.funcj.codec.xml.XmlTypes;
 import org.typemeta.funcj.functions.SideEffectGenEx;
 
 import javax.xml.stream.*;
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.*;
 import java.math.BigDecimal;
 
 public class OutputImpl implements XmlTypes.OutStream {

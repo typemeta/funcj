@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec.bytes;
 
-import org.typemeta.funcj.codec.CodecConfig;
-import org.typemeta.funcj.codec.CodecFormat;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.io.*;
 
 import java.io.*;

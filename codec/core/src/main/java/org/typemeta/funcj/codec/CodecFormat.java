@@ -2,8 +2,7 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.functions.Functions;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implementations of this interface represent encodings

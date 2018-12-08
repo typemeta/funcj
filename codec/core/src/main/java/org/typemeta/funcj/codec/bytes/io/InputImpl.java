@@ -3,8 +3,7 @@ package org.typemeta.funcj.codec.bytes.io;
 import org.typemeta.funcj.codec.CodecException;
 import org.typemeta.funcj.codec.bytes.ByteTypes;
 
-import java.io.DataInput;
-import java.io.IOException;
+import java.io.*;
 
 public final class InputImpl implements ByteTypes.InStream {
     private final DataInput input;

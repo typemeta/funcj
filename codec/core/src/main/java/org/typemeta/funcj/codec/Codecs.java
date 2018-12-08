@@ -1,15 +1,13 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.Input;
-import org.typemeta.funcj.codec.CodecFormat.Output;
+import org.typemeta.funcj.codec.CodecFormat.*;
 import org.typemeta.funcj.codec.bytes.ByteCodecCore;
 import org.typemeta.funcj.codec.json.JsonCodecCore;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
 import org.typemeta.funcj.functions.Functions.F;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.time.*;
 import java.util.*;
 

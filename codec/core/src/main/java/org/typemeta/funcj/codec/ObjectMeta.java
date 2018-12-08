@@ -1,10 +1,8 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.Input;
-import org.typemeta.funcj.codec.CodecFormat.Output;
+import org.typemeta.funcj.codec.CodecFormat.*;
 
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * Abstraction for creating an object fby accumulating the fields that comprise it.

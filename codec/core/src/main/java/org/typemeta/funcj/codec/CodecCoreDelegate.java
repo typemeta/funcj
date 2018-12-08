@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.Input;
-import org.typemeta.funcj.codec.CodecFormat.Output;
+import org.typemeta.funcj.codec.CodecFormat.*;
+import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.functions.Functions;
 
 public class CodecCoreDelegate<
@@ -44,6 +44,11 @@ public class CodecCoreDelegate<
     @Override
     public <T> void registerArgArrayCtor(Class<? extends T> clazz, ArgArrayTypeCtor<T> typeCtor) {
         delegate.registerArgArrayCtor(clazz, typeCtor);
+    }
+
+    @Override
+    public <T> void registerArgMapTypeCtor(Class<? extends T> clazz, ArgMapTypeCtor<T> typeCtor) {
+        delegate.registerArgMapTypeCtor(clazz, typeCtor);
     }
 
     @Override

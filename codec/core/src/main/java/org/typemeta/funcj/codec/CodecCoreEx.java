@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.Input;
-import org.typemeta.funcj.codec.CodecFormat.Output;
+import org.typemeta.funcj.codec.CodecFormat.*;
+import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -26,6 +26,8 @@ public interface CodecCoreEx<
     <T> NoArgsTypeCtor<T> getNoArgsCtor(Class<T> clazz);
 
     <T> Optional<ArgArrayTypeCtor<T>> getArgArrayCtorOpt(Class<T> clazz);
+
+    <T> Optional<ArgMapTypeCtor<T>> getArgMapTypeCtorOpt(Class<T> clazz);
 
     default <T> boolean encodeDynamicType(Codec<T, IN, OUT, CFG> codec, T val, OUT out) {
         return format().encodeDynamicType(this, codec, val, out, this::getCodec);
@@ -91,13 +93,26 @@ public interface CodecCoreEx<
             Map<String, FieldCodec<IN, OUT, CFG>> fieldCodecs,
             NoArgsTypeCtor<T> ctor);
 
-    <T> Codec<T, IN, OUT, CFG> createObjectCodec(Class<T> clazz, ArgArrayTypeCtor<T> ctor);
-
     <T> ObjectCodecBuilder<T, IN, OUT, CFG> objectCodecDeferredRegister(Class<T> clazz);
 
     <T> Codec<T, IN, OUT, CFG> createObjectCodec(Class<T> clazz);
 
-    <T> Codec<T, IN, OUT, CFG> createObjectCodec(
+    <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgMap(
+            Class<T> clazz,
+            ArgMapTypeCtor<T> ctor
+    );
+
+    <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgMap(
+            Class<T> clazz,
+            Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs,
+            ArgMapTypeCtor<T> ctor);
+
+    <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgArray(
+            Class<T> clazz,
+            ArgArrayTypeCtor<T> ctor
+    );
+
+    <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgArray(
             Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs,
             ArgArrayTypeCtor<T> ctor);

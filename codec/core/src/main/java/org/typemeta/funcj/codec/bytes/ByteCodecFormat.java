@@ -5,10 +5,8 @@ import org.typemeta.funcj.codec.bytes.ByteTypes.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Folds;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Map;
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * Encoding via byte streams.

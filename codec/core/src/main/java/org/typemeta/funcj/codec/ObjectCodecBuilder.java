@@ -1,12 +1,10 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.Input;
-import org.typemeta.funcj.codec.CodecFormat.Output;
+import org.typemeta.funcj.codec.CodecFormat.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.*;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provides a builder interface for building an object {@link Codec},
@@ -79,7 +77,7 @@ public class ObjectCodecBuilder<
     class _1<A> {
         public Codec<T, IN, OUT, CFG> map(F<A, T> ctor) {
             return registration(
-                    core.createObjectCodec(
+                    core.createObjectCodecWithArgArray(
                             clazz,
                             fields,
                             arr -> ctor.apply((A)arr[0])));
@@ -97,7 +95,7 @@ public class ObjectCodecBuilder<
         class _2<B> {
             public Codec<T, IN, OUT, CFG> map(F2<A, B, T> ctor) {
                 return registration(
-                        core.createObjectCodec(
+                        core.createObjectCodecWithArgArray(
                                 clazz,
                                 fields,
                                 arr -> ctor.apply((A)arr[0], (B)arr[1])));
@@ -115,7 +113,7 @@ public class ObjectCodecBuilder<
             class _3<C> {
                 public Codec<T, IN, OUT, CFG> map(F3<A, B, C, T> ctor) {
                     return registration(
-                            core.createObjectCodec(
+                            core.createObjectCodecWithArgArray(
                                     clazz,
                                     fields,
                                     arr -> ctor.apply((A)arr[0], (B)arr[1], (C)arr[2])));
@@ -133,7 +131,7 @@ public class ObjectCodecBuilder<
                 class _4<D> {
                     public Codec<T, IN, OUT, CFG> map(Functions.F4<A, B, C, D, T> ctor) {
                         return registration(
-                                core.createObjectCodec(
+                                core.createObjectCodecWithArgArray(
                                         clazz,
                                         fields,
                                         arr -> ctor.apply((A)arr[0], (B)arr[1], (C)arr[2], (D)arr[3])));
@@ -150,7 +148,7 @@ public class ObjectCodecBuilder<
 
                     class _N {
                         public Codec<T, IN, OUT, CFG> map(ArgArrayTypeCtor<T> ctor) {
-                            return registration(core.createObjectCodec(clazz, fields, ctor));
+                            return registration(core.createObjectCodecWithArgArray(clazz, fields, ctor));
                         }
 
                         <N> _N field(String name, F<T, N> getter, Codec<N, IN, OUT, CFG> codec) {

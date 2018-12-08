@@ -3,8 +3,7 @@ package org.typemeta.funcj.codec.json.io;
 import org.typemeta.funcj.codec.CodecException;
 import org.typemeta.funcj.codec.json.JsonTypes.InStream.Event;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.*;
 import java.util.function.Supplier;
 
