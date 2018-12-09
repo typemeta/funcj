@@ -257,25 +257,25 @@ Alternatively a custom codec can target a specific encoding.
 
 #### Custom Codec Builder
 
-The simplest way to define a custom codec is to call `CodecCore.registerCodec`,
+The simplest way to define a custom codec is to use either `CodecCore.registerCodecWithArgArray`
+or `CodecCore.registerCodecWithArgMap`,
 and pass it the class value for the type in question. 
-This returns a `ObjectCodecBuilder`,
-which has a fluent API for defining custom codecs.
+These methods return a class with a fluent API for defining custom codecs.
 You first call `field` for each field comprising the class,
 supplying the field name, a getter for the field,
 and either a codec,
 or a class value (which is used to look up the appropriate codec).
-Finally call the `map` method with the function which,
+Finally call the `construct` method with the function which,
 when supplied with the field values, will constuct an instance of the type.
 
 For example, the codec for `ZonedDateTime` type is defined like this
 
 ```java
-core.registerCodec(ZonedDateTime.class)
+core.registerCodecWithArgArray(ZonedDateTime.class)
         .field("dateTime", ZonedDateTime::toLocalDateTime, LocalDateTime.class)
         .field("zone", ZonedDateTime::getZone, ZoneId.class)
         .field("offset", ZonedDateTime::getOffset, ZoneOffset.class)
-        .map(ZonedDateTime::ofLocal);
+        .construct(ZonedDateTime::ofLocal);
 ```
 
 Note that the same custom codec can be used for any encoding format - XML, JSON etc.
@@ -425,13 +425,6 @@ If they are different, then the dynamic type is added to the encoding.
 The class must have a default constructor.
 The constructor can be private -
 the framework will attempt to temporarily disable this by calling `AccessibleObject.setAccessible`.
-If the class does not have a default constructor,
-or if the system `SecurityManager` prevents access to said constructor or to the class's fields,
-then creation of the codec will fail.
-
-If successfully created,
-the resultant codec is then cached within the `CodecCore` instance,
-and re-used for any subsequent occurrences of that class.
 
 # FAQ
 
@@ -450,6 +443,5 @@ com.fasterxml.jackson.databind.exc.InvalidDefinitionException:
 No serializer found for class org.typemeta.funcj.codec.Example$Person and no properties discovered to create BeanSerializer (to avoid exception, disable SerializationFeature.FAIL_ON_EMPTY_BEANS)
 	at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:77)
 ```
-
 
 If, as suggested, I disable the `FAIL_ON_EMPTY_BEANS` feature, then I get an empty JSON object.
