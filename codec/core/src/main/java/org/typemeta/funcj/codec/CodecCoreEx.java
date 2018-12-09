@@ -21,13 +21,29 @@ public interface CodecCoreEx<
 
     CodecFormat<IN, OUT, CFG> format();
 
-    <T> Optional<NoArgsTypeCtor<T>> getNoArgsCtorOpt(Class<T> clazz);
-
+    /**
+     * Return a {@code NoArgsTypeCtor}.
+     * @param clazz     the type for which a {@code NoArgsTypeCtor} is required
+     * @param <T>       the class type
+     * @return          a {@code NoArgsTypeCtor}
+     */
     <T> NoArgsTypeCtor<T> getNoArgsCtor(Class<T> clazz);
 
-    <T> Optional<ArgArrayTypeCtor<T>> getArgArrayCtorOpt(Class<T> clazz);
+    /**
+     * Return a {@code ArgArrayTypeCtor} or null if one can't be created.
+     * @param clazz     the type for which a {@code ArgArrayTypeCtor} is required
+     * @param <T>       the class type
+     * @return          a {@code NoArgsTypeCtor} or null if one can't be created
+     */
+    <T> ArgArrayTypeCtor<T> getArgArrayCtor(Class<T> clazz);
 
-    <T> Optional<ArgMapTypeCtor<T>> getArgMapTypeCtorOpt(Class<T> clazz);
+    /**
+     * Return a {@code ArgMapTypeCtor} or null if one can't be created.
+     * @param clazz     the type for which a {@code ArgMapTypeCtor} is required
+     * @param <T>       the class type
+     * @return          a {@code NoArgsTypeCtor} or null if one can't be created
+     */
+    <T> ArgMapTypeCtor<T> getArgMapTypeCtor(Class<T> clazz);
 
     default <T> boolean encodeDynamicType(Codec<T, IN, OUT, CFG> codec, T val, OUT out) {
         return format().encodeDynamicType(this, codec, val, out, this::getCodec);

@@ -135,43 +135,37 @@ public class CodecCoreImpl<
     }
 
     @Override
-    public <T> Optional<NoArgsTypeCtor<T>> getNoArgsCtorOpt(Class<T> clazz) {
+    public <T> NoArgsTypeCtor<T> getNoArgsCtor(Class<T> clazz) {
         final ClassKey<?> key = ClassKey.valueOf(clazz);
+
         NoArgsTypeCtor<T> ctor = (NoArgsTypeCtor<T>)noArgsCtorRegistry.get(key);
 
-        if (ctor == null) {
-            final Optional<NoArgsTypeCtor<T>> newCtor = NoArgsTypeCtor.create(clazz);
-            if (newCtor.isPresent()) {
-                ctor = (NoArgsTypeCtor<T>) noArgsCtorRegistry.putIfAbsent(key, newCtor.get());
-                if (ctor == null) {
-                    return newCtor;
+        if (ctor != null) {
+            return ctor;
+        } else {
+            // TODO: review this.
+            final NoArgsTypeCtor<T> newCtor = NoArgsTypeCtor.create(clazz);
+            if (newCtor != null) {
+                ctor = (NoArgsTypeCtor<T>) noArgsCtorRegistry.putIfAbsent(key, newCtor);
+                if (ctor != null) {
+                    return ctor;
                 } else {
-                    return Optional.of(ctor);
+                    return newCtor;
                 }
             } else {
-                return newCtor;
+                throw new CodecException("No suitable type constructor was found for " + clazz);
             }
-        } else {
-            return Optional.of(ctor);
         }
     }
 
     @Override
-    public <T> NoArgsTypeCtor<T> getNoArgsCtor(Class<T> clazz) {
-        return getNoArgsCtorOpt(clazz)
-                .orElseThrow(() ->
-                        new CodecException("A no-args constructor was not found for " + clazz)
-                );
+    public <T> ArgArrayTypeCtor<T> getArgArrayCtor(Class<T> clazz) {
+        return (ArgArrayTypeCtor<T>)argArrayCtorRegistry.get(ClassKey.valueOf(clazz));
     }
 
     @Override
-    public <T> Optional<ArgArrayTypeCtor<T>> getArgArrayCtorOpt(Class<T> clazz) {
-        return Optional.ofNullable((ArgArrayTypeCtor<T>)argArrayCtorRegistry.get(ClassKey.valueOf(clazz)));
-    }
-
-    @Override
-    public <T> Optional<ArgMapTypeCtor<T>> getArgMapTypeCtorOpt(Class<T> clazz) {
-        return Optional.ofNullable((ArgMapTypeCtor<T>)argMapCtorRegistry.get(ClassKey.valueOf(clazz)));
+    public <T> ArgMapTypeCtor<T> getArgMapTypeCtor(Class<T> clazz) {
+        return (ArgMapTypeCtor<T>)argMapCtorRegistry.get(ClassKey.valueOf(clazz));
     }
 
     @Override
@@ -257,15 +251,15 @@ public class CodecCoreImpl<
         }
     }
 
-    private static class InterfaceCodec<
+    protected static class InterfaceCodec<
             T,
             IN extends Input<IN>,
             OUT extends Output<OUT>,
             CFG extends CodecConfig> implements Codec<T, IN, OUT, CFG> {
 
-    private final Class<T> clazz;
+        protected final Class<T> clazz;
 
-        private InterfaceCodec(Class<T> clazz) {
+        protected InterfaceCodec(Class<T> clazz) {
             this.clazz = clazz;
         }
 
@@ -399,20 +393,16 @@ public class CodecCoreImpl<
 
     @Override
     public <T> Codec<T, IN, OUT, CFG> createObjectCodec(Class<T> clazz) {
-        final Optional<NoArgsTypeCtor<T>> ctorOpt = getNoArgsCtorOpt(clazz);
-        if (ctorOpt.isPresent()) {
-            return createObjectCodec(clazz, ctorOpt.get());
+        final ArgArrayTypeCtor<T> ctor = getArgArrayCtor(clazz);
+        if (ctor != null) {
+            return createObjectCodecWithArgArray(clazz, ctor);
         } else {
-            Optional<ArgMapTypeCtor<T>> ctorOpt2 = getArgMapTypeCtorOpt(clazz);
-            if (ctorOpt2.isPresent()) {
-                return createObjectCodecWithArgMap(clazz, ctorOpt2.get());
+            final ArgMapTypeCtor<T> ctor2 = getArgMapTypeCtor(clazz);
+            if (ctor2 != null) {
+                return createObjectCodecWithArgMap(clazz, ctor2);
             } else {
-                Optional<ArgArrayTypeCtor<T>> ctorOpt3 = getArgArrayCtorOpt(clazz);
-                if (ctorOpt3.isPresent()) {
-                    return createObjectCodecWithArgArray(clazz, ctorOpt3.get());
-                } else {
-                    throw new CodecException("No suitable type constructor was found for " + clazz);
-                }
+                final NoArgsTypeCtor<T> ctor3 = getNoArgsCtor(clazz);
+                return createObjectCodec(clazz, ctor3);
             }
         }
     }

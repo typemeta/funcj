@@ -84,16 +84,12 @@ public abstract class CollectionCodec<
     }
 
     protected CollProxy<T> getCollectionProxy(CodecCoreEx<IN, OUT, CFG> core) {
-        final Optional<NoArgsTypeCtor<Collection<T>>> noaCtorOpt = core.getNoArgsCtorOpt(collType);
-        if (noaCtorOpt.isPresent()) {
-            return new CollProxy1<T>(noaCtorOpt.get().construct());
-        } else {
-            final ArgArrayTypeCtor<Collection<T>> argArrCtor =
-                    core.getArgArrayCtorOpt(collType)
-                            .orElseThrow(() -> new CodecException(
-                                    "Could not find suitable constructor for " + collType));
-
+        final ArgArrayTypeCtor<Collection<T>> argArrCtor = core.getArgArrayCtor(collType);
+        if (argArrCtor != null) {
             return new CollProxy2<T>(elemCodec.type(), argArrCtor);
+        } else {
+            final NoArgsTypeCtor<Collection<T>> noaCtor = core.getNoArgsCtor(collType);
+            return new CollProxy1<T>(noaCtor.construct());
         }
     }
 

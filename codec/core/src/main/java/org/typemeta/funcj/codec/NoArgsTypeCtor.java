@@ -21,8 +21,7 @@ public interface NoArgsTypeCtor<T> {
      * @return          an {@code Optional} wrapping a {@code NoArgsTypeCtor} if one exists,
      *                  otherwise an empty Optional
      */
-    static <T> Optional<NoArgsTypeCtor<T>> create(Class<T> clazz)
-            throws CodecException {
+    static <T> NoArgsTypeCtor<T> create(Class<T> clazz) throws CodecException {
         // Get the empty-arg constructors.
         final List<Constructor<T>> ctors =
                 Arrays.stream(clazz.getDeclaredConstructors())
@@ -35,7 +34,7 @@ public interface NoArgsTypeCtor<T> {
         switch (ctors.size()) {
             case 0:
                 // No default constructor.
-                return Optional.empty();
+                return null;
             case 1:
                 noArgsCtor = ctors.get(0);
                 break;
@@ -54,13 +53,13 @@ public interface NoArgsTypeCtor<T> {
 
         accCtor = () -> noArgsCtor.newInstance((Object[])null);
 
-        return Optional.of(() -> {
+        return () -> {
             try {
                 return accCtor.apply();
             } catch (ReflectiveOperationException ex) {
                 throw new CodecException("Unable to construct object of type '" + clazz.getName() + "'", ex);
             }
-        });
+        };
     }
 
     /**

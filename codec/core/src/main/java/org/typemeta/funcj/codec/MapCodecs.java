@@ -76,16 +76,12 @@ public abstract class MapCodecs {
         }
 
         protected MapProxy<K, V> getMapProxy(CodecCoreEx<IN, OUT, CFG> core) {
-            final Optional<NoArgsTypeCtor<Map<K, V>>> noaCtorOpt = core.getNoArgsCtorOpt(mapType);
-            if (noaCtorOpt.isPresent()) {
-                return new MapProxy1<K, V>(noaCtorOpt.get().construct());
-            } else {
-                final ArgArrayTypeCtor<Map<K, V>> argArrCtor =
-                        core.getArgArrayCtorOpt(mapType)
-                                .orElseThrow(() -> new CodecException(
-                                        "Could not find suitable constructor for " + mapType));
-
+            final ArgArrayTypeCtor<Map<K, V>> argArrCtor = core.getArgArrayCtor(mapType);
+            if (argArrCtor != null) {
                 return new MapProxy2<K, V>(keyCodec.type(), valueCodec.type(), argArrCtor);
+            } else {
+                final NoArgsTypeCtor<Map<K, V>> noaCtor = core.getNoArgsCtor(mapType);
+                return new MapProxy1<K, V>(noaCtor.construct());
             }
         }
     }
@@ -157,16 +153,12 @@ public abstract class MapCodecs {
         }
 
         protected MapProxy<String, V> getMapProxy(CodecCoreEx<IN, OUT, CFG> core) {
-            final Optional<NoArgsTypeCtor<Map<String, V>>> noaCtorOpt = core.getNoArgsCtorOpt(mapType);
-            if (noaCtorOpt.isPresent()) {
-                return new MapProxy1<String, V>(noaCtorOpt.get().construct());
-            } else {
-                final ArgArrayTypeCtor<Map<String, V>> argArrCtor =
-                        core.getArgArrayCtorOpt(mapType)
-                                .orElseThrow(() -> new CodecException(
-                                        "Could not find suitable constructor for " + mapType));
-
+            final ArgArrayTypeCtor<Map<String, V>> argArrCtor = core.getArgArrayCtor(mapType);
+            if (argArrCtor != null) {
                 return new MapProxy2<String, V>(String.class, valueCodec.type(), argArrCtor);
+            } else {
+                final NoArgsTypeCtor<Map<String, V>> noaCtor = core.getNoArgsCtor(mapType);
+                return new MapProxy1<String, V>(noaCtor.construct());
             }
         }
     }
@@ -197,7 +189,7 @@ public abstract class MapCodecs {
     protected static class MapProxy2<K, V> implements MapProxy<K, V> {
         final Class<K> keyType;
         final Class<V> valueType;
-        final List<Object> args = new ArrayList<Object>();
+        final List<Object> args = new ArrayList<>();
         final ArgArrayTypeCtor<Map<K, V>> argArrCtor;
 
         public MapProxy2(Class<K> keyType, Class<V> valueType, ArgArrayTypeCtor<Map<K, V>> argArrCtor) {

@@ -110,11 +110,11 @@ public interface CodecConfig {
     boolean isDefaultCollectionType(Class<?> intfClass, Class<?> implClass);
 
     /**
-     * Return the primary default collection implementation for a collection type
+     * Return the primary default collection implementation for the given collection type
      * @param intfClass the collection interface
      * @param <T>       the collection interface type
      * @param <U>       the collection implementation type
-     * @return
+     * @return          the primary default collection implementation for the given collection type
      */
     <T, U> Class<U> getDefaultCollectionType(Class<T> intfClass);
 
