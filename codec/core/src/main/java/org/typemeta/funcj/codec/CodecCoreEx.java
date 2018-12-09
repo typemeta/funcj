@@ -93,8 +93,6 @@ public interface CodecCoreEx<
             Map<String, FieldCodec<IN, OUT, CFG>> fieldCodecs,
             NoArgsTypeCtor<T> ctor);
 
-    <T> ObjectCodecBuilder<T, IN, OUT, CFG> objectCodecDeferredRegister(Class<T> clazz);
-
     <T> Codec<T, IN, OUT, CFG> createObjectCodec(Class<T> clazz);
 
     <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgMap(

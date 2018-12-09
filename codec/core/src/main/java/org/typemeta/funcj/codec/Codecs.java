@@ -210,47 +210,47 @@ public abstract class Codecs {
 
         // Register codecs for Java 8 date/time classes.
 
-        core.registerCodec(LocalDate.class)
+        core.registerCodecWithArgArray(LocalDate.class)
                 .field("year", LocalDate::getYear, Integer.class)
                 .field("month", LocalDate::getMonthValue, Integer.class)
                 .field("day", LocalDate::getDayOfMonth, Integer.class)
-                .map(LocalDate::of);
+                .construct(LocalDate::of);
 
-        core.registerCodec(LocalTime.class)
+        core.registerCodecWithArgArray(LocalTime.class)
                 .field("hours", LocalTime::getHour, Integer.class)
                 .field("mins", LocalTime::getMinute, Integer.class)
                 .field("secs", LocalTime::getSecond, Integer.class)
                 .field("nanos", LocalTime::getNano, Integer.class)
-                .map(LocalTime::of);
+                .construct(LocalTime::of);
 
-        core.registerCodec(LocalDateTime.class)
+        core.registerCodecWithArgArray(LocalDateTime.class)
                 .field("date", LocalDateTime::toLocalDate, LocalDate.class)
                 .field("time", LocalDateTime::toLocalTime, LocalTime.class)
-                .map(LocalDateTime::of);
+                .construct(LocalDateTime::of);
 
-        core.registerCodec(ZoneId.class)
+        core.registerCodecWithArgArray(ZoneId.class)
                 .field("id", ZoneId::getId, String.class)
-                .map(ZoneId::of);
+                .construct(ZoneId::of);
 
-        core.registerCodec(ZoneOffset.class)
+        core.registerCodecWithArgArray(ZoneOffset.class)
                 .field("id", ZoneOffset::getId, String.class)
-                .map(ZoneOffset::of);
+                .construct(ZoneOffset::of);
 
-        core.registerCodec(OffsetTime.class)
+        core.registerCodecWithArgArray(OffsetTime.class)
                 .field("time", OffsetTime::toLocalTime, LocalTime.class)
                 .field("offset", OffsetTime::getOffset, ZoneOffset.class)
-                .map(OffsetTime::of);
+                .construct(OffsetTime::of);
 
-        core.registerCodec(OffsetDateTime.class)
+        core.registerCodecWithArgArray(OffsetDateTime.class)
                 .field("dateTime", OffsetDateTime::toLocalDateTime, LocalDateTime.class)
                 .field("offset", OffsetDateTime::getOffset, ZoneOffset.class)
-                .map(OffsetDateTime::of);
+                .construct(OffsetDateTime::of);
 
-        core.registerCodec(ZonedDateTime.class)
+        core.registerCodecWithArgArray(ZonedDateTime.class)
                 .field("dateTime", ZonedDateTime::toLocalDateTime, LocalDateTime.class)
                 .field("zone", ZonedDateTime::getZone, ZoneId.class)
                 .field("offset", ZonedDateTime::getOffset, ZoneOffset.class)
-                .map(ZonedDateTime::ofLocal);
+                .construct(ZonedDateTime::ofLocal);
 
         return core;
     }

@@ -1063,14 +1063,14 @@ public abstract class TestTypes {
             this.name = name;
             this.age = age;
         }
-
-        Custom() {
-            this.colour = null;
-            this.date = null;
-            this.flag = false;
-            this.name = null;
-            this.age = 0.0;
-        }
+//
+//        Custom() {
+//            this.colour = null;
+//            this.date = null;
+//            this.flag = false;
+//            this.name = null;
+//            this.age = 0.0;
+//        }
 
         Custom(Init init) {
             this.colour = Colour.GREEN;

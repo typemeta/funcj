@@ -32,15 +32,26 @@ public interface CodecCore<
     <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT, CFG> codec);
 
     /**
-     * Create a {@code ObjectCodecBuilder} for the specified class.
+     * Create a {@code ObjectCodecBuilderWithArgArray} for the specified class.
      * <p>
-     * Create a {@code ObjectCodecBuilder}, essentially a fluent interface
+     * Create a {@code ObjectCodecBuilderWithArgArray}, essentially a fluent interface
      * for creating and registering a {@code Codec}.
      * @param clazz     the class to register codec against
      * @param <T>       the codec value type
      * @return          an {@code ObjectCodecBuilder}
      */
-    <T> ObjectCodecBuilder<T, IN, OUT, CFG> registerCodec(Class<T> clazz);
+    <T> ObjectCodecBuilderWithArgArray<T, IN, OUT, CFG> registerCodecWithArgArray(Class<T> clazz);
+
+    /**
+     * Create a {@code ObjectCodecBuilderWithArgMap} for the specified class.
+     * <p>
+     * Create a {@code ObjectCodecBuilderWithArgMap}, essentially a fluent interface
+     * for creating and registering a {@code Codec}.
+     * @param clazz     the class to register codec against
+     * @param <T>       the codec value type
+     * @return          an {@code ObjectCodecBuilder}
+     */
+    <T> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG> registerCodecWithArgMap(Class<T> clazz);
 
     /**
      * Create and register a {@link Codecs.StringProxyCodec} for a class.

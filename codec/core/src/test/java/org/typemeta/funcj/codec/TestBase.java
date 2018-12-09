@@ -5,6 +5,8 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.util.*;
 
+import static org.typemeta.funcj.codec.TestTypes.*;
+
 public abstract class TestBase {
 
     protected static final boolean printData = false;
@@ -18,22 +20,22 @@ public abstract class TestBase {
             CFG extends CodecConfig,
             CC extends CodecCore<IN, OUT, CFG>
              > CC prepareCodecCore(CC core) {
-        core.registerCodec(TestTypes.Custom.class)
-                .field("colour", c -> c.colour, TestTypes.Custom.Colour.class)
+        core.registerCodecWithArgMap(Custom.class)
+                .field("colour", c -> c.colour, Custom.Colour.class)
                 .field("date", c -> c.date, LocalDate.class)
                 .field("flag", c -> c.flag, Boolean.class)
                 .field("name", c -> c.name, String.class)
                 .field("age", c -> c.age, Double.class)
-                .map(args -> new TestTypes.Custom(
-                        (TestTypes.Custom.Colour)args[0],
-                        (LocalDate)args[1],
-                        (Boolean)args[2],
-                        (String)args[3],
-                        (Double)args[4]));
+                .construct(args -> new Custom(
+                        (Custom.Colour)args.get("colour"),
+                        (LocalDate)args.get("date"),
+                        (Boolean)args.get("flag"),
+                        (String)args.get("name"),
+                        (Double)args.get("age")));
 
-        core.registerNoArgsCtor(TestTypes.NoEmptyCtor.class, () -> TestTypes.NoEmptyCtor.create(false));
+        core.registerNoArgsCtor(NoEmptyCtor.class, () -> NoEmptyCtor.create(false));
 
-        core.registerArgArrayCtor(TestTypes.StaticCtor.class, args -> TestTypes.StaticCtor.create((boolean)args[0]));
+        core.registerArgArrayCtor(StaticCtor.class, args -> StaticCtor.create((boolean)args[0]));
 
         core.config().registerAllowedPackage(TestTypes.class.getPackage());
         return core;
@@ -41,174 +43,174 @@ public abstract class TestBase {
 
     @Test
     public void testCommonNulls() throws Exception {
-        roundTrip(new TestTypes.CommonData(), TestTypes.CommonData.class);
+        roundTrip(new CommonData(), CommonData.class);
     }
 
     @Test
     public void testCommon() throws Exception {
-        roundTrip(new TestTypes.CommonData(TestTypes.Init.INIT), TestTypes.CommonData.class);
+        roundTrip(new CommonData(Init.INIT), CommonData.class);
     }
 
     @Test
     public void testBooleanNulls() throws Exception {
-        roundTrip(new TestTypes.BooleanData(), TestTypes.BooleanData.class);
+        roundTrip(new BooleanData(), BooleanData.class);
     }
 
     @Test
     public void testBoolean() throws Exception {
-        roundTrip(new TestTypes.BooleanData(TestTypes.Init.INIT), TestTypes.BooleanData.class);
+        roundTrip(new BooleanData(Init.INIT), BooleanData.class);
     }
 
     @Test
     public void testByteNulls() throws Exception {
-        roundTrip(new TestTypes.ByteData(), TestTypes.ByteData.class);
+        roundTrip(new ByteData(), ByteData.class);
     }
 
     @Test
     public void testByte() throws Exception {
-        roundTrip(new TestTypes.ByteData(TestTypes.Init.INIT), TestTypes.ByteData.class);
+        roundTrip(new ByteData(Init.INIT), ByteData.class);
     }
 
     @Test
     public void testCharNulls() throws Exception {
-        roundTrip(new TestTypes.CharData(), TestTypes.CharData.class);
+        roundTrip(new CharData(), CharData.class);
     }
 
     @Test
     public void testChar() throws Exception {
-        roundTrip(new TestTypes.CharData(TestTypes.Init.INIT), TestTypes.CharData.class);
+        roundTrip(new CharData(Init.INIT), CharData.class);
     }
 
     @Test
     public void testShortNulls() throws Exception {
-        roundTrip(new TestTypes.ShortData(), TestTypes.ShortData.class);
+        roundTrip(new ShortData(), ShortData.class);
     }
 
     @Test
     public void testShort() throws Exception {
-        roundTrip(new TestTypes.ShortData(TestTypes.Init.INIT), TestTypes.ShortData.class);
+        roundTrip(new ShortData(Init.INIT), ShortData.class);
     }
 
     @Test
     public void testIntegerNulls() throws Exception {
-        roundTrip(new TestTypes.IntegerData(), TestTypes.IntegerData.class);
+        roundTrip(new IntegerData(), IntegerData.class);
     }
 
     @Test
     public void testInteger() throws Exception {
-        roundTrip(new TestTypes.IntegerData(TestTypes.Init.INIT), TestTypes.IntegerData.class);
+        roundTrip(new IntegerData(Init.INIT), IntegerData.class);
     }
 
     @Test
     public void testLongNulls() throws Exception {
-        roundTrip(new TestTypes.LongData(), TestTypes.LongData.class);
+        roundTrip(new LongData(), LongData.class);
     }
 
     @Test
     public void testLong() throws Exception {
-        roundTrip(new TestTypes.LongData(TestTypes.Init.INIT), TestTypes.LongData.class);
+        roundTrip(new LongData(Init.INIT), LongData.class);
     }
 
     @Test
     public void testFloatNulls() throws Exception {
-        roundTrip(new TestTypes.FloatData(), TestTypes.FloatData.class);
+        roundTrip(new FloatData(), FloatData.class);
     }
 
     @Test
     public void testFloat() throws Exception {
-        roundTrip(new TestTypes.FloatData(TestTypes.Init.INIT), TestTypes.FloatData.class);
+        roundTrip(new FloatData(Init.INIT), FloatData.class);
     }
 
     @Test
     public void testDoubleNulls() throws Exception {
-        roundTrip(new TestTypes.DoubleData(), TestTypes.DoubleData.class);
+        roundTrip(new DoubleData(), DoubleData.class);
     }
 
     @Test
     public void testDouble() throws Exception {
-        roundTrip(new TestTypes.DoubleData(TestTypes.Init.INIT), TestTypes.DoubleData.class);
+        roundTrip(new DoubleData(Init.INIT), DoubleData.class);
     }
 
     @Test
     public void testBigIntegerNulls() throws Exception {
-        roundTrip(new TestTypes.BigIntegerData(), TestTypes.BigIntegerData.class);
+        roundTrip(new BigIntegerData(), BigIntegerData.class);
     }
 
     @Test
     public void testBigInteger() throws Exception {
-        roundTrip(new TestTypes.BigIntegerData(TestTypes.Init.INIT), TestTypes.BigIntegerData.class);
+        roundTrip(new BigIntegerData(Init.INIT), BigIntegerData.class);
     }
 
     @Test
     public void testBigDecimalNulls() throws Exception {
-        roundTrip(new TestTypes.BigDecimalData(), TestTypes.BigDecimalData.class);
+        roundTrip(new BigDecimalData(), BigDecimalData.class);
     }
 
     @Test
     public void testBigDecimal() throws Exception {
-        roundTrip(new TestTypes.BigDecimalData(TestTypes.Init.INIT), TestTypes.BigDecimalData.class);
+        roundTrip(new BigDecimalData(Init.INIT), BigDecimalData.class);
     }
 
     @Test
     public void testOptionalNulls() throws Exception {
-        roundTrip(TestTypes.HasOptional.<Integer>create(), TestTypes.HasOptional.class);
+        roundTrip(HasOptional.<Integer>create(), HasOptional.class);
     }
 
     @Test
     public void testOptionalEmpty() throws Exception {
-        roundTrip(new TestTypes.HasOptional<Integer>(Optional.empty(), Optional.empty()), TestTypes.HasOptional.class);
+        roundTrip(new TestTypes.HasOptional<Integer>(Optional.empty(), Optional.empty()), HasOptional.class);
     }
 
     @Test
     public void testOptional() throws Exception {
-        roundTrip(new TestTypes.HasOptional<Integer>(1234, "abcd"), TestTypes.HasOptional.class);
+        roundTrip(new TestTypes.HasOptional<Integer>(1234, "abcd"), HasOptional.class);
     }
 
     @Test
     public void testNoEmptyCtor() throws Exception {
-        roundTrip(TestTypes.NoEmptyCtor.create(true), TestTypes.NoEmptyCtor.class);
+        roundTrip(NoEmptyCtor.create(true), NoEmptyCtor.class);
     }
 
     @Test
     public void testStaticCtor() throws Exception {
-        roundTrip(TestTypes.StaticCtor.create(true), TestTypes.StaticCtor.class);
+        roundTrip(StaticCtor.create(true), StaticCtor.class);
     }
 
     @Test
     public void testRecursive() throws Exception {
-        final TestTypes.Recursive rec = new TestTypes.Recursive(null, 0);
-        roundTrip(rec, TestTypes.Recursive.class);
+        final Recursive rec = new Recursive(null, 0);
+        roundTrip(rec, Recursive.class);
 
-        final TestTypes.Recursive rec2 = new TestTypes.Recursive(rec, 1);
-        roundTrip(rec2, TestTypes.Recursive.class);
+        final Recursive rec2 = new Recursive(rec, 1);
+        roundTrip(rec2, Recursive.class);
 
-        final TestTypes.Recursive rec3 = new TestTypes.Recursive(rec2, 2);
-        roundTrip(rec3, TestTypes.Recursive.class);
+        final Recursive rec3 = new Recursive(rec2, 2);
+        roundTrip(rec3, Recursive.class);
     }
 
     @Test
     public void testCustomNulls() throws Exception {
-        roundTrip(new TestTypes.Custom(), TestTypes.Custom.class);
+        roundTrip(new Custom(Init.INIT), Custom.class);
     }
 
     @Test
     public void testCustom() throws Exception {
-        roundTrip(new TestTypes.Custom(TestTypes.Init.INIT), TestTypes.Custom.class);
+        roundTrip(new Custom(Init.INIT), Custom.class);
     }
 
     @Test
     public void testEnum() throws Exception {
-        roundTrip(new TestTypes.TypeWithEnum(TestTypes.EnumType.VALUE2), TestTypes.TypeWithEnum.class);
+        roundTrip(new TypeWithEnum(EnumType.VALUE2), TypeWithEnum.class);
     }
 
     @Test
     public void testCollectionTypes() throws Exception {
-        roundTrip(new TestTypes.CollTypes(), TestTypes.CollTypes.class);
+        roundTrip(new CollTypes(), CollTypes.class);
     }
 
     @Test
     public void testInterface() throws Exception {
-        roundTrip(new TestTypes.SomeClass("bleh"), TestTypes.SomeInterface.class);
+        roundTrip(new SomeClass("bleh"), SomeInterface.class);
     }
 
     @Test

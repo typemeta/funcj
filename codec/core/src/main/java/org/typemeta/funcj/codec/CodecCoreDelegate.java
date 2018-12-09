@@ -27,8 +27,13 @@ public class CodecCoreDelegate<
     }
 
     @Override
-    public <T> ObjectCodecBuilder<T, IN, OUT, CFG> registerCodec(Class<T> clazz) {
-        return delegate.registerCodec(clazz);
+    public <T> ObjectCodecBuilderWithArgArray<T, IN, OUT, CFG> registerCodecWithArgArray(Class<T> clazz) {
+        return delegate.registerCodecWithArgArray(clazz);
+    }
+
+    @Override
+    public <T> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG> registerCodecWithArgMap(Class<T> clazz) {
+        return delegate.registerCodecWithArgMap(clazz);
     }
 
     @Override

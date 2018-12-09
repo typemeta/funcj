@@ -92,10 +92,30 @@ public interface CodecConfig {
      */
     int resizeArray(int size);
 
+    /**
+     * Register a collection implementation as a default for that collection type.
+     * This prevents the implementation type name from being encoded.
+     * @param intfClass the collection interface
+     * @param implClass the collection implementation
+     * @param <T>       the collection interface type
+     */
     <T> void registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass);
 
+    /**
+     * Check whether a collection class is a default for that collection type.
+     * @param intfClass the collection interface
+     * @param implClass the collection implementation
+     * @return      true if the collection implementation is registered as the default for that type
+     */
     boolean isDefaultCollectionType(Class<?> intfClass, Class<?> implClass);
 
+    /**
+     * Return the primary default collection implementation for a collection type
+     * @param intfClass the collection interface
+     * @param <T>       the collection interface type
+     * @param <U>       the collection implementation type
+     * @return
+     */
     <T, U> Class<U> getDefaultCollectionType(Class<T> intfClass);
 
     /**

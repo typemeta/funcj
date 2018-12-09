@@ -72,8 +72,25 @@ public class CodecCoreImpl<
     }
 
     @Override
-    public <T> ObjectCodecBuilder<T, IN, OUT, CFG> registerCodec(Class<T> clazz) {
-        return objectCodecDeferredRegister(clazz);
+    public <T> ObjectCodecBuilderWithArgArray<T, IN, OUT, CFG> registerCodecWithArgArray(Class<T> clazz) {
+        return new ObjectCodecBuilderWithArgArray<T, IN, OUT, CFG>(this, clazz) {
+            @Override
+            protected Codec<T, IN, OUT, CFG> registration(Codec<T, IN, OUT, CFG> codec) {
+                registerCodec(clazz, codec);
+                return codec;
+            }
+        };
+    }
+
+    @Override
+    public <T> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG> registerCodecWithArgMap(Class<T> clazz) {
+        return new ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG>(this, clazz) {
+            @Override
+            protected Codec<T, IN, OUT, CFG> registration(Codec<T, IN, OUT, CFG> codec) {
+                registerCodec(clazz, codec);
+                return codec;
+            }
+        };
     }
 
     @Override
@@ -639,17 +656,6 @@ public class CodecCoreImpl<
                 }),
                 codec
         );
-    }
-
-    @Override
-    public <T> ObjectCodecBuilder<T, IN, OUT, CFG> objectCodecDeferredRegister(Class<T> clazz) {
-        return new ObjectCodecBuilder<T, IN, OUT, CFG>(this, clazz) {
-            @Override
-            protected Codec<T, IN, OUT, CFG> registration(Codec<T, IN, OUT, CFG> codec) {
-                registerCodec(clazz, codec);
-                return codec;
-            }
-        };
     }
 
     @Override
