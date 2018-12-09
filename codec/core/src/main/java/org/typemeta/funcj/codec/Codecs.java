@@ -156,6 +156,8 @@ public abstract class Codecs {
                 args -> {
                     if (args.length == 0) {
                         return Collections.unmodifiableMap(Collections.emptyMap());
+                    } else if (args.length % 2 != 0) {
+                        throw new CodecException("Argument list length (" + args.length + ") it not a multiple of 2");
                     } else {
                         final Map map;
                         if (args[0] instanceof Comparable) {
@@ -175,6 +177,8 @@ public abstract class Codecs {
                 args -> {
                     if (args.length == 0) {
                         return Collections.unmodifiableMap(Collections.emptyMap());
+                    } else if (args.length % 2 != 0) {
+                        throw new CodecException("Argument list length (" + args.length + ") it not a multiple of 2");
                     } else {
                         final NavigableMap map = new TreeMap();
                         for (int i = 0; i < args.length; i += 2) {
@@ -189,6 +193,8 @@ public abstract class Codecs {
                 args -> {
                     if (args.length == 0) {
                         return Collections.unmodifiableMap(Collections.emptyMap());
+                    } else if (args.length % 2 != 0) {
+                        throw new CodecException("Argument list length (" + args.length + ") it not a multiple of 2");
                     } else {
                         final NavigableMap map = new TreeMap();
                         for (int i = 0; i < args.length; i += 2) {
