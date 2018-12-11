@@ -1,5 +1,7 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.misc.SimpleType;
+
 import java.math.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -1212,6 +1214,18 @@ public abstract class TestTypes {
             }
             SomeClass someClass = (SomeClass) o;
             return Objects.equals(name, someClass.name);
+        }
+    }
+
+    public static class ShouldFail {
+        final SimpleType simpleType;
+
+        public ShouldFail(SimpleType simpleType) {
+            this.simpleType = simpleType;
+        }
+
+        private ShouldFail() {
+            this.simpleType = null;
         }
     }
 }

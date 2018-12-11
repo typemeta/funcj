@@ -1,7 +1,9 @@
 package org.typemeta.funcj.codec;
 
 import org.junit.Test;
+import org.typemeta.funcj.codec.misc.SimpleType;
 
+import java.awt.color.ColorSpace;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -20,6 +22,9 @@ public abstract class TestBase {
             CFG extends CodecConfig,
             CC extends CodecCore<IN, OUT, CFG>
              > CC prepareCodecCore(CC core) {
+
+        core.config().registerAllowedPackage(TestTypes.class.getPackage());
+
         core.registerCodecWithArgMap(Custom.class)
                 .field("colour", c -> c.colour, Custom.Colour.class)
                 .field("date", c -> c.date, LocalDate.class)
@@ -37,7 +42,6 @@ public abstract class TestBase {
 
         core.registerArgArrayCtor(StaticCtor.class, args -> StaticCtor.create((boolean)args[0]));
 
-        core.config().registerAllowedPackage(TestTypes.class.getPackage());
         return core;
     }
 
@@ -213,12 +217,8 @@ public abstract class TestBase {
         roundTrip(new SomeClass("bleh"), SomeInterface.class);
     }
 
-    @Test
-    public void testMap() throws Exception {
-        final Map<String, Integer> map = new TreeMap<>();
-        map.put("one", 1);
-        map.put("two", 2);
-        map.put("three", 3);
-        roundTrip(map, Map.class);
+    @Test(expected = CodecException.class)
+    public void testShouldFail() throws Exception {
+        roundTrip(new ShouldFail(new SimpleType("")), ShouldFail.class);
     }
 }

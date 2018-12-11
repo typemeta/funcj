@@ -29,37 +29,41 @@ public interface NoArgsTypeCtor<T> {
                         .map(ctor -> (Constructor<T>)ctor)
                         .collect(toList());
 
-        // Select the accessible ctor if there is only one, otherwise just use any one.
-        final Constructor<T> noArgsCtor;
-        switch (ctors.size()) {
-            case 0:
-                // No default constructor.
-                return null;
-            case 1:
-                noArgsCtor = ctors.get(0);
-                break;
-            default:
-                noArgsCtor = ctors.stream()
-                        .filter(AccessibleObject::isAccessible)
-                        .findAny()
-                        .orElse(ctors.get(0));
-                break;
-        }
-
-        final F0<T, ReflectiveOperationException> accCtor;
-        if (!noArgsCtor.isAccessible()) {
-            noArgsCtor.setAccessible(true);
-        }
-
-        accCtor = () -> noArgsCtor.newInstance((Object[])null);
-
-        return () -> {
-            try {
-                return accCtor.apply();
-            } catch (ReflectiveOperationException ex) {
-                throw new CodecException("Unable to construct object of type '" + clazz.getName() + "'", ex);
+        try {
+            // Select the accessible ctor if there is only one, otherwise just use any one.
+            final Constructor<T> noArgsCtor;
+            switch (ctors.size()) {
+                case 0:
+                    // No default constructor.
+                    return null;
+                case 1:
+                    noArgsCtor = ctors.get(0);
+                    break;
+                default:
+                    noArgsCtor = ctors.stream()
+                            .filter(AccessibleObject::isAccessible)
+                            .findAny()
+                            .orElse(ctors.get(0));
+                    break;
             }
-        };
+
+            final F0<T, ReflectiveOperationException> accCtor;
+            if (!noArgsCtor.isAccessible()) {
+                noArgsCtor.setAccessible(true);
+            }
+
+            accCtor = () -> noArgsCtor.newInstance((Object[]) null);
+
+            return () -> {
+                try {
+                    return accCtor.apply();
+                } catch (ReflectiveOperationException ex) {
+                    throw new CodecException("Unable to construct object of type '" + clazz.getName() + "'", ex);
+                }
+            };
+        } catch (SecurityException ex) {
+            return null;
+        }
     }
 
     /**

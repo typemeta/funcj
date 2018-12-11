@@ -56,7 +56,7 @@ public class CodecConfigImpl implements CodecConfig {
             if (allowedClasses.contains(cls)) {
                 return clazz;
             } else {
-                throw new RuntimeException(cls + "' is not allowed");
+                throw new CodecException(cls + "' is not allowed");
             }
         }
     }
@@ -93,11 +93,10 @@ public class CodecConfigImpl implements CodecConfig {
     public <T> Class<T> nameToClass(String name) {
         Class<T> clazz = (Class<T>) nameToClassMap.get(name);
         if (clazz != null) {
-            return checkClassIsAllowed(clazz);
+            return clazz;
         } else {
             try {
-                clazz = (Class<T>) Class.forName(name);
-                return checkClassIsAllowed(clazz);
+                return (Class<T>) Class.forName(name);
             } catch (ClassNotFoundException ex) {
                 throw new CodecException("Cannot find class from name '" + name + "'", ex);
             }

@@ -170,6 +170,7 @@ public class CodecCoreImpl<
 
     @Override
     public <T> Codec<T, IN, OUT, CFG> getCodec(Class<T> clazz) {
+        config().checkClassIsAllowed(clazz);
         return getCodec(
                 ClassKey.valueOf(config().mapToProxy(clazz)),
                 () -> createCodec(clazz)
