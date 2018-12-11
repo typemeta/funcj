@@ -54,6 +54,11 @@
             <!--<scope>provided</scope>-->
         <!--</dependency>-->
 
+        <!-- Flight Recorder flags:
+            -XX:+UnlockCommercialFeatures
+            -XX:+FlightRecorder
+            -XX:StartFlightRecording=delay=50s,duration=50s,name=funcjcodecjmh,dumponexit=true,filename=funcjcodecjmh.jfr,settings=profile
+        -->
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>

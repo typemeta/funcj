@@ -20,11 +20,11 @@ public class JmhCodecTest extends TestBase {
 
         final StringReader sr = new StringReader(data);
 
-        final T val2 = codec.decode(clazz, sr);
+        codec.decode(clazz, sr);
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
+    @BenchmarkMode(Mode.Throughput)
     public void testAll() throws Exception {
         testCommonNulls();
         testCommon();
@@ -64,6 +64,8 @@ public class JmhCodecTest extends TestBase {
 
         final Options opt = new OptionsBuilder()
                 .include(JmhCodecTest.class.getSimpleName())
+                .warmupIterations(5)
+                .measurementIterations(5)
                 .forks(1)
                 .build();
 
