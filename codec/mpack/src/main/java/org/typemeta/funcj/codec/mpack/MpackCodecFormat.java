@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.mpack;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.mpack.MpackTypes.*;
+import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Folds;
 
@@ -12,11 +12,12 @@ import java.util.*;
  * Encoding via byte streams.
  */
 @SuppressWarnings("unchecked")
-public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config> {
+public class MpackCodecFormat
+        implements StreamCodecFormat<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
-    protected final Config config;
+    protected final MpackTypes.Config config;
 
-    public MpackCodecFormat(Config config) {
+    public MpackCodecFormat(MpackTypes.Config config) {
         this.config = config;
     }
 
@@ -25,36 +26,36 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     }
 
     @Override
-    public Config config() {
+    public MpackTypes.Config config() {
         return config;
     }
 
     @Override
-    public <T> boolean encodeNull(T val, OutStream out) {
+    public <T> boolean encodeNull(T val, MpackTypes.OutStream out) {
         final boolean isNull = val == null;
         out.writeBoolean(isNull);
         return isNull;
     }
 
     @Override
-    public boolean decodeNull(InStream in) {
+    public boolean decodeNull(MpackTypes.InStream in) {
         return in.readBoolean();
     }
 
     @Override
     public <T> boolean encodeDynamicType(
-            CodecCoreEx<InStream, OutStream, Config> core,
-            Codec<T, InStream, OutStream, Config> codec,
+            CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core,
+            Codec<T, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> codec,
             T val,
-            OutStream out,
-            Functions.F<Class<T>, Codec<T, InStream, OutStream, Config>> getDynCodec) {
+            MpackTypes.OutStream out,
+            Functions.F<Class<T>, Codec<T, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>> getDynCodec) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             out.writeBoolean(false);
             return false;
         } else {
             out.writeBoolean(true);
-            final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
+            final Codec<T, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> dynCodec = getDynCodec.apply(dynType);
             out.writeString(config().classToName(dynType));
             dynCodec.encode(core, val, out);
             return true;
@@ -62,7 +63,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     }
 
     @Override
-    public <T> T decodeDynamicType(InStream in, Functions.F<String, T> decoder) {
+    public <T> T decodeDynamicType(MpackTypes.InStream in, Functions.F<String, T> decoder) {
         if (in.readBoolean()) {
             final String typeName = in.readString();
             return decoder.apply(typeName);
@@ -71,28 +72,28 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
     }
 
-    protected static class BooleanCodec implements Codec.BooleanCodec<InStream, OutStream, Config> {
+    protected static class BooleanCodec implements Codec.BooleanCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         @Override
-        public OutStream encodePrim(boolean val, OutStream out) {
+        public MpackTypes.OutStream encodePrim(boolean val, MpackTypes.OutStream out) {
             return out.writeBoolean(val);
         }
 
         @Override
-        public boolean decodePrim(InStream in) {
+        public boolean decodePrim(MpackTypes.InStream in) {
             return in.readBoolean();
         }
     }
 
-    protected final Codec.BooleanCodec<InStream, OutStream, Config> booleanCodec = new BooleanCodec();
+    protected final Codec.BooleanCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> booleanCodec = new BooleanCodec();
 
     @Override
-    public Codec.BooleanCodec<InStream, OutStream, Config> booleanCodec() {
+    public Codec.BooleanCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> booleanCodec() {
         return booleanCodec;
     }
 
-    protected final Codec<boolean[], InStream, OutStream, Config> booleanArrayCodec =
-            new Codec<boolean[], InStream, OutStream, Config>() {
+    protected final Codec<boolean[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> booleanArrayCodec =
+            new Codec<boolean[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>() {
 
         @Override
         public Class<boolean[]> type() {
@@ -100,7 +101,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, boolean[] value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, boolean[] value, MpackTypes.OutStream out) {
             out.writeInt(value.length);
             for (boolean val : value) {
                 booleanCodec().encodePrim(val, out);
@@ -109,7 +110,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public boolean[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public boolean[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             final int l = in.readInt();
             final boolean[] vals = new boolean[l];
 
@@ -122,32 +123,32 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     };
 
     @Override
-    public Codec<boolean[], InStream, OutStream, Config> booleanArrayCodec() {
+    public Codec<boolean[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
-    protected static class ByteCodec implements Codec.ByteCodec<InStream, OutStream, Config> {
+    protected static class ByteCodec implements Codec.ByteCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         @Override
-        public OutStream encodePrim(byte val, OutStream out) {
+        public MpackTypes.OutStream encodePrim(byte val, MpackTypes.OutStream out) {
             return out.writeByte(val);
         }
 
         @Override
-        public byte decodePrim(InStream in) {
+        public byte decodePrim(MpackTypes.InStream in) {
             return in.readByte();
         }
     }
 
-    protected final Codec.ByteCodec<InStream, OutStream, Config> byteCodec = new ByteCodec();
+    protected final Codec.ByteCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> byteCodec = new ByteCodec();
 
     @Override
-    public Codec.ByteCodec<InStream, OutStream, Config> byteCodec() {
+    public Codec.ByteCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> byteCodec() {
         return byteCodec;
     }
 
-    protected final Codec<byte[], InStream, OutStream, Config> byteArrayCodec =
-            new Codec<byte[], InStream, OutStream, Config>() {
+    protected final Codec<byte[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> byteArrayCodec =
+            new Codec<byte[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>() {
 
         @Override
         public Class<byte[]> type() {
@@ -155,7 +156,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, byte[] value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, byte[] value, MpackTypes.OutStream out) {
             out.writeInt(value.length);
             for (byte val : value) {
                 byteCodec().encodePrim(val, out);
@@ -164,7 +165,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public byte[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public byte[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             final int l = in.readInt();
             final byte[] vals = new byte[l];
 
@@ -177,32 +178,32 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     };
 
     @Override
-    public Codec<byte[], InStream, OutStream, Config> byteArrayCodec() {
+    public Codec<byte[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> byteArrayCodec() {
         return byteArrayCodec;
     }
 
-    protected static class CharCodec implements Codec.CharCodec<InStream, OutStream, Config> {
+    protected static class CharCodec implements Codec.CharCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         @Override
-        public OutStream encodePrim(char val, OutStream out) {
+        public MpackTypes.OutStream encodePrim(char val, MpackTypes.OutStream out) {
             return out.writeChar(val);
         }
 
         @Override
-        public char decodePrim(InStream in ) {
+        public char decodePrim(MpackTypes.InStream in ) {
             return in.readChar();
         }
     }
 
-    protected final Codec.CharCodec<InStream, OutStream, Config> charCodec = new CharCodec();
+    protected final Codec.CharCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> charCodec = new CharCodec();
 
     @Override
-    public Codec.CharCodec<InStream, OutStream, Config> charCodec() {
+    public Codec.CharCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> charCodec() {
         return charCodec;
     }
 
-    protected final Codec<char[], InStream, OutStream, Config> charArrayCodec =
-            new Codec<char[], InStream, OutStream, Config>() {
+    protected final Codec<char[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> charArrayCodec =
+            new Codec<char[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>() {
 
         @Override
         public Class<char[]> type() {
@@ -210,7 +211,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, char[] value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, char[] value, MpackTypes.OutStream out) {
             out.writeInt(value.length);
             for (char val : value) {
                 charCodec().encodePrim(val, out);
@@ -219,7 +220,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public char[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public char[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             final int l = in.readInt();
             final char[] vals = new char[l];
 
@@ -232,32 +233,32 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     };
 
     @Override
-    public Codec<char[], InStream, OutStream, Config> charArrayCodec() {
+    public Codec<char[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> charArrayCodec() {
         return charArrayCodec;
     }
 
-    protected static class ShortCodec implements Codec.ShortCodec<InStream, OutStream, Config> {
+    protected static class ShortCodec implements Codec.ShortCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         @Override
-        public OutStream encodePrim(short val, OutStream out) {
+        public MpackTypes.OutStream encodePrim(short val, MpackTypes.OutStream out) {
             return out.writeShort(val);
         }
 
         @Override
-        public short decodePrim(InStream in ) {
+        public short decodePrim(MpackTypes.InStream in ) {
             return in.readShort();
         }
     }
 
-    protected final Codec.ShortCodec<InStream, OutStream, Config> shortCodec = new ShortCodec();
+    protected final Codec.ShortCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> shortCodec = new ShortCodec();
 
     @Override
-    public Codec.ShortCodec<InStream, OutStream, Config> shortCodec() {
+    public Codec.ShortCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> shortCodec() {
         return shortCodec;
     }
 
-    protected final Codec<short[], InStream, OutStream, Config> shortArrayCodec =
-            new Codec<short[], InStream, OutStream, Config>() {
+    protected final Codec<short[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> shortArrayCodec =
+            new Codec<short[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>() {
 
         @Override
         public Class<short[]> type() {
@@ -265,7 +266,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, short[] value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, short[] value, MpackTypes.OutStream out) {
             out.writeInt(value.length);
             for (short val : value) {
                 shortCodec().encodePrim(val, out);
@@ -274,7 +275,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public short[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public short[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             final int l = in.readInt();
             final short[] vals = new short[l];
 
@@ -287,32 +288,32 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     };
 
     @Override
-    public Codec<short[], InStream, OutStream, Config> shortArrayCodec() {
+    public Codec<short[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> shortArrayCodec() {
         return shortArrayCodec;
     }
 
-    protected static class IntCodec implements Codec.IntCodec<InStream, OutStream, Config> {
+    protected static class IntCodec implements Codec.IntCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         @Override
-        public OutStream encodePrim(int val, OutStream out) {
+        public MpackTypes.OutStream encodePrim(int val, MpackTypes.OutStream out) {
             return out.writeInt(val);
         }
 
         @Override
-        public int decodePrim(InStream in ) {
+        public int decodePrim(MpackTypes.InStream in ) {
             return in.readInt();
         }
     }
 
-    protected final Codec.IntCodec<InStream, OutStream, Config> intCodec = new IntCodec();
+    protected final Codec.IntCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> intCodec = new IntCodec();
 
     @Override
-    public Codec.IntCodec<InStream, OutStream, Config> intCodec() {
+    public Codec.IntCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> intCodec() {
         return intCodec;
     }
 
-    protected final Codec<int[], InStream, OutStream, Config> intArrayCodec =
-            new Codec<int[], InStream, OutStream, Config>() {
+    protected final Codec<int[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> intArrayCodec =
+            new Codec<int[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>() {
 
         @Override
         public Class<int[]> type() {
@@ -320,7 +321,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, int[] value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, int[] value, MpackTypes.OutStream out) {
             out.writeInt(value.length);
             for (int val : value) {
                 intCodec().encodePrim(val, out);
@@ -329,7 +330,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public int[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public int[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             final int l = in.readInt();
             final int[] vals = new int[l];
 
@@ -342,32 +343,32 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     };
 
     @Override
-    public Codec<int[], InStream, OutStream, Config> intArrayCodec() {
+    public Codec<int[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> intArrayCodec() {
         return intArrayCodec;
     }
 
-    protected static class LongCodec implements Codec.LongCodec<InStream, OutStream, Config> {
+    protected static class LongCodec implements Codec.LongCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         @Override
-        public OutStream encodePrim(long val, OutStream out) {
+        public MpackTypes.OutStream encodePrim(long val, MpackTypes.OutStream out) {
             return out.writeLong(val);
         }
 
         @Override
-        public long decodePrim(InStream in) {
+        public long decodePrim(MpackTypes.InStream in) {
             return in.readLong();
         }
     }
 
-    protected final Codec.LongCodec<InStream, OutStream, Config> longCodec = new LongCodec();
+    protected final Codec.LongCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> longCodec = new LongCodec();
 
     @Override
-    public Codec.LongCodec<InStream, OutStream, Config> longCodec() {
+    public Codec.LongCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> longCodec() {
         return longCodec;
     }
 
-    protected final Codec<long[], InStream, OutStream, Config> longArrayCodec =
-            new Codec<long[], InStream, OutStream, Config>() {
+    protected final Codec<long[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> longArrayCodec =
+            new Codec<long[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>() {
 
         @Override
         public Class<long[]> type() {
@@ -375,7 +376,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, long[] value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, long[] value, MpackTypes.OutStream out) {
             out.writeInt(value.length);
             for (long val : value) {
                 longCodec().encodePrim(val, out);
@@ -384,7 +385,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public long[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public long[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             final int l = in.readInt();
             final long[] vals = new long[l];
 
@@ -397,32 +398,32 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     };
 
     @Override
-    public Codec<long[], InStream, OutStream, Config> longArrayCodec() {
+    public Codec<long[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> longArrayCodec() {
         return longArrayCodec;
     }
 
-    protected static class FloatCodec implements Codec.FloatCodec<InStream, OutStream, Config> {
+    protected static class FloatCodec implements Codec.FloatCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         @Override
-        public OutStream encodePrim(float val, OutStream out) {
+        public MpackTypes.OutStream encodePrim(float val, MpackTypes.OutStream out) {
             return out.writeFloat(val);
         }
 
         @Override
-        public float decodePrim(InStream in ) {
+        public float decodePrim(MpackTypes.InStream in ) {
             return in.readFloat();
         }
     }
 
-    protected final Codec.FloatCodec<InStream, OutStream, Config> floatCodec = new FloatCodec();
+    protected final Codec.FloatCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> floatCodec = new FloatCodec();
 
     @Override
-    public Codec.FloatCodec<InStream, OutStream, Config> floatCodec() {
+    public Codec.FloatCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> floatCodec() {
         return floatCodec;
     }
 
-    protected final Codec<float[], InStream, OutStream, Config> floatArrayCodec =
-            new Codec<float[], InStream, OutStream, Config>() {
+    protected final Codec<float[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> floatArrayCodec =
+            new Codec<float[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>() {
 
         @Override
         public Class<float[]> type() {
@@ -430,7 +431,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, float[] value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, float[] value, MpackTypes.OutStream out) {
             out.writeInt(value.length);
             for (float val : value) {
                 floatCodec().encodePrim(val, out);
@@ -439,7 +440,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public float[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public float[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             final int l = in.readInt();
             final float[] vals = new float[l];
 
@@ -452,32 +453,32 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     };
 
     @Override
-    public Codec<float[], InStream, OutStream, Config> floatArrayCodec() {
+    public Codec<float[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> floatArrayCodec() {
         return floatArrayCodec;
     }
 
-    protected static class DoubleCodec implements Codec.DoubleCodec<InStream, OutStream, Config> {
+    protected static class DoubleCodec implements Codec.DoubleCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         @Override
-        public OutStream encodePrim(double value, OutStream out) {
+        public MpackTypes.OutStream encodePrim(double value, MpackTypes.OutStream out) {
             return out.writeDouble(value);
         }
 
         @Override
-        public double decodePrim(InStream in ) {
+        public double decodePrim(MpackTypes.InStream in ) {
             return in.readDouble();
         }
     }
 
-    protected final Codec.DoubleCodec<InStream, OutStream, Config> doubleCodec = new DoubleCodec();
+    protected final Codec.DoubleCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> doubleCodec = new DoubleCodec();
 
     @Override
-    public Codec.DoubleCodec<InStream, OutStream, Config> doubleCodec() {
+    public Codec.DoubleCodec<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> doubleCodec() {
         return doubleCodec;
     }
 
-    protected final Codec<double[], InStream, OutStream, Config> doubleArrayCodec =
-            new Codec<double[], InStream, OutStream, Config>() {
+    protected final Codec<double[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> doubleArrayCodec =
+            new Codec<double[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>() {
 
         @Override
         public Class<double[]> type() {
@@ -485,7 +486,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, double[] value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, double[] value, MpackTypes.OutStream out) {
             out.writeInt(value.length);
             for (double val : value) {
                 doubleCodec().encodePrim(val, out);
@@ -494,7 +495,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public double[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public double[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             final int l = in.readInt();
             final double[] vals = new double[l];
 
@@ -507,11 +508,11 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     };
 
     @Override
-    public Codec<double[], InStream, OutStream, Config> doubleArrayCodec() {
+    public Codec<double[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
-    protected static class StringCodec implements Codec<String, InStream, OutStream, Config> {
+    protected static class StringCodec implements Codec<String, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         @Override
         public Class<String> type() {
@@ -519,49 +520,49 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, String value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, String value, MpackTypes.OutStream out) {
             return out.writeString(value);
         }
 
         @Override
-        public String decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public String decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             return in.readString();
         }
     }
 
-    protected final Codec<String, InStream, OutStream, Config> stringCodec = new StringCodec();
+    protected final Codec<String, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> stringCodec = new StringCodec();
 
     @Override
-    public Codec<String, InStream, OutStream, Config> stringCodec() {
+    public Codec<String, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    public <V> Codec<Map<String, V>, InStream, OutStream, Config> createMapCodec(
+    public <V> Codec<Map<String, V>, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> createMapCodec(
             Class<Map<String, V>> type,
-            Codec<V, InStream, OutStream, Config> valueCodec) {
+            Codec<V, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> valueCodec) {
         return new MpackMapCodecs.StringMapCodec<V>(type, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, InStream, OutStream, Config> createMapCodec(
+    public <K, V> Codec<Map<K, V>, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> createMapCodec(
             Class<Map<K, V>> type,
-            Codec<K, InStream, OutStream, Config> keyCodec,
-            Codec<V, InStream, OutStream, Config> valueCodec) {
+            Codec<K, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> keyCodec,
+            Codec<V, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> valueCodec) {
         return new MpackMapCodecs.MapCodec<K, V>(type, keyCodec, valueCodec);
     }
 
     @Override
-    public <T> Codec<Collection<T>, InStream, OutStream, Config> createCollCodec(
+    public <T> Codec<Collection<T>, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> createCollCodec(
             Class<Collection<T>> collType,
-            Codec<T, InStream, OutStream, Config> elemCodec) {
-        return new CollectionCodec<T, InStream, OutStream, Config>(collType, elemCodec) {
+            Codec<T, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> elemCodec) {
+        return new CollectionCodec<T, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>(collType, elemCodec) {
 
             @Override
-            public OutStream encodeWithCheck(
-                    CodecCoreEx<InStream, OutStream, Config> core,
+            public MpackTypes.OutStream encodeWithCheck(
+                    CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core,
                     Collection<T> value,
-                    OutStream out) {
+                    MpackTypes.OutStream out) {
                 if (core.format().encodeNull(value, out)) {
                     return out;
                 } else if (!core.format().encodeDynamicType(
@@ -577,7 +578,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
             }
 
             @Override
-            public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Collection<T> value, OutStream out) {
+            public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, Collection<T> value, MpackTypes.OutStream out) {
                 out.writeInt(value.size());
                 for (T val : value) {
                     elemCodec.encodeWithCheck(core, val, out);
@@ -586,7 +587,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
             }
 
             @Override
-            public Collection<T> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+            public Collection<T> decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
                 final int l = in.readInt();
                 final CollProxy<T> collProxy = getCollectionProxy(core);
 
@@ -600,11 +601,11 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     }
 
     @Override
-    public <T> Codec<T[], InStream, OutStream, Config> createObjectArrayCodec(
+    public <T> Codec<T[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> createObjectArrayCodec(
             Class<T[]> arrType,
             Class<T> elemType,
-            Codec<T, InStream, OutStream, Config> elemCodec) {
-        return new Codec<T[], InStream, OutStream, Config>() {
+            Codec<T, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> elemCodec) {
+        return new Codec<T[], MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>() {
 
             @Override
             public Class<T[]> type() {
@@ -612,7 +613,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
             }
 
             @Override
-            public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, T[] value, OutStream out) {
+            public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, T[] value, MpackTypes.OutStream out) {
                 out.writeInt(value.length);
                 for (T val : value) {
                     elemCodec.encodeWithCheck(core, val, out);
@@ -621,7 +622,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
             }
 
             @Override
-            public T[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+            public T[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
                 final int l = in.readInt();
                 final T[] vals = (T[]) Array.newInstance(elemType, l);
 
@@ -635,9 +636,9 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, InStream, OutStream, Config> createObjectCodec(
+    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> createObjectCodec(
             Class<T> type,
-            ObjectMeta<T, InStream, OutStream, RA> objMeta) {
+            ObjectMeta<T, MpackTypes.InStream, MpackTypes.OutStream, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
             return new FinalObjectCodec<T, RA>(type, objMeta);
         } else {
@@ -646,14 +647,14 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
     }
 
     protected static class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
-            implements Codec<T, InStream, OutStream, Config> {
+            implements Codec<T, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         private final Class<T> type;
-        private final ObjectMeta<T, InStream, OutStream, RA> objMeta;
+        private final ObjectMeta<T, MpackTypes.InStream, MpackTypes.OutStream, RA> objMeta;
 
         private ObjectCodec(
                 Class<T> type,
-                ObjectMeta<T, InStream, OutStream, RA> objMeta) {
+                ObjectMeta<T, MpackTypes.InStream, MpackTypes.OutStream, RA> objMeta) {
             this.type = type;
             this.objMeta = objMeta;
         }
@@ -664,7 +665,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, T value, OutStream out) {
+        public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, T value, MpackTypes.OutStream out) {
             objMeta.forEach(field ->
                     field.encodeField(value, out)
             );
@@ -672,7 +673,7 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
         }
 
         @Override
-        public T decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public T decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
             return Folds.foldLeft(
                     (acc, field) -> field.decodeField(acc, in),
                     objMeta.startDecode(),
@@ -683,11 +684,11 @@ public class MpackCodecFormat implements CodecFormat<InStream, OutStream, Config
 
     protected static class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
             extends ObjectCodec<T, RA>
-            implements Codec.FinalCodec<T, InStream, OutStream, Config> {
+            implements Codec.FinalCodec<T, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
 
         protected FinalObjectCodec(
                 Class<T> type,
-                ObjectMeta<T, InStream, OutStream, RA> objMeta) {
+                ObjectMeta<T, MpackTypes.InStream, MpackTypes.OutStream, RA> objMeta) {
             super(type, objMeta);
         }
     }

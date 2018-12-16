@@ -8,11 +8,7 @@ package org.typemeta.funcj.codec;
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
  */
-public interface Codec<
-        T,
-        IN extends CodecFormat.Input<IN>,
-        OUT extends CodecFormat.Output<OUT>,
-        CFG extends CodecConfig> {
+public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
 
     /**
      * A sub-interface for codecs for classes which are final.
@@ -21,11 +17,7 @@ public interface Codec<
      * @param <OUT>     the encoded output type
      * @param <CFG>     the config type
      */
-    interface FinalCodec<
-            T,
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig> extends Codec<T, IN, OUT, CFG> {
+    interface FinalCodec<T, IN, OUT, CFG extends CodecConfig> extends Codec<T, IN, OUT, CFG> {
 
         @Override
         default OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
@@ -51,10 +43,7 @@ public interface Codec<
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface BooleanCodec<
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig> extends FinalCodec<Boolean, IN, OUT, CFG> {
+    interface BooleanCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Boolean, IN, OUT, CFG> {
 
         @Override
         default Class<Boolean> type() {
@@ -81,10 +70,7 @@ public interface Codec<
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface ByteCodec<
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig> extends FinalCodec<Byte, IN, OUT, CFG> {
+    interface ByteCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Byte, IN, OUT, CFG> {
 
         @Override
         default Class<Byte> type() {
@@ -111,10 +97,7 @@ public interface Codec<
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface CharCodec<
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig> extends FinalCodec<Character, IN, OUT, CFG> {
+    interface CharCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Character, IN, OUT, CFG> {
 
         @Override
         default Class<Character> type() {
@@ -141,10 +124,7 @@ public interface Codec<
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface ShortCodec<
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig> extends FinalCodec<Short, IN, OUT, CFG> {
+    interface ShortCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Short, IN, OUT, CFG> {
 
         @Override
         default Class<Short> type() {
@@ -171,10 +151,7 @@ public interface Codec<
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface IntCodec<
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig> extends FinalCodec<Integer, IN, OUT, CFG> {
+    interface IntCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Integer, IN, OUT, CFG> {
 
         @Override
         default Class<Integer> type() {
@@ -201,10 +178,7 @@ public interface Codec<
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface LongCodec<
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig> extends FinalCodec<Long, IN, OUT, CFG> {
+    interface LongCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Long, IN, OUT, CFG> {
 
         @Override
         default Class<Long> type() {
@@ -231,10 +205,7 @@ public interface Codec<
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface FloatCodec<
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig> extends FinalCodec<Float, IN, OUT, CFG> {
+    interface FloatCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Float, IN, OUT, CFG> {
 
         @Override
         default Class<Float> type() {
@@ -261,10 +232,7 @@ public interface Codec<
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    interface DoubleCodec<
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig> extends FinalCodec<Double, IN, OUT, CFG> {
+    interface DoubleCodec<IN, OUT, CFG extends CodecConfig> extends FinalCodec<Double, IN, OUT, CFG> {
 
         @Override
         default Class<Double> type() {

@@ -1,8 +1,9 @@
 package org.typemeta.funcj.codec.mpack;
 
 import org.msgpack.core.MessagePack;
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecConfig;
 import org.typemeta.funcj.codec.mpack.io.*;
+import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -19,7 +20,7 @@ public abstract class MpackTypes {
     /**
      * Interface for classes which implement an input stream of bytes
      */
-    public interface InStream extends CodecFormat.Input<InStream> {
+    public interface InStream extends StreamCodecFormat.Input<InStream> {
         int startArray();
 
         int startMap();
@@ -30,7 +31,7 @@ public abstract class MpackTypes {
     /**
      * Interface for classes which implement an output stream of bytes
      */
-    public interface OutStream extends CodecFormat.Output<OutStream> {
+    public interface OutStream extends StreamCodecFormat.Output<OutStream> {
         OutStream startArray(int size);
 
         OutStream startMap(int size);

@@ -1,29 +1,27 @@
-package org.typemeta.funcj.codec.xml;
+package org.typemeta.funcj.codec.avro.schema;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.stream.StreamCodecFormat;
-import org.typemeta.funcj.codec.xml.XmlTypes.*;
+import org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.*;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.util.Folds;
 
 import java.lang.reflect.*;
 import java.util.*;
 
-import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
-
 /**
- * Encoding via XML streams.
+ * Encoding via byte streams.
  */
 @SuppressWarnings("unchecked")
-public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Config> {
+public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, Config> {
 
     protected final Config config;
 
-    public XmlCodecFormat(Config config) {
+    public AvroSchemaCodecFormat(Config config) {
         this.config = config;
     }
 
-    public XmlCodecFormat() {
-        this(new XmlConfigImpl());
+    public AvroSchemaCodecFormat() {
+        this(new AvroSchemaConfigImpl());
     }
 
     @Override
@@ -33,17 +31,14 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
     @Override
     public <T> boolean encodeNull(T val, OutStream out) {
-        if (val == null) {
-            out.attribute(config.nullAttrName(), config.nullAttrVal());
-            return true;
-        } else {
-            return false;
-        }
+        final boolean isNull = val == null;
+        out.writeBoolean(isNull);
+        return isNull;
     }
 
     @Override
     public boolean decodeNull(InStream in) {
-        return in.attributeMap().nameHasValue(config.nullAttrName(), config.nullAttrVal());
+        return in.readBoolean();
     }
 
     @Override
@@ -55,10 +50,12 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
             Functions.F<Class<T>, Codec<T, InStream, OutStream, Config>> getDynCodec) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
+            out.writeBoolean(false);
             return false;
         } else {
+            out.writeBoolean(true);
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
-            out.attribute(config.typeAttrName(), config().classToName(dynType));
+            out.writeString(config().classToName(dynType));
             dynCodec.encode(core, val, out);
             return true;
         }
@@ -66,8 +63,8 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
     @Override
     public <T> T decodeDynamicType(InStream in, Functions.F<String, T> decoder) {
-        if (in.attributeMap().hasName(config.typeAttrName())) {
-            final String typeName = in.attributeMap().getValue(config.typeAttrName());
+        if (in.readBoolean()) {
+            final String typeName = in.readString();
             return decoder.apply(typeName);
         } else {
             return null;
@@ -104,31 +101,23 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, boolean[] value, OutStream out) {
+            out.writeInt(value.length);
             for (boolean val : value) {
-                booleanCodec().encodePrim(val, out.startElement(config.entryElemName()));
-                out.endElement();
+                booleanCodec().encodePrim(val, out);
             }
             return out;
         }
 
         @Override
         public boolean[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-            boolean[] arr = new boolean[config.defaultArraySize()];
-            int i = 0;
-            while (in.hasNext()) {
-                if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                    break;
-                }
+            final int l = in.readInt();
+            final boolean[] vals = new boolean[l];
 
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
-                }
-
-                in.startElement(config.entryElemName());
-                arr[i++] = booleanCodec().decodePrim(in);
-                in.endElement();
+            for (int i = 0; i < l; ++i) {
+                vals[i] = booleanCodec().decodePrim(in);
             }
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -167,31 +156,23 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, byte[] value, OutStream out) {
+            out.writeInt(value.length);
             for (byte val : value) {
-                byteCodec().encodePrim(val, out.startElement(config.entryElemName()));
-                out.endElement();
+                byteCodec().encodePrim(val, out);
             }
             return out;
         }
 
         @Override
         public byte[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-            byte[] arr = new byte[config.defaultArraySize()];
-            int i = 0;
-            while (in.hasNext()) {
-                if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                    break;
-                }
+            final int l = in.readInt();
+            final byte[] vals = new byte[l];
 
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
-                }
-
-                in.startElement(config.entryElemName());
-                arr[i++] = byteCodec().decodePrim(in);
-                in.endElement();
+            for (int i = 0; i < l; ++i) {
+                vals[i] = byteCodec().decodePrim(in);
             }
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -230,31 +211,23 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, char[] value, OutStream out) {
+            out.writeInt(value.length);
             for (char val : value) {
-                charCodec().encodePrim(val, out.startElement(config.entryElemName()));
-                out.endElement();
+                charCodec().encodePrim(val, out);
             }
             return out;
         }
 
         @Override
         public char[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-            char[] arr = new char[config.defaultArraySize()];
-            int i = 0;
-            while (in.hasNext()) {
-                if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                    break;
-                }
+            final int l = in.readInt();
+            final char[] vals = new char[l];
 
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
-                }
-
-                in.startElement(config.entryElemName());
-                arr[i++] = charCodec().decodePrim(in);
-                in.endElement();
+            for (int i = 0; i < l; ++i) {
+                vals[i] = charCodec().decodePrim(in);
             }
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -293,31 +266,23 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, short[] value, OutStream out) {
+            out.writeInt(value.length);
             for (short val : value) {
-                shortCodec().encodePrim(val, out.startElement(config.entryElemName()));
-                out.endElement();
+                shortCodec().encodePrim(val, out);
             }
             return out;
         }
 
         @Override
         public short[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-            short[] arr = new short[config.defaultArraySize()];
-            int i = 0;
-            while (in.hasNext()) {
-                if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                    break;
-                }
+            final int l = in.readInt();
+            final short[] vals = new short[l];
 
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
-                }
-
-                in.startElement(config.entryElemName());
-                arr[i++] = shortCodec().decodePrim(in);
-                in.endElement();
+            for (int i = 0; i < l; ++i) {
+                vals[i] = shortCodec().decodePrim(in);
             }
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -356,31 +321,23 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, int[] value, OutStream out) {
+            out.writeInt(value.length);
             for (int val : value) {
-                intCodec().encodePrim(val, out.startElement(config.entryElemName()));
-                out.endElement();
+                intCodec().encodePrim(val, out);
             }
             return out;
         }
 
         @Override
         public int[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-            int[] arr = new int[config.defaultArraySize()];
-            int i = 0;
-            while (in.hasNext()) {
-                if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                    break;
-                }
+            final int l = in.readInt();
+            final int[] vals = new int[l];
 
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
-                }
-
-                in.startElement(config.entryElemName());
-                arr[i++] = intCodec().decodePrim(in);
-                in.endElement();
+            for (int i = 0; i < l; ++i) {
+                vals[i] = intCodec().decodePrim(in);
             }
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -419,31 +376,23 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, long[] value, OutStream out) {
+            out.writeInt(value.length);
             for (long val : value) {
-                longCodec().encodePrim(val, out.startElement(config.entryElemName()));
-                out.endElement();
+                longCodec().encodePrim(val, out);
             }
             return out;
         }
 
         @Override
         public long[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-            long[] arr = new long[config.defaultArraySize()];
-            int i = 0;
-            while (in.hasNext()) {
-                if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                    break;
-                }
+            final int l = in.readInt();
+            final long[] vals = new long[l];
 
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
-                }
-
-                in.startElement(config.entryElemName());
-                arr[i++] = longCodec().decodePrim(in);
-                in.endElement();
+            for (int i = 0; i < l; ++i) {
+                vals[i] = longCodec().decodePrim(in);
             }
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -482,31 +431,23 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, float[] value, OutStream out) {
+            out.writeInt(value.length);
             for (float val : value) {
-                floatCodec().encodePrim(val, out.startElement(config.entryElemName()));
-                out.endElement();
+                floatCodec().encodePrim(val, out);
             }
             return out;
         }
 
         @Override
         public float[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-            float[] arr = new float[config.defaultArraySize()];
-            int i = 0;
-            while (in.hasNext()) {
-                if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                    break;
-                }
+            final int l = in.readInt();
+            final float[] vals = new float[l];
 
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
-                }
-
-                in.startElement(config.entryElemName());
-                arr[i++] = floatCodec().decodePrim(in);
-                in.endElement();
+            for (int i = 0; i < l; ++i) {
+                vals[i] = floatCodec().decodePrim(in);
             }
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -516,6 +457,7 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
     }
 
     protected static class DoubleCodec implements Codec.DoubleCodec<InStream, OutStream, Config> {
+
         @Override
         public OutStream encodePrim(double value, OutStream out) {
             return out.writeDouble(value);
@@ -544,31 +486,23 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, double[] value, OutStream out) {
+            out.writeInt(value.length);
             for (double val : value) {
-                doubleCodec().encodePrim(val, out.startElement(config.entryElemName()));
-                out.endElement();
+                doubleCodec().encodePrim(val, out);
             }
             return out;
         }
 
         @Override
         public double[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-            double[] arr = new double[config.defaultArraySize()];
-            int i = 0;
-            while (in.hasNext()) {
-                if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                    break;
-                }
+            final int l = in.readInt();
+            final double[] vals = new double[l];
 
-                if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
-                }
-
-                in.startElement(config.entryElemName());
-                arr[i++] = doubleCodec().decodePrim(in);
-                in.endElement();
+            for (int i = 0; i < l; ++i) {
+                vals[i] = doubleCodec().decodePrim(in);
             }
-            return Arrays.copyOf(arr, i);
+
+            return vals;
         }
     };
 
@@ -606,7 +540,7 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
     public <V> Codec<Map<String, V>, InStream, OutStream, Config> createMapCodec(
             Class<Map<String, V>> type,
             Codec<V, InStream, OutStream, Config> valueCodec) {
-        return new XmlMapCodecs.StringMapCodec<V>(type, valueCodec);
+        return new AvroSchemaMapCodecs.StringMapCodec<V>(type, valueCodec);
     }
 
     @Override
@@ -614,7 +548,7 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
             Class<Map<K, V>> type,
             Codec<K, InStream, OutStream, Config> keyCodec,
             Codec<V, InStream, OutStream, Config> valueCodec) {
-        return new XmlMapCodecs.MapCodec<K, V>(type, keyCodec, valueCodec);
+        return new AvroSchemaMapCodecs.MapCodec<K, V>(type, keyCodec, valueCodec);
     }
 
     @Override
@@ -624,26 +558,40 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
         return new CollectionCodec<T, InStream, OutStream, Config>(collType, elemCodec) {
 
             @Override
+            public OutStream encodeWithCheck(
+                    CodecCoreEx<InStream, OutStream, Config> core,
+                    Collection<T> value,
+                    OutStream out) {
+                if (core.format().encodeNull(value, out)) {
+                    return out;
+                } else if (!core.format().encodeDynamicType(
+                        core,
+                        this,
+                        value,
+                        out,
+                        type -> getCodec(core, type))) {
+                    return encode(core, value, out);
+                } else {
+                    return out;
+                }
+            }
+
+            @Override
             public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Collection<T> value, OutStream out) {
+                out.writeInt(value.size());
                 for (T val : value) {
-                    elemCodec.encodeWithCheck(core, val, out.startElement(config.entryElemName()));
-                    out.endElement();
+                    elemCodec.encodeWithCheck(core, val, out);
                 }
                 return out;
             }
 
             @Override
             public Collection<T> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+                final int l = in.readInt();
                 final CollProxy<T> collProxy = getCollectionProxy(core);
 
-                while (in.hasNext()) {
-                    if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                        break;
-                    }
-
-                    in.startElement(config.entryElemName());
+                for (int i = 0; i < l; ++i) {
                     collProxy.add(elemCodec.decodeWithCheck(core, in));
-                    in.endElement();
                 }
 
                 return collProxy.construct();
@@ -665,31 +613,23 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
             @Override
             public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, T[] value, OutStream out) {
+                out.writeInt(value.length);
                 for (T val : value) {
-                    elemCodec.encodeWithCheck(core, val, out.startElement(config.entryElemName()));
-                    out.endElement();
+                    elemCodec.encodeWithCheck(core, val, out);
                 }
                 return out;
             }
 
             @Override
             public T[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-                T[] arr = (T[]) Array.newInstance(elemCodec.type(), config.defaultArraySize());
-                int i = 0;
-                while (in.hasNext()) {
-                    if (!in.type().equals(InStream.Type.START_ELEMENT)) {
-                        break;
-                    }
+                final int l = in.readInt();
+                final T[] vals = (T[]) Array.newInstance(elemType, l);
 
-                    if (i == arr.length) {
-                        arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
-                    }
-
-                    in.startElement(config.entryElemName());
-                    arr[i++] = elemCodec.decodeWithCheck(core, in);
-                    in.endElement();
+                for (int i = 0; i < l; ++i) {
+                    vals[i] = elemCodec.decodeWithCheck(core, in);
                 }
-                return Arrays.copyOf(arr, i);
+
+                return vals;
             }
         };
     }
@@ -710,18 +650,12 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         private final Class<T> type;
         private final ObjectMeta<T, InStream, OutStream, RA> objMeta;
-        private final Map<String, ObjectMeta.Field<T, InStream, OutStream, RA>> fields;
 
         private ObjectCodec(
                 Class<T> type,
                 ObjectMeta<T, InStream, OutStream, RA> objMeta) {
             this.type = type;
             this.objMeta = objMeta;
-            this.fields = objMeta.stream()
-                    .collect(toLinkedHashMap(
-                            ObjectMeta.Field::name,
-                            f -> f
-                    ));
         }
 
         @Override
@@ -731,42 +665,19 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, T value, OutStream out) {
-            fields.forEach((name, field) -> {
-                field.encodeField(value, out.startElement(field.name()));
-                out.endElement();
-            });
-
+            objMeta.forEach(field ->
+                    field.encodeField(value, out)
+            );
             return out;
         }
 
         @Override
         public T decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-            final Set<String> expKeys = fields.keySet();
-            final Set<String> setFields = new HashSet<>();
-            final RA ra = objMeta.startDecode();
-
-            while(in.hasNext() && in.type().equals(InStream.Type.START_ELEMENT)) {
-                final String name = in.startElement();
-                if (!expKeys.contains(name)) {
-                    throw new CodecException("Field name '" + name + "' unexpected for type " + type +
-                                                     " at location " + in.location());
-                } else if (setFields.contains(name)) {
-                    throw new CodecException("Duplicate field name '" + name + "' for type " + type +
-                                                     " at location " + in.location());
-                }
-
-                setFields.add(name);
-                fields.get(name).decodeField(ra, in);
-                in.endElement();
-            }
-
-            if (!setFields.equals(expKeys)) {
-                // TODO more informative error message.
-                throw new CodecException("Encountered fields differs to expected fields for type " + type +
-                                                 " at location " + in.location());
-            }
-
-            return ra.construct();
+            return Folds.foldLeft(
+                    (acc, field) -> field.decodeField(acc, in),
+                    objMeta.startDecode(),
+                    objMeta
+            ).construct();
         }
     }
 

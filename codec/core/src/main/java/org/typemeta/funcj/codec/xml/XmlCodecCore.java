@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.stream.StreamCodecCoreDelegate;
 import org.typemeta.funcj.codec.xml.XmlTypes.*;
 
 import java.io.*;
@@ -9,7 +10,7 @@ import java.io.*;
  * Interface for classes which implement an encoding via XML.
  */
 public class XmlCodecCore
-        extends CodecCoreDelegate<InStream, OutStream, Config>
+        extends StreamCodecCoreDelegate<InStream, OutStream, Config>
         implements CodecAPI {
 
     public XmlCodecCore(XmlCodecFormat format) {

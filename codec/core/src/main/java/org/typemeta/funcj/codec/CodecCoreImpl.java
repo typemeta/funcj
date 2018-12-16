@@ -1,6 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.*;
 import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.functions.Functions;
@@ -19,11 +18,8 @@ import static java.util.stream.Collectors.toList;
  * @param <CFG>     the config type
  */
 @SuppressWarnings("unchecked")
-public class CodecCoreImpl<
-        IN extends Input<IN>,
-        OUT extends Output<OUT>,
-        CFG extends CodecConfig
-        > implements CodecCoreEx<IN, OUT, CFG> {
+public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
+        implements CodecCoreEx<IN, OUT, CFG> {
 
     /**
      * A map that associates a class with a {@code Codec}.
@@ -252,11 +248,8 @@ public class CodecCoreImpl<
         }
     }
 
-    protected static class InterfaceCodec<
-            T,
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
-            CFG extends CodecConfig> implements Codec<T, IN, OUT, CFG> {
+    protected static class InterfaceCodec<T, IN, OUT, CFG extends CodecConfig>
+            implements Codec<T, IN, OUT, CFG> {
 
         protected final Class<T> clazz;
 

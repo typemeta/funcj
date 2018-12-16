@@ -1,6 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.*;
 
@@ -18,8 +17,8 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class ObjectCodecBuilderWithArgArray<
         T,
-        IN extends Input<IN>,
-        OUT extends Output<OUT>,
+        IN ,
+        OUT,
         CFG extends CodecConfig
         > extends ObjectCodecBuilder {
 

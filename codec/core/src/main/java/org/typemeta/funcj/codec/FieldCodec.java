@@ -1,7 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.*;
-
 import java.lang.reflect.*;
 import java.util.Objects;
 
@@ -14,14 +12,14 @@ import java.util.Objects;
  */
 @SuppressWarnings("unchecked")
 public interface FieldCodec<
-        IN extends Input<IN>,
-        OUT extends Output<OUT>,
+        IN,
+        OUT,
         CFG extends CodecConfig
         > {
 
     abstract class Impl<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > implements FieldCodec<IN, OUT, CFG> {
 
@@ -43,8 +41,8 @@ public interface FieldCodec<
     }
 
     class BooleanFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -73,8 +71,8 @@ public interface FieldCodec<
     }
 
     class BooleanArrayFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -103,8 +101,8 @@ public interface FieldCodec<
     }
 
     class ByteFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -133,8 +131,8 @@ public interface FieldCodec<
     }
 
     class ByteArrayFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -163,8 +161,8 @@ public interface FieldCodec<
     }
 
     class CharFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -193,8 +191,8 @@ public interface FieldCodec<
     }
 
     class CharArrayFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -223,8 +221,8 @@ public interface FieldCodec<
     }
 
     class ShortFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -253,8 +251,8 @@ public interface FieldCodec<
     }
 
     class ShortArrayFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -283,8 +281,8 @@ public interface FieldCodec<
     }
 
     class IntegerFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -312,8 +310,8 @@ public interface FieldCodec<
     }
 
     class IntegerArrayFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -342,8 +340,8 @@ public interface FieldCodec<
     }
 
     class LongFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -372,8 +370,8 @@ public interface FieldCodec<
     }
 
     class LongArrayFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -402,8 +400,8 @@ public interface FieldCodec<
     }
 
     class FloatFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -432,8 +430,8 @@ public interface FieldCodec<
     }
 
     class FloatArrayFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -462,8 +460,8 @@ public interface FieldCodec<
     }
 
     class DoubleFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -492,8 +490,8 @@ public interface FieldCodec<
     }
 
     class DoubleArrayFieldCodec<
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -523,8 +521,8 @@ public interface FieldCodec<
 
     class ObjectFieldCodec<
             T,
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -555,8 +553,8 @@ public interface FieldCodec<
 
     class ObjectArrayFieldCodec<
             T,
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > extends Impl<IN, OUT, CFG> {
 
@@ -585,7 +583,6 @@ public interface FieldCodec<
             setAccessible(false);
         }
     }
-
 
     /**
      * Encode a field within an object into an encoded type {@code OUT}.

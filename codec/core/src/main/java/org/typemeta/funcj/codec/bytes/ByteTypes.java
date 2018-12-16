@@ -1,7 +1,8 @@
 package org.typemeta.funcj.codec.bytes;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecConfig;
 import org.typemeta.funcj.codec.bytes.io.*;
+import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 
 import java.io.*;
 
@@ -17,13 +18,13 @@ public abstract class ByteTypes {
     /**
      * Interface for classes which implement an input stream of bytes
      */
-    public interface InStream extends CodecFormat.Input<InStream> {
+    public interface InStream extends StreamCodecFormat.Input<InStream> {
     }
 
     /**
      * Interface for classes which implement an output stream of bytes
      */
-    public interface OutStream extends CodecFormat.Output<OutStream> {
+    public interface OutStream extends StreamCodecFormat.Output<OutStream> {
     }
 
     public static InStream inputOf(InputStream is) {

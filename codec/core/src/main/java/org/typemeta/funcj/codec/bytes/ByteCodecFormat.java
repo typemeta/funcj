@@ -2,6 +2,7 @@ package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ByteTypes.*;
+import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Folds;
 
@@ -12,7 +13,7 @@ import java.util.*;
  * Encoding via byte streams.
  */
 @SuppressWarnings("unchecked")
-public class ByteCodecFormat implements CodecFormat<InStream, OutStream, Config> {
+public class ByteCodecFormat implements StreamCodecFormat<InStream, OutStream, Config> {
 
     protected final Config config;
 

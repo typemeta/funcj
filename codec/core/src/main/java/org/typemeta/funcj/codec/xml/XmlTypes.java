@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecConfig;
+import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.codec.xml.io.*;
 
 import javax.xml.stream.*;
@@ -30,7 +31,7 @@ public class XmlTypes {
     /**
      * Interface for classes which implement an input stream of XML events
      */
-    public interface InStream extends CodecFormat.Input<InStream> {
+    public interface InStream extends StreamCodecFormat.Input<InStream> {
         enum Type {
             START_DOCUMENT,
             END_DOCUMENT,
@@ -74,7 +75,7 @@ public class XmlTypes {
     /**
      * Interface for classes which implement an output stream of XML events
      */
-    public interface OutStream extends CodecFormat.Output<OutStream> {
+    public interface OutStream extends StreamCodecFormat.Output<OutStream> {
         void close();
 
         OutStream startDocument();

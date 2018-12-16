@@ -1,6 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.*;
 import org.typemeta.funcj.functions.Functions;
 
 import java.util.Objects;
@@ -13,12 +12,8 @@ import java.util.Objects;
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
  */
-public class CodecRef<
-        T,
-        IN extends Input<IN>,
-        OUT extends Output<OUT>,
-        CFG extends CodecConfig
-        > implements Codec<T, IN, OUT, CFG> {
+public class CodecRef<T, IN, OUT, CFG extends CodecConfig>
+        implements Codec<T, IN, OUT, CFG> {
 
     private enum Uninitialised implements Codec {
         INSTANCE;
@@ -29,17 +24,17 @@ public class CodecRef<
         }
 
         @Override
-        public Output encode(
+        public Object encode(
                 CodecCoreEx core,
                 Object value,
-                Output output) {
+                Object output) {
             throw error();
         }
 
         @Override
         public Object decode(
                 CodecCoreEx core,
-                Input input) {
+                Object input) {
             throw error();
         }
 

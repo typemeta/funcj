@@ -1,7 +1,8 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecConfig;
 import org.typemeta.funcj.codec.json.io.*;
+import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ public class JsonTypes {
     /**
      * Interface for classes which implement an input stream of JSON events
      */
-    public interface InStream extends CodecFormat.Input<InStream> {
+    public interface InStream extends StreamCodecFormat.Input<InStream> {
         interface Event {
             Type type();
 
@@ -180,7 +181,7 @@ public class JsonTypes {
     /**
      * Interface for classes which implement an output stream of JSON events
      */
-    public interface OutStream extends CodecFormat.Output<OutStream> {
+    public interface OutStream extends StreamCodecFormat.Output<OutStream> {
 
         OutStream writeNull();
 

@@ -1,14 +1,18 @@
-package org.typemeta.funcj.codec;
+package org.typemeta.funcj.codec.stream;
 
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.functions.Functions;
 
-public class CodecCoreDelegate<IN, OUT, CFG extends CodecConfig>
-        implements CodecCore<IN, OUT, CFG> {
+public class StreamCodecCoreDelegate<
+        IN extends StreamCodecFormat.Input<IN>,
+        OUT extends StreamCodecFormat.Output<OUT>,
+        CFG extends CodecConfig
+        > implements CodecCore<IN, OUT, CFG> {
 
     protected final CodecCore<IN, OUT, CFG> delegate;
 
-    public CodecCoreDelegate(CodecCore<IN, OUT, CFG> delegate) {
+    public StreamCodecCoreDelegate(CodecCore<IN, OUT, CFG> delegate) {
         this.delegate = delegate;
     }
 

@@ -1,6 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.*;
 import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 
 import java.lang.reflect.Field;
@@ -13,11 +12,7 @@ import java.util.function.Supplier;
  * @param <OUT>     the encoded output type
  * @param <CFG>     the config type
  */
-public interface CodecCoreEx<
-        IN extends Input<IN>,
-        OUT extends Output<OUT>,
-        CFG extends CodecConfig
-        > extends CodecCore<IN, OUT, CFG> {
+public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore<IN, OUT, CFG> {
 
     CodecFormat<IN, OUT, CFG> format();
 

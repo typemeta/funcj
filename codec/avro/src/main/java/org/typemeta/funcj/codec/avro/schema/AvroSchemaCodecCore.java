@@ -1,27 +1,27 @@
-package org.typemeta.funcj.codec.mpack;
+package org.typemeta.funcj.codec.avro.schema;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.stream.StreamCodecCoreDelegate;
+import org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.*;
 
 import java.io.*;
 
 /**
- * Interface for classes which implement an encoding via MessagePack.
+ * Interface for classes which implement an encoding Avro Schemas.
  */
-public class MpackCodecCore
-        extends StreamCodecCoreDelegate<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>
+public class AvroSchemaCodecCore
+        extends CodecCoreDelegate<InStream, OutStream, Config>
         implements CodecAPI {
 
-    public MpackCodecCore(MpackCodecFormat format) {
+    public AvroSchemaCodecCore(AvroSchemaCodecFormat format) {
         super(new CodecCoreImpl<>(format));
     }
 
-    public MpackCodecCore(MpackTypes.Config config) {
-        this(new MpackCodecFormat(config));
+    public AvroSchemaCodecCore(Config config) {
+        this(new AvroSchemaCodecFormat(config));
     }
 
-    public MpackCodecCore() {
-        this(new MpackConfigImpl());
+    public AvroSchemaCodecCore() {
+        this(new AvroSchemaConfigImpl());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MpackCodecCore
      * @param <T>       the static type of the value
      */
     public <T> void encode(Class<? super T> type, T value, OutputStream os) {
-        try (final MpackTypes.OutStream out = MpackTypes.outputOf(os)) {
+        try (final OutStream out = AvroSchemaTypes.outputOf(os)) {
             encode(type, value, out);
         }
     }
@@ -58,7 +58,7 @@ public class MpackCodecCore
      */
     @Override
     public <T> T decode(Class<? super T> type, InputStream is) {
-        try (final MpackTypes.InStream in = MpackTypes.inputOf(is)) {
+        try (final InStream in = AvroSchemaTypes.inputOf(is)) {
             return decode(type, in);
         }
     }

@@ -1,15 +1,15 @@
 package org.typemeta.funcj.codec.mpack;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.bytes.ByteCodecCore;
+import org.typemeta.funcj.codec.mpack.MpackTypes.*;
 
 import java.math.BigInteger;
 
 public abstract class MpackCodecs extends Codecs {
 
     /**
-     * Construct and return a new instance of a {@link ByteCodecCore}.
-     * @return the new {@code ByteCodecCore}
+     * Construct and return a new instance of a {@link MpackCodecCore}.
+     * @return the new {@code MpackCodecCore}
      */
     public static MpackCodecCore mpackCodec() {
         final MpackCodecCore core = registerAll(new MpackCodecCore());
@@ -19,7 +19,7 @@ public abstract class MpackCodecs extends Codecs {
         return core;
     }
 
-    private static class BigIntegerCodec implements Codec<BigInteger, MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> {
+    private static class BigIntegerCodec implements Codec<BigInteger, InStream, OutStream, Config> {
 
         @Override
         public Class<BigInteger> type() {
@@ -27,17 +27,17 @@ public abstract class MpackCodecs extends Codecs {
         }
 
         @Override
-        public MpackTypes.OutStream encode(
-                CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core,
+        public OutStream encode(
+                CodecCoreEx<InStream, OutStream, Config> core,
                 BigInteger value,
-                MpackTypes.OutStream out) {
+                OutStream out) {
             return out.writeBigInteger(value);
         }
 
         @Override
         public BigInteger decode(
-                CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core,
-                MpackTypes.InStream in) {
+                CodecCoreEx<InStream, OutStream, Config> core,
+                InStream in) {
             return in.readBigInteger();
         }
     }

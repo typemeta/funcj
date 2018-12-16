@@ -5,8 +5,8 @@ import org.typemeta.funcj.functions.Functions;
 public class ObjectCodecBuilder {
     public static class FieldCodec<
             T,
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
+            IN,
+            OUT,
             CFG extends CodecConfig
             > {
         protected final Functions.F3<CodecCoreEx<IN, OUT, CFG>, T, OUT, OUT> encoder;

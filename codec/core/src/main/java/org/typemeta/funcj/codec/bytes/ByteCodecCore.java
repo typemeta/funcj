@@ -2,6 +2,7 @@ package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ByteTypes.*;
+import org.typemeta.funcj.codec.stream.StreamCodecCoreDelegate;
 
 import java.io.*;
 
@@ -9,7 +10,7 @@ import java.io.*;
  * Interface for classes which implement an encoding via byte streams.
  */
 public class ByteCodecCore
-        extends CodecCoreDelegate<InStream, OutStream, Config>
+        extends StreamCodecCoreDelegate<InStream, OutStream, Config>
         implements CodecAPI {
 
     public ByteCodecCore(ByteCodecFormat format) {

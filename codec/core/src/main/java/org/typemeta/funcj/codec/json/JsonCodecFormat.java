@@ -2,6 +2,7 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
+import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.functions.Functions;
 
 import java.lang.reflect.*;
@@ -13,7 +14,7 @@ import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
  * Encoding via JSON streams.
  */
 @SuppressWarnings("unchecked")
-public class JsonCodecFormat implements CodecFormat<InStream, OutStream, Config> {
+public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, Config> {
 
     protected final Config config;
 

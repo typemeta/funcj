@@ -1,6 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.CodecFormat.*;
 import org.typemeta.funcj.codec.bytes.ByteCodecCore;
 import org.typemeta.funcj.codec.json.JsonCodecCore;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
@@ -41,12 +40,7 @@ public abstract class Codecs {
     }
 
     @SuppressWarnings("unchecked")
-    public static <
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
-            CFG extends CodecConfig,
-            CORE extends CodecCore<IN, OUT, CFG>
-            > CORE registerAll(CORE core) {
+    public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>> CORE registerAll(CORE core) {
 
         // Register allowed packages and classes.
 
@@ -268,12 +262,8 @@ public abstract class Codecs {
      * @param <IN>      the encoded input type
      * @param <OUT>     the encoded output type
      */
-    public static class StringProxyCodec<
-            T,
-            IN extends Input<IN>,
-            OUT extends Output<OUT>,
-            CFG extends CodecConfig
-            > implements Codec<T, IN, OUT, CFG> {
+    public static class StringProxyCodec<T, IN, OUT, CFG extends CodecConfig>
+            implements Codec<T, IN, OUT, CFG> {
 
         protected final Class<T> type;
         protected final F<T, String> encode;

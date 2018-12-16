@@ -3,9 +3,8 @@ package org.typemeta.funcj.codec;
 import org.junit.Test;
 import org.typemeta.funcj.codec.misc.SimpleType;
 
-import java.awt.color.ColorSpace;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Optional;
 
 import static org.typemeta.funcj.codec.TestTypes.*;
 
@@ -16,12 +15,8 @@ public abstract class TestBase {
 
     protected abstract <T> void roundTrip(T val, Class<T> clazz) throws Exception;
 
-    protected static <
-            IN extends CodecFormat.Input<IN>,
-            OUT extends CodecFormat.Output<OUT>,
-            CFG extends CodecConfig,
-            CC extends CodecCore<IN, OUT, CFG>
-             > CC prepareCodecCore(CC core) {
+    protected static <IN, OUT, CFG extends CodecConfig, CC extends CodecCore<IN, OUT, CFG>>
+    CC prepareCodecCore(CC core) {
 
         core.config().registerAllowedPackage(TestTypes.class.getPackage());
 
