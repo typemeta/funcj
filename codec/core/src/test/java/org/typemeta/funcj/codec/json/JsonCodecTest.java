@@ -14,13 +14,13 @@ public class JsonCodecTest extends TestBase {
         final StringWriter sw = new StringWriter();
         codec.encode(clazz, val, sw);
 
-        if (printData) {
+        if (printData()) {
             System.out.println(sw);
         }
 
         final String data = sw.toString();
 
-        if (printSizes) {
+        if (printSizes()) {
             System.out.println("Encoded JSON " + clazz.getSimpleName() + " data size = " + data.length() + " chars");
         }
 
@@ -28,7 +28,7 @@ public class JsonCodecTest extends TestBase {
 
         final T val2 = codec.decode(clazz, sr);
 
-        if (!printData && !val.equals(val2)) {
+        if (!printData() && !val.equals(val2)) {
             System.out.println(sw);
         }
 

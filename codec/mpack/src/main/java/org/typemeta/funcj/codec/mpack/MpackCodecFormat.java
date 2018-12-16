@@ -102,7 +102,7 @@ public class MpackCodecFormat
 
         @Override
         public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, boolean[] value, MpackTypes.OutStream out) {
-            out.writeInt(value.length);
+            out.startArray(value.length);
             for (boolean val : value) {
                 booleanCodec().encodePrim(val, out);
             }
@@ -111,7 +111,7 @@ public class MpackCodecFormat
 
         @Override
         public boolean[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-            final int l = in.readInt();
+            final int l = in.startArray();
             final boolean[] vals = new boolean[l];
 
             for (int i = 0; i < l; ++i) {
@@ -157,7 +157,7 @@ public class MpackCodecFormat
 
         @Override
         public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, byte[] value, MpackTypes.OutStream out) {
-            out.writeInt(value.length);
+            out.startArray(value.length);
             for (byte val : value) {
                 byteCodec().encodePrim(val, out);
             }
@@ -166,7 +166,7 @@ public class MpackCodecFormat
 
         @Override
         public byte[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-            final int l = in.readInt();
+            final int l = in.startArray();
             final byte[] vals = new byte[l];
 
             for (int i = 0; i < l; ++i) {
@@ -212,7 +212,7 @@ public class MpackCodecFormat
 
         @Override
         public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, char[] value, MpackTypes.OutStream out) {
-            out.writeInt(value.length);
+            out.startArray(value.length);
             for (char val : value) {
                 charCodec().encodePrim(val, out);
             }
@@ -221,7 +221,7 @@ public class MpackCodecFormat
 
         @Override
         public char[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-            final int l = in.readInt();
+            final int l = in.startArray();
             final char[] vals = new char[l];
 
             for (int i = 0; i < l; ++i) {
@@ -267,7 +267,7 @@ public class MpackCodecFormat
 
         @Override
         public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, short[] value, MpackTypes.OutStream out) {
-            out.writeInt(value.length);
+            out.startArray(value.length);
             for (short val : value) {
                 shortCodec().encodePrim(val, out);
             }
@@ -276,7 +276,7 @@ public class MpackCodecFormat
 
         @Override
         public short[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-            final int l = in.readInt();
+            final int l = in.startArray();
             final short[] vals = new short[l];
 
             for (int i = 0; i < l; ++i) {
@@ -322,7 +322,7 @@ public class MpackCodecFormat
 
         @Override
         public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, int[] value, MpackTypes.OutStream out) {
-            out.writeInt(value.length);
+            out.startArray(value.length);
             for (int val : value) {
                 intCodec().encodePrim(val, out);
             }
@@ -331,7 +331,7 @@ public class MpackCodecFormat
 
         @Override
         public int[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-            final int l = in.readInt();
+            final int l = in.startArray();
             final int[] vals = new int[l];
 
             for (int i = 0; i < l; ++i) {
@@ -377,7 +377,7 @@ public class MpackCodecFormat
 
         @Override
         public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, long[] value, MpackTypes.OutStream out) {
-            out.writeInt(value.length);
+            out.startArray(value.length);
             for (long val : value) {
                 longCodec().encodePrim(val, out);
             }
@@ -386,7 +386,7 @@ public class MpackCodecFormat
 
         @Override
         public long[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-            final int l = in.readInt();
+            final int l = in.startArray();
             final long[] vals = new long[l];
 
             for (int i = 0; i < l; ++i) {
@@ -432,7 +432,7 @@ public class MpackCodecFormat
 
         @Override
         public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, float[] value, MpackTypes.OutStream out) {
-            out.writeInt(value.length);
+            out.startArray(value.length);
             for (float val : value) {
                 floatCodec().encodePrim(val, out);
             }
@@ -441,7 +441,7 @@ public class MpackCodecFormat
 
         @Override
         public float[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-            final int l = in.readInt();
+            final int l = in.startArray();
             final float[] vals = new float[l];
 
             for (int i = 0; i < l; ++i) {
@@ -487,7 +487,7 @@ public class MpackCodecFormat
 
         @Override
         public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, double[] value, MpackTypes.OutStream out) {
-            out.writeInt(value.length);
+            out.startArray(value.length);
             for (double val : value) {
                 doubleCodec().encodePrim(val, out);
             }
@@ -496,7 +496,7 @@ public class MpackCodecFormat
 
         @Override
         public double[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-            final int l = in.readInt();
+            final int l = in.startArray();
             final double[] vals = new double[l];
 
             for (int i = 0; i < l; ++i) {
@@ -579,7 +579,7 @@ public class MpackCodecFormat
 
             @Override
             public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, Collection<T> value, MpackTypes.OutStream out) {
-                out.writeInt(value.size());
+                out.startArray(value.size());
                 for (T val : value) {
                     elemCodec.encodeWithCheck(core, val, out);
                 }
@@ -588,7 +588,7 @@ public class MpackCodecFormat
 
             @Override
             public Collection<T> decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-                final int l = in.readInt();
+                final int l = in.startArray();
                 final CollProxy<T> collProxy = getCollectionProxy(core);
 
                 for (int i = 0; i < l; ++i) {
@@ -614,7 +614,7 @@ public class MpackCodecFormat
 
             @Override
             public MpackTypes.OutStream encode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, T[] value, MpackTypes.OutStream out) {
-                out.writeInt(value.length);
+                out.startArray(value.length);
                 for (T val : value) {
                     elemCodec.encodeWithCheck(core, val, out);
                 }
@@ -623,7 +623,7 @@ public class MpackCodecFormat
 
             @Override
             public T[] decode(CodecCoreEx<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config> core, MpackTypes.InStream in) {
-                final int l = in.readInt();
+                final int l = in.startArray();
                 final T[] vals = (T[]) Array.newInstance(elemType, l);
 
                 for (int i = 0; i < l; ++i) {

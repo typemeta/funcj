@@ -10,8 +10,13 @@ import static org.typemeta.funcj.codec.TestTypes.*;
 
 public abstract class TestBase {
 
-    protected static final boolean printData = false;
-    protected static final boolean printSizes = false;
+    protected boolean printData() {
+        return false;
+    }
+
+    protected boolean printSizes() {
+        return false;
+    }
 
     protected abstract <T> void roundTrip(T val, Class<T> clazz) throws Exception;
 

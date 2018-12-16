@@ -1,7 +1,9 @@
 package org.typemeta.funcj.codec.avro.schema;
 
+import org.apache.avro.Schema;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.*;
+import org.typemeta.funcj.data.Unit;
 
 import java.io.*;
 
@@ -9,7 +11,7 @@ import java.io.*;
  * Interface for classes which implement an encoding Avro Schemas.
  */
 public class AvroSchemaCodecCore
-        extends CodecCoreDelegate<InStream, OutStream, Config>
+        extends CodecCoreDelegate<Unit, Schema, Config>
         implements CodecAPI {
 
     public AvroSchemaCodecCore(AvroSchemaCodecFormat format) {

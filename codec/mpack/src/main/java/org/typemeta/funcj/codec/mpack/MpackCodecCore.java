@@ -26,12 +26,12 @@ public class MpackCodecCore
 
     @Override
     public <T> void encode(Class<? super T> clazz, T value, Writer wtr) {
-        throw new CodecException("Not supported");
+        throw new NotSupportedException();
     }
 
     @Override
     public <T> T decode(Class<? super T> clazz, Reader rdr) {
-        throw new CodecException("Not supported");
+        throw new NotSupportedException();
     }
 
     /**
