@@ -18,18 +18,18 @@ public class MpackCodecTest extends TestBase {
 
         final byte[] ba = baos.toByteArray();
 
-        if (printData) {
+        if (printData()) {
             System.out.println(DatatypeConverter.printHexBinary(ba));
         }
 
-        if (printSizes) {
+        if (printSizes()) {
             System.out.println("Encoded MessagePack " + clazz.getSimpleName() + " data size = " + ba.length + " bytes");
         }
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(ba);
         final T val2 = codec.decode(clazz, bais);
 
-        if (!printData && !val.equals(val2)) {
+        if (!printData() && !val.equals(val2)) {
             System.out.println(DatatypeConverter.printHexBinary(ba));
         }
 
