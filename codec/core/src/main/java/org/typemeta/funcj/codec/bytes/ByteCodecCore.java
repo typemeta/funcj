@@ -3,6 +3,7 @@ package org.typemeta.funcj.codec.bytes;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ByteTypes.*;
 import org.typemeta.funcj.codec.stream.StreamCodecCoreDelegate;
+import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.io.*;
 

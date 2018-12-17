@@ -1,5 +1,6 @@
-package org.typemeta.funcj.codec;
+package org.typemeta.funcj.codec.utils;
 
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.functions.Functions;
 
 import java.util.Objects;
@@ -50,7 +51,7 @@ public class CodecRef<T, IN, OUT, CFG extends CodecConfig>
     private Codec<T, IN, OUT, CFG> impl;
 
     @SuppressWarnings("unchecked")
-    CodecRef() {
+    public CodecRef() {
         this.impl = Uninitialised.of();
     }
 

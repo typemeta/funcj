@@ -3,6 +3,7 @@ package org.typemeta.funcj.codec.json;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.MapCodecs.*;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
+import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.util.Map;
 

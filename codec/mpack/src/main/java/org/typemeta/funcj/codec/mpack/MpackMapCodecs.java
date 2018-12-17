@@ -22,9 +22,9 @@ public abstract class MpackMapCodecs {
                 CodecCoreEx<InStream, OutStream, Config> core,
                 Map<K, V> value,
                 OutStream out) {
-            if (core.format().encodeNull(value, out)) {
+            if (core.format().encodeNull(value, out)._1) {
                 return out;
-            } else if (!core.format().encodeDynamicType(core,this, value, out, clazz -> getCodec(core, clazz))) {
+            } else if (!core.format().encodeDynamicType(core,this, value, out, clazz -> getCodec(core, clazz))._1) {
                 return encode(core, value, out);
             } else {
                 return out;
@@ -72,9 +72,9 @@ public abstract class MpackMapCodecs {
                 CodecCoreEx<InStream, OutStream, Config> core,
                 Map<String, V> value,
                 OutStream out) {
-            if (core.format().encodeNull(value, out)) {
+            if (core.format().encodeNull(value, out)._1) {
                 return out;
-            } else if (!core.format().encodeDynamicType(core, this, value, out, clazz -> getCodec(core, clazz))) {
+            } else if (!core.format().encodeDynamicType(core, this, value, out, clazz -> getCodec(core, clazz))._1) {
                 return encode(core, value, out);
             } else {
                 return out;

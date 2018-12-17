@@ -1,5 +1,7 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.tuples.Tuple2;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -32,15 +34,26 @@ public abstract class MapCodecs {
 
         @Override
         public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Map<K, V> value, OUT out) {
-            if (core.format().encodeNull(value, out)) {
-                return out;
+            final Tuple2<Boolean, OUT> nullRes = core.format().encodeNull(value, out);
+            if (nullRes._1) {
+                return nullRes._2;
             } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
                 final Class<Map<K, V>> implCollType = core.config().getDefaultCollectionType(type());
                 return getCodec(core, implCollType).encode(core, value, out);
-            } else if (!core.format().encodeDynamicType(core,this, value, out, clazz -> getCodec(core, clazz))) {
-                return encode(core, value, out);
             } else {
-                return out;
+                final Tuple2<Boolean, OUT> dynRes =
+                        core.format().encodeDynamicType(
+                                core,
+                                this,
+                                value,
+                                out,
+                                clazz -> getCodec(core, clazz)
+                        );
+                if (dynRes._1) {
+                    return dynRes._2;
+                } else {
+                    return encode(core, value, out);
+                }
             }
         }
 
@@ -105,15 +118,26 @@ public abstract class MapCodecs {
 
         @Override
         public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Map<String, V> value, OUT out) {
-            if (core.format().encodeNull(value, out)) {
-                return out;
+            final Tuple2<Boolean, OUT> nullRes = core.format().encodeNull(value, out);
+            if (nullRes._1) {
+                return nullRes._2;
             } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
                 final Class<Map<String, V>> implCollType = core.config().getDefaultCollectionType(type());
                 return getCodec(core, implCollType).encode(core, value, out);
-            } else if (!core.format().encodeDynamicType(core, this, value, out, clazz -> getCodec(core, clazz))) {
-                return encode(core, value, out);
             } else {
-                return out;
+                final Tuple2<Boolean, OUT> dynRes =
+                        core.format().encodeDynamicType(
+                                core,
+                                this,
+                                value,
+                                out,
+                                clazz -> getCodec(core, clazz)
+                        );
+                if (dynRes._1) {
+                    return dynRes._2;
+                } else {
+                    return encode(core, value, out);
+                }
             }
         }
 

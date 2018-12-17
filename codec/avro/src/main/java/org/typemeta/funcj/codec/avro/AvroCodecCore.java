@@ -3,6 +3,7 @@ package org.typemeta.funcj.codec.avro;
 import org.apache.avro.Schema;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
+import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.data.Unit;
 
 import java.io.*;

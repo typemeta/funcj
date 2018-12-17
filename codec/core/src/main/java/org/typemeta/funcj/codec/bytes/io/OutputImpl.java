@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.bytes.io;
 
-import org.typemeta.funcj.codec.CodecException;
+import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.bytes.ByteTypes;
 
 import java.io.*;

@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.avro.io;
 
 import org.msgpack.core.MessageUnpacker;
-import org.typemeta.funcj.codec.CodecException;
+import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.avro.AvroTypes;
 
 import java.io.IOException;

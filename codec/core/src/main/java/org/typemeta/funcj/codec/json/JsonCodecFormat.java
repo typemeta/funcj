@@ -3,7 +3,9 @@ package org.typemeta.funcj.codec.json;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
+import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -28,12 +30,12 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> boolean encodeNull(T val, OutStream out) {
+    public <T> Tuple2<Boolean, OutStream> encodeNull(T val, OutStream out) {
         if (val == null) {
             out.writeNull();
-            return true;
+            return Tuple2.of(true, out);
         } else {
-            return false;
+            return Tuple2.of(false, out);
         }
     }
 
@@ -48,7 +50,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> boolean encodeDynamicType(
+    public <T> Tuple2<Boolean, OutStream> encodeDynamicType(
             CodecCoreEx<InStream, OutStream, Config> core,
             Codec<T, InStream, OutStream, Config> codec,
             T val,
@@ -56,7 +58,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             Functions.F<Class<T>, Codec<T, InStream, OutStream, Config>> getDynCodec) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
-            return false;
+            return Tuple2.of(false, out);
         } else {
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             out.startObject();
@@ -67,7 +69,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             dynCodec.encode(core, val, out);
 
             out.endObject();
-            return true;
+            return Tuple2.of(true, out);
         }
     }
 

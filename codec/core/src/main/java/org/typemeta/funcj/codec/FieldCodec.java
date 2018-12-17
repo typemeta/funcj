@@ -1,5 +1,7 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.utils.CodecException;
+
 import java.lang.reflect.*;
 import java.util.Objects;
 

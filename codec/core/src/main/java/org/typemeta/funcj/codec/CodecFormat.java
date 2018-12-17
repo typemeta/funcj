@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import java.util.*;
 
@@ -15,11 +16,11 @@ public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
 
     CFG config();
 
-    <T> boolean encodeNull(T val, OUT out);
+    <T> Tuple2<Boolean, OUT> encodeNull(T val, OUT out);
 
     boolean decodeNull(IN in);
 
-    <T> boolean encodeDynamicType(
+    <T> Tuple2<Boolean, OUT> encodeDynamicType(
             CodecCoreEx<IN, OUT, CFG> core,
             Codec<T, IN, OUT, CFG> codec,
             T val,

@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec;
+package org.typemeta.funcj.codec.utils;
 
 /**
  * ClassKey wraps classes in an outer class which supports use as a key in collections.

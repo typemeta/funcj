@@ -2,6 +2,7 @@ package org.typemeta.funcj.codec;
 
 import org.junit.Test;
 import org.typemeta.funcj.codec.misc.SimpleType;
+import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.time.LocalDate;
 import java.util.Optional;

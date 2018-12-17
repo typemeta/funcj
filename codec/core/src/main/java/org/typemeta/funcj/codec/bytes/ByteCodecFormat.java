@@ -4,6 +4,7 @@ import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ByteTypes.*;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.tuples.Tuple2;
 import org.typemeta.funcj.util.Folds;
 
 import java.lang.reflect.*;
@@ -31,10 +32,10 @@ public class ByteCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> boolean encodeNull(T val, OutStream out) {
+    public <T> Tuple2<Boolean, OutStream> encodeNull(T val, OutStream out) {
         final boolean isNull = val == null;
         out.writeBoolean(isNull);
-        return isNull;
+        return Tuple2.of(isNull, out);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class ByteCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> boolean encodeDynamicType(
+    public <T> Tuple2<Boolean, OutStream> encodeDynamicType(
             CodecCoreEx<InStream, OutStream, Config> core,
             Codec<T, InStream, OutStream, Config> codec,
             T val,
@@ -52,13 +53,13 @@ public class ByteCodecFormat implements StreamCodecFormat<InStream, OutStream, C
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             out.writeBoolean(false);
-            return false;
+            return Tuple2.of(false, out);
         } else {
             out.writeBoolean(true);
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             out.writeString(config().classToName(dynType));
             dynCodec.encode(core, val, out);
-            return true;
+            return Tuple2.of(true, out);
         }
     }
 
@@ -563,14 +564,14 @@ public class ByteCodecFormat implements StreamCodecFormat<InStream, OutStream, C
                     CodecCoreEx<InStream, OutStream, Config> core,
                     Collection<T> value,
                     OutStream out) {
-                if (core.format().encodeNull(value, out)) {
+                if (core.format().encodeNull(value, out)._1) {
                     return out;
                 } else if (!core.format().encodeDynamicType(
                         core,
                         this,
                         value,
                         out,
-                        type -> getCodec(core, type))) {
+                        type -> getCodec(core, type))._1) {
                     return encode(core, value, out);
                 } else {
                     return out;

@@ -1,8 +1,11 @@
 package org.typemeta.funcj.codec.avro.schema;
 
+import org.apache.avro.Schema;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.*;
+import org.typemeta.funcj.data.Unit;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.tuples.Tuple2;
 import org.typemeta.funcj.util.Folds;
 
 import java.lang.reflect.*;
@@ -12,7 +15,7 @@ import java.util.*;
  * Encoding via byte streams.
  */
 @SuppressWarnings("unchecked")
-public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, Config> {
+public class AvroSchemaCodecFormat implements CodecFormat<Unit, Schema, Config> {
 
     protected final Config config;
 
@@ -30,31 +33,31 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> boolean encodeNull(T val, OutStream out) {
+    public <T> Tuple2<Boolean, Schema> encodeNull(T val, Schema out) {
         final boolean isNull = val == null;
         out.writeBoolean(isNull);
         return isNull;
     }
 
     @Override
-    public boolean decodeNull(InStream in) {
+    public boolean decodeNull(Unit in) {
         return in.readBoolean();
     }
 
     @Override
     public <T> boolean encodeDynamicType(
-            CodecCoreEx<InStream, OutStream, Config> core,
-            Codec<T, InStream, OutStream, Config> codec,
+            CodecCoreEx<Unit, Schema, Config> core,
+            Codec<T, Unit, Schema, Config> codec,
             T val,
-            OutStream out,
-            Functions.F<Class<T>, Codec<T, InStream, OutStream, Config>> getDynCodec) {
+            Schema out,
+            Functions.F<Class<T>, Codec<T, Unit, Schema, Config>> getDynCodec) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             out.writeBoolean(false);
             return false;
         } else {
             out.writeBoolean(true);
-            final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
+            final Codec<T, Unit, Schema, Config> dynCodec = getDynCodec.apply(dynType);
             out.writeString(config().classToName(dynType));
             dynCodec.encode(core, val, out);
             return true;
@@ -62,7 +65,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> T decodeDynamicType(InStream in, Functions.F<String, T> decoder) {
+    public <T> T decodeDynamicType(Unit in, Functions.F<String, T> decoder) {
         if (in.readBoolean()) {
             final String typeName = in.readString();
             return decoder.apply(typeName);
@@ -71,28 +74,28 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
     }
 
-    protected static class BooleanCodec implements Codec.BooleanCodec<InStream, OutStream, Config> {
+    protected static class BooleanCodec implements Codec.BooleanCodec<Unit, Schema, Config> {
 
         @Override
-        public OutStream encodePrim(boolean val, OutStream out) {
+        public Schema encodePrim(boolean val, Schema out) {
             return out.writeBoolean(val);
         }
 
         @Override
-        public boolean decodePrim(InStream in) {
+        public boolean decodePrim(Unit in) {
             return in.readBoolean();
         }
     }
 
-    protected final Codec.BooleanCodec<InStream, OutStream, Config> booleanCodec = new BooleanCodec();
+    protected final Codec.BooleanCodec<Unit, Schema, Config> booleanCodec = new BooleanCodec();
 
     @Override
-    public Codec.BooleanCodec<InStream, OutStream, Config> booleanCodec() {
+    public Codec.BooleanCodec<Unit, Schema, Config> booleanCodec() {
         return booleanCodec;
     }
 
-    protected final Codec<boolean[], InStream, OutStream, Config> booleanArrayCodec =
-            new Codec<boolean[], InStream, OutStream, Config>() {
+    protected final Codec<boolean[], Unit, Schema, Config> booleanArrayCodec =
+            new Codec<boolean[], Unit, Schema, Config>() {
 
         @Override
         public Class<boolean[]> type() {
@@ -100,7 +103,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, boolean[] value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, boolean[] value, Schema out) {
             out.writeInt(value.length);
             for (boolean val : value) {
                 booleanCodec().encodePrim(val, out);
@@ -109,7 +112,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public boolean[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public boolean[] decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             final int l = in.readInt();
             final boolean[] vals = new boolean[l];
 
@@ -122,32 +125,32 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     };
 
     @Override
-    public Codec<boolean[], InStream, OutStream, Config> booleanArrayCodec() {
+    public Codec<boolean[], Unit, Schema, Config> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
-    protected static class ByteCodec implements Codec.ByteCodec<InStream, OutStream, Config> {
+    protected static class ByteCodec implements Codec.ByteCodec<Unit, Schema, Config> {
 
         @Override
-        public OutStream encodePrim(byte val, OutStream out) {
+        public Schema encodePrim(byte val, Schema out) {
             return out.writeByte(val);
         }
 
         @Override
-        public byte decodePrim(InStream in) {
+        public byte decodePrim(Unit in) {
             return in.readByte();
         }
     }
 
-    protected final Codec.ByteCodec<InStream, OutStream, Config> byteCodec = new ByteCodec();
+    protected final Codec.ByteCodec<Unit, Schema, Config> byteCodec = new ByteCodec();
 
     @Override
-    public Codec.ByteCodec<InStream, OutStream, Config> byteCodec() {
+    public Codec.ByteCodec<Unit, Schema, Config> byteCodec() {
         return byteCodec;
     }
 
-    protected final Codec<byte[], InStream, OutStream, Config> byteArrayCodec =
-            new Codec<byte[], InStream, OutStream, Config>() {
+    protected final Codec<byte[], Unit, Schema, Config> byteArrayCodec =
+            new Codec<byte[], Unit, Schema, Config>() {
 
         @Override
         public Class<byte[]> type() {
@@ -155,7 +158,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, byte[] value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, byte[] value, Schema out) {
             out.writeInt(value.length);
             for (byte val : value) {
                 byteCodec().encodePrim(val, out);
@@ -164,7 +167,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public byte[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public byte[] decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             final int l = in.readInt();
             final byte[] vals = new byte[l];
 
@@ -177,32 +180,32 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     };
 
     @Override
-    public Codec<byte[], InStream, OutStream, Config> byteArrayCodec() {
+    public Codec<byte[], Unit, Schema, Config> byteArrayCodec() {
         return byteArrayCodec;
     }
 
-    protected static class CharCodec implements Codec.CharCodec<InStream, OutStream, Config> {
+    protected static class CharCodec implements Codec.CharCodec<Unit, Schema, Config> {
 
         @Override
-        public OutStream encodePrim(char val, OutStream out) {
+        public Schema encodePrim(char val, Schema out) {
             return out.writeChar(val);
         }
 
         @Override
-        public char decodePrim(InStream in ) {
+        public char decodePrim(Unit in ) {
             return in.readChar();
         }
     }
 
-    protected final Codec.CharCodec<InStream, OutStream, Config> charCodec = new CharCodec();
+    protected final Codec.CharCodec<Unit, Schema, Config> charCodec = new CharCodec();
 
     @Override
-    public Codec.CharCodec<InStream, OutStream, Config> charCodec() {
+    public Codec.CharCodec<Unit, Schema, Config> charCodec() {
         return charCodec;
     }
 
-    protected final Codec<char[], InStream, OutStream, Config> charArrayCodec =
-            new Codec<char[], InStream, OutStream, Config>() {
+    protected final Codec<char[], Unit, Schema, Config> charArrayCodec =
+            new Codec<char[], Unit, Schema, Config>() {
 
         @Override
         public Class<char[]> type() {
@@ -210,7 +213,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, char[] value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, char[] value, Schema out) {
             out.writeInt(value.length);
             for (char val : value) {
                 charCodec().encodePrim(val, out);
@@ -219,7 +222,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public char[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public char[] decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             final int l = in.readInt();
             final char[] vals = new char[l];
 
@@ -232,32 +235,32 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     };
 
     @Override
-    public Codec<char[], InStream, OutStream, Config> charArrayCodec() {
+    public Codec<char[], Unit, Schema, Config> charArrayCodec() {
         return charArrayCodec;
     }
 
-    protected static class ShortCodec implements Codec.ShortCodec<InStream, OutStream, Config> {
+    protected static class ShortCodec implements Codec.ShortCodec<Unit, Schema, Config> {
 
         @Override
-        public OutStream encodePrim(short val, OutStream out) {
+        public Schema encodePrim(short val, Schema out) {
             return out.writeShort(val);
         }
 
         @Override
-        public short decodePrim(InStream in ) {
+        public short decodePrim(Unit in ) {
             return in.readShort();
         }
     }
 
-    protected final Codec.ShortCodec<InStream, OutStream, Config> shortCodec = new ShortCodec();
+    protected final Codec.ShortCodec<Unit, Schema, Config> shortCodec = new ShortCodec();
 
     @Override
-    public Codec.ShortCodec<InStream, OutStream, Config> shortCodec() {
+    public Codec.ShortCodec<Unit, Schema, Config> shortCodec() {
         return shortCodec;
     }
 
-    protected final Codec<short[], InStream, OutStream, Config> shortArrayCodec =
-            new Codec<short[], InStream, OutStream, Config>() {
+    protected final Codec<short[], Unit, Schema, Config> shortArrayCodec =
+            new Codec<short[], Unit, Schema, Config>() {
 
         @Override
         public Class<short[]> type() {
@@ -265,7 +268,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, short[] value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, short[] value, Schema out) {
             out.writeInt(value.length);
             for (short val : value) {
                 shortCodec().encodePrim(val, out);
@@ -274,7 +277,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public short[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public short[] decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             final int l = in.readInt();
             final short[] vals = new short[l];
 
@@ -287,32 +290,32 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     };
 
     @Override
-    public Codec<short[], InStream, OutStream, Config> shortArrayCodec() {
+    public Codec<short[], Unit, Schema, Config> shortArrayCodec() {
         return shortArrayCodec;
     }
 
-    protected static class IntCodec implements Codec.IntCodec<InStream, OutStream, Config> {
+    protected static class IntCodec implements Codec.IntCodec<Unit, Schema, Config> {
 
         @Override
-        public OutStream encodePrim(int val, OutStream out) {
+        public Schema encodePrim(int val, Schema out) {
             return out.writeInt(val);
         }
 
         @Override
-        public int decodePrim(InStream in ) {
+        public int decodePrim(Unit in ) {
             return in.readInt();
         }
     }
 
-    protected final Codec.IntCodec<InStream, OutStream, Config> intCodec = new IntCodec();
+    protected final Codec.IntCodec<Unit, Schema, Config> intCodec = new IntCodec();
 
     @Override
-    public Codec.IntCodec<InStream, OutStream, Config> intCodec() {
+    public Codec.IntCodec<Unit, Schema, Config> intCodec() {
         return intCodec;
     }
 
-    protected final Codec<int[], InStream, OutStream, Config> intArrayCodec =
-            new Codec<int[], InStream, OutStream, Config>() {
+    protected final Codec<int[], Unit, Schema, Config> intArrayCodec =
+            new Codec<int[], Unit, Schema, Config>() {
 
         @Override
         public Class<int[]> type() {
@@ -320,7 +323,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, int[] value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, int[] value, Schema out) {
             out.writeInt(value.length);
             for (int val : value) {
                 intCodec().encodePrim(val, out);
@@ -329,7 +332,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public int[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public int[] decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             final int l = in.readInt();
             final int[] vals = new int[l];
 
@@ -342,32 +345,32 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     };
 
     @Override
-    public Codec<int[], InStream, OutStream, Config> intArrayCodec() {
+    public Codec<int[], Unit, Schema, Config> intArrayCodec() {
         return intArrayCodec;
     }
 
-    protected static class LongCodec implements Codec.LongCodec<InStream, OutStream, Config> {
+    protected static class LongCodec implements Codec.LongCodec<Unit, Schema, Config> {
 
         @Override
-        public OutStream encodePrim(long val, OutStream out) {
+        public Schema encodePrim(long val, Schema out) {
             return out.writeLong(val);
         }
 
         @Override
-        public long decodePrim(InStream in) {
+        public long decodePrim(Unit in) {
             return in.readLong();
         }
     }
 
-    protected final Codec.LongCodec<InStream, OutStream, Config> longCodec = new LongCodec();
+    protected final Codec.LongCodec<Unit, Schema, Config> longCodec = new LongCodec();
 
     @Override
-    public Codec.LongCodec<InStream, OutStream, Config> longCodec() {
+    public Codec.LongCodec<Unit, Schema, Config> longCodec() {
         return longCodec;
     }
 
-    protected final Codec<long[], InStream, OutStream, Config> longArrayCodec =
-            new Codec<long[], InStream, OutStream, Config>() {
+    protected final Codec<long[], Unit, Schema, Config> longArrayCodec =
+            new Codec<long[], Unit, Schema, Config>() {
 
         @Override
         public Class<long[]> type() {
@@ -375,7 +378,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, long[] value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, long[] value, Schema out) {
             out.writeInt(value.length);
             for (long val : value) {
                 longCodec().encodePrim(val, out);
@@ -384,7 +387,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public long[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public long[] decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             final int l = in.readInt();
             final long[] vals = new long[l];
 
@@ -397,32 +400,32 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     };
 
     @Override
-    public Codec<long[], InStream, OutStream, Config> longArrayCodec() {
+    public Codec<long[], Unit, Schema, Config> longArrayCodec() {
         return longArrayCodec;
     }
 
-    protected static class FloatCodec implements Codec.FloatCodec<InStream, OutStream, Config> {
+    protected static class FloatCodec implements Codec.FloatCodec<Unit, Schema, Config> {
 
         @Override
-        public OutStream encodePrim(float val, OutStream out) {
+        public Schema encodePrim(float val, Schema out) {
             return out.writeFloat(val);
         }
 
         @Override
-        public float decodePrim(InStream in ) {
+        public float decodePrim(Unit in ) {
             return in.readFloat();
         }
     }
 
-    protected final Codec.FloatCodec<InStream, OutStream, Config> floatCodec = new FloatCodec();
+    protected final Codec.FloatCodec<Unit, Schema, Config> floatCodec = new FloatCodec();
 
     @Override
-    public Codec.FloatCodec<InStream, OutStream, Config> floatCodec() {
+    public Codec.FloatCodec<Unit, Schema, Config> floatCodec() {
         return floatCodec;
     }
 
-    protected final Codec<float[], InStream, OutStream, Config> floatArrayCodec =
-            new Codec<float[], InStream, OutStream, Config>() {
+    protected final Codec<float[], Unit, Schema, Config> floatArrayCodec =
+            new Codec<float[], Unit, Schema, Config>() {
 
         @Override
         public Class<float[]> type() {
@@ -430,7 +433,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, float[] value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, float[] value, Schema out) {
             out.writeInt(value.length);
             for (float val : value) {
                 floatCodec().encodePrim(val, out);
@@ -439,7 +442,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public float[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public float[] decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             final int l = in.readInt();
             final float[] vals = new float[l];
 
@@ -452,32 +455,32 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     };
 
     @Override
-    public Codec<float[], InStream, OutStream, Config> floatArrayCodec() {
+    public Codec<float[], Unit, Schema, Config> floatArrayCodec() {
         return floatArrayCodec;
     }
 
-    protected static class DoubleCodec implements Codec.DoubleCodec<InStream, OutStream, Config> {
+    protected static class DoubleCodec implements Codec.DoubleCodec<Unit, Schema, Config> {
 
         @Override
-        public OutStream encodePrim(double value, OutStream out) {
+        public Schema encodePrim(double value, Schema out) {
             return out.writeDouble(value);
         }
 
         @Override
-        public double decodePrim(InStream in ) {
+        public double decodePrim(Unit in ) {
             return in.readDouble();
         }
     }
 
-    protected final Codec.DoubleCodec<InStream, OutStream, Config> doubleCodec = new DoubleCodec();
+    protected final Codec.DoubleCodec<Unit, Schema, Config> doubleCodec = new DoubleCodec();
 
     @Override
-    public Codec.DoubleCodec<InStream, OutStream, Config> doubleCodec() {
+    public Codec.DoubleCodec<Unit, Schema, Config> doubleCodec() {
         return doubleCodec;
     }
 
-    protected final Codec<double[], InStream, OutStream, Config> doubleArrayCodec =
-            new Codec<double[], InStream, OutStream, Config>() {
+    protected final Codec<double[], Unit, Schema, Config> doubleArrayCodec =
+            new Codec<double[], Unit, Schema, Config>() {
 
         @Override
         public Class<double[]> type() {
@@ -485,7 +488,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, double[] value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, double[] value, Schema out) {
             out.writeInt(value.length);
             for (double val : value) {
                 doubleCodec().encodePrim(val, out);
@@ -494,7 +497,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public double[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public double[] decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             final int l = in.readInt();
             final double[] vals = new double[l];
 
@@ -507,11 +510,11 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     };
 
     @Override
-    public Codec<double[], InStream, OutStream, Config> doubleArrayCodec() {
+    public Codec<double[], Unit, Schema, Config> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
-    protected static class StringCodec implements Codec<String, InStream, OutStream, Config> {
+    protected static class StringCodec implements Codec<String, Unit, Schema, Config> {
 
         @Override
         public Class<String> type() {
@@ -519,49 +522,49 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, String value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, String value, Schema out) {
             return out.writeString(value);
         }
 
         @Override
-        public String decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public String decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             return in.readString();
         }
     }
 
-    protected final Codec<String, InStream, OutStream, Config> stringCodec = new StringCodec();
+    protected final Codec<String, Unit, Schema, Config> stringCodec = new StringCodec();
 
     @Override
-    public Codec<String, InStream, OutStream, Config> stringCodec() {
+    public Codec<String, Unit, Schema, Config> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    public <V> Codec<Map<String, V>, InStream, OutStream, Config> createMapCodec(
+    public <V> Codec<Map<String, V>, Unit, Schema, Config> createMapCodec(
             Class<Map<String, V>> type,
-            Codec<V, InStream, OutStream, Config> valueCodec) {
+            Codec<V, Unit, Schema, Config> valueCodec) {
         return new AvroSchemaMapCodecs.StringMapCodec<V>(type, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, InStream, OutStream, Config> createMapCodec(
+    public <K, V> Codec<Map<K, V>, Unit, Schema, Config> createMapCodec(
             Class<Map<K, V>> type,
-            Codec<K, InStream, OutStream, Config> keyCodec,
-            Codec<V, InStream, OutStream, Config> valueCodec) {
+            Codec<K, Unit, Schema, Config> keyCodec,
+            Codec<V, Unit, Schema, Config> valueCodec) {
         return new AvroSchemaMapCodecs.MapCodec<K, V>(type, keyCodec, valueCodec);
     }
 
     @Override
-    public <T> Codec<Collection<T>, InStream, OutStream, Config> createCollCodec(
+    public <T> Codec<Collection<T>, Unit, Schema, Config> createCollCodec(
             Class<Collection<T>> collType,
-            Codec<T, InStream, OutStream, Config> elemCodec) {
-        return new CollectionCodec<T, InStream, OutStream, Config>(collType, elemCodec) {
+            Codec<T, Unit, Schema, Config> elemCodec) {
+        return new CollectionCodec<T, Unit, Schema, Config>(collType, elemCodec) {
 
             @Override
-            public OutStream encodeWithCheck(
-                    CodecCoreEx<InStream, OutStream, Config> core,
+            public Schema encodeWithCheck(
+                    CodecCoreEx<Unit, Schema, Config> core,
                     Collection<T> value,
-                    OutStream out) {
+                    Schema out) {
                 if (core.format().encodeNull(value, out)) {
                     return out;
                 } else if (!core.format().encodeDynamicType(
@@ -577,7 +580,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
             }
 
             @Override
-            public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Collection<T> value, OutStream out) {
+            public Schema encode(CodecCoreEx<Unit, Schema, Config> core, Collection<T> value, Schema out) {
                 out.writeInt(value.size());
                 for (T val : value) {
                     elemCodec.encodeWithCheck(core, val, out);
@@ -586,7 +589,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
             }
 
             @Override
-            public Collection<T> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+            public Collection<T> decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
                 final int l = in.readInt();
                 final CollProxy<T> collProxy = getCollectionProxy(core);
 
@@ -600,11 +603,11 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> Codec<T[], InStream, OutStream, Config> createObjectArrayCodec(
+    public <T> Codec<T[], Unit, Schema, Config> createObjectArrayCodec(
             Class<T[]> arrType,
             Class<T> elemType,
-            Codec<T, InStream, OutStream, Config> elemCodec) {
-        return new Codec<T[], InStream, OutStream, Config>() {
+            Codec<T, Unit, Schema, Config> elemCodec) {
+        return new Codec<T[], Unit, Schema, Config>() {
 
             @Override
             public Class<T[]> type() {
@@ -612,7 +615,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
             }
 
             @Override
-            public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, T[] value, OutStream out) {
+            public Schema encode(CodecCoreEx<Unit, Schema, Config> core, T[] value, Schema out) {
                 out.writeInt(value.length);
                 for (T val : value) {
                     elemCodec.encodeWithCheck(core, val, out);
@@ -621,7 +624,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
             }
 
             @Override
-            public T[] decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+            public T[] decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
                 final int l = in.readInt();
                 final T[] vals = (T[]) Array.newInstance(elemType, l);
 
@@ -635,9 +638,9 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, InStream, OutStream, Config> createObjectCodec(
+    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, Unit, Schema, Config> createObjectCodec(
             Class<T> type,
-            ObjectMeta<T, InStream, OutStream, RA> objMeta) {
+            ObjectMeta<T, Unit, Schema, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
             return new FinalObjectCodec<T, RA>(type, objMeta);
         } else {
@@ -646,14 +649,14 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
     }
 
     protected static class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
-            implements Codec<T, InStream, OutStream, Config> {
+            implements Codec<T, Unit, Schema, Config> {
 
         private final Class<T> type;
-        private final ObjectMeta<T, InStream, OutStream, RA> objMeta;
+        private final ObjectMeta<T, Unit, Schema, RA> objMeta;
 
         private ObjectCodec(
                 Class<T> type,
-                ObjectMeta<T, InStream, OutStream, RA> objMeta) {
+                ObjectMeta<T, Unit, Schema, RA> objMeta) {
             this.type = type;
             this.objMeta = objMeta;
         }
@@ -664,7 +667,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, T value, OutStream out) {
+        public Schema encode(CodecCoreEx<Unit, Schema, Config> core, T value, Schema out) {
             objMeta.forEach(field ->
                     field.encodeField(value, out)
             );
@@ -672,7 +675,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
         }
 
         @Override
-        public T decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        public T decode(CodecCoreEx<Unit, Schema, Config> core, Unit in) {
             return Folds.foldLeft(
                     (acc, field) -> field.decodeField(acc, in),
                     objMeta.startDecode(),
@@ -683,11 +686,11 @@ public class AvroSchemaCodecFormat implements CodecFormat<InStream, OutStream, C
 
     protected static class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
             extends ObjectCodec<T, RA>
-            implements Codec.FinalCodec<T, InStream, OutStream, Config> {
+            implements Codec.FinalCodec<T, Unit, Schema, Config> {
 
         protected FinalObjectCodec(
                 Class<T> type,
-                ObjectMeta<T, InStream, OutStream, RA> objMeta) {
+                ObjectMeta<T, Unit, Schema, RA> objMeta) {
             super(type, objMeta);
         }
     }

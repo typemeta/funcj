@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec;
+package org.typemeta.funcj.codec.utils;
 
 import org.typemeta.funcj.functions.*;
 

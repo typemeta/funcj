@@ -2,6 +2,7 @@ package org.typemeta.funcj.codec.mpack;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.stream.StreamCodecCoreDelegate;
+import org.typemeta.funcj.codec.utils.NotSupportedException;
 
 import java.io.*;
 

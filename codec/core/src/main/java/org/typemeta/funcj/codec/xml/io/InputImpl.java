@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.xml.io;
 
-import org.typemeta.funcj.codec.CodecException;
+import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.xml.XmlTypes;
 
 import javax.xml.stream.*;

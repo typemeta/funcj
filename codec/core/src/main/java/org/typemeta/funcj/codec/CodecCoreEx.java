@@ -1,6 +1,8 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
+import org.typemeta.funcj.codec.utils.ClassKey;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -40,7 +42,7 @@ public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore
      */
     <T> ArgMapTypeCtor<T> getArgMapTypeCtor(Class<T> clazz);
 
-    default <T> boolean encodeDynamicType(Codec<T, IN, OUT, CFG> codec, T val, OUT out) {
+    default <T> Tuple2<Boolean, OUT> encodeDynamicType(Codec<T, IN, OUT, CFG> codec, T val, OUT out) {
         return format().encodeDynamicType(this, codec, val, out, this::getCodec);
     }
 

@@ -1,6 +1,8 @@
 package org.typemeta.funcj.codec;
 
 
+import org.typemeta.funcj.tuples.Tuple2;
+
 /**
  * Interface for classes that encapsulates the logic for encoding a value of type {@code T}
  * into an encoded value and vice versa.
@@ -21,8 +23,9 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
 
         @Override
         default OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
-            if (core.format().encodeNull(value, out)) {
-                return out;
+            final Tuple2<Boolean, OUT> nullRes = core.format().encodeNull(value, out);
+            if (nullRes._1) {
+                return nullRes._2;
             } else {
                 return encode(core, value, out);
             }
@@ -284,13 +287,15 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
      * @return          the encoded output stream
      */
     default OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
-        if (core.format().encodeNull(value, out)) {
-            return out;
+        final Tuple2<Boolean, OUT> nullRes = core.format().encodeNull(value, out);
+        if (nullRes._1) {
+            return nullRes._2;
         } else {
-            if (!core.encodeDynamicType(this, value, out)) {
-                return encode(core, value, out);
+            final Tuple2<Boolean, OUT> dynRes = core.encodeDynamicType(this, value, out);
+            if (dynRes._1) {
+                return dynRes._2;
             } else {
-                return out;
+                return encode(core, value, out);
             }
         }
     }

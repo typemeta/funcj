@@ -3,6 +3,7 @@ package org.typemeta.funcj.codec.avro.schema;
 import org.apache.avro.Schema;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.*;
+import org.typemeta.funcj.codec.utils.*;
 import org.typemeta.funcj.data.Unit;
 
 import java.io.*;
@@ -33,7 +34,7 @@ public class AvroSchemaCodecCore
 
     @Override
     public <T> T decode(Class<? super T> clazz, Reader rdr) {
-        throw new CodecException("Not supported");
+        throw new NotSupportedException("AvroSchemaCodecCore.decode is not supported");
     }
 
     /**
@@ -60,8 +61,6 @@ public class AvroSchemaCodecCore
      */
     @Override
     public <T> T decode(Class<? super T> type, InputStream is) {
-        try (final InStream in = AvroSchemaTypes.inputOf(is)) {
-            return decode(type, in);
-        }
+        throw new NotSupportedException("AvroSchemaCodecCore.decode is not supported");
     }
 }
