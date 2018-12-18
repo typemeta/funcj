@@ -326,7 +326,6 @@ interface IMapS<V> {
         return k -> k.equals(key) ? Option.some(value) : get(k);
     }
 
-
     default IMapS<V> del(String key) {
         return k -> k.equals(key) ? Option.none() : get(k);
     }

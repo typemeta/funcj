@@ -13,22 +13,23 @@ import static org.typemeta.funcj.control.StateTest.Utils.pure;
 public class StateTest {
     @Property
     public void testState(String a, String b, String c) {
-        final String r =
+        final State<String, String> state =
                 put(a).flatMap(u -> get())
                         .flatMap(s -> put(s + b))
-                        .flatMap(u -> get())
-                        .eval(c);
+                        .flatMap(u -> get());
+        final String r = state.eval(c);
 
         assertEquals(a+b, r);
     }
 
     @Property
     public void testState2(String a, String b) {
-        final String r =
+        final State<String, String> state =
                 State.<String>get()
                         .flatMap(s -> put(s + a))
-                        .flatMap(u -> get())
-                        .eval(b);
+                        .flatMap(u -> get());
+        final String r = state.eval(b);
+
         assertEquals(b+a, r);
     }
 
