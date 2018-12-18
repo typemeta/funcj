@@ -10,7 +10,6 @@ import java.util.*;
  */
 public class CodecConfigImpl implements CodecConfig {
 
-
     protected final Set<Package> allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));
 
     protected final Set<Class<?>> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
@@ -26,6 +25,10 @@ public class CodecConfigImpl implements CodecConfig {
      * Where a class has a proxy, the codec for the proxy will be used for the class.
      */
     protected final Map<Class<?>, Class<?>> typeProxyRegistry = new TreeMap<>(Comparator.comparing(Class::getName));
+
+    protected boolean dynamicTypeTags = true;
+
+    protected boolean failOnNoTypeConstructor = true;
 
     protected CodecConfigImpl() {
     }
@@ -161,5 +164,25 @@ public class CodecConfigImpl implements CodecConfig {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void dynamicTypeTags(boolean enable) {
+        dynamicTypeTags = enable;
+    }
+
+    @Override
+    public boolean dynamicTypeTags() {
+        return dynamicTypeTags;
+    }
+
+    @Override
+    public void failOnNoTypeConstructor(boolean enable) {
+        failOnNoTypeConstructor = enable;
+    }
+
+    @Override
+    public boolean failOnNoTypeConstructor() {
+        return failOnNoTypeConstructor;
     }
 }

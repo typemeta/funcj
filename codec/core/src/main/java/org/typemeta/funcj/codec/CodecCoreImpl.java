@@ -148,10 +148,16 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                 } else {
                     return newCtor;
                 }
+            } else if (config().failOnNoTypeConstructor()){
+                return raiseNoTypeCtorException(clazz);
             } else {
-                throw new CodecException("No suitable type constructor was found for " + clazz);
+                return () -> raiseNoTypeCtorException(clazz);
             }
         }
+    }
+
+    protected <T> T raiseNoTypeCtorException(Class<?> clazz) {
+        throw new CodecException("No suitable type constructor was found for " + clazz);
     }
 
     @Override

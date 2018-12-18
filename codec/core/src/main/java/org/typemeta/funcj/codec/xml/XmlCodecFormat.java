@@ -58,6 +58,10 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             return Tuple2.of(false, out);
+        } else if (!config().dynamicTypeTags()) {
+            final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
+            dynCodec.encode(core, val, out);
+            return Tuple2.of(true, out);
         } else {
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             out.attribute(config.typeAttrName(), config().classToName(dynType));
@@ -68,7 +72,9 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
     @Override
     public <T> T decodeDynamicType(InStream in, Functions.F<String, T> decoder) {
-        if (in.attributeMap().hasName(config.typeAttrName())) {
+        if (!config().dynamicTypeTags()) {
+            return null;
+        } else if (in.attributeMap().hasName(config.typeAttrName())) {
             final String typeName = in.attributeMap().getValue(config.typeAttrName());
             return decoder.apply(typeName);
         } else {

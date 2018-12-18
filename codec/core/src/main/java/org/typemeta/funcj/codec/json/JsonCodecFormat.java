@@ -59,6 +59,10 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             return Tuple2.of(false, out);
+        } else if (!config().dynamicTypeTags()) {
+            final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
+            dynCodec.encode(core, val, out);
+            return Tuple2.of(true, out);
         } else {
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             out.startObject();
@@ -75,7 +79,9 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
 
     @Override
     public <T> T decodeDynamicType(InStream in, Functions.F<String, T> decoder) {
-        if (in.notEOF() && in.currentEventType() == InStream.Event.Type.OBJECT_START) {
+        if (!config().dynamicTypeTags()) {
+            return null;
+        } else if (in.notEOF() && in.currentEventType() == InStream.Event.Type.OBJECT_START) {
             final String typeFieldName = config.typeFieldName();
             final InStream.Event.FieldName typeField = new InStream.Event.FieldName(typeFieldName);
             final String valueFieldName = config.valueFieldName();
@@ -97,9 +103,12 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
                 in.endObject();
 
                 return val;
+            } else {
+                return null;
             }
+        } else {
+            return null;
         }
-        return null;
     }
 
     protected static class BooleanCodec implements Codec.BooleanCodec<InStream, OutStream, Config> {

@@ -52,8 +52,8 @@ public interface CodecConfig {
     /**
      * Register a type alias.
      * A type alias is used in place of the class name in the encoded data.
-     * @param clazz    the clas to be mapped
-     * @param name     the proxy type
+     * @param clazz     the clas to be mapped
+     * @param name      the proxy type
      */
     void registerTypeAlias(Class<?> clazz, String name);
 
@@ -107,7 +107,7 @@ public interface CodecConfig {
      * Check whether a collection class is a default for that collection type.
      * @param intfClass the collection interface
      * @param implClass the collection implementation
-     * @return      true if the collection implementation is registered as the default for that type
+     * @return          true if the collection implementation is registered as the default for that type
      */
     boolean isDefaultCollectionType(Class<?> intfClass, Class<?> implClass);
 
@@ -128,4 +128,32 @@ public interface CodecConfig {
      * @return          true if the types match
      */
     <T> boolean dynamicTypeMatch(Class<T> stcClass, Class<? extends T> dynClass);
+
+    /**
+     * Specify whether dynamic type information should be encoded.
+     * By default this is enabled.
+     * Disabling it may prevent data from round-tripping successfully.
+     * @param enable    specify whether dynamic type information should be encoded
+     */
+    void dynamicTypeTags(boolean enable);
+
+    /**
+     * Indicate whether dynamic type information should be encoded.
+     * @return          whether dynamic type information should be encoded
+     */
+    boolean dynamicTypeTags();
+
+    /**
+     * Specify whether the codec should fail if no type constructor is found.
+     * By default this is enabled.
+     * Disabling it may prevent data from round-tripping successfully.
+     * @param enable    specify whether the the codec should fail if no type constructor is found.
+     */
+    void failOnNoTypeConstructor(boolean enable);
+
+    /**
+     * Indicate whether the codec should fail if no type constructor is found.
+     * @return          whether the the codec should fail if no type constructor is found
+     */
+    boolean failOnNoTypeConstructor();
 }
