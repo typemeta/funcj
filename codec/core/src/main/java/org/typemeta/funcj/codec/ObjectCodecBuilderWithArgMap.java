@@ -40,12 +40,12 @@ public class ObjectCodecBuilderWithArgMap<
         return core.getCodec(clazz);
     }
 
-    <A> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG> field(String name, F<T, A> getter, Codec<A, IN, OUT, CFG> codec) {
+    public <A> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG> field(String name, F<T, A> getter, Codec<A, IN, OUT, CFG> codec) {
         fields.put(name, new FieldCodec<>(getter, codec));
         return this;
     }
 
-    <A> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG>  field(String name, F<T, A> getter, Class<A> clazz) {
+    public <A> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG>  field(String name, F<T, A> getter, Class<A> clazz) {
         return field(name, getter, getCodec(clazz));
     }
 
