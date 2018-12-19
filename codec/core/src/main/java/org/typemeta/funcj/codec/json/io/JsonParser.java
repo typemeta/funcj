@@ -122,7 +122,7 @@ public class JsonParser implements JsonTypes.InStream {
     }
 
     @Override
-    public void skipValue() {
+    public void skipNode() {
         int depth = stateStack.size();
         while (true) {
             switch (currentEventType().type()) {

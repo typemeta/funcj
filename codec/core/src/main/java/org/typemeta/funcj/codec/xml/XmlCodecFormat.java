@@ -753,13 +753,16 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
             final Set<String> actNames = new HashSet<>();
             final RA ra = objMeta.startDecode();
 
-            while(in.hasNext() && in.type().equals(InStream.Type.START_ELEMENT)) {
+            while (in.hasNext() && in.type().equals(InStream.Type.START_ELEMENT)) {
                 final String name = in.startElement();
                 if (!expNames.contains(name)) {
                     if (config().failOnUnrecognisedFields()) {
                         throw new CodecException(
                                 "Field name '" + name + "' unexpected for type " + type +
                                         " at location " + in.location());
+                    } else {
+                        in.skipNode();
+                        in.endElement();
                     }
                 } else if (actNames.contains(name)) {
                     throw new CodecException(

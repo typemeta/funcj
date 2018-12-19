@@ -749,7 +749,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
                                 "Field name '" + name + "' unexpected for type " + type +
                                         " at location " + in.location());
                     } else {
-                        in.skipValue();
+                        in.skipNode();
                     }
                 } else if (actNames.contains(name)) {
                     throw new CodecException(

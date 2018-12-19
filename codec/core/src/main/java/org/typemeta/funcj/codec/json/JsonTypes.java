@@ -166,7 +166,7 @@ public class JsonTypes {
 
         Event event(int lookahead);
 
-        void skipValue();
+        void skipNode();
 
         <T> T readNull();
 

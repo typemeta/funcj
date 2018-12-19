@@ -82,7 +82,9 @@ public class InputImpl implements XmlTypes.InStream {
                     attrMap.get(name).equals(value);
         }
     }
+
     private final XMLStreamReader rdr;
+
     private final AttributeMapImpl attrMap = new AttributeMapImpl();
 
     public InputImpl(XMLStreamReader rdr) {
@@ -119,6 +121,7 @@ public class InputImpl implements XmlTypes.InStream {
         } else if (rdr.getEventType() == XMLStreamConstants.END_ELEMENT) {
             attrMap.clear();
         }
+
         try {
             for(boolean step = true; step; ) {
                 switch (rdr.next()) {
@@ -140,6 +143,7 @@ public class InputImpl implements XmlTypes.InStream {
         } catch (XMLStreamException ex) {
             throw new CodecException(ex);
         }
+
         return type();
     }
 
@@ -162,8 +166,29 @@ public class InputImpl implements XmlTypes.InStream {
     }
 
     @Override
-    public void skipValue() {
-        throw TODO();
+    public void skipNode() {
+        int depth = 0;
+        while (true) {
+            switch (type()) {
+                case START_ELEMENT:
+                    ++depth;
+                    break;
+                case END_ELEMENT:
+                    --depth;
+                    if (depth == 0) {
+                        next();
+                        return;
+                    }
+                    break;
+                case CHARACTERS:
+                    break;
+                case OTHER:
+                    break;
+                default:
+                    throw new CodecException("Unexpected event " + type() + " at location " + location());
+            }
+            next();
+        }
     }
 
     @Override

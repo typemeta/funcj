@@ -58,7 +58,7 @@ public class XmlTypes {
 
         Type type();
 
-        void skipValue();
+        void skipNode();
 
         void startDocument();
         void endDocument();
