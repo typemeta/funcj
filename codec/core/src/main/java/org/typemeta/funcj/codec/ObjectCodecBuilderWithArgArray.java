@@ -49,6 +49,18 @@ public class ObjectCodecBuilderWithArgArray<
         return field(name, getter, getCodec(clazz));
     }
 
+    public <A> _1<A> field (
+            String name,
+            F<T, A> getter,
+            Class<A> clazz,
+            Class<?> elemType) {
+        return field(
+                name,
+                getter,
+                (Codec<A, IN, OUT, CFG>)core.getCollCodec((Class)clazz, core.getCodec(elemType))
+        );
+    }
+
     public class _1<A> {
         public void construct(F<A, T> ctor) {
             registration(
@@ -65,6 +77,18 @@ public class ObjectCodecBuilderWithArgArray<
 
         public <B> _2<B> field(String name, F<T, B> getter, Class<B> clazz) {
             return field(name, getter, getCodec(clazz));
+        }
+
+        public <B> _2<B> field(
+                String name,
+                F<T, B> getter,
+                Class<B> clazz,
+                Class<?> elemType) {
+            return field(
+                    name,
+                    getter,
+                    (Codec<B, IN, OUT, CFG>)core.getCollCodec((Class)clazz, core.getCodec(elemType))
+            );
         }
 
         public class _2<B> {
@@ -85,6 +109,18 @@ public class ObjectCodecBuilderWithArgArray<
                 return field(name, getter, getCodec(clazz));
             }
 
+            public <C> _3<C> field(
+                    String name,
+                    F<T, C> getter,
+                    Class<C> clazz,
+                    Class<?> elemType) {
+                return field(
+                        name,
+                        getter,
+                        (Codec<C, IN, OUT, CFG>)core.getCollCodec((Class)clazz, core.getCodec(elemType))
+                );
+            }
+
             public class _3<C> {
                 public void construct(F3<A, B, C, T> ctor) {
                     registration(
@@ -101,6 +137,18 @@ public class ObjectCodecBuilderWithArgArray<
 
                 public <D> _4<D> field(String name, F<T, D> getter, Class<D> clazz) {
                     return field(name, getter, getCodec(clazz));
+                }
+
+                public <D> _4<D> field(
+                        String name,
+                        F<T, D> getter,
+                        Class<D> clazz,
+                        Class<?> elemType) {
+                    return field(
+                            name,
+                            getter,
+                            (Codec<D, IN, OUT, CFG>)core.getCollCodec((Class)clazz, core.getCodec(elemType))
+                    );
                 }
 
                 public class _4<D> {
@@ -121,6 +169,18 @@ public class ObjectCodecBuilderWithArgArray<
                         return field(name, getter, getCodec(clazz));
                     }
 
+                    public <N> _N field(
+                            String name,
+                            F<T, N> getter,
+                            Class<N> clazz,
+                            Class<?> elemType) {
+                        return field(
+                                name,
+                                getter,
+                                (Codec<N, IN, OUT, CFG>)core.getCollCodec((Class)clazz, core.getCodec(elemType))
+                        );
+                    }
+
                     public class _N {
                         public void construct(ArgArrayTypeCtor<T> ctor) {
                             registration(core.createObjectCodecWithArgArray(clazz, fields, ctor));
@@ -133,6 +193,18 @@ public class ObjectCodecBuilderWithArgArray<
 
                         public <N> _N field(String name, F<T, N> getter, Class<N> clazz) {
                             return field(name, getter, getCodec(clazz));
+                        }
+
+                        public <N> _N field(
+                                String name,
+                                F<T, N> getter,
+                                Class<N> clazz,
+                                Class<?> elemType) {
+                            return field(
+                                    name,
+                                    getter,
+                                    (Codec<N, IN, OUT, CFG>)core.getCollCodec((Class)clazz, core.getCodec(elemType))
+                            );
                         }
                     }
                 }

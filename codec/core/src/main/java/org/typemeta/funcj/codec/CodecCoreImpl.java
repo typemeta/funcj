@@ -270,12 +270,12 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
 
         @Override
         public OUT encode(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
-            throw new CodecException("Internal error - can't encode an interface");
+            throw new CodecException("Internal error - can't encode an interface (" + clazz.getName() + ")");
         }
 
         @Override
         public T decode(CodecCoreEx<IN, OUT, CFG> core, IN in) {
-            throw new CodecException("Internal error - can't decode an interface");
+            throw new CodecException("Internal error - can't decode an interface (" + clazz.getName() + ")");
         }
     }
 
