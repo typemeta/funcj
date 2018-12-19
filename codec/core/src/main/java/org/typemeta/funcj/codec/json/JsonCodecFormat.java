@@ -697,7 +697,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
         }
     }
 
-    protected static class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
             implements Codec<T, InStream, OutStream, Config> {
 
         private final Class<T> type;
@@ -737,25 +737,31 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
         public T decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
             in.startObject();
 
-            final Set<String> expKeys = fields.keySet();
-            final Set<String> setFields = new HashSet<>();
+            final Set<String> expNames = fields.keySet();
+            final Set<String> actNames = new HashSet<>();
             final RA ra = objMeta.startDecode();
 
             while (in.notEOF() && in.currentEventType() != InStream.Event.Type.OBJECT_END) {
                 final String name = in.readFieldName();
-                if (!expKeys.contains(name)) {
-                    throw new CodecException("Field name '" + name + "' unexpected for type " + type);
-                } else if (setFields.contains(name)) {
-                    throw new CodecException("Duplicate field name '" + name + "' for type " + type);
+                if (!expNames.contains(name)) {
+                    if (config().failOnUnrecognisedFields()) {
+                        throw new CodecException(
+                                "Field name '" + name + "' unexpected for type " + type +
+                                        " at location " + in.location());
+                    } else {
+                        in.skipValue();
+                    }
+                } else if (actNames.contains(name)) {
+                    throw new CodecException(
+                            "Duplicate field name '" + name + "' for type " + type +
+                                    " at location " + in.location());
+                } else {
+                    actNames.add(name);
+                    fields.get(name).decodeField(ra, in);
                 }
-                setFields.add(name);
-                fields.get(name).decodeField(ra, in);
             }
 
-            if (!setFields.equals(expKeys)) {
-                // TODO: more informative error message.
-                throw new CodecException("Encountered fields differs to expected fields for type " + type);
-            }
+            checkFields(type, expNames, actNames);
 
             in.endObject();
 
@@ -763,7 +769,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
         }
     }
 
-    protected static class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
             extends ObjectCodec<T, RA>
             implements Codec.FinalCodec<T, InStream, OutStream, Config> {
 

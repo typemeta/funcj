@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.json;
 
-import org.junit.Assert;
+import org.junit.*;
 import org.typemeta.funcj.codec.*;
 
 import java.io.*;
@@ -31,6 +31,23 @@ public class JsonCodecTest extends TestBase {
         if (!printData() && !val.equals(val2)) {
             System.out.println(sw);
         }
+
+        Assert.assertEquals(val, val2);
+    }
+
+    @Test
+    public void testDontFailOnUnrecognisedFields() {
+        final JsonCodecCore codec = prepareCodecCore(Codecs.jsonCodec());
+        codec.config().failOnUnrecognisedFields(false);
+        final TestTypes.Custom val = new TestTypes.Custom(TestTypes.Init.INIT);
+
+        final StringWriter sw = new StringWriter();
+        codec.encode(TestTypes.Custom.class, val, sw);
+
+        final String raw = sw.toString();
+        final String raw2 = raw.replace("\"flag\"", "\"test\" : {\"a\": [12.34, \"z\"] }, \"flag\"");
+
+        final TestTypes.Custom val2 = codec.decode(TestTypes.Custom.class, new StringReader(raw2));
 
         Assert.assertEquals(val, val2);
     }

@@ -1,5 +1,6 @@
 package org.typemeta.funcj.codec;
 
+import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.tuples.Tuple2;
 
@@ -93,4 +94,19 @@ public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
     <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT, CFG> createObjectCodec(
             Class<T> clazz,
             ObjectMeta<T, IN, OUT, RA> objMeta);
+
+    default void checkFields(Class<?> clazz, Set<String> expNames, Set<String> actNames) {
+        if (!expNames.equals(actNames)) {
+            if (!expNames.containsAll(actNames)) {
+                if (config().failOnUnrecognisedFields()) {
+                    actNames.removeAll(expNames);
+                    throw new CodecException("Unrecognised fields for type " + clazz + " : " + actNames);
+                }
+            } else if (!actNames.containsAll(expNames)) {
+                final Set<String> keys = new TreeSet<>(expNames);
+                keys.removeAll(actNames);
+                throw new CodecException("Missing fields for type " + clazz + " : " + keys);
+            }
+        }
+    }
 }

@@ -166,6 +166,8 @@ public class JsonTypes {
 
         Event event(int lookahead);
 
+        void skipValue();
+
         <T> T readNull();
 
         Number readNumber();

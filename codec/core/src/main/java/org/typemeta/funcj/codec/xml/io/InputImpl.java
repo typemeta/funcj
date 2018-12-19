@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.text.*;
 import java.util.*;
 
+import static org.typemeta.funcj.util.Exceptions.TODO;
+
 public class InputImpl implements XmlTypes.InStream {
     public static XmlTypes.InStream inputOf(XMLStreamReader reader) {
         if (reader.getProperty(XMLInputFactory.IS_COALESCING) != Boolean.TRUE) {
@@ -157,6 +159,11 @@ public class InputImpl implements XmlTypes.InStream {
             default:
                 return Type.OTHER;
         }
+    }
+
+    @Override
+    public void skipValue() {
+        throw TODO();
     }
 
     @Override

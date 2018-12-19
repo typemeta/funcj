@@ -121,6 +121,43 @@ public class JsonParser implements JsonTypes.InStream {
         return pullEventsIntoBuffer(ahead);
     }
 
+    @Override
+    public void skipValue() {
+        int depth = stateStack.size();
+        while (true) {
+            switch (currentEventType().type()) {
+                case OBJECT_START:
+                case ARRAY_START:
+                    processCurrentEvent();
+                    break;
+                case ARRAY_END:
+                case OBJECT_END:
+                    processCurrentEvent();
+                    if (stateStack.size() == depth) {
+                        return;
+                    }
+                    break;
+                case TRUE:
+                case FALSE:
+                case NULL:
+                case NUMBER:
+                case STRING:
+                    processCurrentEvent();
+                    if (stateStack.size() == depth) {
+                        return;
+                    }
+                    break;
+                case FIELD_NAME:
+                    processCurrentEvent();
+                    break;
+                case EOF:
+                    throw new CodecException("Unexpected EOF");
+                default:
+                    throw new CodecException("Unexpected event type " + currentEventType().type());
+            }
+        }
+     }
+
     private void checkTokenType(Event.Type type) {
         if (!currentEvent().type().equals(type)) {
             throw raiseError("Expecting " + type + " token but found " + currentEvent().type());

@@ -30,6 +30,8 @@ public class CodecConfigImpl implements CodecConfig {
 
     protected boolean failOnNoTypeConstructor = true;
 
+    protected boolean failOnUnrecognisedFields = true;
+
     protected CodecConfigImpl() {
     }
 
@@ -184,5 +186,15 @@ public class CodecConfigImpl implements CodecConfig {
     @Override
     public boolean failOnNoTypeConstructor() {
         return failOnNoTypeConstructor;
+    }
+
+    @Override
+    public void failOnUnrecognisedFields(boolean enable) {
+        failOnUnrecognisedFields = enable;
+    }
+
+    @Override
+    public boolean failOnUnrecognisedFields() {
+        return failOnUnrecognisedFields;
     }
 }

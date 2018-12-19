@@ -16,4 +16,9 @@ public class ByteConfigImpl extends CodecConfigImpl implements ByteTypes.Config 
     public void failOnNoTypeConstructor(boolean enable) {
         throw new NotSupportedException();
     }
+
+    @Override
+    public void failOnUnrecognisedFields(boolean enable) {
+        throw new NotSupportedException();
+    }
 }

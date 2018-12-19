@@ -156,4 +156,8 @@ public interface CodecConfig {
      * @return          whether the the codec should fail if no type constructor is found
      */
     boolean failOnNoTypeConstructor();
+
+    void failOnUnrecognisedFields(boolean enable);
+
+    boolean failOnUnrecognisedFields();
 }
