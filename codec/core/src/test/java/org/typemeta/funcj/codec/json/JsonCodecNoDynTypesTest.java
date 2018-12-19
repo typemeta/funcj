@@ -1,9 +1,8 @@
-package org.typemeta.funcj.codec;
+package org.typemeta.funcj.codec.json;
 
 
 import org.junit.Assert;
-import org.typemeta.funcj.codec.json.*;
-
+import org.typemeta.funcj.codec.*;
 import java.io.*;
 
 public class JsonCodecNoDynTypesTest extends TestBase {

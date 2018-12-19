@@ -45,8 +45,15 @@ public class ObjectCodecBuilderWithArgMap<
         return this;
     }
 
-    public <A> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG>  field(String name, F<T, A> getter, Class<A> clazz) {
+    public <A> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG> field(String name, F<T, A> getter, Class<A> clazz) {
         return field(name, getter, getCodec(clazz));
+    }
+
+    public <A> ObjectCodecBuilderWithArgMap<T, IN, OUT, CFG> field(
+            String name, F<T, A> getter,
+            Class<A> clazz,
+            Class<?> elemClass) {
+        return field(name, getter, (Codec<A, IN, OUT, CFG>)core.getCollCodec((Class)clazz, core.getCodec(elemClass)));
     }
 
     public Codec<T, IN, OUT, CFG> construct(ArgMapTypeCtor<T> ctor) {

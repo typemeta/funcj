@@ -69,9 +69,9 @@ public abstract class TestTypes {
         }
     }
 
-    enum Init {INIT}
+    public enum Init {INIT}
 
-    static class Base<T> {
+    public static class Base<T> {
         private final T val;
         private final Object obj;
         private final T[] valArr;
@@ -1048,38 +1048,32 @@ public abstract class TestTypes {
         }
     }
 
-    static class Custom {
+    public static class Custom {
 
         enum Colour {RED, GREEN, BLUE};
 
         final Colour colour;
-        final LocalDate date;
+        final List<LocalDate> dates;
         final boolean flag;
         final String name;
         final double age;
 
-        Custom(Colour colour, LocalDate date, boolean flag, String name, double age) {
+        public Custom(Colour colour, List<LocalDate> dates, boolean flag, String name, double age) {
             this.colour = colour;
-            this.date = date;
+            this.dates = dates;
             this.flag = flag;
             this.name = name;
             this.age = age;
         }
-//
-//        Custom() {
-//            this.colour = null;
-//            this.date = null;
-//            this.flag = false;
-//            this.name = null;
-//            this.age = 0.0;
-//        }
 
-        Custom(Init init) {
+        public Custom(Init init) {
             this.colour = Colour.GREEN;
-            this.date = LocalDate.now();
+            this.dates = new ArrayList<>();
             this.flag = true;
             this.name = "zap";
             this.age = 3.141592;
+            dates.add(LocalDate.now());
+            dates.add(LocalDate.now().plusYears(1));
         }
 
         @Override
@@ -1088,7 +1082,7 @@ public abstract class TestTypes {
             if (o == null || getClass() != o.getClass()) return false;
             Custom custom = (Custom) o;
             return colour == custom.colour &&
-                    Objects.equals(date, custom.date) &&
+                    Objects.equals(dates, custom.dates) &&
                     flag == custom.flag &&
                     Objects.equals(name, custom.name);
         }
@@ -1097,14 +1091,14 @@ public abstract class TestTypes {
         public String toString() {
             return "Custom{" +
                     "colour=" + colour +
-                    ", date=" + date +
+                    ", dates=" + dates +
                     ", flag=" + flag +
                     ", name=" + name +
                     '}';
         }
     }
 
-    enum EnumType {
+    public enum EnumType {
         VALUE1 {
             @Override
             public String code() {
@@ -1120,7 +1114,7 @@ public abstract class TestTypes {
         public abstract String code();
     }
 
-    static class TypeWithEnum {
+    public static class TypeWithEnum {
         final EnumType enumType;
 
         public TypeWithEnum(EnumType enumType) {
@@ -1144,7 +1138,7 @@ public abstract class TestTypes {
         }
     }
 
-    static class CollTypes {
+    public static class CollTypes {
         final static TreeMap<String, Integer> m = new TreeMap<>();
         static {
             m.put("alpha", 1);
@@ -1190,7 +1184,7 @@ public abstract class TestTypes {
         }
     }
 
-    interface SomeInterface {
+    public interface SomeInterface {
     }
 
     public static class SomeClass implements SomeInterface {

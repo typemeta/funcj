@@ -5,7 +5,7 @@ import org.typemeta.funcj.codec.misc.SimpleType;
 import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.*;
 
 import static org.typemeta.funcj.codec.TestTypes.*;
 
@@ -28,13 +28,13 @@ public abstract class TestBase {
 
         core.registerCodecWithArgMap(Custom.class)
                 .field("colour", c -> c.colour, Custom.Colour.class)
-                .field("date", c -> c.date, LocalDate.class)
+                .field("date", c -> c.dates, List.class, LocalDate.class)
                 .field("flag", c -> c.flag, Boolean.class)
                 .field("name", c -> c.name, String.class)
                 .field("age", c -> c.age, Double.class)
                 .construct(args -> new Custom(
                         (Custom.Colour)args.get("colour"),
-                        (LocalDate)args.get("date"),
+                        (List<LocalDate>)args.get("date"),
                         (Boolean)args.get("flag"),
                         (String)args.get("name"),
                         (Double)args.get("age")));

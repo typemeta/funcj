@@ -16,4 +16,9 @@ public class MpackConfigImpl extends CodecConfigImpl implements MpackTypes.Confi
     public void failOnNoTypeConstructor(boolean enable) {
         throw new NotSupportedException();
     }
+
+    @Override
+    public void failOnUnrecognisedFields(boolean enable) {
+        throw new NotSupportedException();
+    }
 }

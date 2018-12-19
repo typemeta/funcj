@@ -27,6 +27,7 @@ public class JsonTypes {
      * Interface for classes which implement an input stream of JSON events
      */
     public interface InStream extends StreamCodecFormat.Input<InStream> {
+
         interface Event {
             Type type();
 
@@ -156,6 +157,8 @@ public class JsonTypes {
                 }
             }
         }
+
+        String location();
 
         boolean notEOF();
 

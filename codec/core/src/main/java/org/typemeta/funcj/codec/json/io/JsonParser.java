@@ -102,6 +102,11 @@ public class JsonParser implements JsonTypes.InStream {
     }
 
     @Override
+    public String location() {
+        return "position: " + tokeniser.position();
+    }
+
+    @Override
     public boolean notEOF() {
         return !currentEvent().equals(Event.Type.EOF);
     }
