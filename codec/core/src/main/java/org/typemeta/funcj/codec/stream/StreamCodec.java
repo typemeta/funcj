@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.stream;
 
-
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codec;
+import org.typemeta.funcj.codec.CodecConfig;
 
 /**
  * Interface for classes that encapsulates the logic for encoding a value of type {@code T}

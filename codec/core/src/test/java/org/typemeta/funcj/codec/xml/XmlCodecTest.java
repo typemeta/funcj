@@ -1,9 +1,11 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.typemeta.funcj.codec.*;
 
-import java.io.*;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 public class XmlCodecTest extends TestBase {
 
@@ -49,7 +51,7 @@ public class XmlCodecTest extends TestBase {
         final String raw2 = raw.replace(
                 "<flag>true</flag>",
                 "<flag>true</flag><test a=\"1\"><value>1.234</value></test>");
-        System.out.println(raw2);
+
         final TestTypes.Custom val2 = codec.decode(TestTypes.Custom.class, new StringReader(raw2));
 
         Assert.assertEquals(val, val2);

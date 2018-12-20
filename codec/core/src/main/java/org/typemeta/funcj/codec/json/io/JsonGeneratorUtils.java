@@ -2,7 +2,8 @@ package org.typemeta.funcj.codec.json.io;
 
 import org.typemeta.funcj.codec.utils.CodecException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 
 abstract class JsonGeneratorUtils {
 

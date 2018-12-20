@@ -5,7 +5,8 @@ import org.typemeta.funcj.codec.utils.ClassKey;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -15,6 +16,11 @@ import java.util.function.Supplier;
  * @param <CFG>     the config type
  */
 public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore<IN, OUT, CFG> {
+
+    @Override
+    default CodecCoreEx<IN, OUT, CFG> getCodecCoreEx() {
+        return this;
+    }
 
     CodecFormat<IN, OUT, CFG> format();
 
@@ -49,16 +55,6 @@ public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore
     default <T> T decodeDynamicType(Class<T> clazz, IN in) {
         return format().decodeDynamicType(this, in);
     }
-
-    /**
-     * Lookup a {@code Codec} for a name, and, if one doesn't exist,
-     * then create a new one.
-     * @param clazz     the class
-     * @param <T>       the raw type to be encoded/decoded
-     * @return          the {@code Codec} for the specified name
-     */
-    <T> Codec<T, IN, OUT, CFG> getCodec(Class<T> clazz);
-
     /**
      * Lookup a {@code Codec} for a name, and, if one doesn't exist,
      * then create a new one using the supplier.
@@ -76,12 +72,7 @@ public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore
 
     <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(
             Class<Collection<T>> collType,
-            Codec<T, IN, OUT, CFG> elemCodec);
-
-    <K, V> Codec<Map<K, V>, IN, OUT, CFG> getMapCodec(
-            Class<Map<K, V>> mapType,
-            Class<K> keyType,
-            Class<V> valType);
+            Codec<T, IN, OUT, CFG> elemType);
 
     <K, V> Codec<Map<K, V>, IN, OUT, CFG> getMapCodec(
             Class<Map<K, V>> mapType,

@@ -3,18 +3,26 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.functions.Functions;
 
+import java.util.Collection;
+import java.util.Map;
+
 public class CodecCoreDelegate<IN, OUT, CFG extends CodecConfig>
         implements CodecCore<IN, OUT, CFG> {
 
-    protected final CodecCore<IN, OUT, CFG> delegate;
+    protected final CodecCoreEx<IN, OUT, CFG> delegate;
 
-    public CodecCoreDelegate(CodecCore<IN, OUT, CFG> delegate) {
+    public CodecCoreDelegate(CodecCoreEx<IN, OUT, CFG> delegate) {
         this.delegate = delegate;
     }
 
     @Override
     public CFG config() {
         return delegate.config();
+    }
+
+    @Override
+    public CodecCoreEx<IN, OUT, CFG> getCodecCoreEx() {
+        return delegate;
     }
 
     @Override
@@ -60,5 +68,25 @@ public class CodecCoreDelegate<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> T decode(Class<? super T> clazz, IN in) {
         return delegate.decode(clazz, in);
+    }
+
+    @Override
+    public <T> Codec<T, IN, OUT, CFG> getCodec(Class<T> clazz) {
+        return delegate.getCodec(clazz);
+    }
+
+    @Override
+    public <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(
+            Class<Collection<T>> collType,
+            Class<T> elemType) {
+        return delegate.getCollCodec(collType, elemType);
+    }
+
+    @Override
+    public <K, V> Codec<Map<K, V>, IN, OUT, CFG> getMapCodec(
+            Class<Map<K, V>> mapType,
+            Class<K> keyType,
+            Class<V> valType) {
+        return delegate.getMapCodec(mapType, keyType, valType);
     }
 }

@@ -7,7 +7,8 @@ import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.tuples.Tuple2;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;

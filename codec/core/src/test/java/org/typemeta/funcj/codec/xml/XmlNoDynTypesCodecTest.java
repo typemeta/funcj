@@ -3,7 +3,7 @@ package org.typemeta.funcj.codec.xml;
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
 
-import java.io.*;
+import java.io.StringWriter;
 
 public class XmlNoDynTypesCodecTest extends TestBase {
 

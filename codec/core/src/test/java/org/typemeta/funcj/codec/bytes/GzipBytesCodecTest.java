@@ -1,11 +1,14 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.junit.Assert;
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codecs;
+import org.typemeta.funcj.codec.TestBase;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.*;
-import java.util.zip.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class GzipBytesCodecTest extends TestBase {
 

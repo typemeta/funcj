@@ -4,9 +4,11 @@ import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.codec.utils.*;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
@@ -209,6 +211,14 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(
             Class<Collection<T>> collType,
+            Class<T> elemType) {
+        final ClassKey<?> key = ClassKey.valueOf(collType, elemType);
+        return getCodec(key, () -> format().createCollCodec((Class)collType, getCodec(elemType)));
+    }
+
+    @Override
+    public <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(
+            Class<Collection<T>> collType,
             Codec<T, IN, OUT, CFG> elemCodec) {
         final ClassKey<?> key = ClassKey.valueOf(collType, elemCodec.type());
         return getCodec(key, () -> format().createCollCodec(collType, elemCodec));
@@ -229,7 +239,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
             Codec<K, IN, OUT, CFG> keyCodec,
             Codec<V, IN, OUT, CFG> valueCodec) {
         final ClassKey<?> key = ClassKey.valueOf(mapType, keyCodec.type(), valueCodec.type());
-        return getCodec(key, () -> format().createMapCodec(mapType, keyCodec, valueCodec));
+        return getCodec(key, () -> format().createMapCodec((Class)mapType, keyCodec, valueCodec));
     }
 
     @Override
@@ -237,7 +247,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
             Class<Map<String, V>> mapType,
             Codec<V, IN, OUT, CFG> valueCodec) {
         final ClassKey<?> key = ClassKey.valueOf(mapType, String.class, valueCodec.type());
-        return getCodec(key, () -> format().createMapCodec(mapType, valueCodec));
+        return getCodec(key, () -> format().createMapCodec((Class)mapType, valueCodec));
     }
 
     @Override
@@ -250,7 +260,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
             return (Codec)format().createMapCodec((Class<Map<String, V>>)(Class)mapType, valueCodec);
         } else {
             final Codec<K, IN, OUT, CFG> keyCodec = getCodec(keyType);
-            return format().createMapCodec(mapType, keyCodec, valueCodec);
+            return format().createMapCodec((Class)mapType, keyCodec, valueCodec);
         }
     }
 
@@ -374,15 +384,13 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                     return (Codec<T, IN, OUT, CFG>) getMapCodec((Class)clazz, Object.class, Object.class);
                 }
             } else if (Collection.class.isAssignableFrom(clazz)) {
-                final Codec<Object, IN, OUT, CFG> elemCodec;
                 final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(clazz, Collection.class);
                 if (typeArgs.size() == 1) {
                     final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
-                    elemCodec = getCodec(elemType);
+                    return (Codec<T, IN, OUT, CFG>)getCollCodec((Class<Collection<Object>>) clazz, elemType);
                 } else {
-                    elemCodec = getCodec(Object.class);
+                    return (Codec<T, IN, OUT, CFG>)getCollCodec((Class<Collection<Object>>) clazz, Object.class);
                 }
-                return (Codec<T, IN, OUT, CFG>) getCollCodec((Class<Collection<Object>>) clazz, elemCodec);
             } else if (clazz.isInterface()) {
                 return new InterfaceCodec<>(clazz);
             } else {

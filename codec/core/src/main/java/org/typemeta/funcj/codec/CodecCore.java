@@ -3,6 +3,9 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.functions.Functions;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  * Interface for classes which provide an encoding of values of any type,
  * into a specific target type.
@@ -11,6 +14,8 @@ import org.typemeta.funcj.functions.Functions;
  * @param <CFG>     the config type
  */
 public interface CodecCore<IN, OUT, CFG extends CodecConfig> {
+
+    CodecCoreEx<IN, OUT, CFG> getCodecCoreEx();
 
     /**
      * Return the config object associated with this {@code CodecCore}.
@@ -107,4 +112,23 @@ public interface CodecCore<IN, OUT, CFG extends CodecConfig> {
      * @return          the decoded value
      */
     <T> T decode(Class<? super T> clazz, IN in);
+
+    /**
+     * Lookup a {@code Codec} for a name, and, if one doesn't exist,
+     * then create a new one.
+     * @param clazz     the class
+     * @param <T>       the raw type to be encoded/decoded
+     * @return          the {@code Codec} for the specified name
+     */
+    <T> Codec<T, IN, OUT, CFG> getCodec(Class<T> clazz);
+
+
+    <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(
+            Class<Collection<T>> collType,
+            Class<T> elemType);
+
+    <K, V> Codec<Map<K, V>, IN, OUT, CFG> getMapCodec(
+            Class<Map<K, V>> mapType,
+            Class<K> keyType,
+            Class<V> valType);
 }

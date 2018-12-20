@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec.mpack;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.stream.StreamCodecCoreDelegate;
 import org.typemeta.funcj.codec.utils.NotSupportedException;
 
 import java.io.*;
@@ -10,7 +9,7 @@ import java.io.*;
  * Interface for classes which implement an encoding via MessagePack.
  */
 public class MpackCodecCore
-        extends StreamCodecCoreDelegate<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>
+        extends CodecCoreDelegate<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>
         implements CodecAPI {
 
     public MpackCodecCore(MpackCodecFormat format) {

@@ -1,9 +1,10 @@
 package org.typemeta.funcj.codec.bytes.io;
 
-import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.bytes.ByteTypes;
+import org.typemeta.funcj.codec.utils.CodecException;
 
-import java.io.*;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public final class OutputImpl implements ByteTypes.OutStream {
     private final DataOutput output;

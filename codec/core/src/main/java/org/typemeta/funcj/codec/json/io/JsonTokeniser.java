@@ -1,9 +1,10 @@
 package org.typemeta.funcj.codec.json.io;
 
-import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.json.JsonTypes.InStream.Event;
+import org.typemeta.funcj.codec.utils.CodecException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -213,6 +214,13 @@ public class JsonTokeniser {
                                         case 't':
                                             buffer.add('\t');
                                             break;
+                                        case '"':
+                                            buffer.add('"');
+                                            break;
+                                        default:
+                                            throw new CodecException(
+                                                    "Unrecognised escape character in string - '" + esc0 + "'"
+                                            );
                                     }
                                     break;
                                 }

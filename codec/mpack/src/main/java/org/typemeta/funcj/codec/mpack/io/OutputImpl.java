@@ -1,8 +1,8 @@
 package org.typemeta.funcj.codec.mpack.io;
 
 import org.msgpack.core.MessagePacker;
-import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.mpack.MpackTypes;
+import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.io.IOException;
 import java.math.BigInteger;

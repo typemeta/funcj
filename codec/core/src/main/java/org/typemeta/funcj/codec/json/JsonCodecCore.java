@@ -2,15 +2,15 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
-import org.typemeta.funcj.codec.stream.StreamCodecCoreDelegate;
 
-import java.io.*;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * Interface for classes which implement an encoding via JSON.
  */
 public class JsonCodecCore
-        extends StreamCodecCoreDelegate<InStream, OutStream, Config>
+        extends CodecCoreDelegate<InStream, OutStream, Config>
         implements CodecAPI {
 
     public JsonCodecCore(JsonCodecFormat format) {

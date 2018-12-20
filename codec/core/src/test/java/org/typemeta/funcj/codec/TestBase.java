@@ -5,7 +5,8 @@ import org.typemeta.funcj.codec.misc.SimpleType;
 import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static org.typemeta.funcj.codec.TestTypes.*;
 
@@ -21,6 +22,7 @@ public abstract class TestBase {
 
     protected abstract <T> void roundTrip(T val, Class<T> clazz) throws Exception;
 
+    @SuppressWarnings("unchecked")
     protected static <IN, OUT, CFG extends CodecConfig, CC extends CodecCore<IN, OUT, CFG>>
     CC prepareCodecCore(CC core) {
 
