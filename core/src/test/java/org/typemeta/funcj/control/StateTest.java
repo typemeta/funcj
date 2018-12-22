@@ -2,7 +2,11 @@ package org.typemeta.funcj.control;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.typemeta.funcj.data.*;
+
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.typemeta.funcj.control.State.*;
@@ -31,6 +35,59 @@ public class StateTest {
         final String r = state.eval(b);
 
         assertEquals(b+a, r);
+    }
+
+    @Test
+    public void testSequenceStream() {
+        final State<String, Unit> addA = State.modify(s -> s + "A");
+        final State<String, Unit> addB = State.modify(s -> s + "B");
+        final State<String, Unit> addC = State.modify(s -> s + "C");
+
+        final List<State<String, Unit>> l = new ArrayList<>();
+        l.add(State.modify(s -> s + "A"));
+        l.add(State.modify(s -> s + "B"));
+        l.add(State.modify(s -> s + "C"));
+
+        final String result = State.sequence(l.stream()).exec("X");
+
+        assertEquals("XABC", result);
+    }
+
+    @Test
+    public void testSequenceIList() {
+        IList<State<String, Unit>> l = IList.nil();
+        l = l.add(State.modify(s -> s + "C"));
+        l = l.add(State.modify(s -> s + "B"));
+        l = l.add(State.modify(s -> s + "A"));
+
+        final String result = State.sequence(l.stream()).exec("X");
+
+        assertEquals("XABC", result);
+    }
+
+    @Test
+    public void testTraverseIList() {
+        final IList<String> l = IList.of("A", "B", "C");
+
+        final String result =
+                State.traverse(l, x -> State.modify((String s) -> s + x))
+                        .exec("X");
+
+        assertEquals("XABC", result);
+    }
+
+    @Test
+    public void testTraverseList() {
+        final List<String> l = new ArrayList<>();
+        l.add("A");
+        l.add("B");
+        l.add("C");
+
+        final String result =
+                State.traverse(l, x -> State.modify((String s) -> s + x))
+                        .exec("X");
+
+        assertEquals("XABC", result);
     }
 
     static class Utils {

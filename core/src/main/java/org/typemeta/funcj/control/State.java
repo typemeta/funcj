@@ -107,8 +107,8 @@ public interface State<S, A> {
      * @return          a {@code State} which wraps an {@link IList} of values
      */
     static <S, A, B> State<S, IList<B>> traverse(IList<A> la, F<A, State<S, B>> f) {
-        return la.foldRight(
-            (a, slb) -> f.apply(a).apply(slb.map(lb -> lb::add)),
+        return la.foldLeft(
+            (slb, a) -> f.apply(a).apply(slb.map(lb -> lb::add)),
             pure(IList.nil())
         );
     }

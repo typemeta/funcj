@@ -116,8 +116,8 @@ public interface StateR<S, A> {
      * @return          a {@code StateR} which wraps an {@link IList} of values
      */
     static <S, A, B> StateR<S, IList<B>> traverse(IList<A> lt, F<A, StateR<S, B>> f) {
-        return lt.foldRight(
-            (a, slb) -> f.apply(a).apply(slb.map(l -> l::add)),
+        return lt.foldLeft(
+            (slb, a) -> f.apply(a).apply(slb.map(l -> l::add)),
             pure(IList.nil())
         );
     }
