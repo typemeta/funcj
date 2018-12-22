@@ -111,8 +111,8 @@ public interface Validated<E, T> {
      * @return          a {@code Validated} which wraps an {@link IList} of values
      */
     static <E, T, U> Validated<E, IList<U>> traverse(IList<T> lt, F<T, Validated<E, U>> f) {
-        return lt.foldRight(
-                (t, vlu) -> f.apply(t).apply(vlu.map(lu -> lu::add)),
+        return lt.foldLeft(
+                (vlu, t) -> f.apply(t).apply(vlu.map(lu -> lu::add)),
                 success(IList.nil())
         );
     }

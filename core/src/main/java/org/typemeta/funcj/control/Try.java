@@ -82,8 +82,8 @@ public interface Try<T> {
      * @return          a {@code Try} which wraps an {@link IList} of values
      */
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
-        return lt.foldRight(
-                (t, tlu) -> f.apply(t).apply(tlu.map(lu -> lu::add)),
+        return lt.foldLeft(
+                (tlu, t) -> f.apply(t).apply(tlu.map(lu -> lu::add)),
                 success(IList.nil())
         );
     }

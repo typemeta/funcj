@@ -72,8 +72,8 @@ public interface Option<T> {
      * @return          a {@code Option} which wraps an {@link IList} of values
      */
     static <T, U> Option<IList<U>> traverse(IList<T> lt, F<T, Option<U>> f) {
-        return lt.foldRight(
-                (t, olu) -> f.apply(t).apply(olu.map(lu -> lu::add)),
+        return lt.foldLeft(
+                (olu, t) -> f.apply(t).apply(olu.map(lu -> lu::add)),
                 some(IList.nil())
         );
     }
