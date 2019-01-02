@@ -265,6 +265,22 @@ public interface Either<E, S> {
     boolean isRight();
 
     /**
+     * If this is a {@code Left} value then return the contained value,
+     * otherwise throw an exception.
+     * @return          the {@code Left} value
+     * @throws          {@link RuntimeException} if this is a {@code Right} value
+     */
+    E left();
+
+    /**
+     * If this is a {@code Right} value then return the contained value,
+     * otherwise throw an exception.
+     * @return          the {@code Right} value
+     * @throws          {@link RuntimeException} if this is a {@code Left} value
+     */
+    S right();
+
+    /**
      * Either return the wrapped value if it's a {@code Right},
      * otherwise return the given default value.
      * @param defaultValue value to be returned if this is a {@code Left} value.
@@ -409,6 +425,16 @@ public interface Either<E, S> {
         }
 
         @Override
+        public E left() {
+            return value;
+        }
+
+        @Override
+        public S right() {
+            throw new RuntimeException("Either.right() called on a Either.Left value");
+        }
+
+        @Override
         public S getOrElse(S defaultValue) {
             return defaultValue;
         }
@@ -508,6 +534,16 @@ public interface Either<E, S> {
         @Override
         public boolean isRight() {
             return true;
+        }
+
+        @Override
+        public E left() {
+            throw new RuntimeException("Either.left() called on a Either.Right value");
+        }
+
+        @Override
+        public S right() {
+            return value;
         }
 
         @Override
