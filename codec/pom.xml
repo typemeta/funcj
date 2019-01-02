@@ -19,7 +19,6 @@
     <modules>
         <module>core</module>
         <module>mpack</module>
-        <!--<module>avro</module>-->
     </modules>
 
 </project>
