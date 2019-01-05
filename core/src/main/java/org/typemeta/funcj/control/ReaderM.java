@@ -11,34 +11,43 @@ import java.util.stream.Stream;
  * {@code ReaderM} is an implementation of the Reader monad.
  * It is essentially an enriched {@link Functions.F}.
  */
-public interface ReaderM<A, R> {
+public interface ReaderM<ENV, A> {
+
+    static <ENV> ReaderM<ENV, ENV> ask() {
+        return e -> e;
+    }
+
+    static <ENV, A> ReaderM<ENV, A> asks(F<ENV, A> f) {
+        return f::apply;
+    }
+
+    static <ENV, A, T> ReaderM<ENV, A> local(F<ENV, T> f, ReaderM<T, A> r) {
+        //return ReaderM.<ENV>ask().map(env -> r.run(f.apply(env)));
+        return a -> r.run(f.apply(a));
+    }
 
     /**
      * A {@code Reader} that always returns the same value, regardless of its argument
-     * @param r         the value the {@code Reader} will return
-     * @param <A>       the input type of the {@code Reader}
-     * @param <R>       the type of the constant value {@code r}
+     * @param a         the value the {@code Reader} will return
+     * @param <ENV>       the input type of the {@code Reader}
+     * @param <A>       the type of the constant value {@code r}
      * @return          the constant {@code Reader}
      */
-    static <A, R> ReaderM<A, R> pure(R r) {
-        return a -> r;
-    }
-
-    static <T> F<T, T> ask() {
-        return t -> t;
+    static <ENV, A> ReaderM<ENV, A> pure(A a) {
+        return e -> a;
     }
 
     /**
      * Applicative function application.
      * @param rf        the function wrapped in a {@code Reader}
-     * @param rt        the function argument wrapped in a {@code Reader}
-     * @param <A>       the function argument type
-     * @param <T>       the function input type
-     * @param <U>       the function return type
+     * @param ra        the function argument wrapped in a {@code Reader}
+     * @param <ENV>     the function argument type
+     * @param <A>       the function input type
+     * @param <B>       the function return type
      * @return          the result of applying the function to the argument, wrapped in a {@code Try}
      */
-    static <A, T, U> ReaderM<A, U> ap(ReaderM<A, F<T, U>> rf, ReaderM<A, T> rt) {
-        return rt.app(rf);
+    static <ENV, A, B> ReaderM<ENV, B> ap(ReaderM<ENV, F<A, B>> rf, ReaderM<ENV, A> ra) {
+        return ra.app(rf);
     }
 
     /**
@@ -46,15 +55,15 @@ public interface ReaderM<A, R> {
      * <p>
      * Equivalent to <pre>sequence(lt.map(f))</pre>.
      * @param la        the list of values
-     * @param ffb       the function to be applied to each value in the list
-     * @param <T>       the input type of the applicative function
+     * @param frb       the function to be applied to each value in the list
+     * @param <ENV>     the input type of the applicative function
      * @param <A>       the type of list elements
      * @param <B>       the return type of the {@code F} returned by the function
      * @return          an {@code F} which wraps an {@link IList} of values
      */
-    static <T, A, B> ReaderM<T, IList<B>> traverse(IList<A> la, F<A, ReaderM<T, B>> ffb) {
+    static <ENV, A, B> ReaderM<ENV, IList<B>> traverse(IList<A> la, F<A, ReaderM<ENV, B>> frb) {
         return la.foldRight(
-                (a, flb) -> ffb.apply(a).app(flb.map(l -> l::add)),
+                (a, flb) -> frb.apply(a).app(flb.map(lb -> lb::add)),
                 pure(IList.nil())
         );
     }
@@ -64,137 +73,112 @@ public interface ReaderM<A, R> {
      * <p>
      * Translate a {@link IList} of {@code F}s into a {@code F} of an {@code IList},
      * by composing each consecutive {@code F}s using the {@link F#app} method.
-     * @param lfu       the list of {@code F} values
-     * @param <T>       the input type of the applicative function
-     * @param <U>       the return type of the {@code F}s in the list
+     * @param lrb       the list of {@code F} values
+     * @param <ENV>     the input type of the applicative function
+     * @param <A>       the return type of the {@code F}s in the list
      * @return          a {@code Reader} which wraps an {@link IList} of values
      */
-    static <T, U> ReaderM<T, IList<U>> sequence(IList<ReaderM<T, U>> lfu) {
-        return lfu.foldRight(
-                (fu, flu) -> fu.app(flu.map(l -> l::add)),
+    static <ENV, A> ReaderM<ENV, IList<A>> sequence(IList<ReaderM<ENV, A>> lrb) {
+        return lrb.foldRight(
+                (fa, rla) -> fa.app(rla.map(la -> la::add)),
                 pure(IList.nil())
         );
     }
 
     /**
      * Variation of {@link ReaderM#sequence(IList)} for {@link Stream}.
-     * @param sfu       the stream of {@code F} values
-     * @param <T>       the error type
-     * @param <U>       the return type of the {@code F}s in the stream
+     * @param sra       the stream of {@code F} values
+     * @param <ENV>     the error type
+     * @param <A>       the return type of the {@code F}s in the stream
      * @return          a {@code F} which wraps an {@link Stream} of values
      */
-    static <T, U> ReaderM<T, Stream<U>> sequence(Stream<ReaderM<T, U>> sfu) {
-        final Iterator<ReaderM<T, U>> iter = sfu.iterator();
-        ReaderM<T, IList<U>> flu = pure(IList.nil());
+    static <ENV, A> ReaderM<ENV, Stream<A>> sequence(Stream<ReaderM<ENV, A>> sra) {
+        final Iterator<ReaderM<ENV, A>> iter = sra.iterator();
+        ReaderM<ENV, IList<A>> rla = pure(IList.nil());
         while (iter.hasNext()) {
-            final ReaderM<T, U> fu = iter.next();
-            flu = fu.app(flu.map(lt -> lt::add));
+            final ReaderM<ENV, A> ra = iter.next();
+            rla = ra.app(rla.map(la -> la::add));
         }
-        return flu.map(IList::stream);
+        return rla.map(IList::stream);
     }
 
     /**
      * Kleisli models composable operations that return a {@code Reader}.
-     * @param <T>       the input type of the returned {@code Reader} type
-     * @param <U>       the input type of the returned {@code F} type
-     * @param <V>       the return type of the returned {@code Reader} type
+     * @param <ENV>       the input type of the returned {@code Reader} type
+     * @param <A>       the input type of the returned {@code F} type
+     * @param <B>       the return type of the returned {@code Reader} type
      */
     @FunctionalInterface
-    interface Kleisli<T, U, V> {
+    interface Kleisli<ENV, A, B> {
         /**
-         * Construct a {@code Kleisli} value from a function.
-         * @param f         the function
-         * @param <T>       the function (fixed) input type
-         * @param <U>       the input type of the returned {@code F} type
-         * @param <V>       the return type of the returned {@code F} type
+         * Construct a {@code Kleisli} value from a reader.
+         * @param rB        the reader
+         * @param <ENV>     the reader (fixed) input type
+         * @param <A>       the input type of the returned {@code F} type
+         * @param <B>       the return type of the returned {@code F} type
          * @return          the new {@code Kleisli}
          */
-        static <T, U, V> Kleisli<T, U, V> of(F<U, ReaderM<T, V>> f) {
-            return f::apply;
+        static <ENV, A, B> Kleisli<ENV, A, B> of(F<A, ReaderM<ENV, B>> rB) {
+            return rB::apply;
         }
 
         /**
          * Apply this {@code Kleisli} operation
-         * @param t         the input value
+         * @param a         the input value
          * @return          the result of the operation
          */
-        ReaderM<T, V> apply(U t);
+        ReaderM<ENV, B> apply(A a);
 
         /**
          * Compose this {@code Kleisli} with another by applying this one first,
          * then the other.
-         * @param kVW       the {@code Kleisli} to be applied after this one
-         * @param <W>       the second {@code Kleisli}'s return type
+         * @param kBC       the {@code Kleisli} to be applied after this one
+         * @param <C>       the second {@code Kleisli}'s return type
          * @return          the composed {@code Kleisli}
          */
-        default <W> Kleisli<T, U, W> andThen(Kleisli<T, V, W> kVW) {
-            return t -> apply(t).flatMap(kVW::apply);
+        default <C> Kleisli<ENV, A, C> andThen(Kleisli<ENV, B, C> kBC) {
+            return a -> apply(a).flatMap(kBC::apply);
         }
 
         /**
          * Compose this {@code Kleisli} with another by applying the other one first,
          * and then this one.
-         * @param kSU       the {@code Kleisli} to be applied after this one
-         * @param <S>       the first {@code Kleisli}'s input type
+         * @param kCA       the {@code Kleisli} to be applied after this one
+         * @param <C>       the first {@code Kleisli}'s input type
          * @return          the composed {@code Kleisli}
          */
-        default <S> Kleisli<T, S, V> compose(Kleisli<T, S, U> kSU) {
-            return s -> kSU.apply(s).flatMap(this::apply);
+        default <C> Kleisli<ENV, C, B> compose(Kleisli<ENV, C, A> kCA) {
+            return c -> kCA.apply(c).flatMap(this::apply);
         }
 
         /**
          * Compose this {@code Kleisli} with a function,
          * by applying this {@code Kleisli} first,
          * and then mapping the function over the result.
-         * @param f         the function
-         * @param <W>       the function return type
+         * @param fC         the function
+         * @param <C>       the function return type
          * @return          the composed {@code Kleisli}
          */
-        default <W> Kleisli<T, U, W> map(F<V, W> f) {
-            return t -> apply(t).map(f);
+        default <C> Kleisli<ENV, A, C> map(F<B, C> fC) {
+            return a -> apply(a).map(fC);
         }
     }
 
     /**
-     * Apply this function
+     * Run this reader.
      * @param a         the function argument
      * @return          the result of applying this function
      */
-    R apply(A a);
-
-    /**
-     * Compose this {@code Reader} with another,
-     * to create a {@code Reader} that first applies {@code f}
-     * and then applies this {@code Reader} to the result.
-     * @param f         the {@code Reader} to compose with
-     * @param <T>       the argument type to {@code f}
-     * @return          a {@code Reader} that first applies {@code f} and then applies this to the result.
-     */
-    default <T> ReaderM<T, R> compose(ReaderM<? super T, ? extends A> f) {
-        return t -> this.apply(f.apply(t));
-    }
-
-    /**
-     * Compose this {@code Reader} with another,
-     * to create a {@code Reader} that first applies this {@code Reader}
-     * and then applies {@code f} to the result.
-     * @param f         the function to compose with
-     * @param <T>       the argument type to {@code f}
-     * @return          a function that first applies this function and then applies {@code f} to the result.
-     */
-    default <T> ReaderM<A, T> andThen(ReaderM<? super R, ? extends T> f) {
-        return a -> f.apply(this.apply(a));
-    }
+    A run(ENV a);
 
     /**
      * Map a function over this {@code Reader}.
-     * Essentially {@link ReaderM#compose} without the wildcard generic types.
      * @param f         the function to compose with
-     * @param <T>       the argument type to {@code f}
+     * @param <B>       the argument type to {@code f}
      * @return          a function that first applies {@code f} and then applies this function to the result.
      */
-    default <T> ReaderM<A, T> map(F<R, T> f) {
-        return a -> f.apply(apply(a));
+    default <B> ReaderM<ENV, B> map(F<A, B> f) {
+        return a -> f.apply(this.run(a));
     }
 
     /**
@@ -203,8 +187,8 @@ public interface ReaderM<A, R> {
      * @param <B>       the return type of the function returned by {@code f}
      * @return          the composed function
      */
-    default <B> ReaderM<A, B> app(ReaderM<A, F<R, B>> rf) {
-        return a -> rf.apply(a).apply(this.apply(a));
+    default <B> ReaderM<ENV, B> app(ReaderM<ENV, F<A, B>> rf) {
+        return a -> rf.run(a).apply(this.run(a));
     }
 
     /**
@@ -213,7 +197,7 @@ public interface ReaderM<A, R> {
      * @param <B>       the return type of the function returned by {@code f}
      * @return          the composed function
      */
-    default <B> ReaderM<A, B> flatMap(F<R, ReaderM<A, B>> f) {
-        return a -> f.apply(this.apply(a)).apply(a);
+    default <B> ReaderM<ENV, B> flatMap(F<A, ReaderM<ENV, B>> f) {
+        return a -> f.apply(this.run(a)).run(a);
     }
 }

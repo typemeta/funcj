@@ -39,8 +39,8 @@ public class ReaderMTest {
             Kleisli<Integer, Integer, T> rhs) {
         assertEquals(
                 msg,
-                lhs.apply(i).apply(j),
-                rhs.apply(i).apply(j));
+                lhs.apply(i).run(j),
+                rhs.apply(i).run(j));
     }
 
     @Property
@@ -99,7 +99,7 @@ public class ReaderMTest {
 
         final DAO dao = fxRates::get;
 
-        final double gbpEurA = getFxRateAB.apply(Ccy.EUR, Ccy.GBP).apply(dao);
+        final double gbpEurA = getFxRateAB.apply(Ccy.EUR, Ccy.GBP).run(dao);
         final double gbpEurE = usdEur/usdGbp;
 
         assertEquals("GBP/EUR fx rate via DAO injection", gbpEurE, gbpEurA, 1e-8);
@@ -117,7 +117,7 @@ public class ReaderMTest {
 
         final DAO dao = fxRates::get;
 
-        final double gbpEurA = getFxRateAB.apply(Ccy.EUR, Ccy.GBP).apply(dao);
+        final double gbpEurA = getFxRateAB.apply(Ccy.EUR, Ccy.GBP).run(dao);
         final double gbpEurE = usdEur/usdGbp;
 
         assertEquals("GBP/EUR fx rate via DAO injection", gbpEurE, gbpEurA, 1e-8);

@@ -228,7 +228,7 @@ public interface State<S, A> {
          * @return          the composed {@code Kleisli}
          */
         default <C> Kleisli<S, A, C> andThen(Kleisli<S, B, C> kUV) {
-            return a -> apply(a).flatMap(kUV::apply);
+            return a -> this.apply(a).flatMap(kUV::apply);
         }
 
         /**
@@ -251,7 +251,7 @@ public interface State<S, A> {
          * @return          the composed {@code Kleisli}
          */
         default <C> Kleisli<S, A, C> map(F<B, C> f) {
-            return t -> apply(t).map(f);
+            return t -> this.apply(t).map(f);
         }
     }
 

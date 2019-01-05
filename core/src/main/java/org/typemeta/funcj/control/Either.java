@@ -225,7 +225,7 @@ public interface Either<E, S> {
          * @return          the composed {@code Kleisli}
          */
         default <V> Kleisli<E, T, V> andThen(Kleisli<E, U, V> kUV) {
-            return t -> apply(t).flatMap(kUV::apply);
+            return t -> this.apply(t).flatMap(kUV::apply);
         }
 
         /**
@@ -248,7 +248,7 @@ public interface Either<E, S> {
          * @return          the composed {@code Kleisli}
          */
         default <V> Kleisli<E, T, V> map(F<U, V> f) {
-            return t -> apply(t).map(f);
+            return t -> this.apply(t).map(f);
         }
     }
 

@@ -205,7 +205,7 @@ public interface Option<T> {
          * @return          the composed {@code Kleisli}
          */
         default <V> Kleisli<T, V> andThen(Kleisli<U, V> kUV) {
-            return t -> apply(t).flatMap(kUV::apply);
+            return t -> this.apply(t).flatMap(kUV::apply);
         }
 
         /**
@@ -228,7 +228,7 @@ public interface Option<T> {
          * @return          the composed {@code Kleisli}
          */
         default <V> Kleisli<T, V> map(F<U, V> f) {
-            return t -> apply(t).map(f);
+            return t -> this.apply(t).map(f);
         }
     }
 
