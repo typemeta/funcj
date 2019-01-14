@@ -4,12 +4,13 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.tuples.Tuple2;
 
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.typemeta.funcj.control.StateR.*;
 import static org.typemeta.funcj.control.StateR.pure;
 import static org.typemeta.funcj.control.StateRTest.Utils.*;
 import static org.typemeta.funcj.control.StateRTest.Utils.pure;
@@ -19,9 +20,9 @@ public class StateRTest {
     @Property
     public void testStateR(String a, String b, String c) {
         final String r =
-                put(a).flatMap(u -> get())
-                        .flatMap(s -> put(s + b))
-                        .flatMap(u -> get())
+                StateR.put(a).flatMap(u -> StateR.get())
+                        .flatMap(s -> StateR.put(s + b))
+                        .flatMap(u -> StateR.get())
                         .eval(c);
 
         assertEquals(a+b, r);
@@ -31,50 +32,53 @@ public class StateRTest {
     public void testStateR2(String a, String b) {
         final String r =
                 StateR.<String>get()
-                        .flatMap(s -> put(s + a))
-                        .flatMap(u -> get())
+                        .flatMap(s -> StateR.put(s + a))
+                        .flatMap(u -> StateR.get())
                         .eval(b);
         assertEquals(b+a, r);
     }
 
+    static <S> StateR<S, S> modify(Functions.F<S, S> f) {
+        return StateR.<S>get().flatMap(s -> StateR.put(f.apply(s)).map(u -> s));
+    }
 
     @Test
-    public void testSequenceStream() {
-        final StateR<String, Unit> addA = StateR.modify(s -> s + "A");
-        final StateR<String, Unit> addB = StateR.modify(s -> s + "B");
-        final StateR<String, Unit> addC = StateR.modify(s -> s + "C");
+    public void testSequenceList() {
+        final List<StateR<String, String>> l = new ArrayList<>();
+        l.add(modify(s -> s + "A"));
+        l.add(modify(s -> s + "B"));
+        l.add(modify(s -> s + "C"));
 
-        final List<StateR<String, Unit>> l = new ArrayList<>();
-        l.add(StateR.modify(s -> s + "A"));
-        l.add(StateR.modify(s -> s + "B"));
-        l.add(StateR.modify(s -> s + "C"));
+        final Tuple2<String, List<String>> result = StateR.sequence(l).runState("X");
 
-        final String result = StateR.sequence(l.stream()).exec("X");
-
-        assertEquals("XABC", result);
+        assertEquals("XABC", result._1);
+        assertEquals(Arrays.asList("X", "XA", "XAB"), result._2);
     }
 
     @Test
     public void testSequenceIList() {
-        IList<StateR<String, Unit>> l = IList.nil();
-        l = l.add(StateR.modify(s -> s + "C"));
-        l = l.add(StateR.modify(s -> s + "B"));
-        l = l.add(StateR.modify(s -> s + "A"));
+        final IList<StateR<String, String>> l = IList.of(
+                modify(s -> s + "A"),
+                modify(s -> s + "B"),
+                modify(s -> s + "C")
+        );
 
-        final String result = StateR.sequence(l.stream()).exec("X");
+        final Tuple2<String, IList<String>> result = StateR.sequence(l).runState("X");
 
-        assertEquals("XABC", result);
+        assertEquals("XABC", result._1);
+        assertEquals(IList.of("X", "XA", "XAB"), result._2);
     }
 
     @Test
     public void testTraverseIList() {
         final IList<String> l = IList.of("A", "B", "C");
 
-        final String result =
-                StateR.traverse(l, x -> StateR.modify((String s) -> s + x))
-                        .exec("X");
+        final Tuple2<String, IList<String>> result =
+                StateR.traverse(l, x -> modify((String s) -> s + x))
+                        .runState("X");
 
-        assertEquals("XABC", result);
+        assertEquals("XABC", result._1);
+        assertEquals(IList.of("X", "XA", "XAB"), result._2);
     }
 
     @Test
@@ -84,24 +88,25 @@ public class StateRTest {
         l.add("B");
         l.add("C");
 
-        final String result =
-                StateR.traverse(l, x -> StateR.modify((String s) -> s + x))
-                        .exec("X");
+        final Tuple2<String, List<String>> result =
+                StateR.traverse(l, x -> modify((String s) -> s + x))
+                        .runState("X");
 
-        assertEquals("XABC", result);
+        assertEquals("XABC", result._1);
+        assertEquals(Arrays.asList("X", "XA", "XAB"), result._2);
     }
 
     static class Utils {
-        static final Kleisli<Double, Double, Double> pure = Kleisli.of(StateR::pure);
+        static final StateR.Kleisli<Double, Double, Double> pure = StateR.Kleisli.of(StateR::pure);
 
-        static final Kleisli<Double, Double, Double> add = d ->
-                StateR.<Double>get().flatMap(x -> put(x + d)).flatMap(u -> pure(d));
+        static final StateR.Kleisli<Double, Double, Double> add = d ->
+                StateR.<Double>get().flatMap(x -> StateR.put(x + d)).flatMap(u -> pure(d));
 
-        static final Kleisli<Double, Double, Double> sub = d ->
-                StateR.<Double>get().flatMap(x -> put(x - d)).flatMap(u -> pure(d));
+        static final StateR.Kleisli<Double, Double, Double> sub = d ->
+                StateR.<Double>get().flatMap(x -> StateR.put(x - d)).flatMap(u -> pure(d));
 
-        static final Kleisli<Double, Double, Double> div = d ->
-                StateR.<Double>get().flatMap(x -> put(x / d)).flatMap(u -> pure(d));
+        static final StateR.Kleisli<Double, Double, Double> div = d ->
+                StateR.<Double>get().flatMap(x -> StateR.put(x / d)).flatMap(u -> pure(d));
 
         static final double EPSILON = 1e-32;
         static final double INIT = 12.34;
@@ -109,8 +114,8 @@ public class StateRTest {
         static void check(
                 String msg,
                 double d,
-                Kleisli<Double, Double, Double> lhs,
-                Kleisli<Double, Double, Double> rhs) {
+                StateR.Kleisli<Double, Double, Double> lhs,
+                StateR.Kleisli<Double, Double, Double> rhs) {
             assertEquals(
                     msg,
                     lhs.apply(d).exec(INIT),
@@ -121,18 +126,18 @@ public class StateRTest {
 
     @Property
     public void kleisliLeftIdentity(double i) {
-        check("Kleisli Left-identity 1", i, pure.andThen(add), add);
-        check("Kleisli Left-identity 2", i, pure.andThen(div), div);
+        check("StateR.Kleisli Left-identity 1", i, pure.andThen(add), add);
+        check("StateR.Kleisli Left-identity 2", i, pure.andThen(div), div);
     }
 
     @Property
     public void kleisliRightIdentity(double i) {
-        check("Kleisli Right-identity 1", i, add.andThen(pure), add);
-        check("Kleisli Right-identity 2", i, div.andThen(pure), div);
+        check("StateR.Kleisli Right-identity 1", i, add.andThen(pure), add);
+        check("StateR.Kleisli Right-identity 2", i, div.andThen(pure), div);
     }
 
     @Property
     public void kleisliIsAssociative(double i) {
-        check("Kleisli Associativity", i, (add.andThen(div)).andThen(sub), add.andThen(div.andThen(sub)));
+        check("StateR.Kleisli Associativity", i, (add.andThen(div)).andThen(sub), add.andThen(div.andThen(sub)));
     }
 }

@@ -3,10 +3,9 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
-import org.typemeta.funcj.util.Folds;
+import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import static org.typemeta.funcj.data.Unit.UNIT;
 
@@ -77,8 +76,8 @@ public interface StateR<S, A> {
      * @return          the new {@code StateR} instance
      */
     static <S> StateR<S, Unit> modify(F<S, S> f) {
-        return StateR.<S>get().flatMap(x ->
-            put(f.apply(x))
+        return StateR.<S>get().flatMap(s ->
+            put(f.apply(s))
         );
     }
 
@@ -108,17 +107,17 @@ public interface StateR<S, A> {
 
     /**
      * Standard applicative traversal.
-     * @param lt        list of values
+     * @param la        list of values
      * @param f         function to be applied to each value in the list
      * @param <S>       the state type
      * @param <A>       type of list elements
      * @param <B>       the state result type
      * @return          a {@code StateR} which wraps an {@link IList} of values
      */
-    static <S, A, B> StateR<S, IList<B>> traverse(IList<A> lt, F<A, StateR<S, B>> f) {
-        return lt.foldLeft(
-            (slb, a) -> f.apply(a).apply(slb.map(l -> l::add)),
-            pure(IList.nil())
+    static <S, A, B> StateR<S, IList<B>> traverse(IList<A> la, F<A, StateR<S, B>> f) {
+        return la.foldRight(
+                (a, slb) -> slb.apply(f.apply(a).map(b -> l -> l.add(b))),
+                pure(IList.nil())
         );
     }
 
@@ -134,11 +133,7 @@ public interface StateR<S, A> {
      * @return          a {@code StateR} which wraps an {@link List} of values
      */
     static <S, A, B> StateR<S, List<B>> traverse(List<A> la, F<A, StateR<S, B>> f) {
-        return Folds.foldLeft(
-                (slb, s) -> f.apply(s).apply(slb.map(F.of(lb -> (B b) -> {lb.add(b); return lb;}))),
-                pure(new ArrayList<>()),
-                la
-        );
+        return sequence(Functors.map(f, la));
     }
 
     /**
@@ -150,26 +145,26 @@ public interface StateR<S, A> {
      */
     static <S, A> StateR<S, IList<A>> sequence(IList<? extends StateR<S, A>> lsa) {
         return lsa.foldRight(
-            (sa, sla) -> sa.apply(sla.map(l -> l::add)),
-            pure(IList.nil())
+                (sa, sla) -> sla.apply(sa.map(a -> l -> l.add(a))),
+                pure(IList.nil())
         );
     }
 
     /**
-     * Variation of {@link StateR#sequence(IList)} for {@link Stream}.
-     * @param sst       the stream of {@code StateR} values
+     * Variation of {@link StateR#sequence(IList)} for {@link List}.
+     * @param lst       the list of {@code StateR} values
      * @param <S>       the state type
-     * @param <T>       the result type of the {@code StateR}s in the stream
-     * @return          a {@code StateR} which wraps an {@link Stream} of values
+     * @param <T>       the result type of the {@code StateR}s in the list
+     * @return          a {@code StateR} which wraps an {@link List} of values
      */
-    static <S, T> StateR<S, Stream<T>> sequence(Stream<StateR<S, T>> sst) {
-        final Iterator<StateR<S, T>> iter = sst.iterator();
+    static <S, T> StateR<S, List<T>> sequence(List<StateR<S, T>> lst) {
+        final Iterator<StateR<S, T>> iter = lst.iterator();
         StateR<S, IList<T>> slt = pure(IList.nil());
         while (iter.hasNext()) {
             final StateR<S, T> st = iter.next();
             slt = st.apply(slt.map(lt -> lt::add));
         }
-        return slt.map(IList::stream);
+        return slt.map(IList::reverse).map(IList::toList);
     }
 
     /**
