@@ -12,8 +12,11 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.typemeta.funcj.control.StateR.pure;
-import static org.typemeta.funcj.control.StateRTest.Utils.*;
+import static org.typemeta.funcj.control.StateRTest.Utils.add;
+import static org.typemeta.funcj.control.StateRTest.Utils.check;
+import static org.typemeta.funcj.control.StateRTest.Utils.div;
 import static org.typemeta.funcj.control.StateRTest.Utils.pure;
+import static org.typemeta.funcj.control.StateRTest.Utils.sub;
 
 @RunWith(JUnitQuickcheck.class)
 public class StateRTest {

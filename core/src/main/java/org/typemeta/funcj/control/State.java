@@ -1,6 +1,7 @@
 package org.typemeta.funcj.control;
 
-import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.data.Unit;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
 import org.typemeta.funcj.util.Folds;
@@ -8,7 +9,8 @@ import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
 
-import static org.typemeta.funcj.control.Trampoline.*;
+import static org.typemeta.funcj.control.Trampoline.defer;
+import static org.typemeta.funcj.control.Trampoline.done;
 import static org.typemeta.funcj.data.Unit.UNIT;
 
 /**

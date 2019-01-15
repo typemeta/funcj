@@ -2,9 +2,9 @@ package org.typemeta.funcj.parser;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.junit.*;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.data.Chr;
 
 import java.io.StringReader;
 

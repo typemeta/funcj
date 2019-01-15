@@ -1,6 +1,7 @@
 package org.typemeta.funcj.parser;
 
-import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.data.Unit;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.tuples.Tuple2;
 

@@ -2,15 +2,20 @@ package org.typemeta.funcj.json;
 
 import org.junit.Test;
 import org.typemeta.funcj.control.Try;
-import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.data.Chr;
+import org.typemeta.funcj.data.Unit;
 import org.typemeta.funcj.json.model.JsValue;
-import org.typemeta.funcj.parser.*;
+import org.typemeta.funcj.parser.Input;
+import org.typemeta.funcj.parser.Result;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.*;
 
 public class JsonParserTest {
@@ -94,7 +99,7 @@ abstract class FileUtils {
         });
     }
 
-    static Try<Stream<Tuple2<String, BufferedReader>>> openDir(String name) {
+    static Try<List<Tuple2<String, BufferedReader>>> openDir(String name) {
         final String dir = "/" + name + "/";
 
         return Try.sequence(
@@ -102,11 +107,13 @@ abstract class FileUtils {
                         .get()
                         .lines()
                         .map(file -> openResource(dir + file)
-                                .map(br -> Tuple2.of(file, br))));
+                                .map(br -> Tuple2.of(file, br)))
+                        .collect(toList())
+        );
     }
 
     static String read(BufferedReader rdr) {
-        return rdr.lines().collect(Collectors.joining("\n"));
+        return rdr.lines().collect(joining("\n"));
     }
 
     static Unit roundTripJson(String name, String json) {

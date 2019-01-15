@@ -1,9 +1,9 @@
 package org.typemeta.funcj.json.algebras;
 
-import org.typemeta.funcj.document.*;
+import org.typemeta.funcj.document.API;
+import org.typemeta.funcj.document.Document;
 import org.typemeta.funcj.functions.SideEffect;
 import org.typemeta.funcj.json.model.*;
-import org.typemeta.funcj.json.model.Utils;
 
 import java.util.*;
 

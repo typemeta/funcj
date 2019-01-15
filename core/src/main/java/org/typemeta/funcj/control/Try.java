@@ -2,7 +2,8 @@ package org.typemeta.funcj.control;
 
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
-import org.typemeta.funcj.functions.*;
+import org.typemeta.funcj.functions.FunctionsEx;
+import org.typemeta.funcj.functions.SideEffect;
 import org.typemeta.funcj.util.Folds;
 import org.typemeta.funcj.util.Functors;
 

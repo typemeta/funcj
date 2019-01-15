@@ -6,7 +6,8 @@ import org.typemeta.funcj.functions.Functions.Op2;
 
 import static org.junit.Assert.assertEquals;
 import static org.typemeta.funcj.parser.Combinators.choice;
-import static org.typemeta.funcj.parser.Text.*;
+import static org.typemeta.funcj.parser.Text.chr;
+import static org.typemeta.funcj.parser.Text.dble;
 
 public class ExprTest {
 

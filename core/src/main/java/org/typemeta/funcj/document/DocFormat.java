@@ -3,7 +3,8 @@ package org.typemeta.funcj.document;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.util.Exceptions;
 
-import java.io.*;
+import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  * Format a {@code Document} into a {@code String}.

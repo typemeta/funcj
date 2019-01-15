@@ -11,9 +11,12 @@ import org.typemeta.funcj.tuples.Tuple2;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.typemeta.funcj.control.State.*;
-import static org.typemeta.funcj.control.StateTest.Utils.*;
+import static org.typemeta.funcj.control.State.pure;
+import static org.typemeta.funcj.control.StateTest.Utils.add;
+import static org.typemeta.funcj.control.StateTest.Utils.check;
+import static org.typemeta.funcj.control.StateTest.Utils.div;
 import static org.typemeta.funcj.control.StateTest.Utils.pure;
+import static org.typemeta.funcj.control.StateTest.Utils.sub;
 
 @RunWith(JUnitQuickcheck.class)
 public class StateTest {

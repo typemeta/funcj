@@ -3,7 +3,8 @@ package org.typemeta.funcj.parser;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.data.*;
+import org.typemeta.funcj.data.Chr;
+import org.typemeta.funcj.data.Unit;
 import org.typemeta.funcj.functions.Functions.Predicate;
 
 @RunWith(JUnitQuickcheck.class)
