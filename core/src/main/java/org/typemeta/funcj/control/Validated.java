@@ -4,6 +4,7 @@ import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.util.Folds;
+import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -111,8 +112,8 @@ public interface Validated<E, T> {
      * @return          a {@code Validated} which wraps an {@link IList} of values
      */
     static <E, T, U> Validated<E, IList<U>> traverse(IList<T> lt, F<T, Validated<E, U>> f) {
-        return lt.foldLeft(
-                (vlu, t) -> f.apply(t).apply(vlu.map(lu -> lu::add)),
+        return lt.foldRight(
+                (t, vlt) -> vlt.apply(f.apply(t).map(b -> l -> l.add(b))),
                 success(IList.nil())
         );
     }
@@ -129,11 +130,7 @@ public interface Validated<E, T> {
      * @return          a {@code Validated} which wraps an {@link List} of values
      */
     static <E, T, U> Validated<E, List<U>> traverse(List<T> lt, F<T, Validated<E, U>> f) {
-        return Folds.foldLeft(
-                (vlu, t) -> f.apply(t).apply(vlu.map(lu -> u -> {lu.add(u); return lu;})),
-                success(new ArrayList<>(lt.size())),
-                lt
-        );
+        return sequence(Functors.map(f, lt));
     }
 
     /**
@@ -148,26 +145,9 @@ public interface Validated<E, T> {
      */
     static <E, T> Validated<E, IList<T>> sequence(IList<Validated<E, T>> lvt) {
         return lvt.foldRight(
-                (vt, vlt) -> vt.apply(vlt.map(lt -> lt::add)),
+                (vt, vlt) -> vlt.apply(vt.map(a -> l -> l.add(a))),
                 success(IList.nil())
         );
-    }
-
-    /**
-     * Variation of {@link Validated#sequence(IList)} for a {@link Stream}.
-     * @param svt       the stream of {@code Validated} values
-     * @param <E>       the error type
-     * @param <T>       the value type of the {@code Validated}s in the stream
-     * @return          a {@code Validated} which wraps an {@link Stream} of values
-     */
-    static <E, T> Validated<E, Stream<T>> sequence(Stream<Validated<E, T>> svt) {
-        final Iterator<Validated<E, T>> iter = svt.iterator();
-        Validated<E, IList<T>> vlt = success(IList.nil());
-        while (iter.hasNext()) {
-            final Validated<E, T> vt = iter.next();
-            vlt = vt.apply(vlt.map(lt -> lt::add));
-        }
-        return vlt.map(IList::stream);
     }
 
     /**
@@ -178,11 +158,12 @@ public interface Validated<E, T> {
      * @return          a {@code Validated} which wraps an {@link Stream} of values
      */
     static <E, T> Validated<E, List<T>> sequence(List<Validated<E, T>> lvt) {
-        return Folds.foldRight(
-                (vt, vlt) -> vt.apply(vlt.map(lt -> t -> {lt.add(t); return lt;})),
+        final Validated<E, List<T>> res = Folds.foldRight(
+                (vt, vlt) -> vlt.apply(vt.map(t -> lt -> {lt.add(t); return lt;})),
                 success(new ArrayList<>(lvt.size())),
                 lvt
         );
+        return res.map(l -> {Collections.reverse(l); return l;});
     }
 
     /**

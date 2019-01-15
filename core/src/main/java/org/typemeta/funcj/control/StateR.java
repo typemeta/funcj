@@ -3,6 +3,7 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.tuples.Tuple2;
+import org.typemeta.funcj.util.Folds;
 import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
@@ -158,13 +159,12 @@ public interface StateR<S, A> {
      * @return          a {@code StateR} which wraps an {@link List} of values
      */
     static <S, T> StateR<S, List<T>> sequence(List<StateR<S, T>> lst) {
-        final Iterator<StateR<S, T>> iter = lst.iterator();
-        StateR<S, IList<T>> slt = pure(IList.nil());
-        while (iter.hasNext()) {
-            final StateR<S, T> st = iter.next();
-            slt = st.apply(slt.map(lt -> lt::add));
-        }
-        return slt.map(IList::reverse).map(IList::toList);
+        final StateR<S, List<T>> res = Folds.foldRight(
+                (st, slt) -> slt.apply(st.map(t -> lt -> {lt.add(t); return lt;})),
+                pure(new ArrayList<>(lst.size())),
+                lst
+        );
+        return res.map(l -> {Collections.reverse(l); return l;});
     }
 
     /**

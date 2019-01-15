@@ -2,8 +2,13 @@ package org.typemeta.funcj.control;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.control.Try.Kleisli;
+import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.util.Functors;
+
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.typemeta.funcj.control.TryTest.Utils.*;
@@ -60,6 +65,46 @@ public class TryTest {
         assertEquals(failure(cs), Try.success(c).flatMap(d -> failure(cs)));
         assertEquals(failure(cs), failure(cs).flatMap(d -> Try.success(e)));
         assertEquals(failure(cs), failure(cs).flatMap(d -> failure("error")));
+    }
+
+    @Test
+    public void testSequenceList1() {
+        final List<String> l = Arrays.asList("A", "B", "C");
+        final List<Try<String>> le = Functors.map(Try::success, l);
+        final Try<List<String>> result = Try.sequence(le);
+        assertEquals(Try.success(l), result);
+    }
+
+    @Test
+    public void testSequenceList2() {
+        final List<Try<String>> l = new ArrayList<>();
+        l.add(Try.success("A"));
+        l.add(Try.failure(new RuntimeException()));
+        l.add(Try.success("C"));
+
+        final Try<List<String>> result = Try.sequence(l);
+
+        assertFalse(result.isSuccess());
+    }
+
+    @Test
+    public void testSequenceIList1() {
+        final IList<String> l = IList.of("A", "B", "C");
+        final IList<Try<String>> le = l.map(Try::success);
+        final Try<IList<String>> result = Try.sequence(le);
+        assertEquals(Try.success(l), result);
+    }
+
+    @Test
+    public void testSequenceIList2() {
+        final IList<Try<String>> le = IList.of(
+                Try.success("A"),
+                Try.failure(new RuntimeException()),
+                Try.success("C")
+        );
+
+        final Try<IList<String>> result = Try.sequence(le);
+        assertFalse(result.isSuccess());
     }
 
     private static final Try<Integer> fail = Try.failure(new Exception(""));

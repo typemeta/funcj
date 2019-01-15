@@ -39,7 +39,10 @@ public class StateRTest {
     }
 
     static <S> StateR<S, S> modify(Functions.F<S, S> f) {
-        return StateR.<S>get().flatMap(s -> StateR.put(f.apply(s)).map(u -> s));
+        return StateR.<S>get()
+                .flatMap(s -> StateR.put(
+                        f.apply(s)
+                ).map(u -> s));
     }
 
     @Test

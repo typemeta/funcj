@@ -69,6 +69,28 @@ public abstract class FunctionsGenEx {
         }
 
         /**
+         * The identity function, that simply returns its argument.
+         * @param <A>       input and output type of function
+         * @param <X>       the exception type
+         * @return          the identity function
+         */
+        static <A, X extends Exception> F<A, A, X> id() {
+            return x -> x;
+        }
+
+        /**
+         * The constant function, that always returns the same value, regardless of its argument
+         * @param r         the value the constant function will return
+         * @param <A>       the input type of the function
+         * @param <R>       the type of the constant value {@code r}
+         * @param <X>       the exception type
+         * @return          the constant function
+         */
+        static <A, R, X extends Exception> F<A, R, X> konst(R r) {
+            return a -> r;
+        }
+
+        /**
          * Convert a curried function by reversing the order of its arguments
          * @param f         the function to be flipped
          * @param <A>       the function's first argument type

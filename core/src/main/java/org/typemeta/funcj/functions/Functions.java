@@ -63,6 +63,15 @@ public abstract class Functions {
         }
 
         /**
+         * The identity function, that simply returns its argument.
+         * @param <A>       input and output type of function
+         * @return          the identity function
+         */
+        static <A> F<A, A> id() {
+            return x -> x;
+        }
+
+        /**
          * The constant function, that always returns the same value, regardless of its argument
          * @param r         the value the constant function will return
          * @param <A>       the input type of the function
@@ -947,15 +956,6 @@ public abstract class Functions {
         }
 
         T apply(T t);
-    }
-
-    /**
-     * The identity function, that simply returns its argument.
-     * @param <A>       input and output type of function
-     * @return          the identity function
-     */
-    public static <A> Op<A> id() {
-        return x -> x;
     }
 
     /**

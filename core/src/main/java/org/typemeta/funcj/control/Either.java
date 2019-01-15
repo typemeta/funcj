@@ -4,6 +4,7 @@ import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.util.Folds;
+import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -88,8 +89,8 @@ public interface Either<E, S> {
      * @return          a {@code Either} which wraps an {@link IList} of values
      */
     static <E, S, T> Either<E, IList<T>> traverse(IList<S> ls, F<S, Either<E, T>> f) {
-        return ls.foldLeft(
-            (elt, s) -> f.apply(s).apply(elt.map(lt -> lt::add)),
+        return ls.foldRight(
+            (s, elt) -> elt.apply(f.apply(s).map(b -> l -> l.add(b))),
             right(IList.nil())
         );
     }
@@ -106,11 +107,7 @@ public interface Either<E, S> {
      * @return          a {@code Either} which wraps an {@link List} of values
      */
     static <E, S, T> Either<E, List<T>> traverse(List<S> ls, F<S, Either<E, T>> f) {
-        return Folds.foldLeft(
-                (elt, s) -> f.apply(s).apply(elt.map(lt -> t -> {lt.add(t); return lt;})),
-                right(new ArrayList<>(ls.size())),
-                ls
-        );
+        return sequence(Functors.map(f, ls));
     }
 
     /**
@@ -122,27 +119,27 @@ public interface Either<E, S> {
      */
     static <E, S> Either<E, IList<S>> sequence(IList<Either<E, S>> les) {
         return les.foldRight(
-            (es, els) -> es.apply(els.map(ls -> ls::add)),
-            right(IList.nil())
+                (es, els) -> els.apply(es.map(a -> l -> l.add(a))),
+                right(IList.nil())
         );
     }
-
-    /**
-     * Variation of {@link Either#sequence(IList)} for {@link Stream}.
-     * @param set       the stream of {@code Either} values
-     * @param <E>       the left-hand type
-     * @param <T>       the right-hand type of the {@code Either}s in the stream
-     * @return          a {@code Either} which wraps an {@link Stream} of values
-     */
-    static <E, T> Either<E, Stream<T>> sequence(Stream<Either<E, T>> set) {
-        final Iterator<Either<E, T>> iter = set.iterator();
-        Either<E, IList<T>> elt = right(IList.nil());
-        while (iter.hasNext()) {
-            final Either<E, T> et = iter.next();
-            elt = et.apply(elt.map(lt -> lt::add));
-        }
-        return elt.map(IList::stream);
-    }
+//
+//    /**
+//     * Variation of {@link Either#sequence(IList)} for {@link List}.
+//     * @param set       the list of {@code Either} values
+//     * @param <E>       the left-hand type
+//     * @param <T>       the right-hand type of the {@code Either}s in the list
+//     * @return          a {@code Either} which wraps an {@link List} of values
+//     */
+//    static <E, T> Either<E, List<T>> sequence(List<Either<E, T>> set) {
+//        final Iterator<Either<E, T>> iter = set.iterator();
+//        Either<E, IList<T>> elt = right(IList.nil());
+//        while (iter.hasNext()) {
+//            final Either<E, T> et = iter.next();
+//            elt = et.apply(elt.map(lt -> lt::add));
+//        }
+//        return elt.map(IList::reverse).map(IList::toList);
+//    }
 
     /**
      * Variation of {@link Either#sequence(IList)} for a {@link List}.
@@ -152,11 +149,12 @@ public interface Either<E, S> {
      * @return          a {@code Validated} which wraps an {@link Stream} of values
      */
     static <E, T> Either<E, List<T>> sequence(List<Either<E, T>> let) {
-        return Folds.foldRight(
-                (et, elt) -> et.apply(elt.map(lt -> t -> {lt.add(t); return lt;})),
+        final Either<E, List<T>> res = Folds.foldRight(
+                (et, elt) -> elt.apply(et.map(t -> lt -> {lt.add(t); return lt;})),
                 right(new ArrayList<>(let.size())),
                 let
         );
+        return res.map(l -> {Collections.reverse(l); return l;});
     }
 
     /**
@@ -268,7 +266,7 @@ public interface Either<E, S> {
      * If this is a {@code Left} value then return the contained value,
      * otherwise throw an exception.
      * @return          the {@code Left} value
-     * @throws          {@link RuntimeException} if this is a {@code Right} value
+     * @throws          RuntimeException if this is a {@code Right} value
      */
     E left();
 
@@ -276,7 +274,7 @@ public interface Either<E, S> {
      * If this is a {@code Right} value then return the contained value,
      * otherwise throw an exception.
      * @return          the {@code Right} value
-     * @throws          {@link RuntimeException} if this is a {@code Left} value
+     * @throws          RuntimeException if this is a {@code Left} value
      */
     S right();
 

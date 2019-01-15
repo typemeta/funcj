@@ -4,6 +4,7 @@ import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.functions.SideEffect;
 import org.typemeta.funcj.util.Folds;
+import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -72,8 +73,8 @@ public interface Option<T> {
      * @return          a {@code Option} which wraps an {@link IList} of values
      */
     static <T, U> Option<IList<U>> traverse(IList<T> lt, F<T, Option<U>> f) {
-        return lt.foldLeft(
-                (olu, t) -> f.apply(t).apply(olu.map(lu -> lu::add)),
+        return lt.foldRight(
+                (t, olu) -> olu.apply(f.apply(t).map(b -> l -> l.add(b))),
                 some(IList.nil())
         );
     }
@@ -89,11 +90,7 @@ public interface Option<T> {
      * @return          a {@code Option} which wraps an {@link List} of values
      */
     static <T, U> Option<List<U>> traverse(List<T> lt, F<T, Option<U>> f) {
-        return Folds.foldLeft(
-                (olu, t) -> f.apply(t).apply(olu.map(lu -> u -> {lu.add(u); return lu;})),
-                some(new ArrayList<>(lt.size())),
-                lt
-        );
+        return sequence(Functors.map(f, lt));
     }
 
     /**
@@ -107,40 +104,24 @@ public interface Option<T> {
      */
     static <T> Option<IList<T>> sequence(IList<Option<T>> lot) {
         return lot.foldRight(
-            (ot, olt) -> ot.apply(olt.map(lt -> lt::add)),
+            (ot, olt) -> olt.apply(ot.map(a -> l -> l.add(a))),
                 some(IList.nil())
         );
     }
 
-
-    /**
-     * Variation of {@link Option#sequence(IList)} for {@link Stream}.
-     * @param stt       the stream of {@code Option} values
-     * @param <T>       the value type of the {@code Option}s in the stream
-     * @return          a {@code Option} which wraps an {@link Stream} of values
-     */
-    static <T> Option<Stream<T>> sequence(Stream<Option<T>> stt) {
-        final Iterator<Option<T>> iter = stt.iterator();
-        Option<IList<T>> tlt = some(IList.nil());
-        while (iter.hasNext()) {
-            final Option<T> tt = iter.next();
-            tlt = tt.apply(tlt.map(lt -> lt::add));
-        }
-        return tlt.map(IList::stream);
-    }
-
-    /**
+   /**
      * Variation of {@link Try#sequence(IList)} for a {@link List}.
      * @param lot       the list of {@code Option} values
      * @param <T>       the value type of the {@code Option}s in the stream
      * @return          a {@code Option} which wraps an {@link Stream} of values
      */
     static <T> Option<List<T>> sequence(List<Option<T>> lot) {
-        return Folds.foldRight(
-                (ot, olt) -> ot.apply(olt.map(lt -> t -> {lt.add(t); return lt;})),
+        final Option<List<T>> res = Folds.foldRight(
+                (ot, olt) -> olt.apply(ot.map(t -> lt -> {lt.add(t); return lt;})),
                 some(new ArrayList<>(lot.size())),
                 lot
         );
+        return res.map(l -> {Collections.reverse(l); return l;});
     }
 
     /**

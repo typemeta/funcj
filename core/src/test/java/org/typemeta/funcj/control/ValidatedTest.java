@@ -4,6 +4,10 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.util.Functors;
+
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -99,4 +103,45 @@ public class ValidatedTest {
         assertEquals(failure("fail"), Validated.success(c).apply(failure("fail")));
         assertEquals(failure("fail"), failure("fail").apply(Validated.success(Object::toString)));
     }
+
+    @Test
+    public void testSequenceList1() {
+        final List<String> l = Arrays.asList("A", "B", "C");
+        final List<Validated<Integer, String>> le = Functors.map(Validated::success, l);
+        final Validated<Integer, List<String>> result = Validated.sequence(le);
+        assertEquals(Validated.success(l), result);
+    }
+
+    @Test
+    public void testSequenceList2() {
+        final List<Validated<Integer, String>> l = new ArrayList<>();
+        l.add(Validated.success("A"));
+        l.add(Validated.failure(1));
+        l.add(Validated.success("C"));
+
+        final Validated<Integer, List<String>> result = Validated.sequence(l);
+
+        assertEquals(Validated.failure(1), result);
+    }
+
+    @Test
+    public void testSequenceIList1() {
+        final IList<String> l = IList.of("A", "B", "C");
+        final IList<Validated<Integer, String>> le = l.map(Validated::success);
+        final Validated<Integer, IList<String>> result = Validated.sequence(le);
+        assertEquals(Validated.success(l), result);
+    }
+
+    @Test
+    public void testSequenceIList2() {
+        final IList<Validated<Integer, String>> le = IList.of(
+                Validated.success("A"),
+                Validated.failure(1),
+                Validated.success("C")
+        );
+
+        final Validated<Integer, IList<String>> result = Validated.sequence(le);
+        assertEquals(Validated.failure(1), result);
+    }
+
 }

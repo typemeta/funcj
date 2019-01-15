@@ -3,8 +3,13 @@ package org.typemeta.funcj.control;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.control.Option.Kleisli;
+import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.util.Functors;
+
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.typemeta.funcj.control.OptionTest.Utils.*;
@@ -62,6 +67,44 @@ public class OptionTest {
         Assert.assertEquals(Option.none(), Option.some(c).flatMap(d -> Option.none()));
         Assert.assertEquals(Option.none(), Option.none().flatMap(d -> Option.some(e)));
         Assert.assertEquals(Option.none(), Option.none().flatMap(d -> Option.none()));
+    }
+
+    @Test
+    public void testSequenceList1() {
+        final List<String> l = Arrays.asList("A", "B", "C");
+        final List<Option<String>> le = Functors.map(Option::some, l);
+        final Option<List<String>> result = Option.sequence(le);
+        assertEquals(Option.some(l), result);
+    }
+
+    @Test
+    public void testSequenceList2() {
+        final List<Option<String>> l = new ArrayList<>();
+        l.add(Option.some("A"));
+        l.add(Option.none());
+        l.add(Option.some("C"));
+
+        final Option<List<String>> result = Option.sequence(l);
+        assertEquals(Option.none(), result);
+    }
+
+    @Test
+    public void testSequenceIList1() {
+        final IList<String> l = IList.of("A", "B", "C");
+        final IList<Option<String>> le = l.map(Option::some);
+        final Option<IList<String>> result = Option.sequence(le);
+        assertEquals(Option.some(l), result);
+    }
+
+    @Test
+    public void testSequenceIList2() {
+        final IList<Option<String>> le = IList.of(
+                Option.some("A"),
+                Option.none(),
+                Option.some("C")
+        );
+        final Option<IList<String>> result = Option.sequence(le);
+        assertEquals(Option.none(), result);
     }
 
     static class Utils {

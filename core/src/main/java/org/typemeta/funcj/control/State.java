@@ -153,13 +153,12 @@ public interface State<S, A> {
      * @return          a {@code State} which wraps an {@link List} of values
      */
     static <S, T> State<S, List<T>> sequence(List<State<S, T>> lst) {
-        final Iterator<State<S, T>> iter = lst.iterator();
-        State<S, IList<T>> slt = pure(IList.nil());
-        while (iter.hasNext()) {
-            final State<S, T> st = iter.next();
-            slt = st.apply(slt.map(lt -> lt::add));
-        }
-        return slt.map(IList::reverse).map(IList::toList);
+        final State<S, List<T>> res = Folds.foldRight(
+                (st, slt) -> slt.apply(st.map(t -> lt -> {lt.add(t); return lt;})),
+                pure(new ArrayList<>(lst.size())),
+                lst
+        );
+        return res.map(l -> {Collections.reverse(l); return l;});
     }
 
     /**

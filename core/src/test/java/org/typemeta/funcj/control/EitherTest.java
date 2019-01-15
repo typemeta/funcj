@@ -2,8 +2,13 @@ package org.typemeta.funcj.control;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.control.Either.Kleisli;
+import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.util.Functors;
+
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.typemeta.funcj.control.EitherTest.Utils.*;
@@ -61,6 +66,46 @@ public class EitherTest {
         assertEquals(Either.left(cs), Either.right(c).flatMap(d -> Either.left(cs)));
         assertEquals(Either.left(cs), Either.left(cs).flatMap(d -> Either.right(e)));
         assertEquals(Either.left(cs), Either.left(cs).flatMap(d -> Either.left("error")));
+    }
+
+    @Test
+    public void testSequenceList1() {
+        final List<String> l = Arrays.asList("A", "B", "C");
+        final List<Either<Integer, String>> le = Functors.map(Either::right, l);
+        final Either<Integer, List<String>> result = Either.sequence(le);
+        assertEquals(Either.right(l), result);
+    }
+
+    @Test
+    public void testSequenceList2() {
+        final List<Either<Integer, String>> l = new ArrayList<>();
+        l.add(Either.right("A"));
+        l.add(Either.left(1));
+        l.add(Either.right("C"));
+
+        final Either<Integer, List<String>> result = Either.sequence(l);
+
+        assertEquals(Either.left(1), result);
+    }
+
+    @Test
+    public void testSequenceIList1() {
+        final IList<String> l = IList.of("A", "B", "C");
+        final IList<Either<Integer, String>> le = l.map(Either::right);
+        final Either<Integer, IList<String>> result = Either.sequence(le);
+        assertEquals(Either.right(l), result);
+    }
+
+    @Test
+    public void testSequenceIList2() {
+        final IList<Either<Integer, String>> le = IList.of(
+                Either.right("A"),
+                Either.left(1),
+                Either.right("C")
+        );
+
+        final Either<Integer, IList<String>> result = Either.sequence(le);
+        assertEquals(Either.left(1), result);
     }
 
     static class Utils {

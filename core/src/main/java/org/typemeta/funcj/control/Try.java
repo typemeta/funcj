@@ -4,6 +4,7 @@ import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.util.Folds;
+import org.typemeta.funcj.util.Functors;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -82,8 +83,8 @@ public interface Try<T> {
      * @return          a {@code Try} which wraps an {@link IList} of values
      */
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
-        return lt.foldLeft(
-                (tlu, t) -> f.apply(t).apply(tlu.map(lu -> lu::add)),
+        return lt.foldRight(
+                (t, tlu) -> tlu.apply(f.apply(t).map(b -> l -> l.add(b))),
                 success(IList.nil())
         );
     }
@@ -99,25 +100,7 @@ public interface Try<T> {
      * @return          a {@code Try} which wraps an {@link IList} of values
      */
     static <T, U> Try<List<U>> traverse(List<T> lt, F<T, Try<U>> f) {
-        return Folds.foldLeft(
-                (tlt, t) -> f.apply(t).apply(tlt.map(lu -> u -> {lu.add(u); return lu;})),
-                success(new ArrayList<>(lt.size())),
-                lt
-        );
-    }
-
-    /**
-     * Variation of {@link Try#sequence(IList)} for a {@link List}.
-     * @param ltt       the list of {@code Try} values
-     * @param <T>       the value type of the {@code Try}s in the stream
-     * @return          a {@code Try} which wraps an {@link Stream} of values
-     */
-    static <T> Try<List<T>> sequence(List<Try<T>> ltt) {
-        return Folds.foldRight(
-                (tt, tlt) -> tt.apply(tlt.map(lt -> t -> {lt.add(t); return lt;})),
-                success(new ArrayList<>(ltt.size())),
-                ltt
-        );
+        return sequence(Functors.map(f, lt));
     }
 
     /**
@@ -131,25 +114,24 @@ public interface Try<T> {
      */
     static <T> Try<IList<T>> sequence(IList<Try<T>> ltt) {
         return ltt.foldRight(
-            (tt, tlt) -> tt.apply(tlt.map(lt -> lt::add)),
-            success(IList.nil())
+                (tt, tlt) -> tlt.apply(tt.map(a -> l -> l.add(a))),
+                success(IList.nil())
         );
     }
 
     /**
-     * Variation of {@link Try#sequence(IList)} for {@link Stream}.
-     * @param stt       the stream of {@code Try} values
+     * Variation of {@link Try#sequence(IList)} for a {@link List}.
+     * @param ltt       the list of {@code Try} values
      * @param <T>       the value type of the {@code Try}s in the stream
      * @return          a {@code Try} which wraps an {@link Stream} of values
      */
-    static <T> Try<Stream<T>> sequence(Stream<Try<T>> stt) {
-        final Iterator<Try<T>> iter = stt.iterator();
-        Try<IList<T>> tlt = success(IList.nil());
-        while (iter.hasNext()) {
-            final Try<T> tt = iter.next();
-            tlt = tt.apply(tlt.map(lt -> lt::add));
-        }
-        return tlt.map(IList::stream);
+    static <T> Try<List<T>> sequence(List<Try<T>> ltt) {
+        final Try<List<T>> res = Folds.foldRight(
+                (tt, tlt) -> tlt.apply(tt.map(t -> lt -> {lt.add(t); return lt;})),
+                success(new ArrayList<>(ltt.size())),
+                ltt
+        );
+        return res.map(l -> {Collections.reverse(l); return l;});
     }
 
     /**
