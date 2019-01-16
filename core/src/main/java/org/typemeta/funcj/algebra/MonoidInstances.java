@@ -1,11 +1,14 @@
 package org.typemeta.funcj.algebra;
 
 import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.functions.Functions;
 
 import java.util.*;
 
 public abstract class MonoidInstances {
-    public static final Monoid<Double> monoidDouble = new  Monoid<Double>() {
+
+
+    public static final Monoid<Double> monoidDouble = new Monoid<Double>() {
         @Override
         public Double zero() {
             return 0d;

@@ -3,30 +3,48 @@ package org.typemeta.funcj.util;
 import org.typemeta.funcj.functions.Functions;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Fold operations.
  */
 public abstract class Folds {
     /**
-     * Left-fold a function over an {@link java.lang.Iterable}.
+     * Left-fold a function over an {@link Iterable}.
      * @param f         the binary function to be applied for the fold
      * @param z         the starting value for the fold
-     * @param iter      the iterable to be folded over
+     * @param itb       the iterable to be folded over
      * @param <T>       the iterable element type
      * @param <R>       the result type of fold operation
      * @return          the folded value
      */
-    public static <T, R> R foldLeft(Functions.F2<R, T, R> f, R z, Iterable<T> iter) {
+    public static <T, R> R foldLeft(Functions.F2<R, T, R> f, R z, Iterable<T> itb) {
         R acc = z;
-        for (T t : iter) {
+        for (T t : itb) {
             acc = f.apply(acc, t);
         }
         return acc;
     }
 
     /**
-     * Left-fold a function over a non-empty {@link java.lang.Iterable}.
+     * Left-fold a function over a {@link Stream}.
+     * @param f         the binary function to be applied for the fold
+     * @param z         the starting value for the fold
+     * @param str       the stream to be folded over
+     * @param <T>       the stream element type
+     * @param <R>       the result type of fold operation
+     * @return          the folded value
+     */
+    public static <T, R> R foldLeft(Functions.F2<R, T, R> f, R z, Stream<T> str) {
+        R acc = z;
+        for (Iterator<T> iter = str.iterator(); iter.hasNext();) {
+            acc = f.apply(acc, iter.next());
+        }
+        return acc;
+    }
+
+    /**
+     * Left-fold a function over a non-empty {@link Iterable}.
      * @param f         the binary operator to be applied for the fold
      * @param iter      the iterable to be folded over
      * @param <T>       the iterable element type
@@ -51,7 +69,7 @@ public abstract class Folds {
 
     /**
      *
-     * Right-fold a function over an {@link java.util.List}}
+     * Right-fold a function over an {@link List}}
      * @param f         the binary function to be applied for the fold
      * @param z         the starting value for the fold
      * @param l         the list to fold over
@@ -68,7 +86,7 @@ public abstract class Folds {
     }
 
     /**
-     * Right-fold a function over a non-empty {@link java.util.List}.
+     * Right-fold a function over a non-empty {@link List}.
      * @param f         the binary operator to be applied for the fold
      * @param l         the {@code List} to fold over
      * @param <T>       the list element type

@@ -15,7 +15,7 @@ public final class JsArray
     private final List<JsValue> values;
 
     protected JsArray(List<JsValue> values) {
-        this.values = values;
+        this.values = Objects.requireNonNull(values);
     }
 
     public boolean isEmpty() {

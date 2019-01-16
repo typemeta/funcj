@@ -4,6 +4,7 @@ import org.typemeta.funcj.functions.FunctionsGenEx.F2;
 import org.typemeta.funcj.functions.FunctionsGenEx.Op2;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Fold operations for lambdas that may throw.
@@ -24,6 +25,25 @@ public abstract class FoldsGenEx {
         R acc = z;
         for (T t : iter) {
             acc = f.apply(acc, t);
+        }
+        return acc;
+    }
+
+    /**
+     * Left-fold a function over a {@link Stream}.
+     * @param f         the binary function to be applied for the fold
+     * @param z         the starting value for the fold
+     * @param str       the stream to be folded over
+     * @param <T>       the stream element type
+     * @param <R>       the result type of fold operation
+     * @param <X>       the exception type
+     * @return          the folded value
+     * @throws X        the exception thrown by the function
+     */
+    public static <T, R, X extends Exception> R foldLeft(F2<R, T, R, X> f, R z, Stream<T> str) throws X {
+        R acc = z;
+        for (Iterator<T> iter = str.iterator(); iter.hasNext();) {
+            acc = f.apply(acc, iter.next());
         }
         return acc;
     }

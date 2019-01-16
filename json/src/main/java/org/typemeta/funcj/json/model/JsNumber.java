@@ -12,7 +12,7 @@ public final class JsNumber implements JsValue {
     private final double value;
 
     protected JsNumber(double value) {
-        this.value = Objects.requireNonNull(value);
+        this.value =value;
     }
 
     public double getValue() {
