@@ -78,25 +78,7 @@ public abstract class ReflectionUtils {
             final ParameterizedType pt = (ParameterizedType) type;
             if (pt.getRawType() instanceof Class &&
                     iface.isAssignableFrom((Class)pt.getRawType())) {
-                final Type[] typeArgs = pt.getActualTypeArguments();
-                final List<Class<?>> results = new ArrayList<>(typeArgs.length);
-                for (Type typeArg : pt.getActualTypeArguments()) {
-                    if (typeArg instanceof Class) {
-                        results.add((Class<?>) typeArg);
-                    } else if (typeArg instanceof TypeVariable) {
-                        final TypeVariable<?> tv = (TypeVariable<?>) typeArg;
-                        final Type[] bounds = tv.getBounds();
-                        if (bounds.length == 1 && bounds[0] instanceof Class) {
-                            results.add((Class<?>) bounds[0]);
-                        } else {
-                            results.add(Object.class);
-                        }
-                    } else {
-                        results.add(Object.class);
-                    }
-                }
-
-                return new TypeArgs(results);
+                return getTypeArgs(pt);
             }
         }
 
@@ -120,16 +102,36 @@ public abstract class ReflectionUtils {
                 .filter(pt -> pt.getRawType() instanceof Class)
                 .filter(pt -> iface.isAssignableFrom((Class)pt.getRawType()))
                 .findFirst()
-                .map(ReflectionUtils::getGenTypeArgs)
+                .map(ReflectionUtils::getTypeArgs)
                 .orElseGet(TypeArgs::new);
     }
 
-    private static TypeArgs getGenTypeArgs(ParameterizedType type) {
-        final List<Class<?>> typeArgs =
-                Arrays.stream(type.getActualTypeArguments())
-                        .filter(t -> t instanceof Class)
-                        .map(t -> (Class<?>)t)
-                        .collect(toList());
-        return new TypeArgs(typeArgs);
+    private static TypeArgs getTypeArgs(ParameterizedType pt) {
+        final Type[] typeArgs = pt.getActualTypeArguments();
+        final List<Class<?>> typeArgs2 = new ArrayList<>(typeArgs.length);
+        for (Type typeArg : typeArgs) {
+            typeArgs2.add(determineConcreteType(typeArg));
+        }
+        return new TypeArgs(typeArgs2);
     }
+
+    private static Class<?> determineConcreteType(Type type) {
+        if (type instanceof Class) {
+            return (Class<?>) type;
+        } else if (type instanceof TypeVariable) {
+            final TypeVariable<?> tv = (TypeVariable<?>) type;
+            final Type[] bounds = tv.getBounds();
+            if (bounds.length == 1 && bounds[0] instanceof Class) {
+                return (Class<?>) bounds[0];
+            } else {
+                return Object.class;
+            }
+        } else if (type instanceof ParameterizedType) {
+            final ParameterizedType typeArgPt = (ParameterizedType) type;
+            return (Class)typeArgPt.getRawType();
+        } else {
+            return Object.class;
+        }
+    }
+
 }
