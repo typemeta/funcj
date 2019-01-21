@@ -60,7 +60,7 @@ public interface RNG {
     }
 }
 
-class RNGUtils {
+abstract class RNGUtils {
     final static double SCALE = (double)Long.MAX_VALUE - (double)Long.MIN_VALUE + 1.0;
 
     protected static class XorShiftRNG implements RNG {

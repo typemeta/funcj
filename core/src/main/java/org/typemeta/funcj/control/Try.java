@@ -70,7 +70,7 @@ public interface Try<T> {
      * @return          the result of applying the function to the argument, wrapped in a {@code Try}
      */
     static <A, B> Try<B> ap(Try<F<A, B>> tf, Try<A> ta) {
-        return ta.apply(tf);
+        return ta.app(tf);
     }
 
     /**
@@ -85,7 +85,7 @@ public interface Try<T> {
      */
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
         return lt.foldRight(
-                (t, tlu) -> tlu.apply(f.apply(t).map(b -> l -> l.add(b))),
+                (t, tlu) -> tlu.app(f.apply(t).map(b -> l -> l.add(b))),
                 success(IList.nil())
         );
     }
@@ -108,14 +108,14 @@ public interface Try<T> {
      * Standard applicative sequencing.
      * <p>
      * Translate a {@link IList} of {@code Try} into a {@code Try} of an {@code IList},
-     * by composing each consecutive {@code Try} using the {@link Try#apply(Try)} method.
+     * by composing each consecutive {@code Try} using the {@link Try#app(Try)} method.
      * @param ltt       the list of {@code Try} values
      * @param <T>       the value type of the {@code Try}s in the list
      * @return          a {@code Try} which wraps an {@link IList} of values
      */
     static <T> Try<IList<T>> sequence(IList<Try<T>> ltt) {
         return ltt.foldRight(
-                (tt, tlt) -> tlt.apply(tt.map(a -> l -> l.add(a))),
+                (tt, tlt) -> tlt.app(tt.map(a -> l -> l.add(a))),
                 success(IList.nil())
         );
     }
@@ -128,7 +128,7 @@ public interface Try<T> {
      */
     static <T> Try<List<T>> sequence(List<Try<T>> ltt) {
         final Try<List<T>> res = Folds.foldRight(
-                (tt, tlt) -> tlt.apply(tt.map(t -> lt -> {lt.add(t); return lt;})),
+                (tt, tlt) -> tlt.app(tt.map(t -> lt -> {lt.add(t); return lt;})),
                 success(new ArrayList<>(ltt.size())),
                 ltt
         );
@@ -296,7 +296,7 @@ public interface Try<T> {
      * @param <U>       the return type of function
      * @return          a {@code Try} wrapping the result of applying the function, or a {@code Failure} value
      */
-    <U> Try<U> apply(Try<F<T, U>> tf);
+    <U> Try<U> app(Try<F<T, U>> tf);
 
     /**
      * Monadic bind/flatMap.
@@ -412,7 +412,7 @@ public interface Try<T> {
         }
 
         @Override
-        public <U> Try<U> apply(Try<F<T, U>> tf) {
+        public <U> Try<U> app(Try<F<T, U>> tf) {
             return tf.map(f -> f.apply(value));
         }
 
@@ -512,7 +512,7 @@ public interface Try<T> {
         }
 
         @Override
-        public <U> Try<U> apply(Try<F<T, U>> tf) {
+        public <U> Try<U> app(Try<F<T, U>> tf) {
             return tf.match(
                     fail -> fail.cast(),
                     succ -> this.cast()
@@ -545,7 +545,7 @@ public interface Try<T> {
             }
 
             public <R> Try<R> map(F<A, F<B, R>> f) {
-                return tb.apply(ta.map(f));
+                return tb.app(ta.map(f));
             }
 
             public <R> Try<R> map(F2<A, B, R> f) {

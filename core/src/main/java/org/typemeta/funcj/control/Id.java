@@ -66,6 +66,10 @@ public class Id<T> {
         return new Id<>(f.apply(value));
     }
 
+    public <U> Id<U> app(Id<F<T, U>> idF) {
+        return Id.pure(idF.value.apply(this.value));
+    }
+    
     public <U> Id<U> flatMap(F<T, Id<U>> f) {
         return f.apply(value);
     }

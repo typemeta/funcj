@@ -48,7 +48,7 @@ public interface StateR<S, A> {
      * @return          a new {@code StateR} instance which contains the result of applying the function
      */
     static <S, A, B> StateR<S, B> ap(StateR<S, F<A, B>> sf, StateR<S, A> sa) {
-        return sa.apply(sf);
+        return sa.app(sf);
     }
 
     /**
@@ -108,31 +108,31 @@ public interface StateR<S, A> {
     }
 
     /**
-     * Standard applicative traversal.
-     * @param la        list of values
+     * Standard applicative traversal..
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
+     * @param la        {@link IList} of values
      * @param f         function to be applied to each value in the list
      * @param <S>       the state type
      * @param <A>       type of list elements
      * @param <B>       the state result type
-     * @return          a {@code StateR} which wraps an {@link IList} of values
+     * @return          a {@code StateR} which wraps a {@code IList} of values
      */
     static <S, A, B> StateR<S, IList<B>> traverse(IList<A> la, F<A, StateR<S, B>> f) {
         return la.foldRight(
-                (a, slb) -> slb.apply(f.apply(a).map(b -> l -> l.add(b))),
+                (a, slb) -> slb.app(f.apply(a).map(b -> l -> l.add(b))),
                 pure(IList.nil())
         );
     }
 
     /**
-     * Standard applicative traversal.
-     * <p>
-     * Equivalent to <pre>sequence(lt.map(f))</pre>.
-     * @param la        list of values
+     * Variation of {@link StateR#traverse(IList, F)} for {@link List}.
+     * @param la        {@link List} of values
      * @param f         function to be applied to each value in the list
      * @param <S>       the state type
      * @param <A>       type of list elements
      * @param <B>       the state result type
-     * @return          a {@code StateR} which wraps an {@link List} of values
+     * @return          a {@code StateR} which wraps a {@code List} of values
      */
     static <S, A, B> StateR<S, List<B>> traverse(List<A> la, F<A, StateR<S, B>> f) {
         return sequence(Functors.map(f, la));
@@ -140,14 +140,14 @@ public interface StateR<S, A> {
 
     /**
      * Standard applicative sequencing.
-     * @param lsa       the list of {@code StateR} values
+     * @param lsa       the {@link IList} of {@code StateR} values
      * @param <S>       the state type
      * @param <A>       the state result type
-     * @return          a {@code StateR} which wraps an {@link IList} of values
+     * @return          a {@code StateR} which wraps a {@code IList} of values
      */
     static <S, A> StateR<S, IList<A>> sequence(IList<? extends StateR<S, A>> lsa) {
         return lsa.foldRight(
-                (sa, sla) -> sla.apply(sa.map(a -> l -> l.add(a))),
+                (sa, sla) -> sla.app(sa.map(a -> l -> l.add(a))),
                 pure(IList.nil())
         );
     }
@@ -157,11 +157,11 @@ public interface StateR<S, A> {
      * @param lst       the list of {@code StateR} values
      * @param <S>       the state type
      * @param <T>       the result type of the {@code StateR}s in the list
-     * @return          a {@code StateR} which wraps an {@link List} of values
+     * @return          a {@code StateR} which wraps an {@code List} of values
      */
     static <S, T> StateR<S, List<T>> sequence(List<StateR<S, T>> lst) {
         final StateR<S, List<T>> res = Folds.foldRight(
-                (st, slt) -> slt.apply(st.map(t -> lt -> {lt.add(t); return lt;})),
+                (st, slt) -> slt.app(st.map(t -> lt -> {lt.add(t); return lt;})),
                 pure(new ArrayList<>(lst.size())),
                 lst
         );
@@ -293,7 +293,7 @@ public interface StateR<S, A> {
      * @param <B>       the {@code StateR} that wraps a value
      * @return          a {@code StateR} that wraps the result of applying the function to the value
      */
-    default <B> StateR<S, B> apply(StateR<S, F<A, B>> sf) {
+    default <B> StateR<S, B> app(StateR<S, F<A, B>> sf) {
         return st -> {
             final Tuple2<S, F<A, B>> t2F = sf.runState(st);
             return this.runState(t2F._1).map2(t2F._2);

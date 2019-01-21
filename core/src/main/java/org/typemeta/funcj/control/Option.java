@@ -59,7 +59,7 @@ public interface Option<T> {
      * @return          the result of applying the function to the argument, wrapped in a {@code Option}
      */
     static <A, B> Option<B> ap(Option<F<A, B>> tf, Option<A> ta) {
-        return ta.apply(tf);
+        return ta.app(tf);
     }
 
     /**
@@ -67,14 +67,14 @@ public interface Option<T> {
      * <p>
      * Equivalent to <pre>sequence(lt.map(f))</pre>.
      * @param lt        the list of values
-     * @param f         the function to be applied to each value in the list
+     * @param fou       the function to be applied to each value in the list
      * @param <T>       the type of list elements
      * @param <U>       the type wrapped by the {@code Option} returned by the function
      * @return          a {@code Option} which wraps an {@link IList} of values
      */
-    static <T, U> Option<IList<U>> traverse(IList<T> lt, F<T, Option<U>> f) {
+    static <T, U> Option<IList<U>> traverse(IList<T> lt, F<T, Option<U>> fou) {
         return lt.foldRight(
-                (t, olu) -> olu.apply(f.apply(t).map(b -> l -> l.add(b))),
+                (t, olu) -> olu.app(fou.apply(t).map(b -> lu -> lu.add(b))),
                 some(IList.nil())
         );
     }
@@ -97,14 +97,14 @@ public interface Option<T> {
      * Standard applicative sequencing.
      * <p>
      * Translate a {@link IList} of {@code Option} into a {@code Option} of an {@code IList},
-     * by composing each consecutive {@code Option} using the {@link Option#apply(Option)} method.
+     * by composing each consecutive {@code Option} using the {@link Option#app(Option)} method.
      * @param lot       the list of {@code Option} values
      * @param <T>       the value type of the {@code Option}s in the list
      * @return          a {@code Option} which wraps an {@link IList} of values
      */
     static <T> Option<IList<T>> sequence(IList<Option<T>> lot) {
         return lot.foldRight(
-            (ot, olt) -> olt.apply(ot.map(a -> l -> l.add(a))),
+            (ot, olt) -> olt.app(ot.map(t -> lt -> lt.add(t))),
                 some(IList.nil())
         );
     }
@@ -117,7 +117,7 @@ public interface Option<T> {
      */
     static <T> Option<List<T>> sequence(List<Option<T>> lot) {
         final Option<List<T>> res = Folds.foldRight(
-                (ot, olt) -> olt.apply(ot.map(t -> lt -> {lt.add(t); return lt;})),
+                (ot, olt) -> olt.app(ot.map(t -> lt -> {lt.add(t); return lt;})),
                 some(new ArrayList<>(lot.size())),
                 lot
         );
@@ -299,7 +299,7 @@ public interface Option<T> {
      * @param <U>       the return type of function
      * @return          a {@code Option} wrapping the result of applying the function, or a {@code None} value
      */
-    <U> Option<U> apply(Option<F<T, U>> tf);
+    <U> Option<U> app(Option<F<T, U>> tf);
 
     /**
      * Monadic bind/flatMap.
@@ -420,7 +420,7 @@ public interface Option<T> {
         }
 
         @Override
-        public <U> Option<U> apply(Option<F<T, U>> tf) {
+        public <U> Option<U> app(Option<F<T, U>> tf) {
             return tf.map(f -> f.apply(value));
         }
 
@@ -516,7 +516,7 @@ public interface Option<T> {
         }
 
         @Override
-        public <U> Option<U> apply(Option<F<T, U>> tf) {
+        public <U> Option<U> app(Option<F<T, U>> tf) {
             return this.cast();
         }
 
@@ -551,7 +551,7 @@ public interface Option<T> {
             }
 
             public <R> Option<R> map(F<A, F<B, R>> f) {
-                return tb.apply(ta.map(f));
+                return tb.app(ta.map(f));
             }
 
             public <R> Option<R> map(F2<A, B, R> f) {

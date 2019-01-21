@@ -74,7 +74,7 @@ public interface Either<E, S> {
      * @return          the result of applying the function to the argument, wrapped in a {@code Either}
      */
     static <E, S, T> Either<E, T> ap(Either<E, F<S, T>> ef, Either<E, S> eb) {
-        return eb.apply(ef);
+        return eb.app(ef);
     }
 
     /**
@@ -90,7 +90,7 @@ public interface Either<E, S> {
      */
     static <E, S, T> Either<E, IList<T>> traverse(IList<S> ls, F<S, Either<E, T>> f) {
         return ls.foldRight(
-            (s, elt) -> elt.apply(f.apply(s).map(b -> l -> l.add(b))),
+            (s, elt) -> elt.app(f.apply(s).map(b -> l -> l.add(b))),
             right(IList.nil())
         );
     }
@@ -119,7 +119,7 @@ public interface Either<E, S> {
      */
     static <E, S> Either<E, IList<S>> sequence(IList<Either<E, S>> les) {
         return les.foldRight(
-                (es, els) -> els.apply(es.map(a -> l -> l.add(a))),
+                (es, els) -> els.app(es.map(a -> l -> l.add(a))),
                 right(IList.nil())
         );
     }
@@ -150,7 +150,7 @@ public interface Either<E, S> {
      */
     static <E, T> Either<E, List<T>> sequence(List<Either<E, T>> let) {
         final Either<E, List<T>> res = Folds.foldRight(
-                (et, elt) -> elt.apply(et.map(t -> lt -> {lt.add(t); return lt;})),
+                (et, elt) -> elt.app(et.map(t -> lt -> {lt.add(t); return lt;})),
                 right(new ArrayList<>(let.size())),
                 let
         );
@@ -347,7 +347,7 @@ public interface Either<E, S> {
      * @param <T>       the return type of function
      * @return          a {@code Either} wrapping the result of applying the function, or a {@code Left} value
      */
-    <T> Either<E, T> apply(Either<E, F<S, T>> ef);
+    <T> Either<E, T> app(Either<E, F<S, T>> ef);
 
     /**
      * Monadic bind/flatMap.
@@ -468,7 +468,7 @@ public interface Either<E, S> {
         }
 
         @Override
-        public <C> Either<E, C> apply(Either<E, F<S, C>> ef) {
+        public <C> Either<E, C> app(Either<E, F<S, C>> ef) {
             return ef.match(
                     left -> left.cast(),
                     right -> this.cast()
@@ -581,7 +581,7 @@ public interface Either<E, S> {
         }
 
         @Override
-        public <C> Either<E, C> apply(Either<E, F<S, C>> ef) {
+        public <C> Either<E, C> app(Either<E, F<S, C>> ef) {
             return ef.map(f -> f.apply(value));
         }
 
@@ -607,7 +607,7 @@ public interface Either<E, S> {
             }
 
             public <R> Either<E, R> map(F<A, F<B, R>> f) {
-                return eb.apply(ea.map(f));
+                return eb.app(ea.map(f));
             }
 
             public <R> Either<E, R> map(Functions.F2<A, B, R> f) {

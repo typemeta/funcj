@@ -52,9 +52,9 @@ public class TryTest {
 
     @Property
     public void apply(char c) {
-        assertEquals(Try.success(String.valueOf(c)), Try.success(c).apply(Try.success(Object::toString)));
-        assertEquals(failure("fail"), Try.success(c).apply(failure("fail")));
-        assertEquals(failure("fail"), failure("fail").apply(Try.success(Object::toString)));
+        assertEquals(Try.success(String.valueOf(c)), Try.success(c).app(Try.success(Object::toString)));
+        assertEquals(failure("fail"), Try.success(c).app(failure("fail")));
+        assertEquals(failure("fail"), failure("fail").app(Try.success(Object::toString)));
     }
 
     @Property

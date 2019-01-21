@@ -98,7 +98,7 @@ public interface Validated<E, T> {
      * @return          the result of applying the function to the argument, wrapped in a {@code Validated}
      */
     static <E, A, B> Validated<E, B> ap(Validated<E, F<A, B>> vf, Validated<E, A> va) {
-        return va.apply(vf);
+        return va.app(vf);
     }
 
     /**
@@ -114,7 +114,7 @@ public interface Validated<E, T> {
      */
     static <E, T, U> Validated<E, IList<U>> traverse(IList<T> lt, F<T, Validated<E, U>> f) {
         return lt.foldRight(
-                (t, vlt) -> vlt.apply(f.apply(t).map(b -> l -> l.add(b))),
+                (t, vlt) -> vlt.app(f.apply(t).map(b -> l -> l.add(b))),
                 success(IList.nil())
         );
     }
@@ -138,7 +138,7 @@ public interface Validated<E, T> {
      * Standard applicative sequencing.
      * <p>
      * Translate a {@link IList} of {@code Validated} into a {@code Validated} of an {@code IList},
-     * by composing each consecutive {@code Validated} using the {@link Validated#apply(Validated)} method.
+     * by composing each consecutive {@code Validated} using the {@link Validated#app(Validated)} method.
      * @param lvt       the list of {@code Validated} values
      * @param <E>       the error type
      * @param <T>       the value type of the {@code Validated}s in the list
@@ -146,7 +146,7 @@ public interface Validated<E, T> {
      */
     static <E, T> Validated<E, IList<T>> sequence(IList<Validated<E, T>> lvt) {
         return lvt.foldRight(
-                (vt, vlt) -> vlt.apply(vt.map(a -> l -> l.add(a))),
+                (vt, vlt) -> vlt.app(vt.map(a -> l -> l.add(a))),
                 success(IList.nil())
         );
     }
@@ -160,7 +160,7 @@ public interface Validated<E, T> {
      */
     static <E, T> Validated<E, List<T>> sequence(List<Validated<E, T>> lvt) {
         final Validated<E, List<T>> res = Folds.foldRight(
-                (vt, vlt) -> vlt.apply(vt.map(t -> lt -> {lt.add(t); return lt;})),
+                (vt, vlt) -> vlt.app(vt.map(t -> lt -> {lt.add(t); return lt;})),
                 success(new ArrayList<>(lvt.size())),
                 lvt
         );
@@ -263,7 +263,7 @@ public interface Validated<E, T> {
      * @param <U>       the return type of function
      * @return          a {@code Validated} wrapping the result of applying the function, or a {@code Failure} value
      */
-    <U> Validated<E, U> apply(Validated<E, F<T, U>> vf);
+    <U> Validated<E, U> app(Validated<E, F<T, U>> vf);
 
     /**
      * Return the result of applying a function to the {@code Success} value,
@@ -354,7 +354,7 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public <U> Validated<E, U> apply(Validated<E, F<T, U>> vf) {
+        public <U> Validated<E, U> app(Validated<E, F<T, U>> vf) {
             return vf.map(f -> f.apply(value));
         }
 
@@ -440,7 +440,7 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public <U> Validated<E, U> apply(Validated<E, F<T, U>> vf) {
+        public <U> Validated<E, U> app(Validated<E, F<T, U>> vf) {
             return cast();
         }
 
@@ -480,7 +480,7 @@ public interface Validated<E, T> {
             }
 
             public <R> Validated<E, R> map(F<A, F<B, R>> f) {
-                return vb.apply(va.map(f));
+                return vb.app(va.map(f));
             }
 
             public <R> Validated<E, R> map(F2<A, B, R> f) {

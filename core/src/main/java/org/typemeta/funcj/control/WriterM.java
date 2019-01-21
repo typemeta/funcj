@@ -116,6 +116,12 @@ public interface WriterM<W, A> {
         return writer(wb.value(), monoid().combine(written(), wb.written()));
     }
 
+    default <B> WriterM<W, B> app(WriterM<W, Functions.F<A, B>> wtrF) {
+        final B b = wtrF.value().apply(this.value());
+        final W w = wtrF.monoid().combine(wtrF.written(), this.written());
+        return writer(b, w);
+    }
+
     default <B> WriterM<W, B> map(Functions.F<A, B> f) {
         return writer(f.apply(value()), written());
     }

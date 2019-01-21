@@ -100,9 +100,9 @@ public class ValidatedTest {
 
     @Property
     public void apply(char c) {
-        assertEquals(Validated.success(String.valueOf(c)), Validated.success(c).apply(Validated.success(Object::toString)));
-        assertEquals(failure("fail"), Validated.success(c).apply(failure("fail")));
-        assertEquals(failure("fail"), failure("fail").apply(Validated.success(Object::toString)));
+        assertEquals(Validated.success(String.valueOf(c)), Validated.success(c).app(Validated.success(Object::toString)));
+        assertEquals(failure("fail"), Validated.success(c).app(failure("fail")));
+        assertEquals(failure("fail"), failure("fail").app(Validated.success(Object::toString)));
     }
 
     @Test

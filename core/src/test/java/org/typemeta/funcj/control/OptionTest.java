@@ -54,9 +54,9 @@ public class OptionTest {
 
     @Property
     public void apply(char c) {
-        assertEquals(Option.some(String.valueOf(c)), Option.some(c).apply(Option.some(Object::toString)));
-        assertEquals(Option.none(), Option.some(c).apply(Option.none()));
-        assertEquals(Option.none(), Option.none().apply(Option.some(Object::toString)));
+        assertEquals(Option.some(String.valueOf(c)), Option.some(c).app(Option.some(Object::toString)));
+        assertEquals(Option.none(), Option.some(c).app(Option.none()));
+        assertEquals(Option.none(), Option.none().app(Option.some(Object::toString)));
     }
 
     @Property

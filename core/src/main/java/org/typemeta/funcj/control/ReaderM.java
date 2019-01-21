@@ -3,9 +3,10 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.F;
+import org.typemeta.funcj.util.Folds;
+import org.typemeta.funcj.util.Functors;
 
-import java.util.Iterator;
-import java.util.stream.Stream;
+import java.util.*;
 
 /**
  * {@code ReaderM} is an implementation of the Reader monad.
@@ -63,9 +64,24 @@ public interface ReaderM<ENV, A> {
      */
     static <ENV, A, B> ReaderM<ENV, IList<B>> traverse(IList<A> la, F<A, ReaderM<ENV, B>> frb) {
         return la.foldRight(
-                (a, flb) -> frb.apply(a).app(flb.map(lb -> lb::add)),
+                (a, rlb) -> rlb.app(frb.apply(a).map(b -> lb -> lb.add(b))),
                 pure(IList.nil())
         );
+    }
+
+    /**
+     * Standard applicative traversal.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
+     * @param la        the list of values
+     * @param frb       the function to be applied to each value in the list
+     * @param <ENV>     the input type of the applicative function
+     * @param <A>       the type of list elements
+     * @param <B>       the return type of the {@code F} returned by the function
+     * @return          an {@code F} which wraps an {@link List} of values
+     */
+    static <ENV, A, B> ReaderM<ENV, List<B>> traverse(List<A> la, F<A, ReaderM<ENV, B>> frb) {
+        return sequence(Functors.map(frb, la));
     }
 
     /**
@@ -80,26 +96,25 @@ public interface ReaderM<ENV, A> {
      */
     static <ENV, A> ReaderM<ENV, IList<A>> sequence(IList<ReaderM<ENV, A>> lrb) {
         return lrb.foldRight(
-                (fa, rla) -> fa.app(rla.map(la -> la::add)),
+                (ra, rla) -> rla.app(ra.map(a -> la -> la.add(a))),
                 pure(IList.nil())
         );
     }
 
     /**
-     * Variation of {@link ReaderM#sequence(IList)} for {@link Stream}.
-     * @param sra       the stream of {@code F} values
+     * Variation of {@link ReaderM#sequence(IList)} for {@link List}.
+     * @param lra       the list of {@code F} values
      * @param <ENV>     the error type
      * @param <A>       the return type of the {@code F}s in the stream
-     * @return          a {@code F} which wraps an {@link Stream} of values
+     * @return          a {@code F} which wraps a list of values
      */
-    static <ENV, A> ReaderM<ENV, Stream<A>> sequence(Stream<ReaderM<ENV, A>> sra) {
-        final Iterator<ReaderM<ENV, A>> iter = sra.iterator();
-        ReaderM<ENV, IList<A>> rla = pure(IList.nil());
-        while (iter.hasNext()) {
-            final ReaderM<ENV, A> ra = iter.next();
-            rla = ra.app(rla.map(la -> la::add));
-        }
-        return rla.map(IList::stream);
+    static <ENV, A> ReaderM<ENV, List<A>> sequence(List<ReaderM<ENV, A>> lra) {
+        final ReaderM<ENV, List<A>> res = Folds.foldRight(
+                (ra, rla) -> rla.app(ra.map(a -> la -> {la.add(a); return la;})),
+                pure(new ArrayList<A>(lra.size())),
+                lra
+        );
+        return res.map(l -> {Collections.reverse(l); return l;});
     }
 
     /**
