@@ -78,7 +78,7 @@ public abstract class ReflectionUtils {
             final ParameterizedType pt = (ParameterizedType) type;
             if (pt.getRawType() instanceof Class &&
                     iface.isAssignableFrom((Class)pt.getRawType())) {
-                return getTypeArgs(pt);
+                return new TypeArgs(getTypeArgsImpl(pt));
             }
         }
 
@@ -93,26 +93,54 @@ public abstract class ReflectionUtils {
      * @return          the type arguments
      */
     public static TypeArgs getTypeArgs(Class<?> implClass, Class<?> iface) {
-        final List<ParameterizedType> genIfaces =
-                Arrays.stream(implClass.getGenericInterfaces())
-                        .filter(t -> t instanceof ParameterizedType)
-                        .map(t -> (ParameterizedType) t)
-                        .collect(toList());
-        return genIfaces.stream()
+        return new TypeArgs(
+                getTypeArgsOpt(implClass, iface)
+                        .orElseGet(() -> getParentTypeArgs(implClass, iface))
+        );
+    }
+
+    private static Optional<List<Class<?>>> getTypeArgsOpt(Class<?> implClass, Class<?> iface) {
+        return Arrays.stream(implClass.getGenericInterfaces())
+                .filter(t -> t instanceof ParameterizedType)
+                .map(t -> (ParameterizedType) t)
                 .filter(pt -> pt.getRawType() instanceof Class)
                 .filter(pt -> iface.isAssignableFrom((Class)pt.getRawType()))
                 .findFirst()
-                .map(ReflectionUtils::getTypeArgs)
-                .orElseGet(TypeArgs::new);
+                .map(ReflectionUtils::getTypeArgsImpl);
     }
 
-    private static TypeArgs getTypeArgs(ParameterizedType pt) {
-        final Type[] typeArgs = pt.getActualTypeArguments();
-        final List<Class<?>> typeArgs2 = new ArrayList<>(typeArgs.length);
-        for (Type typeArg : typeArgs) {
-            typeArgs2.add(determineConcreteType(typeArg));
+    private static List<Class<?>> getParentTypeArgs(Class<?> implClass, Class<?> iface) {
+        // Work our way up the class hierarchy.
+        Class<?> parent = implClass.getSuperclass();
+        while (parent != null) {
+            // Does parent implement iface?
+            if (iface.isAssignableFrom(parent)) {
+                final Type type = implClass.getGenericSuperclass();
+                if (type instanceof ParameterizedType) {
+                    return getTypeArgsImpl((ParameterizedType)type);
+                }
+            }
+
+            // Can we get the type args from the parent?
+            final Optional<List<Class<?>>> typeArgsOpt = getTypeArgsOpt(parent, iface);
+            if (typeArgsOpt.isPresent()) {
+                return typeArgsOpt.get();
+            }
+
+            // Both failed, so move ot the next parent.
+            implClass = parent;
+            parent = implClass.getSuperclass();
         }
-        return new TypeArgs(typeArgs2);
+
+        // This indicates a failure in the sense that we were not
+        // able to determine the generic type arguments via any of the class parents.
+        return Collections.emptyList();
+    }
+
+    private static List<Class<?>> getTypeArgsImpl(ParameterizedType pt) {
+        return Arrays.stream(pt.getActualTypeArguments())
+                .map(ReflectionUtils::determineConcreteType)
+                .collect(toList());
     }
 
     private static Class<?> determineConcreteType(Type type) {
@@ -133,5 +161,4 @@ public abstract class ReflectionUtils {
             return Object.class;
         }
     }
-
 }
