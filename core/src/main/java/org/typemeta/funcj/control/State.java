@@ -98,7 +98,7 @@ public interface State<S, A> {
     }
 
     /**
-     * Standard applicative traversal.
+     * Standard applicative traversal for {@link IList}.
      * <p>
      * Equivalent to <pre>sequence(lt.map(f))</pre>.
      * @param la        list of values
@@ -116,7 +116,7 @@ public interface State<S, A> {
     }
 
     /**
-     * Standard applicative traversal.
+     * Standard applicative traversal for {@link List}.
      * <p>
      * Equivalent to <pre>sequence(lt.map(f))</pre>.
      * @param la        list of values

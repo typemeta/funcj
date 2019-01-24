@@ -108,7 +108,7 @@ public interface StateR<S, A> {
     }
 
     /**
-     * Standard applicative traversal..
+     * Standard applicative traversal for {@link IList}.
      * <p>
      * Equivalent to <pre>sequence(lt.map(f))</pre>.
      * @param la        {@link IList} of values
@@ -126,7 +126,9 @@ public interface StateR<S, A> {
     }
 
     /**
-     * Variation of {@link StateR#traverse(IList, F)} for {@link List}.
+     * Standard applicative traversal for {@link List}.
+     * <p>
+     * Equivalent to <pre>sequence(lt.map(f))</pre>.
      * @param la        {@link List} of values
      * @param f         function to be applied to each value in the list
      * @param <S>       the state type
