@@ -243,15 +243,8 @@ public interface Try<T> {
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
      * @return          the wrapped value if it's a {@code Success}
-     * @throws          Throwable if the wrapped value is a {@code Failure}
      */
-    T getOrThrow() throws Throwable;
-
-    /**
-     * Return the wrapped value if it's a {@code Success}, otherwise throw a RuntimeException.
-     * @return          the wrapped value if it's a {@code Success}
-     */
-    T get();
+    T getOrThrow();
 
     /**
      * Push the result to a {@link SideEffect.F}.
@@ -324,7 +317,7 @@ public interface Try<T> {
      * otherwise do nothing.
      * @param f         the function to be applied
      */
-    void foreach(SideEffect.F<? super T> f);
+    void forEach(SideEffect.F<? super T> f);
 
     /**
      * Builder API for chaining together n {@code Try}s,
@@ -387,11 +380,6 @@ public interface Try<T> {
         }
 
         @Override
-        public T get() {
-            return value;
-        }
-
-        @Override
         public void handle(SideEffect.F<Failure<T>> failF, SideEffect.F<Success<T>> succF) {
             succF.apply(this);
         }
@@ -422,7 +410,7 @@ public interface Try<T> {
         }
 
         @Override
-        public void foreach(SideEffect.F<? super T> f) {
+        public void forEach(SideEffect.F<? super T> f) {
             f.apply(value);
         }
     }
@@ -482,13 +470,12 @@ public interface Try<T> {
         }
 
         @Override
-        public T getOrThrow() throws Throwable {
-            throw error;
-        }
-
-        @Override
-        public T get() {
-            throw new RuntimeException(error);
+        public T getOrThrow() {
+            if (error instanceof RuntimeException) {
+                throw (RuntimeException)error;
+            } else {
+                throw new RuntimeException(error);
+            }
         }
 
         @Override
@@ -525,7 +512,7 @@ public interface Try<T> {
         }
 
         @Override
-        public void foreach(SideEffect.F<? super T> f) {
+        public void forEach(SideEffect.F<? super T> f) {
         }
 
         @SuppressWarnings("unchecked")

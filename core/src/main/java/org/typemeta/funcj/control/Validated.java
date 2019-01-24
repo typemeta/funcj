@@ -216,9 +216,8 @@ public interface Validated<E, T> {
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
      * @return          the wrapped value if it's a {@code Success}
-     * @throws          Exception if the wrapped value is a {@code Failure}
      */
-    T getOrThrow() throws Exception;
+    T getOrThrow();
 
     /**
      * Push the result to a {@link SideEffect.F}.
@@ -281,7 +280,7 @@ public interface Validated<E, T> {
      * otherwise do nothing.
      * @param f         the function to be applied
      */
-    void foreach(SideEffect.F<? super T> f);
+    void forEach(SideEffect.F<? super T> f);
 
     /**
      * Builder API for chaining together n {@code Validated}s,
@@ -364,7 +363,7 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public void foreach(SideEffect.F<? super T> f) {
+        public void forEach(SideEffect.F<? super T> f) {
             f.apply(value);
         }
 
@@ -374,7 +373,7 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public T getOrThrow() throws Exception {
+        public T getOrThrow() {
             return value;
         }
     }
@@ -450,7 +449,7 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public void foreach(SideEffect.F<? super T> f) {
+        public void forEach(SideEffect.F<? super T> f) {
         }
 
         @Override
@@ -459,8 +458,8 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public T getOrThrow() throws Exception {
-            throw new Exception("Validated.getOrThrow() called on a Validated.Failure value");
+        public T getOrThrow() {
+            throw new RuntimeException("getOrThrow() called on a Failure value");
         }
 
         @SuppressWarnings("unchecked")

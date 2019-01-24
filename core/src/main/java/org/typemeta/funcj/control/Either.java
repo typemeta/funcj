@@ -290,9 +290,8 @@ public interface Either<E, S> {
     /**
      * Return the wrapped value if it's a {@code Right}, otherwise throw an exception.
      * @return          the wrapped value if it's a {@code Right}
-     * @throws          Exception if the wrapped value is a {@code Left}
      */
-    S getOrThrow() throws Exception;
+    S getOrThrow();
 
     /**
      * Push the result to a {@link SideEffect.F}.
@@ -365,7 +364,7 @@ public interface Either<E, S> {
      * otherwise do nothing.
      * @param f         the function to be applied
      */
-    void foreach(SideEffect.F<? super S> f);
+    void forEach(SideEffect.F<? super S> f);
 
     /**
      * Builder API for chaining together n {@code Either}s,
@@ -438,8 +437,8 @@ public interface Either<E, S> {
         }
 
         @Override
-        public S getOrThrow() throws Exception {
-            throw new Exception("Either.getOrThrow() called on a Either.Left value");
+        public S getOrThrow() {
+            throw new RuntimeException("getOrThrow() called on a Left value");
         }
 
         @Override
@@ -481,7 +480,7 @@ public interface Either<E, S> {
         }
 
         @Override
-        public void foreach(SideEffect.F<? super S> f) {
+        public void forEach(SideEffect.F<? super S> f) {
         }
 
         @SuppressWarnings("unchecked")
@@ -591,7 +590,7 @@ public interface Either<E, S> {
         }
 
         @Override
-        public void foreach(SideEffect.F<? super S> f) {
+        public void forEach(SideEffect.F<? super S> f) {
             f.apply(value);
         }
     }

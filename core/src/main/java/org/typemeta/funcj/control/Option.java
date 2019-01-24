@@ -236,9 +236,8 @@ public interface Option<T> {
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
      * @return          the wrapped value if it's a {@code Success}
-     * @throws          Exception if the wrapped value is a {@code Failure}
      */
-    T getOrThrow() throws Exception;
+    T getOrThrow();
 
     /**
      * Return the wrapped value if it's a {@code Some},
@@ -327,7 +326,7 @@ public interface Option<T> {
      * otherwise do nothing.
      * @param f         the function to be applied
      */
-    void foreach(SideEffect.F<? super T> f);
+    void forEach(SideEffect.F<? super T> f);
 
     /**
      * Builder API for chaining together n {@code Option}s,
@@ -385,7 +384,7 @@ public interface Option<T> {
         }
 
         @Override
-        public T getOrThrow() throws Exception {
+        public T getOrThrow() {
             return value;
         }
 
@@ -430,7 +429,7 @@ public interface Option<T> {
         }
 
         @Override
-        public void foreach(SideEffect.F<? super T> f) {
+        public void forEach(SideEffect.F<? super T> f) {
             f.apply(value);
         }
 
@@ -481,8 +480,8 @@ public interface Option<T> {
         }
 
         @Override
-        public T getOrThrow() throws Exception {
-            throw new Exception("Option.getOrThrow() called on Option.None");
+        public T getOrThrow() {
+            throw new RuntimeException("Option.getOrThrow() called on Option.None");
         }
 
         @Override
@@ -526,7 +525,7 @@ public interface Option<T> {
         }
 
         @Override
-        public void foreach(SideEffect.F<? super T> f) {
+        public void forEach(SideEffect.F<? super T> f) {
         }
 
         @Override
