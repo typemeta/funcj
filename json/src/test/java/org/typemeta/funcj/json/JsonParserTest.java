@@ -65,13 +65,13 @@ public class JsonParserTest {
     private static final String json =
         FileUtils.openResource("/example.json")
             .map(FileUtils::read)
-            .get();
+            .getOrThrow();
 
     @Test
     public void testSuccessParse() throws IOException {
         final Result<Chr, JsValue> result =
             JsonParser.parser.parse(
-                Input.of(FileUtils.openResource("/example.json").get()));
+                Input.of(FileUtils.openResource("/example.json").getOrThrow()));
         final JsValue node = result.getOrThrow();
         final String json2 = node.toString(100);
 
@@ -82,7 +82,7 @@ public class JsonParserTest {
     @Test
     public void testJsonSuite() {
         FileUtils.openDir("json")
-                .get()
+                .getOrThrow()
                 .forEach(t2 -> t2.map2(FileUtils::read)
                         .applyFrom(FileUtils::roundTripJson));
     }
@@ -104,7 +104,7 @@ abstract class FileUtils {
 
         return Try.sequence(
                 openResource(dir)
-                        .get()
+                        .getOrThrow()
                         .lines()
                         .map(file -> openResource(dir + file)
                                 .map(br -> Tuple2.of(file, br)))
