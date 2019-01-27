@@ -172,22 +172,22 @@ public class KVStore {
                 });
             }
 
-            default <T> State<IMapS<Integer>, A> foldMapMS(F<DSL<T>, State<IMapS<Integer>, A>> f) {
-                return State.tailRecM(this, new NT<A, State<IMapS<Integer>, Either<Free<A>, A>>>() {
+            default <T, U> State<IMapS<U>, A> foldMapMS(F<DSL<T>, State<IMapS<U>, A>> f) {
+                return State.tailRecM(this, new NT<A, State<IMapS<U>, Either<Free<A>, A>>>() {
                     @Override
-                    public State<IMapS<Integer>, Either<Free<A>, A>> transform(Pure<A> pure) {
+                    public State<IMapS<U>, Either<Free<A>, A>> transform(Pure<A> pure) {
                         return State.pure(Either.right(pure.a));
                     }
 
                     @Override
-                    public State<IMapS<Integer>, Either<Free<A>, A>> transform(Suspend<A> suspend) {
-                        final F<DSL<A>, State<IMapS<Integer>, A>> fA = ((F<DSL<A>, State<IMapS<Integer>, A>>)(F)f);
+                    public State<IMapS<U>, Either<Free<A>, A>> transform(Suspend<A> suspend) {
+                        final F<DSL<A>, State<IMapS<U>, A>> fA = ((F<DSL<A>, State<IMapS<U>, A>>)(F)f);
                         return fA.apply(suspend.a).map(Either::right);
                     }
 
                     @Override
-                    public <V> State<IMapS<Integer>, Either<Free<A>, A>> transform(FlatMapped<A, V> flatMapped) {
-                        final F<DSL<T>, State<IMapS<Integer>, V>> fV = (F<DSL<T>, State<IMapS<Integer>, V>>)(F)f;
+                    public <V> State<IMapS<U>, Either<Free<A>, A>> transform(FlatMapped<A, V> flatMapped) {
+                        final F<DSL<T>, State<IMapS<U>, V>> fV = (F<DSL<T>, State<IMapS<U>, V>>)(F)f;
                         return flatMapped.c.foldMapMS(fV)
                                 .map(flatMapped.g)
                                 .map(Either::left);
