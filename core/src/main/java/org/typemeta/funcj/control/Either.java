@@ -123,23 +123,6 @@ public interface Either<E, S> {
                 right(IList.nil())
         );
     }
-//
-//    /**
-//     * Variation of {@link Either#sequence(IList)} for {@link List}.
-//     * @param set       the list of {@code Either} values
-//     * @param <E>       the left-hand type
-//     * @param <T>       the right-hand type of the {@code Either}s in the list
-//     * @return          a {@code Either} which wraps an {@link List} of values
-//     */
-//    static <E, T> Either<E, List<T>> sequence(List<Either<E, T>> set) {
-//        final Iterator<Either<E, T>> iter = set.iterator();
-//        Either<E, IList<T>> elt = right(IList.nil());
-//        while (iter.hasNext()) {
-//            final Either<E, T> et = iter.next();
-//            elt = et.apply(elt.map(lt -> lt::add));
-//        }
-//        return elt.map(IList::reverse).map(IList::toList);
-//    }
 
     /**
      * Variation of {@link Either#sequence(IList)} for a {@link List}.
