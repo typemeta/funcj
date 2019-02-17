@@ -48,6 +48,17 @@ public class TaglessFinalTest {
     }
 
     public static class Future<T> implements FlatMap<Future.t, T> {
+        public static <T> Future<T> pure(T value) {
+            return new Future<T>(value);
+        }
+
+        public static <A> Future<A> prj(FlatMap<t, A> fm) {
+            return (Future<A>) fm;
+        }
+
+        public static <A> FlatMap<t, A> inj(Future<A> f) {
+            return f;
+        }
 
         final CompletableFuture<T> futT;
 
@@ -57,10 +68,6 @@ public class TaglessFinalTest {
 
         public Future(T value) {
             this.futT = CompletableFuture.completedFuture(value);
-        }
-
-        public static <A> Future<A> prj(FlatMap<t, A> m) {
-            return (Future<A>) m;
         }
 
         @Override
@@ -82,49 +89,52 @@ public class TaglessFinalTest {
         @Override
         public FlatMap<Future.t, Boolean> create(User user) {
             if (users.containsKey(user.id)) {
-                return new Future<Boolean>(false);
+                return new Future<>(false);
             } else {
                 users.put(user.id, user);
-                return new Future<Boolean>(true);
+                return new Future<>(true);
             }
         }
 
         @Override
         public FlatMap<Future.t, Either<DatabaseError, User>> read(long id) {
             if (!users.containsKey(id)) {
-                return new Future<Either<DatabaseError, User>>(Either.left(new ErrorFindingUser()));
+                return new Future<>(Either.left(new ErrorFindingUser()));
             } else {
-                return new Future<Either<DatabaseError, User>>(Either.right(users.get(id)));
+                return new Future<>(Either.right(users.get(id)));
             }
         }
 
         @Override
         public FlatMap<Future.t, Either<DatabaseError, Unit>> delete(long id) {
             if (!users.containsKey(id)) {
-                return new Future<Either<DatabaseError, Unit>>(
+                return new Future<>(
                         Either.left(new ErrorDeletingUser("No such user"))
                 );
             } else {
                 users.remove(id);
-                return new Future<Either<DatabaseError, Unit>>(Either.right(Unit.UNIT));
+                return new Future<>(Either.right(Unit.UNIT));
             }
         }
     };
 
     public static class Id<T> implements FlatMap<Id.t, T> {
-
-        public final T value;
-
-        public Id(T value) {
-            this.value = value;
+        public static <T> Id<T> pure(T value) {
+            return new Id<T>(value);
         }
 
         public static <A> Id<A> prj(FlatMap<t, A> m) {
             return (Id<A>) m;
         }
 
-        public static <A> FlatMap<t, A> inj(Id<A> m) {
-            return m;
+        public static <A> FlatMap<t, A> inj(Id<A> id) {
+            return id;
+        }
+
+        public final T value;
+
+        public Id(T value) {
+            this.value = value;
         }
 
         @Override
@@ -146,31 +156,31 @@ public class TaglessFinalTest {
         @Override
         public FlatMap<Id.t, Boolean> create(User user) {
             if (users.containsKey(user.id)) {
-                return new Id<Boolean>(false);
+                return new Id<>(false);
             } else {
                 users.put(user.id, user);
-                return new Id<Boolean>(true);
+                return new Id<>(true);
             }
         }
 
         @Override
         public FlatMap<Id.t, Either<DatabaseError, User>> read(long id) {
             if (!users.containsKey(id)) {
-                return new Id<Either<DatabaseError, User>>(Either.left(new ErrorFindingUser()));
+                return new Id<>(Either.left(new ErrorFindingUser()));
             } else {
-                return new Id<Either<DatabaseError, User>>(Either.right(users.get(id)));
+                return new Id<>(Either.right(users.get(id)));
             }
         }
 
         @Override
         public FlatMap<Id.t, Either<DatabaseError, Unit>> delete(long id) {
             if (!users.containsKey(id)) {
-                return new Id<Either<DatabaseError, Unit>>(
+                return new Id<>(
                         Either.left(new ErrorDeletingUser("No such user"))
                 );
             } else {
                 users.remove(id);
-                return new Id<Either<DatabaseError, Unit>>(Either.right(Unit.UNIT));
+                return new Id<>(Either.right(Unit.UNIT));
             }
         }
     };
@@ -246,6 +256,5 @@ public class TaglessFinalTest {
 
         final Id<String> idRes = Id.prj(program(idRepo));
         System.out.println("Result = " + idRes.value);
-
     }
 }
