@@ -5,6 +5,7 @@ import org.typemeta.funcj.codec.json.JsonTypes.*;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.json.parser.JsonEvent;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Array;
@@ -42,7 +43,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
 
     @Override
     public boolean decodeNull(InStream in) {
-        if (in.currentEventType().equals(InStream.Event.Type.NULL)) {
+        if (in.currentEventType().equals(JsonEvent.Type.NULL)) {
             in.readNull();
             return true;
         } else {
@@ -82,12 +83,12 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     public <T> T decodeDynamicType(InStream in, Functions.F<String, T> decoder) {
         if (!config().dynamicTypeTags()) {
             return null;
-        } else if (in.notEOF() && in.currentEventType() == InStream.Event.Type.OBJECT_START) {
+        } else if (in.notEOF() && in.currentEventType() == JsonEvent.Type.OBJECT_START) {
             final String typeFieldName = config.typeFieldName();
-            final InStream.Event.FieldName typeField = new InStream.Event.FieldName(typeFieldName);
+            final JsonEvent.FieldName typeField = new JsonEvent.FieldName(typeFieldName);
             final String valueFieldName = config.valueFieldName();
 
-            final InStream.Event next = in.event(1);
+            final JsonEvent next = in.event(1);
             if (next.equals(typeField)) {
                 in.startObject();
 
@@ -154,7 +155,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             boolean[] arr = new boolean[config.defaultArraySize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
@@ -212,7 +213,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             byte[] arr = new byte[config.defaultArraySize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
@@ -270,7 +271,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             char[] arr = new char[config.defaultArraySize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
@@ -328,7 +329,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             short[] arr = new short[config.defaultArraySize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
@@ -386,7 +387,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             int[] arr = new int[config.defaultArraySize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
@@ -444,7 +445,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             long[] arr = new long[config.defaultArraySize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
@@ -502,7 +503,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             float[] arr = new float[config.defaultArraySize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
@@ -560,7 +561,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             double[] arr = new double[config.defaultArraySize()];
             in.startArray();
             int i = 0;
-            while (in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+            while (in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                 }
@@ -637,7 +638,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
 
                 in.startArray();
 
-                while(in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+                while(in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                     collProxy.add(elemCodec.decodeWithCheck(core, in));
                 }
 
@@ -674,7 +675,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
 
                 in.startArray();
                 int i = 0;
-                while (in.notEOF() && in.currentEventType() != InStream.Event.Type.ARRAY_END) {
+                while (in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
                     if (i == arr.length) {
                         arr = Arrays.copyOf(arr, config().resizeArray(arr.length));
                     }
@@ -742,7 +743,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             final Set<String> actNames = new HashSet<>();
             final RA ra = objMeta.startDecode();
 
-            while (in.notEOF() && in.currentEventType() != InStream.Event.Type.OBJECT_END) {
+            while (in.notEOF() && in.currentEventType() != JsonEvent.Type.OBJECT_END) {
                 final String name = in.readFieldName();
                 if (!expNames.contains(name)) {
                     if (config().failOnUnrecognisedFields()) {

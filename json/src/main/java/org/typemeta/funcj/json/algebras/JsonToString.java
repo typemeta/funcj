@@ -8,6 +8,8 @@ import org.typemeta.funcj.json.model.*;
 import java.util.*;
 
 public class JsonToString implements JsonAlg<SideEffect.F<StringBuilder>> {
+    public static final JsonToString INSTANCE = new JsonToString();
+
     /**
      * Write a JSON value to a {@link StringBuilder}.
      * @param jv        the JSON value
@@ -26,7 +28,7 @@ public class JsonToString implements JsonAlg<SideEffect.F<StringBuilder>> {
 
     @Override
     public SideEffect.F<StringBuilder> bool(boolean b) {
-        return sb -> sb.append(Boolean.toString(b));
+        return sb -> sb.append(b);
     }
 
     @Override

@@ -43,6 +43,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

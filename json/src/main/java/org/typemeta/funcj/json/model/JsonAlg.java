@@ -38,6 +38,7 @@ public interface JsonAlg<T> {
      * @return          the result of processing the value
      */
     T str(String s);
+
     /**
      * Process a {@link JsArray} value.
      * @param elems     the {@code JsArray} elements

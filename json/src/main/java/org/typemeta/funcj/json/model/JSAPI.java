@@ -58,6 +58,10 @@ public class JSAPI {
         }
     }
 
+    public static JsNumber num(Number value) {
+        return new JsNumber(value.doubleValue());
+    }
+
     public static JsString str(String value) {
         return new JsString(value);
     }

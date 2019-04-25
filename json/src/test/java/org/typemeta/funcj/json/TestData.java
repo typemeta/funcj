@@ -4,7 +4,7 @@ import org.typemeta.funcj.json.model.JsValue;
 
 import static org.typemeta.funcj.json.model.JSAPI.*;
 
-public class Example {
+public class TestData {
     public static final JsValue testValue =
             obj(
                     field("null", nul()),

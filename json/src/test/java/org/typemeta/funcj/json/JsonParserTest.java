@@ -11,8 +11,6 @@ import org.typemeta.funcj.tuples.Tuple2;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -68,7 +66,7 @@ public class JsonParserTest {
             .getOrThrow();
 
     @Test
-    public void testSuccessParse() throws IOException {
+    public void testSuccessParse() {
         final Result<Chr, JsValue> result =
             JsonParser.parser.parse(
                 Input.of(FileUtils.openResource("/example.json").getOrThrow()));

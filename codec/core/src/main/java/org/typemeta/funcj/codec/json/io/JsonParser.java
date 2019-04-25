@@ -2,6 +2,8 @@ package org.typemeta.funcj.codec.json.io;
 
 import org.typemeta.funcj.codec.json.JsonTypes;
 import org.typemeta.funcj.codec.utils.CodecException;
+import org.typemeta.funcj.json.parser.JsonEvent;
+import org.typemeta.funcj.json.parser.JsonTokeniser;
 
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -29,13 +31,13 @@ public class JsonParser implements JsonTypes.InStream {
 
     private final JsonTokeniser tokeniser;
     private int bufferPos = 0;
-    private final Event eventBuffer[];
+    private final JsonEvent eventBuffer[];
     private final List<State> stateStack = new ArrayList<>();
     private State state = null;
 
     private JsonParser(JsonTokeniser tokeniser, int lookAhead) {
         this.tokeniser = tokeniser;
-        this.eventBuffer = new Event[lookAhead];
+        this.eventBuffer = new JsonEvent[lookAhead];
     }
 
     public JsonParser(Reader reader, int lookAhead) {
@@ -50,7 +52,7 @@ public class JsonParser implements JsonTypes.InStream {
         return new CodecException(msg.get() + " at position " + tokeniser.position());
     }
 
-    private CodecException unexpectedToken(Event event) {
+    private CodecException unexpectedToken(JsonEvent event) {
         return raiseError("Unexpected token " + event.type());
     }
 
@@ -67,7 +69,7 @@ public class JsonParser implements JsonTypes.InStream {
         }
     }
 
-    public Event currentEvent() {
+    public JsonEvent currentEvent() {
         if (eventBuffer[bufferPos] == null) {
             pullEventsIntoBuffer(0);
         }
@@ -75,7 +77,7 @@ public class JsonParser implements JsonTypes.InStream {
         return eventBuffer[bufferPos];
     }
 
-    private Event pullEventsIntoBuffer(int ahead) {
+    private JsonEvent pullEventsIntoBuffer(int ahead) {
         if (ahead > eventBuffer.length) {
             throw raiseError("Lookahead of " + ahead + " not supported, max is " + eventBuffer.length + ",");
         } else {
@@ -94,7 +96,7 @@ public class JsonParser implements JsonTypes.InStream {
         }
     }
 
-    public Event skipToNextEvent() {
+    public JsonEvent skipToNextEvent() {
         eventBuffer[bufferPos] = null;
         ++bufferPos;
         if (bufferPos == eventBuffer.length) {
@@ -110,16 +112,16 @@ public class JsonParser implements JsonTypes.InStream {
 
     @Override
     public boolean notEOF() {
-        return !currentEvent().equals(Event.Type.EOF);
+        return !currentEvent().equals(JsonEvent.Type.EOF);
     }
 
     @Override
-    public Event.Type currentEventType() {
+    public JsonEvent.Type currentEventType() {
         return currentEvent().type();
     }
 
     @Override
-    public Event event(int ahead) {
+    public JsonEvent event(int ahead) {
         return pullEventsIntoBuffer(ahead);
     }
 
@@ -160,14 +162,14 @@ public class JsonParser implements JsonTypes.InStream {
         }
      }
 
-    private void checkTokenType(Event.Type type) {
+    private void checkTokenType(JsonEvent.Type type) {
         if (!currentEvent().type().equals(type)) {
             throw raiseError("Expecting " + type + " token but found " + currentEvent().type());
         }
     }
 
     public void processCurrentEvent() {
-        final Event event = eventBuffer[bufferPos];
+        final JsonEvent event = eventBuffer[bufferPos];
 
         if (state == null) {
             switch (event.type()) {
@@ -291,7 +293,7 @@ public class JsonParser implements JsonTypes.InStream {
             pullEventsIntoBuffer(0);
         }
 
-        final Event event2 = eventBuffer[bufferPos];
+        final JsonEvent event2 = eventBuffer[bufferPos];
 
         switch (event2.type()) {
             case COMMA:
@@ -322,18 +324,18 @@ public class JsonParser implements JsonTypes.InStream {
 
     @Override
     public <T> T readNull() {
-        checkTokenType(Event.Type.NULL);
+        checkTokenType(JsonEvent.Type.NULL);
         processCurrentEvent();
         return null;
     }
 
     @Override
     public boolean readBoolean() {
-        final Event.Type currType = currentEvent().type();
-        if (currType.equals(Event.Type.FALSE)) {
+        final JsonEvent.Type currType = currentEvent().type();
+        if (currType.equals(JsonEvent.Type.FALSE)) {
             processCurrentEvent();
             return false;
-        } else if (currType.equals(Event.Type.TRUE)) {
+        } else if (currType.equals(JsonEvent.Type.TRUE)) {
             processCurrentEvent();
             return true;
         } else {
@@ -343,72 +345,72 @@ public class JsonParser implements JsonTypes.InStream {
 
     @Override
     public String readString() {
-        checkTokenType(Event.Type.STRING);
-        final String result = ((Event.JString) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.STRING);
+        final String result = ((JsonEvent.JString) currentEvent()).value;
         processCurrentEvent();
         return result;
     }
 
     @Override
     public char readChar() {
-        checkTokenType(Event.Type.STRING);
-        final char result = ((Event.JString) currentEvent()).value.charAt(0);
+        checkTokenType(JsonEvent.Type.STRING);
+        final char result = ((JsonEvent.JString) currentEvent()).value.charAt(0);
         processCurrentEvent();
         return result;
     }
 
     @Override
     public byte readByte() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.NUMBER);
+        final String value = ((JsonEvent.JNumber) currentEvent()).value;
         processCurrentEvent();
         return Byte.parseByte(value);
     }
 
     @Override
     public short readShort() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.NUMBER);
+        final String value = ((JsonEvent.JNumber) currentEvent()).value;
         processCurrentEvent();
         return Short.parseShort(value);
     }
 
     @Override
     public int readInt() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.NUMBER);
+        final String value = ((JsonEvent.JNumber) currentEvent()).value;
         processCurrentEvent();
         return Integer.parseInt(value);
     }
 
     @Override
     public long readLong() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.NUMBER);
+        final String value = ((JsonEvent.JNumber) currentEvent()).value;
         processCurrentEvent();
         return Long.parseLong(value);
     }
 
     @Override
     public float readFloat() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.NUMBER);
+        final String value = ((JsonEvent.JNumber) currentEvent()).value;
         processCurrentEvent();
         return Float.parseFloat(value);
     }
 
     @Override
     public double readDouble() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.NUMBER);
+        final String value = ((JsonEvent.JNumber) currentEvent()).value;
         processCurrentEvent();
         return Double.parseDouble(value);
     }
 
     @Override
     public Number readNumber() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.NUMBER);
+        final String value = ((JsonEvent.JNumber) currentEvent()).value;
         processCurrentEvent();
         try {
             return NumberFormat.getInstance().parse(value);
@@ -420,30 +422,30 @@ public class JsonParser implements JsonTypes.InStream {
 
     @Override
     public BigDecimal readBigDecimal() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.NUMBER);
+        final String value = ((JsonEvent.JNumber) currentEvent()).value;
         processCurrentEvent();
         return new BigDecimal(value);
     }
 
     @Override
     public String readStringNumber() {
-        checkTokenType(Event.Type.NUMBER);
-        final String value = ((Event.JNumber) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.NUMBER);
+        final String value = ((JsonEvent.JNumber) currentEvent()).value;
         processCurrentEvent();
         return value;
     }
 
     @Override
     public void startObject() {
-        checkTokenType(Event.Type.OBJECT_START);
+        checkTokenType(JsonEvent.Type.OBJECT_START);
         processCurrentEvent();
     }
 
     @Override
     public String readFieldName() {
-        checkTokenType(Event.Type.FIELD_NAME);
-        final String result = ((Event.FieldName) currentEvent()).value;
+        checkTokenType(JsonEvent.Type.FIELD_NAME);
+        final String result = ((JsonEvent.FieldName) currentEvent()).value;
         processCurrentEvent();
         return result;
     }
@@ -459,19 +461,19 @@ public class JsonParser implements JsonTypes.InStream {
 
     @Override
     public void endObject() {
-        checkTokenType(Event.Type.OBJECT_END);
+        checkTokenType(JsonEvent.Type.OBJECT_END);
         processCurrentEvent();
     }
 
     @Override
     public void startArray() {
-        checkTokenType(Event.Type.ARRAY_START);
+        checkTokenType(JsonEvent.Type.ARRAY_START);
         processCurrentEvent();
     }
 
     @Override
     public void endArray() {
-        checkTokenType(Event.Type.ARRAY_END);
+        checkTokenType(JsonEvent.Type.ARRAY_END);
         processCurrentEvent();
     }
 }

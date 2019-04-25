@@ -7,7 +7,7 @@ import org.typemeta.funcj.json.model.JsValue;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
-import static org.typemeta.funcj.json.Example.testValue;
+import static org.typemeta.funcj.json.TestData.testValue;
 
 public class JsonToStrDocTest {
 

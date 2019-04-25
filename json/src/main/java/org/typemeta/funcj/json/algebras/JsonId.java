@@ -10,6 +10,8 @@ import java.util.List;
  * i.e. one that creates an identical copy of the original object.
  */
 public class JsonId implements JsonAlg<JsValue> {
+    public static final JsonId INSTANCE = new JsonId();
+
     @Override
     public JsValue nul() {
         return JSAPI.nul();

@@ -239,6 +239,10 @@ public interface Option<T> {
      */
     T getOrThrow();
 
+    T orElse(T value);
+
+    T orElseGet(F0<T> getter);
+
     /**
      * Return the wrapped value if it's a {@code Some},
      * otherwise throw the exception provided by calling {@code exSupp}.
@@ -389,6 +393,16 @@ public interface Option<T> {
         }
 
         @Override
+        public T orElse(T value) {
+            return this.value;
+        }
+
+        @Override
+        public T orElseGet(F0<T> getter) {
+            return this.value;
+        }
+
+        @Override
         public <X extends Throwable> T getOrThrow(F0<X> exSupp) throws X {
             return value;
         }
@@ -482,6 +496,16 @@ public interface Option<T> {
         @Override
         public T getOrThrow() {
             throw new RuntimeException("Option.getOrThrow() called on Option.None");
+        }
+
+        @Override
+        public T orElse(T value) {
+            return value;
+        }
+
+        @Override
+        public T orElseGet(F0<T> getter) {
+            return getter.apply();
         }
 
         @Override

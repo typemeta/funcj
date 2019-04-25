@@ -11,6 +11,8 @@ import static java.util.stream.Collectors.toList;
 import static org.typemeta.funcj.util.Streams.tupleStream;
 
 public class JsonToDoc implements JsonAlg<Document> {
+    public static final JsonToDoc INSTANCE = new JsonToDoc();
+
     /**
      * Pretty-print a JSON value as a JSON string.
      * @param jv        the JSON value
@@ -18,7 +20,7 @@ public class JsonToDoc implements JsonAlg<Document> {
      * @return          the string representation of formatted JSON
      */
     public static String toString(JsValue jv, int width) {
-        return DocFormat.format(width, jv.apply(new JsonToDoc()));
+        return DocFormat.format(width, jv.apply(JsonToDoc.INSTANCE));
     }
 
     @Override

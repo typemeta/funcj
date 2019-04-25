@@ -70,6 +70,10 @@ public final class JsObject
         return fields.size();
     }
 
+    public Set<String> keySet() {
+        return fields.keySet();
+    }
+
     public boolean containsName(String name) {
         return fields.containsKey(name);
     }

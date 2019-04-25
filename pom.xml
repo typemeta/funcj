@@ -79,6 +79,7 @@
         <!-- Library versions -->
         <immutables.version>2.7.3</immutables.version>
         <jmh.version>1.21</jmh.version>
+        <jsonp.version>1.1.5</jsonp.version>
         <junit.version>4.12</junit.version>
         <junit-quickcheck.version>0.8.1</junit-quickcheck.version>
         <slf4j.version>1.7.25</slf4j.version>
@@ -123,6 +124,12 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-nop</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>jakarta.json</artifactId>
+                <version>${jsonp.version}</version>
             </dependency>
 
         </dependencies>

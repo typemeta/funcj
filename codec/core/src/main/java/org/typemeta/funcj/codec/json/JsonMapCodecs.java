@@ -5,6 +5,7 @@ import org.typemeta.funcj.codec.CodecCoreEx;
 import org.typemeta.funcj.codec.MapCodecs.*;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
 import org.typemeta.funcj.codec.utils.CodecException;
+import org.typemeta.funcj.json.parser.JsonEvent;
 
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public abstract class JsonMapCodecs {
 
             in.startArray();
 
-            while(in.notEOF() && in.currentEventType() == InStream.Event.Type.OBJECT_START) {
+            while(in.notEOF() && in.currentEventType() == JsonEvent.Type.OBJECT_START) {
                 K key = null;
                 V val = null;
 
@@ -107,7 +108,7 @@ public abstract class JsonMapCodecs {
 
             final MapProxy<String, V> mapProxy = getMapProxy(core);
 
-            while(in.notEOF() && in.currentEventType() == InStream.Event.Type.FIELD_NAME) {
+            while(in.notEOF() && in.currentEventType() == JsonEvent.Type.FIELD_NAME) {
                 final String key = in.readFieldName();
                 final V val = valueCodec.decodeWithCheck(core, in);
                 mapProxy.put(key, val);
