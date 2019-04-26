@@ -14,6 +14,14 @@ import java.util.*;
  */
 public class JsonParser {
 
+    public enum Consume {
+        ALL, FIRST
+    }
+
+    public enum Comments {
+        ALLOWED, DISALLOWED
+    }
+
     /**
      * Parse the given JSON string into a JSON value.
      * @param json          the JSON string to be parsed
@@ -21,7 +29,7 @@ public class JsonParser {
      * @throws JsonException if an error occurs while parsing the input
      */
     public static JsValue parse(String json) throws JsonException {
-        return parse(new StringReader(json), true);
+        return parse(new StringReader(json), Consume.ALL, Comments.DISALLOWED);
     }
 
 
@@ -32,21 +40,21 @@ public class JsonParser {
      * @throws JsonException if an error occurs while parsing the input
      */
     public static JsValue parse(Reader rdr) throws JsonException {
-        return parse(rdr, false);
+        return parse(rdr, Consume.FIRST, Comments.DISALLOWED);
     }
 
     /**
      * Parse the JSON content in the given reader into a JSON value.
      * @param rdr           the JSON reader to be read from
-     * @param consumeAll    if true then an exception will be thrown if the input is nto entirely consumed
-     *                      after parsing the first JSON value
+     * @param consume       consume flag
+     * @param comments      comments flag
      * @return              the parsed JSON value
      * @throws JsonException if an error occurs while parsing the input
      */
-    public static JsValue parse(Reader rdr, boolean consumeAll) throws JsonException {
-        final JsonParser parser = new JsonParser(rdr);
+    public static JsValue parse(Reader rdr, Consume consume, Comments comments) throws JsonException {
+        final JsonParser parser = new JsonParser(rdr, comments.equals(Comments.ALLOWED));
         final JsValue jsv = parser.readValue();
-        if (consumeAll && !parser.isEof()) {
+        if (consume.equals(Consume.ALL) && !parser.isEof()) {
             throw parser.tokeniser.raiseError("Input not at EOF after parsing JSON value");
         } else {
             if (jsv.isArray() || jsv.isObject()) {
@@ -60,8 +68,12 @@ public class JsonParser {
     private final JsonTokeniser tokeniser;
     private JsonEvent nextEvent = null;
 
+    public JsonParser(Reader rdr, boolean commentsAllowed) {
+        this.tokeniser = new JsonTokeniser(rdr, commentsAllowed);
+    }
+
     public JsonParser(Reader rdr) {
-        this.tokeniser = new JsonTokeniser(rdr);
+        this(rdr, false);
     }
 
     public boolean isEof() {

@@ -55,6 +55,7 @@ public class JsonTokeniser {
         OTHER
     }
 
+    private final boolean allowComments;
     private Reader rdr;
     private int nextChar = EMPTY;
     private long pos = 0;
@@ -62,9 +63,14 @@ public class JsonTokeniser {
     private State state = State.OTHER;
     private final List<State> stateStack = new ArrayList<>();
 
-    public JsonTokeniser(Reader rdr) {
+    public JsonTokeniser(Reader rdr, boolean allowComments) {
+        this.allowComments = allowComments;
         this.rdr = rdr;
         this.buffer = new Buffer();
+    }
+
+    public JsonTokeniser(Reader rdr) {
+        this(rdr, false);
     }
 
     public long position() {
@@ -259,6 +265,34 @@ public class JsonTokeniser {
                     case '+':
                         buffer.add(nc);
                         return parseNumber(NumState.A);
+                    case '/':
+                        if (!allowComments) {
+                            throw raiseError("Unexpected input '" + nc + "'");
+                        } else {
+                            char c2 = nextCharOrThrow();
+                            switch (c2) {
+                                case '/': {
+                                    c2 = nextCharOrThrow();
+                                    while (c2 != '\r' && c2 != '\n') {
+                                        c2 = nextCharOrThrow();
+                                    }
+
+                                    nextChar = c2;
+                                    break;
+                                }
+                                case '*': {
+                                    c2 = nextCharOrThrow();
+                                    while (c2 != '*' && nextCharOrThrow() != '/') {
+                                        c2 = nextCharOrThrow();
+                                    }
+
+                                    nextChar = c2;
+                                    break;
+                                }
+                                default:
+                                    throw raiseError("Unexpected input '" + nc + "'");
+                            }
+                        }
                     default:
                         throw raiseError("Unexpected input '" + nc + "'");
                 }
