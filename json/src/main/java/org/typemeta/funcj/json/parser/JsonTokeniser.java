@@ -265,34 +265,37 @@ public class JsonTokeniser {
                     case '+':
                         buffer.add(nc);
                         return parseNumber(NumState.A);
-                    case '/':
-                        if (!allowComments) {
-                            throw raiseError("Unexpected input '" + nc + "'");
-                        } else {
-                            char c2 = nextCharOrThrow();
-                            switch (c2) {
-                                case '/': {
-                                    c2 = nextCharOrThrow();
-                                    while (c2 != '\r' && c2 != '\n') {
-                                        c2 = nextCharOrThrow();
-                                    }
-
-                                    nextChar = c2;
-                                    break;
-                                }
-                                case '*': {
-                                    c2 = nextCharOrThrow();
-                                    while (c2 != '*' && nextCharOrThrow() != '/') {
-                                        c2 = nextCharOrThrow();
-                                    }
-
-                                    nextChar = c2;
-                                    break;
-                                }
-                                default:
-                                    throw raiseError("Unexpected input '" + nc + "'");
-                            }
-                        }
+//                    case '/':
+//                        if (!allowComments) {
+//                            throw raiseError(
+//                                    "Unexpected input '" + nc +
+//                                         "' (support for comments is not enabled)");
+//                        } else {
+//                            char c2 = nextCharOrThrow();
+//                            switch (c2) {
+//                                case '/': {
+//                                    c2 = nextCharOrThrow();
+//                                    while (c2 != '\r' && c2 != '\n') {
+//                                        c2 = nextCharOrThrow();
+//                                    }
+//
+//                                    nextChar = c2;
+//                                    break;
+//                                }
+//                                case '*': {
+//                                    c2 = nextCharOrThrow();
+//                                    while (c2 != '*' && nextCharOrThrow() != '/') {
+//                                        c2 = nextCharOrThrow();
+//                                    }
+//
+//                                    nextChar = c2;
+//                                    break;
+//                                }
+//                                default:
+//                                    throw raiseError("Unexpected input '" + nc + "'");
+//                            }
+//                        }
+//                        break;
                     default:
                         throw raiseError("Unexpected input '" + nc + "'");
                 }
@@ -371,6 +374,7 @@ public class JsonTokeniser {
                         }
                         case 'e':
                             c = 'E';
+                            // Fall-through
                         case 'E': {
                             state = NumState.F;
                             break;
@@ -389,6 +393,7 @@ public class JsonTokeniser {
                         }
                         case 'e':
                             c = 'E';
+                            // Fall-through
                         case 'E': {
                             state = NumState.F;
                             break;
@@ -418,6 +423,7 @@ public class JsonTokeniser {
                     switch (c) {
                         case 'e':
                             c = 'E';
+                            // Fall-through
                         case 'E': {
                             state = NumState.F;
                             break;
@@ -466,6 +472,7 @@ public class JsonTokeniser {
                     switch (c) {
                         case 'e':
                             c = 'E';
+                            // Fall-through
                         case 'E': {
                             state = NumState.F;
                             break;

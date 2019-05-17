@@ -17,7 +17,7 @@ public abstract class Exceptions {
      * @return          never returns
      * @throws X        the hidden checked exception
      */
-    private static <X extends Exception, T> T throwUnchecked(Exception ex) throws X {
+    public static <X extends Exception, T> T throwUnchecked(Exception ex) throws X {
         throw (X) ex;
     }
 

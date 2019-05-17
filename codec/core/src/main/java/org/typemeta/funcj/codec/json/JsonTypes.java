@@ -2,7 +2,7 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.CodecConfig;
 import org.typemeta.funcj.codec.json.io.JsonGenerator;
-import org.typemeta.funcj.codec.json.io.JsonParser;
+import org.typemeta.funcj.codec.json.io.JsonStreamParser;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.json.parser.JsonEvent;
 
@@ -76,8 +76,8 @@ public class JsonTypes {
 
     private static final int MAX_PARSER_LOOKAHEAD = 3;
 
-    public static JsonParser inputOf(Reader reader) {
-        return new JsonParser(reader, MAX_PARSER_LOOKAHEAD);
+    public static JsonStreamParser inputOf(Reader reader) {
+        return new JsonStreamParser(reader, MAX_PARSER_LOOKAHEAD);
     }
 
     public static JsonGenerator outputOf(Writer writer) {

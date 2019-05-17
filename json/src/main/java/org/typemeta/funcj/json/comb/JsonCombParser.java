@@ -1,4 +1,4 @@
-package org.typemeta.funcj.json;
+package org.typemeta.funcj.json.comb;
 
 import org.typemeta.funcj.data.Chr;
 import org.typemeta.funcj.json.model.*;

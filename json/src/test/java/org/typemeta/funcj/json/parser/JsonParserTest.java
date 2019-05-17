@@ -210,11 +210,11 @@ abstract class FileUtils {
         }
 
         static boolean compare(String path, JsonString exp, JsString act) {
-            return exp.getString().equals(act.getValue());
+            return exp.getString().equals(act.value());
         }
 
         static boolean compare(String path, JsonNumber exp, JsNumber act) {
-            return Math.abs(exp.doubleValue() - act.getValue()) < EPS;
+            return Math.abs(exp.doubleValue() - act.value()) < EPS;
         }
     }
 

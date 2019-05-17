@@ -15,7 +15,7 @@ public enum JsBool implements JsValue {
         this.value = value;
     }
 
-    public boolean getValue() {
+    public boolean value() {
         return value;
     }
 

@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.bytes.ByteCodecCore;
+import org.typemeta.funcj.codec.json.JsValueCodec;
 import org.typemeta.funcj.codec.json.JsonCodecCore;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.utils.ReflectionUtils;
@@ -22,7 +23,8 @@ public abstract class Codecs {
      * @return the new {@code JsonCodecCore}
      */
     public static JsonCodecCore jsonCodec() {
-        return registerAll(new JsonCodecCore());
+        final JsonCodecCore core = registerAll(new JsonCodecCore());
+        return JsValueCodec.registerAll(core);
     }
 
     /**

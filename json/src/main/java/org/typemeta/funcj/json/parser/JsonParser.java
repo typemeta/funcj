@@ -1,13 +1,14 @@
 package org.typemeta.funcj.json.parser;
 
-import org.typemeta.funcj.json.parser.JsonEvent.Type;
 import org.typemeta.funcj.json.model.*;
+import org.typemeta.funcj.json.parser.JsonEvent.Type;
 
 import java.io.Reader;
 import java.io.StringReader;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A parser for JSON streams.
@@ -31,7 +32,6 @@ public class JsonParser {
     public static JsValue parse(String json) throws JsonException {
         return parse(new StringReader(json), Consume.ALL, Comments.DISALLOWED);
     }
-
 
     /**
      * Parse the JSON content in the given reader into a JSON value.

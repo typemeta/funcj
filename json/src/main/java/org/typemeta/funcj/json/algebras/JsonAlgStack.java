@@ -65,18 +65,18 @@ public abstract class JsonAlgStack {
                 }
             } else if (cls.equals(JsBool.class)) {
                 final JsBool jsBl = (JsBool)next.value;
-                resultsStack.push(alg.bool(jsBl.getValue()));
+                resultsStack.push(alg.bool(jsBl.value()));
             } else if (cls.equals(JsNull.class)) {
                 resultsStack.push(alg.nul());
             } else if (cls.equals(JsNumber.class)) {
                 final JsNumber jsNum = (JsNumber)next.value;
-                resultsStack.push(alg.num(jsNum.getValue()));
+                resultsStack.push(alg.num(jsNum.value()));
             } else if (cls.equals(JsObject.class)) {
                 final JsObject jsObj = (JsObject)next.value;
                 if (next.ready) {
                     final List<String> names =
                             jsObj.stream()
-                                    .map(JsObject.Field::getName)
+                                    .map(JsObject.Field::name)
                                     .collect(Collectors.toList());
                     final List<T> values = popN(resultsStack, jsObj.size());
                     final LinkedHashMap<String, T> map = zip(names, values);
@@ -85,13 +85,13 @@ public abstract class JsonAlgStack {
                     next.ready = true;
                     pendingStack.push(next);
                     jsObj.stream()
-                            .map(JsObject.Field::getValue)
+                            .map(JsObject.Field::value)
                             .map(Entry::new)
                             .forEach(pendingStack::push);
                 }
             } else if (cls.equals(JsString.class)) {
                 final JsString jsStr = (JsString)next.value;
-                resultsStack.push(alg.str(jsStr.getValue()));
+                resultsStack.push(alg.str(jsStr.value()));
             } else {
                 throw new IllegalStateException("Unrecognised JsValue sub-type : " + cls);
             }

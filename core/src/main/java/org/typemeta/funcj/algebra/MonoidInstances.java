@@ -1,7 +1,6 @@
 package org.typemeta.funcj.algebra;
 
 import org.typemeta.funcj.data.IList;
-import org.typemeta.funcj.functions.Functions;
 
 import java.util.*;
 

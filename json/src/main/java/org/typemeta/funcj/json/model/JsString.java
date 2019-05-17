@@ -7,13 +7,13 @@ import org.typemeta.funcj.functions.Functions;
  */
 public final class JsString implements JsValue {
 
-    protected final String value;
+    private final String value;
 
     protected JsString(String value) {
         this.value = value;
     }
 
-    public String getValue() {
+    public String value() {
         return value;
     }
 

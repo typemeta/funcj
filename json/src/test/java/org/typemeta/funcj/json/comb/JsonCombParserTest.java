@@ -1,4 +1,4 @@
-package org.typemeta.funcj.json;
+package org.typemeta.funcj.json.comb;
 
 import org.junit.Test;
 import org.typemeta.funcj.control.Try;

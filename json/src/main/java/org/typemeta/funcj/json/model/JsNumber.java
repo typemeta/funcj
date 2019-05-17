@@ -15,7 +15,7 @@ public final class JsNumber implements JsValue {
         this.value =value;
     }
 
-    public double getValue() {
+    public double value() {
         return value;
     }
 

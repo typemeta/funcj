@@ -18,7 +18,7 @@ public class JsonBridge {
     }
 
     public JsonBridge(Reader reader, Writer writer) {
-        this(new JsonParser(reader, 1), new JsonGenerator(writer));
+        this(new JsonStreamParser(reader, 1), new JsonGenerator(writer));
     }
 
     void run() {

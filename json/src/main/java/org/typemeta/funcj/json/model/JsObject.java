@@ -13,19 +13,19 @@ public final class JsObject
         implements Iterable<JsObject.Field>, JsValue {
 
     public static class Field {
-        public final String name;
-        public final JsValue value;
+        private final String name;
+        private final JsValue value;
 
         public Field(String name, JsValue value) {
             this.name = Objects.requireNonNull(name);
             this.value = Objects.requireNonNull(value);
         }
 
-        public String getName() {
+        public String name() {
             return name;
         }
 
-        public JsValue getValue() {
+        public JsValue value() {
             return value;
         }
 

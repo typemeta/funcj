@@ -1,11 +1,5 @@
 package org.typemeta.funcj.json.model;
 
-import java.util.LinkedHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
 public abstract class Utils {
 
     public static String format(double value) {

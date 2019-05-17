@@ -1,20 +1,32 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.codec.CodecCoreEx;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
 import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.json.parser.JsonEvent;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 
-public abstract class JsValueCodecs {
+public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config> {
     public static final JsNullCodec jsNullCodec = new JsNullCodec();
     public static final JsBoolCodec jsBoolCodec = new JsBoolCodec();
     public static final JsStringCodec jsStringCodec = new JsStringCodec();
     public static final JsNumberCodec jsNumberCodec = new JsNumberCodec();
     public static final JsArrayCodec jsArrayCodec = new JsArrayCodec();
     public static final JsObjectCodec jsObjectCodec = new JsObjectCodec();
+    public static final JsValueCodec jsValueCodec = new JsValueCodec();
+
+    public static <CORE extends CodecCore<InStream, OutStream, Config>> CORE registerAll(CORE core) {
+        core.registerCodec(JsNull.class, jsNullCodec);
+        core.registerCodec(JsBool.class, jsBoolCodec);
+        core.registerCodec(JsString.class, jsStringCodec);
+        core.registerCodec(JsNumber.class, jsNumberCodec);
+        core.registerCodec(JsArray.class, jsArrayCodec);
+        core.registerCodec(JsObject.class, jsObjectCodec);
+        core.registerCodec(JsValue.class, jsValueCodec);
+        return core;
+    }
 
     public static class JsNullCodec implements Codec<JsNull, InStream, OutStream, Config> {
         @Override
@@ -37,6 +49,13 @@ public abstract class JsValueCodecs {
             in.readNull();
             return JSAPI.nul();
         }
+
+        @Override
+        public JsNull decodeWithCheck(
+                CodecCoreEx<InStream, OutStream, Config> core,
+                InStream in) {
+            return decode(core, in);
+        }
     }
 
     public static class JsBoolCodec implements Codec<JsBool, InStream, OutStream, Config> {
@@ -50,14 +69,13 @@ public abstract class JsValueCodecs {
                 CodecCoreEx<InStream, OutStream, Config> core,
                 JsBool value,
                 OutStream out) {
-            return out.writeBoolean(value.getValue());
+            return out.writeBoolean(value.value());
         }
 
         @Override
         public JsBool decode(
                 CodecCoreEx<InStream, OutStream, Config> core,
                 InStream in) {
-            // TODO:
             return JSAPI.bool(in.readBoolean());
         }
     }
@@ -73,7 +91,7 @@ public abstract class JsValueCodecs {
                 CodecCoreEx<InStream, OutStream, Config> core,
                 JsString value,
                 OutStream out) {
-            return out.writeString(value.getValue());
+            return out.writeString(value.value());
         }
 
         @Override
@@ -95,7 +113,7 @@ public abstract class JsValueCodecs {
                 CodecCoreEx<InStream, OutStream, Config> core,
                 JsNumber value,
                 OutStream out) {
-            return out.writeNumber(value.getValue());
+            return out.writeNumber(value.value());
         }
 
         @Override
@@ -118,7 +136,7 @@ public abstract class JsValueCodecs {
                 JsArray value,
                 OutStream out) {
             out.startArray();
-            value.forEach(jsv -> JsValueCodecs.encode(core, jsv, out));
+            value.forEach(jsv -> jsValueCodec.encode(core, jsv, out));
             return out.endArray();
         }
 
@@ -134,7 +152,7 @@ public abstract class JsValueCodecs {
                 if (i == arr.length) {
                     arr = Arrays.copyOf(arr, core.config().resizeArray(arr.length));
                 }
-                arr[i++] = JsValueCodecs.decode(core, in);
+                arr[i++] = jsValueCodec.decode(core, in);
             }
             in.endArray();
 
@@ -156,8 +174,8 @@ public abstract class JsValueCodecs {
             out.startObject();
 
             value.forEach(field -> {
-                out.writeField(field.name);
-                JsValueCodecs.encode(core, field.value, out);
+                out.writeField(field.name());
+                jsValueCodec.encode(core, field.value(), out);
             });
 
             return out.endObject();
@@ -173,7 +191,7 @@ public abstract class JsValueCodecs {
 
             while(in.notEOF() && in.currentEventType() == JsonEvent.Type.FIELD_NAME) {
                 final String key = in.readFieldName();
-                final JsValue val = JsValueCodecs.decode(core, in);
+                final JsValue val = jsValueCodec.decode(core, in);
                 map.put(key, val);
             }
 
@@ -183,7 +201,20 @@ public abstract class JsValueCodecs {
         }
     }
 
-    public static OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, JsValue jsv, OutStream out) {
+    @Override
+    public Class<JsValue> type() {
+        return JsValue.class;
+    }
+
+    @Override
+    public OutStream encodeWithCheck(
+            CodecCoreEx<InStream, OutStream, Config> core,
+            JsValue value,
+            OutStream out) {
+        return encode(core, value, out);
+    }
+
+    public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, JsValue jsv, OutStream out) {
         switch (jsv.type()) {
             case ARRAY:
                 return jsArrayCodec.encode(core, (JsArray)jsv, out);
@@ -202,9 +233,19 @@ public abstract class JsValueCodecs {
         }
     }
 
-    public static JsValue decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-        switch (in.currentEventType()) {
+    @Override
+    public JsValue decodeWithCheck(
+            CodecCoreEx<InStream, OutStream, Config> core,
+            InStream in) {
+        if (core.format().decodeNull(in)) {
+            return JSAPI.nul();
+        } else {
+            return decode(core, in);
+        }
+    }
 
+    public JsValue decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+        switch (in.currentEventType()) {
             case ARRAY_START:
                 return jsArrayCodec.decode(core, in);
             case FALSE:
