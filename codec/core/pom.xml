@@ -93,7 +93,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>org.typemeta.funcj-codec-core</Automatic-Module-Name>
+                            <Automatic-Module-Name>org.typemeta.funcj.codec</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>

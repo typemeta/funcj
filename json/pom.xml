@@ -59,7 +59,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>org.typemeta.funcj-json</Automatic-Module-Name>
+                            <Automatic-Module-Name>org.typemeta.funcj.json</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>

@@ -144,7 +144,7 @@ public class JsValueCodecTest {
         final String data = sw.toString();
 
         JsObject jsv1 = (JsObject)JsonParser.parse(data);
-        System.out.println(jsv1);
+        //System.out.println(jsv1);
 
         final StringReader sr = new StringReader(data);
 

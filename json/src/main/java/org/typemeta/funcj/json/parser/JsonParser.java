@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * A parser for JSON streams.
+ * The parser allows token look-ahead.
  */
 public class JsonParser {
 
