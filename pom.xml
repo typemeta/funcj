@@ -3,7 +3,7 @@
 
     <groupId>org.typemeta</groupId>
     <artifactId>funcj</artifactId>
-    <version>0.6.13</version>
+    <version>0.6.14-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
@@ -24,7 +24,7 @@
         <connection>scm:git:git@github.com:typemeta/${project.artifactId}.git</connection>
         <developerConnection>scm:git:git@github.com:typemeta/${project.artifactId}.git</developerConnection>
         <url>http://github.com:typemeta/${project.artifactId}/tree/master</url>
-      <tag>funcj-0.6.13</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <issueManagement>
