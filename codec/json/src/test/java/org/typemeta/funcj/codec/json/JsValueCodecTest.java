@@ -2,7 +2,6 @@ package org.typemeta.funcj.codec.json;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.typemeta.funcj.codec.Codecs;
 import org.typemeta.funcj.codec.json.io.FileUtils;
 import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.json.parser.JsonParser;

@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.codec.CodecCoreEx;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.MapCodecs.*;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
 import org.typemeta.funcj.codec.utils.CodecException;
@@ -11,7 +10,7 @@ import java.util.Map;
 
 public abstract class JsonMapCodecs {
 
-    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, InStream, OutStream, Config> {
+    public static class MapCodec<K, V> extends MapCodecs.AbstractMapCodec<K, V, InStream, OutStream, Config> {
 
         public MapCodec(
                 Class<Map<K, V>> mapType,

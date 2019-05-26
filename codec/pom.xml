@@ -18,6 +18,7 @@
 
     <modules>
         <module>core</module>
+        <module>json</module>
         <module>mpack</module>
     </modules>
 
