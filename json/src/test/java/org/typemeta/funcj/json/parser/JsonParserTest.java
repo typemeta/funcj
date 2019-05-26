@@ -143,6 +143,7 @@ abstract class FileUtils {
 
         return true;
     }
+
     private static class Compare {
 
         private static final double EPS = 1e-16;

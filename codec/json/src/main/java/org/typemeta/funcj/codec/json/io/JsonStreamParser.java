@@ -28,7 +28,7 @@ public class JsonStreamParser implements JsonTypes.InStream {
 
     private final JsonTokeniser tokeniser;
     private int bufferPos = 0;
-    private final JsonEvent eventBuffer[];
+    private final JsonEvent[] eventBuffer;
     private final List<State> stateStack = new ArrayList<>();
     private State state = null;
 
@@ -133,15 +133,11 @@ public class JsonStreamParser implements JsonTypes.InStream {
             switch (currentEventType().type()) {
                 case OBJECT_START:
                 case ARRAY_START:
+                case FIELD_NAME:
                     processCurrentEvent();
                     break;
                 case ARRAY_END:
                 case OBJECT_END:
-                    processCurrentEvent();
-                    if (stateStack.size() == depth) {
-                        return;
-                    }
-                    break;
                 case TRUE:
                 case FALSE:
                 case NULL:
@@ -151,9 +147,6 @@ public class JsonStreamParser implements JsonTypes.InStream {
                     if (stateStack.size() == depth) {
                         return;
                     }
-                    break;
-                case FIELD_NAME:
-                    processCurrentEvent();
                     break;
                 case EOF:
                     throw new CodecException("Unexpected EOF");

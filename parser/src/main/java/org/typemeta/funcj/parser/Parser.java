@@ -374,7 +374,6 @@ public interface Parser<I, A> {
      * @param <B>       the result type of the end parser
      * @return          a parser which applies this parser zero or more times until end succeeds
      */
-    @SuppressWarnings("unchecked")
     default <B> Parser<I, IList<A>> manyTill(Parser<I, B> end) {
         return new ParserImpl<I, IList<A>>(
                 end.acceptsEmpty(),

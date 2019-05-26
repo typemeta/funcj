@@ -43,7 +43,7 @@ public class DocFormat {
                 sb.append(indentStr);
                 depth -= indentStrLen;
             }
-            return sb.append(indentStr.substring(0, depth)).toString();
+            return sb.append(indentStr, 0, depth).toString();
         }
     }
 

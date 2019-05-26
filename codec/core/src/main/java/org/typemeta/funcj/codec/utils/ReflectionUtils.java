@@ -8,7 +8,6 @@ import static java.util.stream.Collectors.toList;
 /**
  * Utility methods relating to Reflection.
  */
-@SuppressWarnings("unchecked")
 public abstract class ReflectionUtils {
     private static final int ENUM      = 0x00004000;
 

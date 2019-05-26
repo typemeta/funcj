@@ -219,7 +219,6 @@ public abstract class MapCodecs {
 
         @Override
         public Map<K, V> construct() {
-            @SuppressWarnings("unchecked")
             final Object[] arr = (Object[])Array.newInstance(Object.class, args.size());
             args.toArray(arr);
             return argArrCtor.construct(arr);

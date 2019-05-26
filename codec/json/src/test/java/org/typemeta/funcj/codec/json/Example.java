@@ -90,7 +90,7 @@ public class Example {
             "Jon",
             1.86,
             ZonedDateTime.of(
-                    LocalDateTime.of(1970, 04, 19, 17, 05, 41),
+                    LocalDateTime.of(1970, 4, 19, 17, 5, 41),
                     ZoneId.of("GMT")),
             Colour.GREEN, Colour.BLUE);
 

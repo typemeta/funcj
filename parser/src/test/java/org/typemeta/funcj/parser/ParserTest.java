@@ -62,8 +62,8 @@ public class ParserTest {
         final Chr cc2 = Chr.valueOf(c2);
 
         // String.toCharArray creates a new array each time, so ensure we call it only once.
-        final char[] ca12 = String.valueOf("" + c1 + c2).toCharArray();
-        final char[] ca11 = String.valueOf("" + c1 + c1).toCharArray();
+        final char[] ca12 = ("" + c1 + c2).toCharArray();
+        final char[] ca11 = ("" + c1 + c1).toCharArray();
 
         final Parser<Chr, Tuple2<Chr, Chr>> parser =
                 ap(

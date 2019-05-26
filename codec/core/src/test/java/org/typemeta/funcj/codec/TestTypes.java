@@ -445,7 +445,7 @@ public abstract class TestTypes {
                     hashMap("c", -1, "d", -2),
                     treeMap("e", -200, "f", -300),
                     Optional.empty(),
-                    Optional.of((int)99)
+                    Optional.of(99)
             );
             this.val = -999;
             this.valArr = new int[]{1234, 5678};
@@ -1050,7 +1050,7 @@ public abstract class TestTypes {
 
     public static class Custom {
 
-        enum Colour {RED, GREEN, BLUE};
+        enum Colour {RED, GREEN, BLUE}
 
         final Colour colour;
         final List<LocalDate> dates;

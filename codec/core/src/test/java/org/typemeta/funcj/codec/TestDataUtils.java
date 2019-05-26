@@ -18,7 +18,7 @@ abstract class TestDataUtils {
         return m;
     }
 
-    static <K, V> TreeMap<K, V> treeMap(K k0, V v0, K k1, V v1) {
+    static <K extends Comparable<K>, V> TreeMap<K, V> treeMap(K k0, V v0, K k1, V v1) {
         final TreeMap<K, V> m = new TreeMap<>();
         m.put(k0, v0);
         m.put(k1, v1);
@@ -26,9 +26,7 @@ abstract class TestDataUtils {
     }
 
     @SafeVarargs
-    static <T> TreeSet<T> treeSet(T... vals) {
-        final TreeSet<T> l = new TreeSet<T>();
-        l.addAll(Arrays.asList(vals));
-        return l;
+    static <T extends Comparable<T>> TreeSet<T> treeSet(T... vals) {
+        return new TreeSet<T>(Arrays.asList(vals));
     }
 }

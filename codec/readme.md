@@ -124,7 +124,7 @@ final Person person = new Person(
         "Marconi",
         1.86,
         ZonedDateTime.of(
-                LocalDateTime.of(1874, 04, 25, 17, 05, 41),
+                LocalDateTime.of(1874, 4, 25, 17, 5, 41),
                 ZoneId.of("GMT")),
         Colour.GREEN, Colour.BLUE);
 ```

@@ -179,7 +179,6 @@ public class InputImpl implements XmlTypes.InStream {
                     }
                     break;
                 case CHARACTERS:
-                    break;
                 case OTHER:
                     break;
                 default:
