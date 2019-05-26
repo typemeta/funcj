@@ -4,8 +4,7 @@ import org.junit.Assert;
 import org.typemeta.funcj.codec.TestBase;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 
 public class MpackCodecTest extends TestBase {
 

@@ -2,8 +2,7 @@ package org.typemeta.funcj.codec.json.io;
 
 import org.typemeta.funcj.codec.json.JsonTypes;
 
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * Connect a JSON input to a JSON output.

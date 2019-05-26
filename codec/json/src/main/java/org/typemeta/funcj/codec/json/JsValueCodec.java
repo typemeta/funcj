@@ -5,8 +5,7 @@ import org.typemeta.funcj.codec.json.JsonTypes.*;
 import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.json.parser.JsonEvent;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config> {
     public static final JsNullCodec jsNullCodec = new JsNullCodec();

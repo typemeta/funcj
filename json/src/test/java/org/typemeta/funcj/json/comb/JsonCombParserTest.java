@@ -2,18 +2,15 @@ package org.typemeta.funcj.json.comb;
 
 import org.junit.Test;
 import org.typemeta.funcj.control.Try;
-import org.typemeta.funcj.data.Chr;
-import org.typemeta.funcj.data.Unit;
+import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.json.model.JsValue;
-import org.typemeta.funcj.parser.Input;
-import org.typemeta.funcj.parser.Result;
+import org.typemeta.funcj.parser.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import java.io.*;
 import java.util.*;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static org.junit.Assert.*;
 
 public class JsonCombParserTest {

@@ -1,13 +1,11 @@
 package org.typemeta.funcj.codec.json;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.typemeta.funcj.codec.json.io.FileUtils;
 import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.json.parser.JsonParser;
 
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 
 public class JsValueCodecTest {
     final static String json =

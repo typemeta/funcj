@@ -1,7 +1,6 @@
 package org.typemeta.funcj.util;
 
-import org.typemeta.funcj.functions.FunctionsGenEx.F;
-import org.typemeta.funcj.functions.FunctionsGenEx.F2;
+import org.typemeta.funcj.functions.FunctionsGenEx.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Array;
@@ -11,8 +10,7 @@ import java.util.function.BinaryOperator;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.*;
-import static org.typemeta.funcj.util.Exceptions.unwrap;
-import static org.typemeta.funcj.util.Exceptions.wrap;
+import static org.typemeta.funcj.util.Exceptions.*;
 
 /**
  * Utility functions for mapping functions over Functor types, such as Collections.

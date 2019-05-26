@@ -2,11 +2,9 @@ package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.CodecConfig;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
-import org.typemeta.funcj.codec.xml.io.InputImpl;
-import org.typemeta.funcj.codec.xml.io.OutputImpl;
+import org.typemeta.funcj.codec.xml.io.*;
 
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.*;
 import java.io.*;
 import java.math.BigDecimal;
 

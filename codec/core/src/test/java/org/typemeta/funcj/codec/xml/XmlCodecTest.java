@@ -1,11 +1,9 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.typemeta.funcj.codec.*;
 
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 
 public class XmlCodecTest extends TestBase {
 

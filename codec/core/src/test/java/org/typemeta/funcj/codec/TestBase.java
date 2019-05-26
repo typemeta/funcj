@@ -5,8 +5,7 @@ import org.typemeta.funcj.codec.misc.SimpleType;
 import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.typemeta.funcj.codec.TestTypes.*;
 

@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * Abstraction for creating an object fby accumulating the fields that comprise it.

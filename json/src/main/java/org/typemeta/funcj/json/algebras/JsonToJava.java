@@ -2,8 +2,7 @@ package org.typemeta.funcj.json.algebras;
 
 import org.typemeta.funcj.json.model.JsonAlg;
 
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 public class JsonToJava implements JsonAlg<Object> {
     public static final JsonToJava INSTANCE = new JsonToJava();

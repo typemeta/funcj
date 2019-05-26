@@ -3,8 +3,7 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.util.Folds;
-import org.typemeta.funcj.util.Functors;
+import org.typemeta.funcj.util.*;
 
 import java.util.*;
 

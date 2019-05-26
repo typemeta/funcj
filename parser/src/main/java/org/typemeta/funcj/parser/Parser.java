@@ -5,8 +5,7 @@ import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.typemeta.funcj.parser.Parser.pure;

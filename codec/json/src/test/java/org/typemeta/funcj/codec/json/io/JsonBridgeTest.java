@@ -2,8 +2,7 @@ package org.typemeta.funcj.codec.json.io;
 
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.StringWriter;
+import java.io.*;
 
 public class JsonBridgeTest {
     @Test

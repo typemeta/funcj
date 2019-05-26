@@ -5,11 +5,9 @@ import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.control.ReaderM.Kleisli;
-import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.functions.Functions.F2;
+import org.typemeta.funcj.functions.Functions.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.typemeta.funcj.control.ReaderM.pure;
