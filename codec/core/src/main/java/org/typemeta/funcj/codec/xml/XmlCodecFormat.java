@@ -54,7 +54,8 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
             Codec<T, InStream, OutStream, Config> codec,
             T val,
             OutStream out,
-            Functions.F<Class<T>, Codec<T, InStream, OutStream, Config>> getDynCodec) {
+            Functions.F<Class<T>, Codec<T, InStream, OutStream, Config>> getDynCodec
+    ) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             return Tuple2.of(false, out);

@@ -26,7 +26,7 @@ public class ByteCodecCore
     }
 
     @Override
-    public <T> void encode(Class<? super T> clazz, T value, Writer wtr) {
+    public <T> Writer encode(Class<? super T> clazz, T value, Writer wtr) {
         throw new CodecException("Not supported");
     }
 
@@ -43,9 +43,11 @@ public class ByteCodecCore
      * @param value     the value to be encoded
      * @param os        the output stream to which the byte data is written
      * @param <T>       the static type of the value
+     * @return          the output stream
      */
-    public <T> void encode(Class<? super T> type, T value, OutputStream os) {
+    public <T> OutputStream encode(Class<? super T> type, T value, OutputStream os) {
         encode(type, value, ByteTypes.outputOf(os));
+        return os;
     }
 
     /**

@@ -37,14 +37,16 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
         public OutStream encode(
                 CodecCoreEx<InStream, OutStream, Config> core,
                 JsNull value,
-                OutStream out) {
+                OutStream out
+        ) {
             return out.writeNull();
         }
 
         @Override
         public JsNull decode(
                 CodecCoreEx<InStream, OutStream, Config> core,
-                InStream in) {
+                InStream in
+        ) {
             in.readNull();
             return JSAPI.nul();
         }
@@ -52,7 +54,8 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
         @Override
         public JsNull decodeWithCheck(
                 CodecCoreEx<InStream, OutStream, Config> core,
-                InStream in) {
+                InStream in
+        ) {
             return decode(core, in);
         }
     }
@@ -67,14 +70,16 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
         public OutStream encode(
                 CodecCoreEx<InStream, OutStream, Config> core,
                 JsBool value,
-                OutStream out) {
+                OutStream out
+        ) {
             return out.writeBoolean(value.value());
         }
 
         @Override
         public JsBool decode(
                 CodecCoreEx<InStream, OutStream, Config> core,
-                InStream in) {
+                InStream in
+        ) {
             return JSAPI.bool(in.readBoolean());
         }
     }
@@ -89,14 +94,16 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
         public OutStream encode(
                 CodecCoreEx<InStream, OutStream, Config> core,
                 JsString value,
-                OutStream out) {
+                OutStream out
+        ) {
             return out.writeString(value.value());
         }
 
         @Override
         public JsString decode(
                 CodecCoreEx<InStream, OutStream, Config> core,
-                InStream in) {
+                InStream in
+        ) {
             return JSAPI.str(in.readString());
         }
     }
@@ -111,14 +118,16 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
         public OutStream encode(
                 CodecCoreEx<InStream, OutStream, Config> core,
                 JsNumber value,
-                OutStream out) {
+                OutStream out
+        ) {
             return out.writeNumber(value.value());
         }
 
         @Override
         public JsNumber decode(
                 CodecCoreEx<InStream, OutStream, Config> core,
-                InStream in) {
+                InStream in
+        ) {
             return JSAPI.num(in.readNumber());
         }
     }
@@ -133,7 +142,8 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
         public OutStream encode(
                 CodecCoreEx<InStream, OutStream, Config> core,
                 JsArray value,
-                OutStream out) {
+                OutStream out
+        ) {
             out.startArray();
             value.forEach(jsv -> jsValueCodec.encode(core, jsv, out));
             return out.endArray();
@@ -142,7 +152,8 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
         @Override
         public JsArray decode(
                 CodecCoreEx<InStream, OutStream, Config> core,
-                InStream in) {
+                InStream in
+        ) {
             JsValue[] arr = new JsValue[core.config().defaultArraySize()];
 
             in.startArray();
@@ -169,7 +180,8 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
         public OutStream encode(
                 CodecCoreEx<InStream, OutStream, Config> core,
                 JsObject value,
-                OutStream out) {
+                OutStream out
+        ) {
             out.startObject();
 
             value.forEach(field -> {
@@ -183,7 +195,8 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
         @Override
         public JsObject decode(
                 CodecCoreEx<InStream, OutStream, Config> core,
-                InStream in) {
+                InStream in
+        ) {
             in.startObject();
 
             final LinkedHashMap<String, JsValue> map = new LinkedHashMap<>();
@@ -209,11 +222,16 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
     public OutStream encodeWithCheck(
             CodecCoreEx<InStream, OutStream, Config> core,
             JsValue value,
-            OutStream out) {
+            OutStream out
+    ) {
         return encode(core, value, out);
     }
 
-    public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, JsValue jsv, OutStream out) {
+    public OutStream encode
+            (CodecCoreEx<InStream, OutStream, Config> core,
+             JsValue jsv,
+             OutStream out
+            ) {
         switch (jsv.type()) {
             case ARRAY:
                 return jsArrayCodec.encode(core, (JsArray)jsv, out);
@@ -235,7 +253,8 @@ public class JsValueCodec implements Codec<JsValue, InStream, OutStream, Config>
     @Override
     public JsValue decodeWithCheck(
             CodecCoreEx<InStream, OutStream, Config> core,
-            InStream in) {
+            InStream in
+    ) {
         if (core.format().decodeNull(in)) {
             return JSAPI.nul();
         } else {

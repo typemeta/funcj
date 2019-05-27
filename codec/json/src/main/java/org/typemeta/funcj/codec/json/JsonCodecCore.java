@@ -25,8 +25,9 @@ public class JsonCodecCore
     }
 
     @Override
-    public <T> void encode(Class<? super T> type, T value, Writer writer) {
+    public <T> Writer encode(Class<? super T> type, T value, Writer writer) {
         encode(type, value, JsonTypes.outputOf(writer));
+        return writer;
     }
 
     @Override

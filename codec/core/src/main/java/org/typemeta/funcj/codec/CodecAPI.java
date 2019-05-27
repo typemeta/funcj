@@ -17,8 +17,9 @@ public interface CodecAPI {
      * @param value     the value to encode
      * @param wtr       the writer
      * @param <T>       the decoded value type
+     * @return          the writer
      */
-    <T> void encode(Class<? super T> clazz, T value, Writer wtr);
+    <T> Writer encode(Class<? super T> clazz, T value, Writer wtr);
 
     /**
      * Decode a value of type {@code T} from an {@link Reader}.
@@ -33,9 +34,10 @@ public interface CodecAPI {
      * Encode the given value into JSON and write the results to the {@link Writer} object.
      * @param value     the value to be encoded
      * @param writer    the output stream to which the JSON is written
+     * @return          the writer
      */
-    default void encode(Object value, Writer writer) {
-        encode(Object.class, value, writer);
+    default Writer encode(Object value, Writer writer) {
+        return encode(Object.class, value, writer);
     }
 
     /**
@@ -56,10 +58,12 @@ public interface CodecAPI {
      * @param value     the value to encode
      * @param os        the output stream
      * @param <T>       the decoded value type
+     * @return          the output stream
      */
-    default <T> void encode(Class<? super T> clazz, T value, OutputStream os) {
+    default <T> OutputStream encode(Class<? super T> clazz, T value, OutputStream os) {
         try(Writer wtr = new BufferedWriter(new OutputStreamWriter(os))) {
             encode(clazz, value, wtr);
+            return os;
         } catch (IOException ex) {
             throw new CodecException(ex);
         }
@@ -85,9 +89,10 @@ public interface CodecAPI {
      * Encode a value of type {@code T} into an {@link OutputStream}.
      * @param value     the value to encode
      * @param os        the output stream
+     * @return          the output stream
      */
-    default void encode(Object value, OutputStream os) {
-        encode(Object.class, value, os);
+    default OutputStream encode(Object value, OutputStream os) {
+        return encode(Object.class, value, os);
     }
 
     /**

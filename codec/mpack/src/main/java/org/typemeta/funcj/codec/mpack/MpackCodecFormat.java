@@ -11,7 +11,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 /**
- * Encoding via byte streams.
+ * Encoding via MessagePack byte streams.
  */
 @SuppressWarnings("unchecked")
 public class MpackCodecFormat
@@ -50,7 +50,8 @@ public class MpackCodecFormat
             Codec<T, InStream, OutStream, Config> codec,
             T val,
             OutStream out,
-            Functions.F<Class<T>, Codec<T, InStream, OutStream, Config>> getDynCodec) {
+            Functions.F<Class<T>, Codec<T, InStream, OutStream, Config>> getDynCodec
+    ) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             out.writeBoolean(false);

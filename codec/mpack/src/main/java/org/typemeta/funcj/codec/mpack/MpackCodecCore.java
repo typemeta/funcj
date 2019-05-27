@@ -25,7 +25,7 @@ public class MpackCodecCore
     }
 
     @Override
-    public <T> void encode(Class<? super T> clazz, T value, Writer wtr) {
+    public <T> Writer encode(Class<? super T> clazz, T value, Writer wtr) {
         throw new NotSupportedException();
     }
 
@@ -42,10 +42,12 @@ public class MpackCodecCore
      * @param value     the value to be encoded
      * @param os        the output stream to which the byte data is written
      * @param <T>       the static type of the value
+     * @return          the output stream
      */
-    public <T> void encode(Class<? super T> type, T value, OutputStream os) {
+    public <T> OutputStream encode(Class<? super T> type, T value, OutputStream os) {
         try (final MpackTypes.OutStream out = MpackTypes.outputOf(os)) {
             encode(type, value, out);
+            return os;
         }
     }
 

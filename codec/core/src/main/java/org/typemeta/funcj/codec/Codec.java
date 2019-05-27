@@ -257,6 +257,9 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
         double decodePrim(IN in);
     }
 
+    /**
+     * @return          the type of value handled by this codec.
+     */
     Class<T> type();
 
     /**

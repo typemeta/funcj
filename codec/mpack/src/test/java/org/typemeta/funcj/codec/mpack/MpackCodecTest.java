@@ -10,7 +10,7 @@ public class MpackCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final MpackCodecCore codec = prepareCodecCore(MpackCodecs.mpackCodec());
+        final MpackCodecCore codec = prepareCodecCore(Codecs.mpackCodec());
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

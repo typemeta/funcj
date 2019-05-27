@@ -77,9 +77,10 @@ public class XmlCodecCore
     }
 
     @Override
-    public <T> void encode(Class<? super T> clazz, T value, Writer wtr) {
+    public <T> Writer encode(Class<? super T> clazz, T value, Writer wtr) {
         try(final OutStream out = XmlTypes.outputOf(wtr, clazz.getSimpleName())) {
             encode(clazz, value, out);
+            return wtr;
         }
     }
 
@@ -91,9 +92,10 @@ public class XmlCodecCore
     }
 
     @Override
-    public <T> void encode(Class<? super T> clazz, T value, OutputStream os) {
+    public <T> OutputStream encode(Class<? super T> clazz, T value, OutputStream os) {
         try(final OutStream out = XmlTypes.outputOf(os, clazz.getSimpleName())) {
             encode(clazz, value, out);
+            return os;
         }
     }
 

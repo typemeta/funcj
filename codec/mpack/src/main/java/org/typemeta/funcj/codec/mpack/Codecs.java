@@ -5,7 +5,7 @@ import org.typemeta.funcj.codec.mpack.MpackTypes.*;
 
 import java.math.BigInteger;
 
-public abstract class MpackCodecs extends Codecs {
+public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
 
     /**
      * Construct and return a new instance of a {@link MpackCodecCore}.
@@ -30,14 +30,16 @@ public abstract class MpackCodecs extends Codecs {
         public OutStream encode(
                 CodecCoreEx<InStream, OutStream, Config> core,
                 BigInteger value,
-                OutStream out) {
+                OutStream out
+        ) {
             return out.writeBigInteger(value);
         }
 
         @Override
         public BigInteger decode(
                 CodecCoreEx<InStream, OutStream, Config> core,
-                InStream in) {
+                InStream in
+        ) {
             return in.readBigInteger();
         }
     }
