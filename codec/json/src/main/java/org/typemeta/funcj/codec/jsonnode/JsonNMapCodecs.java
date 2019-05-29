@@ -1,14 +1,14 @@
 package org.typemeta.funcj.codec.jsonnode;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codec;
+import org.typemeta.funcj.codec.CodecCoreEx;
 import org.typemeta.funcj.codec.MapCodecs.*;
-import org.typemeta.funcj.codec.jsonnode.JsonTypes.Config;
-import org.typemeta.funcj.codec.utils.CodecException;
+import org.typemeta.funcj.codec.jsonnode.JsonNTypes.Config;
 import org.typemeta.funcj.json.model.*;
 
 import java.util.*;
 
-public abstract class JsonMapCodecs {
+public abstract class JsonNMapCodecs {
 
     public static class MapCodec<K, V> extends AbstractMapCodec<K, V, JsValue, JsValue, Config> {
 
@@ -26,13 +26,12 @@ public abstract class JsonMapCodecs {
 
             final List<JsValue> jsvs = new ArrayList<>(value.size());
 
-            int i = 0;
-            value.forEach((k, v) -> {
-                jsvs.add(JSAPI.obj(
-                        JSAPI.field(keyFieldName, keyCodec.encodeWithCheck(core, k, out)),
-                        JSAPI.field(valueFieldName, valueCodec.encodeWithCheck(core, v, out))
-                ));
-            });
+            value.forEach((k, v) ->
+                    jsvs.add(JSAPI.obj(
+                            JSAPI.field(keyFieldName, keyCodec.encodeWithCheck(core, k, out)),
+                            JSAPI.field(valueFieldName, valueCodec.encodeWithCheck(core, v, out))
+                    ))
+            );
 
             return JSAPI.arr(jsvs);
         }

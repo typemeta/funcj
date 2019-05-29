@@ -4,25 +4,26 @@ import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.json.model.JSAPI;
 import org.typemeta.funcj.json.model.JsValue;
 
-import java.io.*;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
- * Interface for classes which implement an encoding via JSON.
+ * Interface for classes which implement an encoding via JSON node values.
  */
-public class JsonCodecCore
-        extends CodecCoreDelegate<JsValue, JsValue, JsonTypes.Config>
+public class JsonNCodecCore
+        extends CodecCoreDelegate<JsValue, JsValue, JsonNTypes.Config>
         implements CodecAPI {
 
-    public JsonCodecCore(JsonCodecFormat format) {
+    public JsonNCodecCore(JsonNCodecFormat format) {
         super(new CodecCoreImpl<>(format));
     }
 
-    public JsonCodecCore(JsonTypes.Config config) {
-        this(new JsonCodecFormat(config));
+    public JsonNCodecCore(JsonNTypes.Config config) {
+        this(new JsonNCodecFormat(config));
     }
 
-    public JsonCodecCore() {
-        this(new JsonConfigImpl());
+    public JsonNCodecCore() {
+        this(new JsonNConfigImpl());
     }
 
     public <T> JsValue encode(Class<? super T> type, T value) {

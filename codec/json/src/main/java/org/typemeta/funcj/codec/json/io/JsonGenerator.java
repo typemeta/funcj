@@ -2,10 +2,12 @@ package org.typemeta.funcj.codec.json.io;
 
 import org.typemeta.funcj.codec.json.JsonTypes;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 
-import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.*;
+import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.raiseWriteFailure;
+import static org.typemeta.funcj.codec.json.io.JsonGeneratorUtils.write;
 
 public class JsonGenerator implements JsonTypes.OutStream {
 

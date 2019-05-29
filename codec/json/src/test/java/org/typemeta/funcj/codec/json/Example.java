@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codec;
+import org.typemeta.funcj.codec.CodecCoreEx;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
 
 import java.time.*;

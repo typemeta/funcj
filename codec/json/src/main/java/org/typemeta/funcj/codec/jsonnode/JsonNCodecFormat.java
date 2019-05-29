@@ -6,21 +6,22 @@ import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
-import static org.typemeta.funcj.codec.jsonnode.JsonTypes.*;
+import static org.typemeta.funcj.codec.jsonnode.JsonNTypes.Config;
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 
 /**
- * Encoding via JSON streams.
+ * Encoding via JSON nodes.
  */
 @SuppressWarnings("unchecked")
-public class JsonCodecFormat implements CodecFormat<JsValue, JsValue, Config> {
+public class JsonNCodecFormat implements CodecFormat<JsValue, JsValue, Config> {
 
     protected final Config config;
 
-    public JsonCodecFormat(Config config) {
+    public JsonNCodecFormat(Config config) {
         this.config = config;
     }
 
@@ -544,6 +545,7 @@ public class JsonCodecFormat implements CodecFormat<JsValue, JsValue, Config> {
     @Override
     public <EM extends Enum<EM>> Codec<EM, JsValue, JsValue, Config> enumCodec(Class<EM> enumType) {
         return new Codec.FinalCodec<EM, JsValue, JsValue, Config>() {
+
             @Override
             public Class<EM> type() {
                 return enumType;
@@ -572,7 +574,7 @@ public class JsonCodecFormat implements CodecFormat<JsValue, JsValue, Config> {
     public <V> Codec<Map<String, V>, JsValue, JsValue, Config> createMapCodec(
             Class<Map<String, V>> type,
             Codec<V, JsValue, JsValue, Config> valueCodec) {
-        return new JsonMapCodecs.StringMapCodec<V>(type, valueCodec);
+        return new JsonNMapCodecs.StringMapCodec<V>(type, valueCodec);
     }
 
     @Override
@@ -580,7 +582,7 @@ public class JsonCodecFormat implements CodecFormat<JsValue, JsValue, Config> {
             Class<Map<K, V>> type,
             Codec<K, JsValue, JsValue, Config> keyCodec,
             Codec<V, JsValue, JsValue, Config> valueCodec) {
-        return new JsonMapCodecs.MapCodec<K, V>(type, keyCodec, valueCodec);
+        return new JsonNMapCodecs.MapCodec<K, V>(type, keyCodec, valueCodec);
     }
 
     @Override

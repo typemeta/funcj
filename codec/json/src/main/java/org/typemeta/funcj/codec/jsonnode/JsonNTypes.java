@@ -1,17 +1,12 @@
 package org.typemeta.funcj.codec.jsonnode;
 
 import org.typemeta.funcj.codec.CodecConfig;
-import org.typemeta.funcj.codec.jsonnode.JsonCodecCore;
 
-
-import java.io.*;
-import java.math.BigDecimal;
-
-public class JsonTypes {
+public class JsonNTypes {
 
     /**
      * Interface for classes which provide configuration information
-     * for {@link JsonCodecCore} implementations.
+     * for {@link JsonNCodecCore} implementations.
      */
     public interface Config extends CodecConfig {
 
