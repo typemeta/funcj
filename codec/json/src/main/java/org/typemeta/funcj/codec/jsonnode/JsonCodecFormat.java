@@ -543,7 +543,29 @@ public class JsonCodecFormat implements CodecFormat<JsValue, JsValue, Config> {
 
     @Override
     public <EM extends Enum<EM>> Codec<EM, JsValue, JsValue, Config> enumCodec(Class<EM> enumType) {
-        return null;
+        return new Codec.FinalCodec<EM, JsValue, JsValue, Config>() {
+            @Override
+            public Class<EM> type() {
+                return enumType;
+            }
+
+            @Override
+            public JsValue encode(
+                    CodecCoreEx<JsValue, JsValue, Config> core,
+                    EM value,
+                    JsValue out
+            ) {
+                return core.format().stringCodec().encode(core, value.name(), out);
+            }
+
+            @Override
+            public EM decode(
+                    CodecCoreEx<JsValue, JsValue, Config> core,
+                    JsValue in
+            ) {
+                return EM.valueOf(enumType, core.format().stringCodec().decode(core, in));
+            }
+        };
     }
 
     @Override
@@ -616,7 +638,7 @@ public class JsonCodecFormat implements CodecFormat<JsValue, JsValue, Config> {
             public T[] decode(CodecCoreEx<JsValue, JsValue, Config> core, JsValue in) {
                 final JsArray jsa = in.asArray();
 
-                final T[] arr = (T[]) Array.newInstance(elemType, config.defaultArraySize());
+                final T[] arr = (T[]) Array.newInstance(elemType, jsa.size());
 
                 for (int i = 0; i < jsa.size(); ++i) {
                     arr[i] = elemCodec.decodeWithCheck(core, jsa.get(i));
@@ -693,7 +715,7 @@ public class JsonCodecFormat implements CodecFormat<JsValue, JsValue, Config> {
                     );
                 } else {
                     actNames.add(name);
-                    fields.get(name).decodeField(ra, in);
+                    fields.get(name).decodeField(ra, field.value());
                 }
             });
 

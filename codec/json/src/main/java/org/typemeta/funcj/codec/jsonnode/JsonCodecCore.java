@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.jsonnode;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.json.model.JSAPI;
 import org.typemeta.funcj.json.model.JsValue;
 
 import java.io.*;
@@ -25,7 +26,7 @@ public class JsonCodecCore
     }
 
     public <T> JsValue encode(Class<? super T> type, T value) {
-        return encode(type, value, (JsValue)null);
+        return encode(type, value, JSAPI.nul());
     }
 
     @Override

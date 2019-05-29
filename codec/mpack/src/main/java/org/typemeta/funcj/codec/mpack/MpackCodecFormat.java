@@ -66,10 +66,10 @@ public class MpackCodecFormat
     }
 
     @Override
-    public <T> T decodeDynamicType(InStream in, Functions.F<String, T> decoder) {
+    public <T> T decodeDynamicType(InStream in, Functions.F2<String, InStream, T> decoder) {
         if (in.readBoolean()) {
             final String typeName = in.readString();
-            return decoder.apply(typeName);
+            return decoder.apply(typeName, in);
         } else {
             return null;
         }

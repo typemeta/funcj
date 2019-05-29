@@ -2,9 +2,10 @@ package org.typemeta.funcj.codec.jsonnode;
 
 import org.junit.*;
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.json.model.JsValue;
+import org.typemeta.funcj.json.model.*;
 
-import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JsonCodecTest extends TestBase {
 
@@ -39,13 +40,15 @@ public class JsonCodecTest extends TestBase {
         codec.config().failOnUnrecognisedFields(false);
         final TestTypes.Custom val = new TestTypes.Custom(TestTypes.Init.INIT);
 
-        final StringWriter sw = new StringWriter();
-        codec.encode(TestTypes.Custom.class, val, sw);
+        final JsObject jso = codec.encode(TestTypes.Custom.class, val).asObject();
 
-        final String raw = sw.toString();
-        final String raw2 = raw.replace("\"flag\"", "\"test\" : {\"a\": [12.34, \"z\"] }, \"flag\"");
+        final List<JsObject.Field> fields = new ArrayList<>();
+        fields.add(JSAPI.field("dummy", JSAPI.num(-999)));
+        jso.forEach(fields::add);
 
-        final TestTypes.Custom val2 = codec.decode(TestTypes.Custom.class, new StringReader(raw2));
+        final JsValue jso2 = JSAPI.obj(fields);
+
+        final TestTypes.Custom val2 = codec.decode(TestTypes.Custom.class, jso2);
 
         Assert.assertEquals(val, val2);
     }
