@@ -66,7 +66,7 @@ public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
         } else {
             final Collection<T> val = core.format().decodeDynamicType(
                     in,
-                    type -> getCodec(core, core.config().nameToClass(type)).decode(core, in)
+                    (type, in2) -> getCodec(core, core.config().nameToClass(type)).decode(core, in2)
             );
 
             if (val != null) {

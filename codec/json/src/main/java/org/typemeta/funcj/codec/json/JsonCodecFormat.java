@@ -80,7 +80,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> T decodeDynamicType(InStream in, Functions.F<String, T> decoder) {
+    public <T> T decodeDynamicType(InStream in, Functions.F2<String, InStream, T> decoder) {
         if (!config().dynamicTypeTags()) {
             return null;
         } else if (in.notEOF() && in.currentEventType() == JsonEvent.Type.OBJECT_START) {
@@ -100,7 +100,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
                     throw new CodecException("Was expecting field '" + valueFieldName + "' but got '" + field2 + "'");
                 }
 
-                final T val = decoder.apply(typeName);
+                final T val = decoder.apply(typeName, in);
 
                 in.endObject();
 

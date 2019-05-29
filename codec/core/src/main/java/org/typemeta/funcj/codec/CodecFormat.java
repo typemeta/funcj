@@ -31,11 +31,11 @@ public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
     default <T> T decodeDynamicType(CodecCoreEx<IN, OUT, CFG> core, IN in) {
         return decodeDynamicType(
                 in,
-                name -> core.getCodec(this.config().<T>nameToClass(name)).decode(core, in)
+                (name, in2) -> core.getCodec(this.config().<T>nameToClass(name)).decode(core, in2)
         );
     }
 
-    <T> T decodeDynamicType(IN in, Functions.F<String, T> decoder);
+    <T> T decodeDynamicType(IN in, Functions.F2<String, IN, T> decoder);
 
     Codec.BooleanCodec<IN, OUT, CFG> booleanCodec();
 

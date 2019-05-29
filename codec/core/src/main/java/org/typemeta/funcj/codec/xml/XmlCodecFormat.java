@@ -72,12 +72,12 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
     }
 
     @Override
-    public <T> T decodeDynamicType(InStream in, Functions.F<String, T> decoder) {
+    public <T> T decodeDynamicType(InStream in, Functions.F2<String, InStream, T> decoder) {
         if (!config().dynamicTypeTags()) {
             return null;
         } else if (in.attributeMap().hasName(config.typeAttrName())) {
             final String typeName = in.attributeMap().getValue(config.typeAttrName());
-            return decoder.apply(typeName);
+            return decoder.apply(typeName, in);
         } else {
             return null;
         }

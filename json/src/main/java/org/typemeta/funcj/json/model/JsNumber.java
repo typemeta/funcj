@@ -19,6 +19,30 @@ public final class JsNumber implements JsValue {
         return value;
     }
 
+    public byte byteValue() {
+        return (byte)value;
+    }
+
+    public short shortValue() {
+        return (short)value;
+    }
+
+    public int intValue() {
+        return (int)value;
+    }
+
+    public long longValue() {
+        return (long)value;
+    }
+
+    public float floatValue() {
+        return (float)value;
+    }
+
+    public double doublealue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return Utils.format(value);
