@@ -3,6 +3,7 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.codec.bytes.ByteCodecCore;
 import org.typemeta.funcj.codec.utils.*;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
+import org.typemeta.funcj.codec.xmlnode.XmlNodeCodecCore;
 import org.typemeta.funcj.functions.Functions.F;
 
 import java.math.*;
@@ -20,6 +21,14 @@ public abstract class Codecs {
      */
     public static XmlCodecCore xmlCodec() {
         return registerAll(new XmlCodecCore());
+    }
+
+    /**
+     * Construct and return a new instance of a {@link XmlCodecCore}.
+     * @return the new {@code XmlCodecCore}
+     */
+    public static XmlNodeCodecCore xmlNodeCodec() {
+        return registerAll(new XmlNodeCodecCore());
     }
 
     /**

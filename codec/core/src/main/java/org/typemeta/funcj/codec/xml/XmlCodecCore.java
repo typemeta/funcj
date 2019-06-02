@@ -52,9 +52,9 @@ public class XmlCodecCore
     }
 
     /**
-     * Decode a value by reading JSON from the given {@link Reader} object.
+     * Decode a value by reading XML from the given {@link Reader} object.
      * @param type      the static type of the value to be decoded.
-     * @param reader    the input stream from which JSON is read
+     * @param reader    the input stream from which XML is read
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
      * @return          the decoded value
@@ -66,8 +66,8 @@ public class XmlCodecCore
     }
 
     /**
-     * Decode a value by reading JSON from the given {@link Reader} object.
-     * @param reader    the input stream from which JSON is read
+     * Decode a value by reading XML from the given {@link Reader} object.
+     * @param reader    the input stream from which XML is read
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
      * @return          the decoded value

@@ -3,6 +3,7 @@ package org.typemeta.funcj.codec.jsonnode;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.json.model.JSAPI;
 import org.typemeta.funcj.json.model.JsValue;
+import org.typemeta.funcj.json.parser.JsonParser;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -10,20 +11,20 @@ import java.io.Writer;
 /**
  * Interface for classes which implement an encoding via JSON node values.
  */
-public class JsonNCodecCore
-        extends CodecCoreDelegate<JsValue, JsValue, JsonNTypes.Config>
+public class JsonNodeCodecCore
+        extends CodecCoreDelegate<JsValue, JsValue, JsonNodeConfig>
         implements CodecAPI {
 
-    public JsonNCodecCore(JsonNCodecFormat format) {
+    public JsonNodeCodecCore(JsonNodeCodecFormat format) {
         super(new CodecCoreImpl<>(format));
     }
 
-    public JsonNCodecCore(JsonNTypes.Config config) {
-        this(new JsonNCodecFormat(config));
+    public JsonNodeCodecCore(JsonNodeConfig config) {
+        this(new JsonNodeCodecFormat(config));
     }
 
-    public JsonNCodecCore() {
-        this(new JsonNConfigImpl());
+    public JsonNodeCodecCore() {
+        this(new JsonNodeConfigImpl());
     }
 
     public <T> JsValue encode(Class<? super T> type, T value) {
@@ -32,11 +33,13 @@ public class JsonNCodecCore
 
     @Override
     public <T> Writer encode(Class<? super T> type, T value, Writer writer) {
-        throw new UnsupportedOperationException();
+        final JsValue jsv = encode(type, value);
+        return jsv.write(writer);
     }
 
     @Override
     public <T> T decode(Class<? super T> type, Reader reader) {
-        throw new UnsupportedOperationException();
+        final JsValue jsv = JsonParser.parse(reader);
+        return decode(type, jsv);
     }
 }

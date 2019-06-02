@@ -2,6 +2,7 @@ package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
 
+import java.io.StringWriter;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -58,19 +59,19 @@ public final class JsArray
 
     @Override
     public String toString() {
-        return toString(new StringBuilder()).toString();
+        return write(new StringWriter()).toString();
     }
 
     @Override
     public boolean equals(Object rhs) {
         if (this == rhs) {
             return true;
-        }
-        if (rhs == null || getClass() != rhs.getClass()) {
+        } else if (rhs == null || getClass() != rhs.getClass()) {
             return false;
+        } else {
+            final JsArray rhsT = (JsArray) rhs;
+            return values.equals(rhsT.values);
         }
-        final JsArray that = (JsArray) rhs;
-        return values.equals(that.values);
     }
 
     @Override

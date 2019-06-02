@@ -26,12 +26,12 @@ public final class JsString implements JsValue {
     public boolean equals(Object rhs) {
         if (this == rhs) {
             return true;
-        }
-        if (rhs == null || getClass() != rhs.getClass()) {
+        } else if (rhs == null || getClass() != rhs.getClass()) {
             return false;
+        } else {
+            final JsString rhsT = (JsString) rhs;
+            return value.equals(rhsT.value);
         }
-        final JsString that = (JsString) rhs;
-        return value.equals(that.value);
     }
 
     @Override

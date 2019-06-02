@@ -19,13 +19,16 @@ public abstract class XmlMapCodecs {
 
         @Override
         public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Map<K, V> value, OutStream out) {
+            final String entryName = core.config().entryElemName();
+            final String keyName = core.config().keyElemName();
+            final String valueName = core.config().valueElemName();
 
             value.forEach((k, v) -> {
-                out.startElement(core.config().entryElemName());
-                out.startElement(core.config().keyElemName());
+                out.startElement(entryName);
+                out.startElement(keyName);
                 keyCodec.encodeWithCheck(core, k, out);
                 out.endElement();
-                out.startElement(core.config().valueElemName());
+                out.startElement(valueName);
                 valueCodec.encodeWithCheck(core, v, out);
                 out.endElement();
                 out.endElement();
@@ -36,6 +39,10 @@ public abstract class XmlMapCodecs {
 
         @Override
         public Map<K, V> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
+            final String entryName = core.config().entryElemName();
+            final String keyName = core.config().keyElemName();
+            final String valueName = core.config().valueElemName();
+
             final MapProxy<K, V> mapProxy = getMapProxy(core);
 
             while(in.hasNext()) {
@@ -43,11 +50,11 @@ public abstract class XmlMapCodecs {
                     break;
                 }
 
-                in.startElement(core.config().entryElemName());
-                in.startElement(core.config().keyElemName());
+                in.startElement(entryName);
+                in.startElement(keyName);
                 final K key = keyCodec.decodeWithCheck(core, in);
                 in.endElement();
-                in.startElement(core.config().valueElemName());
+                in.startElement(valueName);
                 final V val = valueCodec.decodeWithCheck(core, in);
                 in.endElement();
                 in.endElement();

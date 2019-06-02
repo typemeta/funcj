@@ -12,7 +12,7 @@ public final class JsNumber implements JsValue {
     private final double value;
 
     protected JsNumber(double value) {
-        this.value =value;
+        this.value = value;
     }
 
     public double value() {
@@ -52,12 +52,12 @@ public final class JsNumber implements JsValue {
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
+        } else if (obj == null || getClass() != obj.getClass()) {
             return false;
+        } else {
+            final JsNumber rhsT = (JsNumber) obj;
+            return value == rhsT.value;
         }
-        final JsNumber rhs = (JsNumber) obj;
-        return value == rhs.value;
     }
 
     @Override

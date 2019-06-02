@@ -1,5 +1,7 @@
 package org.typemeta.funcj.json.model;
 
+import java.io.*;
+
 public abstract class Utils {
 
     public static String format(double value) {
@@ -62,6 +64,55 @@ public abstract class Utils {
         }
 
         return sb;
+    }
+
+    public static Writer format(String s, Writer w) throws IOException {
+        w.append('"');
+        escape(s, w);
+        return w.append('"');
+    }
+
+    public static Writer escape(String s, Writer w) throws IOException {
+        final int len = s.length();
+        for (int i = 0; i < len; ++i) {
+            final char c = s.charAt(i);
+            switch(c) {
+                case '\"':
+                    w.append("\\\"");
+                    break;
+                case '\\':
+                    w.append("\\\\");
+                    break;
+//                case '/':
+//                    sb.append("\\/");
+//                    break;
+                case '\b':
+                    w.append("\\b");
+                    break;
+                case '\f':
+                    w.append("\\f");
+                    break;
+                case '\n':
+                    w.append("\\n");
+                    break;
+                case '\r':
+                    w.append("\\r");
+                    break;
+                case '\t':
+                    w.append("\\t");
+                    break;
+                default:
+                    if (c <= '\u001F' ||
+                            c >= '\u007F' && c <= '\u009F' ||
+                            c >= '\u00ff') {
+                        w.append("\\u").append(Integer.toHexString(c | 0x10000).substring(1));
+                    } else {
+                        w.append(c);
+                    }
+            }
+        }
+
+        return w;
     }
 
     static RuntimeException nullTypeError(Class<?> clazz) {

@@ -2,6 +2,7 @@ package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
 
+import java.io.StringWriter;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -109,19 +110,19 @@ public final class JsObject
 
     @Override
     public String toString() {
-        return toString(new StringBuilder()).toString();
+        return write(new StringWriter()).toString();
     }
 
     @Override
     public boolean equals(Object rhs) {
         if (this == rhs) {
             return true;
-        }
-        if (rhs == null || getClass() != rhs.getClass()) {
+        } else if (rhs == null || getClass() != rhs.getClass()) {
             return false;
+        } else {
+            final JsObject rhsT = (JsObject) rhs;
+            return fields.equals(rhsT.fields);
         }
-        final JsObject that = (JsObject) rhs;
-        return fields.equals(that.fields);
     }
 
     @Override

@@ -3,6 +3,8 @@ package org.typemeta.funcj.json.model;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.json.algebras.*;
 
+import java.io.Writer;
+
 /**
  * Common interface for classes that represent JSON values.
  */
@@ -30,12 +32,12 @@ public interface JsValue {
     }
 
     /**
-     * Write this value into the given {@code StringBuilder}.
-     * @param sb        the {@code StringBuilder}
-     * @return          the {@code StringBuilder}
+     * Write this value into the given {@link Writer}.
+     * @param w         the {@code Writer}
+     * @return          the {@code Writer}
      */
-    default StringBuilder toString(StringBuilder sb) {
-        return JsonToString.toString(this, sb);
+    default Writer write(Writer w) {
+        return JsonWriter.toString(this, w);
     }
 
     /**

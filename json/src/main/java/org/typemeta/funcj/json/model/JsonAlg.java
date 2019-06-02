@@ -27,10 +27,10 @@ public interface JsonAlg<T> {
 
     /**
      * Process a {@link JsNumber} value.
-     * @param value     the {@code JsNumber} double value
+     * @param d         the {@code JsNumber} double value
      * @return          the result of processing the value
      */
-    T num(double value);
+    T num(double d);
 
     /**
      * Process a {@link JsString} value.
