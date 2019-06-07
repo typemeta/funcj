@@ -26,7 +26,7 @@ public class XmlNodeCodecTest extends TestBase {
         final Document doc = docBuilder.newDocument();
         final Element out = doc.createElement("Custom");
 
-        codec.encode(clazz, val, out);
+        codec.encodeImpl(clazz, val, out);
 
         if (printData()) {
             XmlUtils.write(out, System.out, true);
@@ -37,7 +37,7 @@ public class XmlNodeCodecTest extends TestBase {
             System.out.println("Encoded XML " + clazz.getSimpleName() + " data size = " + data  .length() + " chars");
         }
 
-        final T val2 = codec.decode(clazz, out);
+        final T val2 = codec.decodeImpl(clazz, out);
 
         if (!printData() && !val.equals(val2)) {
             XmlUtils.write(out, System.out, true);
@@ -56,9 +56,9 @@ public class XmlNodeCodecTest extends TestBase {
         final Document doc = docBuilder.newDocument();
         final Element out = doc.createElement("Custom");
 
-        codec.encode(TestTypes.Custom.class, val, out);
+        codec.encodeImpl(TestTypes.Custom.class, val, out);
 
-        final TestTypes.Custom val2 = codec.decode(TestTypes.Custom.class, out);
+        final TestTypes.Custom val2 = codec.decodeImpl(TestTypes.Custom.class, out);
 
         Assert.assertEquals(val, val2);
     }

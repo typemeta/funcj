@@ -121,12 +121,12 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     }
 
     @Override
-    public <T> OUT encode(Class<? super T> clazz, T val, OUT out) {
+    public <T> OUT encodeImpl(Class<? super T> clazz, T val, OUT out) {
         return getCodec(clazz).encodeWithCheck(this, val, out);
     }
 
     @Override
-    public <T> T decode(Class<? super T> clazz, IN in) {
+    public <T> T decodeImpl(Class<? super T> clazz, IN in) {
         return (T)getCodec(clazz).decodeWithCheck(this, in);
     }
 

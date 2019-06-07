@@ -60,13 +60,13 @@ public class CodecCoreDelegate<IN, OUT, CFG extends CodecConfig>
     }
 
     @Override
-    public <T> OUT encode(Class<? super T> clazz, T val, OUT out) {
-        return delegate.encode(clazz, val, out);
+    public <T> OUT encodeImpl(Class<? super T> clazz, T val, OUT out) {
+        return delegate.encodeImpl(clazz, val, out);
     }
 
     @Override
-    public <T> T decode(Class<? super T> clazz, IN in) {
-        return delegate.decode(clazz, in);
+    public <T> T decodeImpl(Class<? super T> clazz, IN in) {
+        return delegate.decodeImpl(clazz, in);
     }
 
     @Override

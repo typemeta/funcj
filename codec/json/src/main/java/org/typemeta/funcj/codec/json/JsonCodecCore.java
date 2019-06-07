@@ -11,7 +11,7 @@ import java.io.Writer;
  */
 public class JsonCodecCore
         extends CodecCoreDelegate<InStream, OutStream, Config>
-        implements CodecAPI {
+        implements CodecAPIReaderWriter {
 
     public JsonCodecCore(JsonCodecFormat format) {
         super(new CodecCoreImpl<>(format));
@@ -27,12 +27,12 @@ public class JsonCodecCore
 
     @Override
     public <T> Writer encode(Class<? super T> type, T value, Writer writer) {
-        encode(type, value, JsonTypes.outputOf(writer));
+        encodeImpl(type, value, JsonTypes.outputOf(writer));
         return writer;
     }
 
     @Override
     public <T> T decode(Class<? super T> type, Reader reader) {
-        return decode(type, JsonTypes.inputOf(reader));
+        return decodeImpl(type, JsonTypes.inputOf(reader));
     }
 }

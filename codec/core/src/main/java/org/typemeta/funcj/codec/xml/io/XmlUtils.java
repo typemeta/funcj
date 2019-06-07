@@ -1,12 +1,12 @@
 package org.typemeta.funcj.codec.xml.io;
 
 public abstract class XmlUtils {
-    public static String escapeXml(String text) {
+    public static String escapeTextChar(String text) {
         int s = 0;
         StringBuilder sb = null;
         for (int i = 0; i < text.length(); ++i) {
             char c = text.charAt(i);
-            final String repl = escapeContent(c);
+            final String repl = escapeTextChar(c);
             if (repl != null) {
                 if (sb == null) {
                     sb = new StringBuilder(text.substring(0, i));
@@ -27,7 +27,7 @@ public abstract class XmlUtils {
         return sb.toString();
     }
 
-    public static String escapeContent(char c) {
+    public static String escapeTextChar(char c) {
         switch (c) {
             case '&': return "&amp;";
             case '<': return "&lt;";

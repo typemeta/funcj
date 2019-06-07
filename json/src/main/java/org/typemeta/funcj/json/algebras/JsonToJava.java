@@ -31,6 +31,7 @@ class JsonToJava implements JsonAlg<Object> {
      * @param json      the JSON string
      * @return          the raw Java value
      */
+    @SuppressWarnings("unchecked")
     public static LinkedHashMap<String, Object> toJava(String json) {
         return JsonCombParser.parse(json)
                 .map(jsv -> (LinkedHashMap<String, Object>)jsv.apply(JsonToJava.INSTANCE))

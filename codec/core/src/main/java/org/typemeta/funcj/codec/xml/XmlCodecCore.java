@@ -10,7 +10,7 @@ import java.io.*;
  */
 public class XmlCodecCore
         extends CodecCoreDelegate<InStream, OutStream, Config>
-        implements CodecAPI {
+        implements CodecAPI<InputStream, OutputStream> {
 
     public XmlCodecCore(XmlCodecFormat format) {
         super(new CodecCoreImpl<>(format));
@@ -36,7 +36,7 @@ public class XmlCodecCore
      */
     public <T> void encode(Class<? super T> type, T value, Writer writer, String rootElemName) {
         try(final OutStream out = XmlTypes.outputOf(writer, rootElemName)) {
-            encode(type, value, out);
+            encodeImpl(type, value, out);
         }
     }
 
@@ -61,7 +61,7 @@ public class XmlCodecCore
      */
     public <T> T decode(Class<? super T> type, Reader reader, String rootElemName) {
         try (final InStream in = XmlTypes.inputOf(reader, rootElemName)) {
-            return decode(type, in);
+            return decodeImpl(type, in);
         }
     }
 
@@ -77,24 +77,9 @@ public class XmlCodecCore
     }
 
     @Override
-    public <T> Writer encode(Class<? super T> clazz, T value, Writer wtr) {
-        try(final OutStream out = XmlTypes.outputOf(wtr, clazz.getSimpleName())) {
-            encode(clazz, value, out);
-            return wtr;
-        }
-    }
-
-    @Override
-    public <T> T decode(Class<? super T> clazz, Reader rdr) {
-        try(final InStream in = XmlTypes.inputOf(rdr, clazz.getSimpleName())) {
-            return decode(clazz, in);
-        }
-    }
-
-    @Override
     public <T> OutputStream encode(Class<? super T> clazz, T value, OutputStream os) {
         try(final OutStream out = XmlTypes.outputOf(os, clazz.getSimpleName())) {
-            encode(clazz, value, out);
+            encodeImpl(clazz, value, out);
             return os;
         }
     }
@@ -102,7 +87,7 @@ public class XmlCodecCore
     @Override
     public <T> T decode(Class<? super T> clazz, InputStream is) {
         try(final InStream in = XmlTypes.inputOf(is, clazz.getSimpleName())) {
-            return decode(clazz, in);
+            return decodeImpl(clazz, in);
         }
     }
 }

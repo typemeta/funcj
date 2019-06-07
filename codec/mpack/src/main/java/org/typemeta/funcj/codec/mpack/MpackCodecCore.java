@@ -10,7 +10,7 @@ import java.io.*;
  */
 public class MpackCodecCore
         extends CodecCoreDelegate<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>
-        implements CodecAPI {
+        implements CodecAPI<InputStream, OutputStream> {
 
     public MpackCodecCore(MpackCodecFormat format) {
         super(new CodecCoreImpl<>(format));
@@ -22,16 +22,6 @@ public class MpackCodecCore
 
     public MpackCodecCore() {
         this(new MpackConfigImpl());
-    }
-
-    @Override
-    public <T> Writer encode(Class<? super T> clazz, T value, Writer wtr) {
-        throw new NotSupportedException();
-    }
-
-    @Override
-    public <T> T decode(Class<? super T> clazz, Reader rdr) {
-        throw new NotSupportedException();
     }
 
     /**
@@ -46,7 +36,7 @@ public class MpackCodecCore
      */
     public <T> OutputStream encode(Class<? super T> type, T value, OutputStream os) {
         try (final MpackTypes.OutStream out = MpackTypes.outputOf(os)) {
-            encode(type, value, out);
+            encodeImpl(type, value, out);
             return os;
         }
     }
@@ -61,7 +51,7 @@ public class MpackCodecCore
     @Override
     public <T> T decode(Class<? super T> type, InputStream is) {
         try (final MpackTypes.InStream in = MpackTypes.inputOf(is)) {
-            return decode(type, in);
+            return decodeImpl(type, in);
         }
     }
 }

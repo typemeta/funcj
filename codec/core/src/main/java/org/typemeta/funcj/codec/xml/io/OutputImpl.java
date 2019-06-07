@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 public class OutputImpl implements XmlTypes.OutStream {
 
     public static XmlTypes.OutStream outputOf(XMLStreamWriter writer) {
-        if (writer.getProperty("escapeCharacters") != Boolean.TRUE) {
-            throw new CodecException("XMLStreamWriter must have the 'escapeCharacters' property set to true");
+        if (writer.getProperty("escapeCharacters") != Boolean.FALSE) {
+            throw new CodecException("XMLStreamWriter must have the 'escapeCharacters' property set to false");
         } else {
             return new OutputImpl(writer);
         }
@@ -21,7 +21,7 @@ public class OutputImpl implements XmlTypes.OutStream {
     public static OutputImpl outputOf(Writer writer, String rootElemName) {
         try {
             final XMLOutputFactory xmlOutFact = XMLOutputFactory.newInstance();
-            xmlOutFact.setProperty("escapeCharacters", false);
+            xmlOutFact.setProperty("escapeCharacters", true);
             final XMLStreamWriter xwtr = xmlOutFact.createXMLStreamWriter(writer);
             return outputOf(xwtr, rootElemName);
         } catch (XMLStreamException ex) {
@@ -32,7 +32,7 @@ public class OutputImpl implements XmlTypes.OutStream {
     public static OutputImpl outputOf(OutputStream os, String rootElemName) {
         try {
             final XMLOutputFactory xmlOutFact = XMLOutputFactory.newInstance();
-            xmlOutFact.setProperty("escapeCharacters", false);
+            xmlOutFact.setProperty("escapeCharacters", true);
             final XMLStreamWriter xwtr = xmlOutFact.createXMLStreamWriter(os);
             return outputOf(xwtr, rootElemName);
         } catch (XMLStreamException ex) {
@@ -148,12 +148,12 @@ public class OutputImpl implements XmlTypes.OutStream {
 
     @Override
     public OutputImpl writeString(String value) {
-        return writeCharacters(XmlUtils.escapeXml(value));
+        return writeCharacters(XmlUtils.escapeTextChar(value));
     }
 
     @Override
     public OutputImpl writeChar(char value) {
-        return writeCharacters(XmlUtils.escapeXml(Character.toString(value)));
+        return writeCharacters(XmlUtils.escapeTextChar(Character.toString(value)));
     }
 
     @Override
@@ -198,6 +198,6 @@ public class OutputImpl implements XmlTypes.OutStream {
 
     @Override
     public OutputImpl writeStringNumber(String value) {
-        return writeCharacters(XmlUtils.escapeXml(value));
+        return writeCharacters(XmlUtils.escapeTextChar(value));
     }
 }

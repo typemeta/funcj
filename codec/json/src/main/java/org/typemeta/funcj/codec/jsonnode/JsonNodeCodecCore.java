@@ -13,7 +13,7 @@ import java.io.Writer;
  */
 public class JsonNodeCodecCore
         extends CodecCoreDelegate<JsValue, JsValue, JsonNodeConfig>
-        implements CodecAPI {
+        implements CodecAPIReaderWriter {
 
     public JsonNodeCodecCore(JsonNodeCodecFormat format) {
         super(new CodecCoreImpl<>(format));
@@ -28,7 +28,11 @@ public class JsonNodeCodecCore
     }
 
     public <T> JsValue encode(Class<? super T> type, T value) {
-        return encode(type, value, JSAPI.nul());
+        return encodeImpl(type, value, JSAPI.nul());
+    }
+
+    public <T> T decode(Class<? super T> type, JsValue jsv) {
+        return decodeImpl(type, jsv);
     }
 
     @Override
@@ -40,6 +44,6 @@ public class JsonNodeCodecCore
     @Override
     public <T> T decode(Class<? super T> type, Reader reader) {
         final JsValue jsv = JsonParser.parse(reader);
-        return decode(type, jsv);
+        return decodeImpl(type, jsv);
     }
 }

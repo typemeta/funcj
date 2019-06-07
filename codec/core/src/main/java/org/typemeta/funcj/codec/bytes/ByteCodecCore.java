@@ -2,7 +2,6 @@ package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ByteTypes.*;
-import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.io.*;
 
@@ -11,7 +10,7 @@ import java.io.*;
  */
 public class ByteCodecCore
         extends CodecCoreDelegate<InStream, OutStream, Config>
-        implements CodecAPI {
+        implements CodecAPI<InputStream, OutputStream> {
 
     public ByteCodecCore(ByteCodecFormat format) {
         super(new CodecCoreImpl<>(format));
@@ -25,16 +24,6 @@ public class ByteCodecCore
         this(new ByteConfigImpl());
     }
 
-    @Override
-    public <T> Writer encode(Class<? super T> clazz, T value, Writer wtr) {
-        throw new CodecException("Not supported");
-    }
-
-    @Override
-    public <T> T decode(Class<? super T> clazz, Reader rdr) {
-        throw new CodecException("Not supported");
-    }
-
     /**
      * Encode the given value into byte data and write the results to the {@link OutputStream} object.
      * The static type determines whether type information is written to recover the value's
@@ -46,7 +35,7 @@ public class ByteCodecCore
      * @return          the output stream
      */
     public <T> OutputStream encode(Class<? super T> type, T value, OutputStream os) {
-        encode(type, value, ByteTypes.outputOf(os));
+        encodeImpl(type, value, ByteTypes.outputOf(os));
         return os;
     }
 
@@ -59,6 +48,6 @@ public class ByteCodecCore
      */
     @Override
     public <T> T decode(Class<? super T> type, InputStream is) {
-        return decode(type, ByteTypes.inputOf(is));
+        return decodeImpl(type, ByteTypes.inputOf(is));
     }
 }

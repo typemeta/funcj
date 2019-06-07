@@ -7,6 +7,9 @@ import java.util.*;
 /**
  * An identity object algebra,
  * i.e. one that creates an identical copy of the original object.
+ * Since JsValue objects are immutable, this algebra isn't that useful in itself,
+ * however it can be used as a base class for algebras that only modify one or two
+ * JsValue types.
  */
 public class JsonId implements JsonAlg<JsValue> {
     public static final JsonId INSTANCE = new JsonId();

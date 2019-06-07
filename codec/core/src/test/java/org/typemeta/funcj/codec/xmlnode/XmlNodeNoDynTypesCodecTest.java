@@ -36,7 +36,7 @@ public class XmlNodeNoDynTypesCodecTest extends TestBase {
         config.dynamicTypeTags(false);
         config.failOnNoTypeConstructor(false);
 
-        codec.encode(clazz, val, out);
+        codec.encodeImpl(clazz, val, out);
 
         if (printData()) {
             XmlUtils.write(out, System.out, true);

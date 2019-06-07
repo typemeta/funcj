@@ -13,7 +13,7 @@ import java.io.*;
  */
 public class XmlNodeCodecCore
         extends CodecCoreDelegate<Element, Element, XmlNodeConfig>
-        implements CodecAPI {
+        implements CodecAPI<InputStream, OutputStream> {
 
     public static final DocumentBuilder docBuilder;
 
@@ -51,7 +51,7 @@ public class XmlNodeCodecCore
     public <T> Writer encode(Class<? super T> type, T value, Writer writer, String rootElemName) {
         final Document doc = docBuilder.newDocument();
         final Element out = doc.createElement(rootElemName);
-        encode(type, value, out);
+        encodeImpl(type, value, out);
         return XmlUtils.write(doc, writer, true);
     }
 
@@ -69,7 +69,7 @@ public class XmlNodeCodecCore
     public <T> OutputStream encode(Class<? super T> type, T value, OutputStream os, String rootElemName) {
         final Document doc = docBuilder.newDocument();
         final Element out = doc.createElement(rootElemName);
-        encode(type, value, out);
+        encodeImpl(type, value, out);
         return XmlUtils.write(doc, os, true);
     }
 
@@ -98,7 +98,7 @@ public class XmlNodeCodecCore
             final Document doc = docBuilder.parse(is);
             final Element elem = doc.getDocumentElement();
             if (elem.getNodeName().equals(rootElemName)) {
-                return decode(type, elem);
+                return decodeImpl(type, elem);
             } else {
                 throw new CodecException(
                         "Root expected to have name " + rootElemName +
@@ -119,16 +119,6 @@ public class XmlNodeCodecCore
      */
     public <T> T decode(InputStream is, String rootElemName) {
         return decode(Object.class, is, rootElemName);
-    }
-
-    @Override
-    public <T> Writer encode(Class<? super T> clazz, T value, Writer wtr) {
-        return encode(clazz, value, wtr, "_");
-    }
-
-    @Override
-    public <T> T decode(Class<? super T> clazz, Reader rdr) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

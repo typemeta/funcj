@@ -102,7 +102,7 @@ public interface CodecCore<IN, OUT, CFG extends CodecConfig> {
      * @param <T>       the decoded value type
      * @return          the encoded value
      */
-    <T> OUT encode(Class<? super T> clazz, T value, OUT out);
+    <T> OUT encodeImpl(Class<? super T> clazz, T value, OUT out);
 
     /**
      * Decode a value of type {@code T} from encoded value of type {@code E}.
@@ -111,7 +111,7 @@ public interface CodecCore<IN, OUT, CFG extends CodecConfig> {
      * @param <T>       the decoded value type
      * @return          the decoded value
      */
-    <T> T decode(Class<? super T> clazz, IN in);
+    <T> T decodeImpl(Class<? super T> clazz, IN in);
 
     /**
      * Lookup a {@code Codec} for a name, and, if one doesn't exist,

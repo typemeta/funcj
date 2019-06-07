@@ -3,7 +3,7 @@ package org.typemeta.funcj.codec;
 import java.util.stream.*;
 
 /**
- * Abstraction for creating an object fby accumulating the fields that comprise it.
+ * Abstraction for creating an object by accumulating the fields that comprise it.
  * @param <T>       the type of object being created
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
