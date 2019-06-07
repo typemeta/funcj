@@ -61,11 +61,11 @@ public class Example {
             out.startObject();
 
             out.writeField("dateTime");
-            core.encode(LocalDateTime.class, value.toLocalDateTime(), out);
+            core.encodeImpl(LocalDateTime.class, value.toLocalDateTime(), out);
             out.writeField("zone");
-            core.encode(ZoneId.class, value.getZone(), out);
+            core.encodeImpl(ZoneId.class, value.getZone(), out);
             out.writeField("offset");
-            core.encode(ZoneOffset.class, value.getOffset(), out);
+            core.encodeImpl(ZoneOffset.class, value.getOffset(), out);
 
             return out.endObject();
         }
@@ -75,11 +75,11 @@ public class Example {
             in.startObject();
 
             in.readFieldName("dateTime");
-            final LocalDateTime ldt = core.decode(LocalDateTime.class, in);
+            final LocalDateTime ldt = core.decodeImpl(LocalDateTime.class, in);
             in.readFieldName("zone");
-            final ZoneId zid = core.decode(ZoneId.class, in);
+            final ZoneId zid = core.decodeImpl(ZoneId.class, in);
             in.readFieldName("offset");
-            final ZoneOffset zo = core.decode(ZoneOffset.class, in);
+            final ZoneOffset zo = core.decodeImpl(ZoneOffset.class, in);
 
             in.endObject();
 
