@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.jsonnode;
 
-import org.typemeta.funcj.codec.CodecConfigImpl;
+import org.typemeta.funcj.codec.impl.CodecConfigImpl;
 
 /**
  * Base class for {@link JsonNodeConfig} implementations.

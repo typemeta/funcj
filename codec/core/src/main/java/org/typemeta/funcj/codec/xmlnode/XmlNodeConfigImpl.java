@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.xmlnode;
 
-import org.typemeta.funcj.codec.CodecConfigImpl;
+import org.typemeta.funcj.codec.impl.CodecConfigImpl;
 
 import java.lang.reflect.Field;
 import java.util.Set;

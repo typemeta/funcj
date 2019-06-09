@@ -286,6 +286,9 @@ public class JsonStreamParser implements JsonTypes.InStream {
         if (bufferPos == eventBuffer.length) {
             bufferPos = 0;
         }
+
+        // SUSPICIOUS CODE
+
         if (eventBuffer[bufferPos] == null) {
             pullEventsIntoBuffer(0);
         }

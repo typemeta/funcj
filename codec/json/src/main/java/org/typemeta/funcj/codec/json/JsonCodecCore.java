@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.impl.CodecCoreImpl;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
 
 import java.io.Reader;
@@ -11,7 +12,7 @@ import java.io.Writer;
  */
 public class JsonCodecCore
         extends CodecCoreDelegate<InStream, OutStream, Config>
-        implements CodecAPIReaderWriter {
+        implements CodecAPI.RW {
 
     public JsonCodecCore(JsonCodecFormat format) {
         super(new CodecCoreImpl<>(format));

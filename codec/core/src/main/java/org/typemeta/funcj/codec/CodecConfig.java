@@ -138,7 +138,7 @@ public interface CodecConfig {
     void dynamicTypeTags(boolean enable);
 
     /**
-     * Indicate whether dynamic type information should be encoded.
+     * Indicates whether dynamic type information should be encoded.
      * @return          whether dynamic type information should be encoded
      */
     boolean dynamicTypeTags();
@@ -152,7 +152,7 @@ public interface CodecConfig {
     void failOnNoTypeConstructor(boolean enable);
 
     /**
-     * Indicate whether the codec should fail if no type constructor is found.
+     * Indicates whether the codec should fail if no type constructor is found.
      * @return          whether the the codec should fail if no type constructor is found
      */
     boolean failOnNoTypeConstructor();

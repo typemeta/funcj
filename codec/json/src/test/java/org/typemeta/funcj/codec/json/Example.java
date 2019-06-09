@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.codec.CodecCoreEx;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
 
 import java.time.*;
@@ -44,7 +43,8 @@ public class Example {
     }
 
     public static void main(String[] args) {
-        //jsonTest();
+        jsonTest(true);
+        jsonTest(false);
         xmlTest();
     }
 
@@ -95,14 +95,16 @@ public class Example {
                     ZoneId.of("GMT")),
             Colour.GREEN, Colour.BLUE);
 
-    static void jsonTest() {
-        final JsonCodecCore jsonCodecCore = Codecs.jsonCodec();
+    static void jsonTest(boolean stream) {
+        System.out.println(stream ? "Streaming" : "JsValue");
+        final CodecAPI.RW jsonCodecCore = stream ? Codecs.jsonCodec() : Codecs.jsonNodeCodec();
+        jsonCodecCore.config().registerAllowedPackage(Example.class.getPackage());
         jsonCodecCore.registerStringProxyCodec(
                 ZonedDateTime.class,
                 ZonedDateTime::toString,
                 ZonedDateTime::parse);
 
-        jsonCodecCore.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec());
+        //jsonCodecCore.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec());
 
         // Encode to JSON.
         jsonCodecCore.encode(Person.class, person, System.out);
@@ -119,6 +121,7 @@ public class Example {
         final String root = "root";
 
         final XmlCodecCore xmlCodecCore = Codecs.xmlCodec();
+        xmlCodecCore.config().registerAllowedPackage(Example.class.getPackage());
         xmlCodecCore.registerStringProxyCodec(
                 ZonedDateTime.class,
                 ZonedDateTime::toString,

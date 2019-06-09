@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.jsonnode;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.impl.CodecCoreImpl;
 import org.typemeta.funcj.json.model.JSAPI;
 import org.typemeta.funcj.json.model.JsValue;
 import org.typemeta.funcj.json.parser.JsonParser;
@@ -13,7 +14,7 @@ import java.io.Writer;
  */
 public class JsonNodeCodecCore
         extends CodecCoreDelegate<JsValue, JsValue, JsonNodeConfig>
-        implements CodecAPIReaderWriter {
+        implements CodecAPI.RW {
 
     public JsonNodeCodecCore(JsonNodeCodecFormat format) {
         super(new CodecCoreImpl<>(format));

@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.xmlnode;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.tuples.Tuple2;

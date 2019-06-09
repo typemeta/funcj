@@ -2,6 +2,7 @@ package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ByteTypes.*;
+import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.tuples.Tuple2;

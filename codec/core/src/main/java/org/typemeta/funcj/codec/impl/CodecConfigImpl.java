@@ -1,5 +1,6 @@
-package org.typemeta.funcj.codec;
+package org.typemeta.funcj.codec.impl;
 
+import org.typemeta.funcj.codec.CodecConfig;
 import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.lang.reflect.Field;

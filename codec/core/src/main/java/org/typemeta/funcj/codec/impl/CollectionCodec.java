@@ -1,5 +1,6 @@
-package org.typemeta.funcj.codec;
+package org.typemeta.funcj.codec.impl;
 
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Array;

@@ -1,7 +1,8 @@
 package org.typemeta.funcj.codec.mpack;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.utils.NotSupportedException;
+import org.typemeta.funcj.codec.impl.CodecCoreImpl;
+import org.typemeta.funcj.codec.mpack.MpackTypes.*;
 
 import java.io.*;
 
@@ -9,14 +10,14 @@ import java.io.*;
  * Interface for classes which implement an encoding via MessagePack.
  */
 public class MpackCodecCore
-        extends CodecCoreDelegate<MpackTypes.InStream, MpackTypes.OutStream, MpackTypes.Config>
-        implements CodecAPI<InputStream, OutputStream> {
+        extends CodecCoreDelegate<InStream, OutStream, Config>
+        implements CodecAPI.IO {
 
     public MpackCodecCore(MpackCodecFormat format) {
         super(new CodecCoreImpl<>(format));
     }
 
-    public MpackCodecCore(MpackTypes.Config config) {
+    public MpackCodecCore(Config config) {
         this(new MpackCodecFormat(config));
     }
 
@@ -34,8 +35,9 @@ public class MpackCodecCore
      * @param <T>       the static type of the value
      * @return          the output stream
      */
+    @Override
     public <T> OutputStream encode(Class<? super T> type, T value, OutputStream os) {
-        try (final MpackTypes.OutStream out = MpackTypes.outputOf(os)) {
+        try (final OutStream out = MpackTypes.outputOf(os)) {
             encodeImpl(type, value, out);
             return os;
         }
@@ -50,7 +52,7 @@ public class MpackCodecCore
      */
     @Override
     public <T> T decode(Class<? super T> type, InputStream is) {
-        try (final MpackTypes.InStream in = MpackTypes.inputOf(is)) {
+        try (final InStream in = MpackTypes.inputOf(is)) {
             return decodeImpl(type, in);
         }
     }

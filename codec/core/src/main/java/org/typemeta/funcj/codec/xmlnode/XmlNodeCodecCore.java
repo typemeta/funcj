@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.xmlnode;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.impl.CodecCoreImpl;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -13,7 +14,7 @@ import java.io.*;
  */
 public class XmlNodeCodecCore
         extends CodecCoreDelegate<Element, Element, XmlNodeConfig>
-        implements CodecAPI<InputStream, OutputStream> {
+        implements CodecAPI.IO {
 
     public static final DocumentBuilder docBuilder;
 

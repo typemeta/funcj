@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.mpack;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.mpack.MpackTypes.*;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.functions.Functions;

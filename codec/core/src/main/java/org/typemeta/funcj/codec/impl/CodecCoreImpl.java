@@ -1,7 +1,9 @@
-package org.typemeta.funcj.codec;
+package org.typemeta.funcj.codec.impl;
 
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.codec.utils.*;
+import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.functions.Functions;
 
 import java.lang.reflect.*;

@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.impl.CodecCoreImpl;
 import org.typemeta.funcj.codec.xml.XmlTypes.*;
 
 import java.io.*;
@@ -10,7 +11,7 @@ import java.io.*;
  */
 public class XmlCodecCore
         extends CodecCoreDelegate<InStream, OutStream, Config>
-        implements CodecAPI<InputStream, OutputStream> {
+        implements CodecAPI.IO {
 
     public XmlCodecCore(XmlCodecFormat format) {
         super(new CodecCoreImpl<>(format));

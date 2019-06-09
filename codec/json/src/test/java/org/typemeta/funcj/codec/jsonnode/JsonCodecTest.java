@@ -14,7 +14,7 @@ public class JsonCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final JsonNodeCodecCore codec = prepareCodecCore(Codecs.jsonNCodec());
+        final JsonNodeCodecCore codec = prepareCodecCore(Codecs.jsonNodeCodec());
 
         final JsValue jsv = codec.encode(clazz, val);
 
@@ -39,7 +39,7 @@ public class JsonCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final JsonNodeCodecCore codec = prepareCodecCore(Codecs.jsonNCodec());
+        final JsonNodeCodecCore codec = prepareCodecCore(Codecs.jsonNodeCodec());
         codec.config().failOnUnrecognisedFields(false);
         final TestTypes.Custom val = new TestTypes.Custom(TestTypes.Init.INIT);
 

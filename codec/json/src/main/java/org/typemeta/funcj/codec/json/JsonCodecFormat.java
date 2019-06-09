@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.codec.utils.CodecException;

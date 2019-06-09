@@ -50,7 +50,7 @@ public interface FieldCodec<
 
         protected final Codec.BooleanCodec<IN, OUT, CFG> codec;
 
-        BooleanFieldCodec(Field field, Codec.BooleanCodec<IN, OUT, CFG> codec) {
+        public BooleanFieldCodec(Field field, Codec.BooleanCodec<IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -80,7 +80,7 @@ public interface FieldCodec<
 
         protected final Codec<boolean[], IN, OUT, CFG> codec;
 
-        BooleanArrayFieldCodec(Field field, Codec<boolean[], IN, OUT, CFG> codec) {
+        public BooleanArrayFieldCodec(Field field, Codec<boolean[], IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -110,7 +110,7 @@ public interface FieldCodec<
 
         protected final Codec.ByteCodec<IN, OUT, CFG> codec;
 
-        ByteFieldCodec(Field field, Codec.ByteCodec<IN, OUT, CFG> codec) {
+        public ByteFieldCodec(Field field, Codec.ByteCodec<IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -140,7 +140,7 @@ public interface FieldCodec<
 
         protected final Codec<byte[], IN, OUT, CFG> codec;
 
-        ByteArrayFieldCodec(Field field, Codec<byte[], IN, OUT, CFG> codec) {
+        public ByteArrayFieldCodec(Field field, Codec<byte[], IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -170,7 +170,7 @@ public interface FieldCodec<
 
         protected final Codec.CharCodec<IN, OUT, CFG> codec;
 
-        CharFieldCodec(Field field, Codec.CharCodec<IN, OUT, CFG> codec) {
+        public CharFieldCodec(Field field, Codec.CharCodec<IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -200,7 +200,7 @@ public interface FieldCodec<
 
         protected final Codec<char[], IN, OUT, CFG> codec;
 
-        CharArrayFieldCodec(Field field, Codec<char[], IN, OUT, CFG> codec) {
+        public CharArrayFieldCodec(Field field, Codec<char[], IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -230,7 +230,7 @@ public interface FieldCodec<
 
         protected final Codec.ShortCodec<IN, OUT, CFG> codec;
 
-        ShortFieldCodec(Field field, Codec.ShortCodec<IN, OUT, CFG> codec) {
+        public ShortFieldCodec(Field field, Codec.ShortCodec<IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -260,7 +260,7 @@ public interface FieldCodec<
 
         protected final Codec<short[], IN, OUT, CFG> codec;
 
-        ShortArrayFieldCodec(Field field, Codec<short[], IN, OUT, CFG> codec) {
+        public ShortArrayFieldCodec(Field field, Codec<short[], IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -290,7 +290,7 @@ public interface FieldCodec<
 
         protected final Codec.IntCodec<IN, OUT, CFG> codec;
 
-        IntegerFieldCodec(Field field, Codec.IntCodec<IN, OUT, CFG> codec) {
+        public IntegerFieldCodec(Field field, Codec.IntCodec<IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -319,7 +319,7 @@ public interface FieldCodec<
 
         protected final Codec<int[], IN, OUT, CFG> codec;
 
-        IntegerArrayFieldCodec(Field field, Codec<int[], IN, OUT, CFG> codec) {
+        public IntegerArrayFieldCodec(Field field, Codec<int[], IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -349,7 +349,7 @@ public interface FieldCodec<
 
         protected final Codec.LongCodec<IN, OUT, CFG> codec;
 
-        LongFieldCodec(Field field, Codec.LongCodec<IN, OUT, CFG> codec) {
+        public LongFieldCodec(Field field, Codec.LongCodec<IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -379,7 +379,7 @@ public interface FieldCodec<
 
         protected final Codec<long[], IN, OUT, CFG> codec;
 
-        LongArrayFieldCodec(Field field, Codec<long[], IN, OUT, CFG> codec) {
+        public LongArrayFieldCodec(Field field, Codec<long[], IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -409,7 +409,7 @@ public interface FieldCodec<
 
         protected final Codec.FloatCodec<IN, OUT, CFG> codec;
 
-        FloatFieldCodec(Field field, Codec.FloatCodec<IN, OUT, CFG> codec) {
+        public FloatFieldCodec(Field field, Codec.FloatCodec<IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -439,7 +439,7 @@ public interface FieldCodec<
 
         protected final Codec<float[], IN, OUT, CFG> codec;
 
-        FloatArrayFieldCodec(Field field, Codec<float[], IN, OUT, CFG> codec) {
+        public FloatArrayFieldCodec(Field field, Codec<float[], IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -469,7 +469,7 @@ public interface FieldCodec<
 
         protected final Codec.DoubleCodec<IN, OUT, CFG> codec;
 
-        DoubleFieldCodec(Field field, Codec.DoubleCodec<IN, OUT, CFG> codec) {
+        public DoubleFieldCodec(Field field, Codec.DoubleCodec<IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -499,7 +499,7 @@ public interface FieldCodec<
 
         protected final Codec<double[], IN, OUT, CFG> codec;
 
-        DoubleArrayFieldCodec(Field field, Codec<double[], IN, OUT, CFG> codec) {
+        public DoubleArrayFieldCodec(Field field, Codec<double[], IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -530,7 +530,7 @@ public interface FieldCodec<
 
         protected final Codec<T, IN, OUT, CFG> codec;
 
-        protected ObjectFieldCodec(Field field, Codec<T, IN, OUT, CFG> codec) {
+        public ObjectFieldCodec(Field field, Codec<T, IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }
@@ -562,7 +562,7 @@ public interface FieldCodec<
 
         protected final Codec<T[], IN, OUT, CFG> codec;
 
-        protected ObjectArrayFieldCodec(Field field, Codec<T[], IN, OUT, CFG> codec) {
+        public ObjectArrayFieldCodec(Field field, Codec<T[], IN, OUT, CFG> codec) {
             super(field);
             this.codec = Objects.requireNonNull(codec);
         }

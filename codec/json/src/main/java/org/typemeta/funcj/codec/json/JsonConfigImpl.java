@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.json;
 
-import org.typemeta.funcj.codec.CodecConfigImpl;
+import org.typemeta.funcj.codec.impl.CodecConfigImpl;
 
 /**
  * Base class for {@link JsonTypes.Config} implementations.

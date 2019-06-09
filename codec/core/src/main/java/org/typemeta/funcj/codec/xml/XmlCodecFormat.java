@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.xml.XmlTypes.*;
