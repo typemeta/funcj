@@ -18,11 +18,12 @@ public class JsonBridge {
     }
 
     public JsonBridge(Reader reader, Writer writer) {
-        this(new JsonStreamParser(reader, 1), new JsonGenerator(writer));
+        this(new JsonStreamParser(reader, 3), new JsonGenerator(writer));
     }
 
     void run() {
         while (input.notEOF()) {
+            //System.out.println(input.currentEventType());
             switch (input.currentEventType()) {
                 case ARRAY_END:
                     input.endArray();

@@ -86,29 +86,49 @@ public class JsonStreamParser implements JsonTypes.InStream {
             throw raiseError("Lookahead of " + ahead + " not supported, max is " + eventBuffer.length + ",");
         } else {
             int pos = bufferPos;
-            while(true) {
+            while (true) {
                 if (eventBuffer[pos] == null) {
                     eventBuffer[pos] = tokeniser.getNextEvent();
+
+                    // Skip over separators.
+                    switch (eventBuffer[pos].type()) {
+                        case COMMA:
+                            switch (state) {
+                                case ARRAY_COMMA:
+                                    state = State.ARRAY_VALUE;
+                                    eventBuffer[pos] = tokeniser.getNextEvent();
+                                    break;
+                                case OBJECT_COMMA:
+                                    state = State.OBJECT_NAME;
+                                    eventBuffer[pos] = tokeniser.getNextEvent();
+                                    break;
+                                default:
+                                    throw unexpectedToken(eventBuffer[pos]);
+                            }
+                            continue;
+                        case COLON:
+                            switch (state) {
+                                case OBJECT_COLON:
+                                    state = State.OBJECT_VALUE;
+                                    eventBuffer[pos] = tokeniser.getNextEvent();
+                                    break;
+                                default:
+                                    throw unexpectedToken(eventBuffer[pos]);
+                            }
+                            continue;
+                    }
                 }
-                if (ahead-- == 0) {
-                    return eventBuffer[pos];
-                }
+
                 if (++pos == eventBuffer.length) {
                     pos = 0;
+                }
+
+                if (ahead-- == 0) {
+                    return eventBuffer[pos];
                 }
             }
         }
     }
-
-    public JsonEvent skipToNextEvent() {
-        eventBuffer[bufferPos] = null;
-        ++bufferPos;
-        if (bufferPos == eventBuffer.length) {
-            bufferPos = 0;
-        }
-        return pullEventsIntoBuffer(0);
-    }
-
     @Override
     public String location() {
         return "position: " + tokeniser.position();
@@ -285,40 +305,6 @@ public class JsonStreamParser implements JsonTypes.InStream {
         eventBuffer[bufferPos++] = null;
         if (bufferPos == eventBuffer.length) {
             bufferPos = 0;
-        }
-
-        // SUSPICIOUS CODE
-
-        if (eventBuffer[bufferPos] == null) {
-            pullEventsIntoBuffer(0);
-        }
-
-        final JsonEvent event2 = eventBuffer[bufferPos];
-
-        switch (event2.type()) {
-            case COMMA:
-                switch (state) {
-                    case ARRAY_COMMA:
-                        state = State.ARRAY_VALUE;
-                        break;
-                    case OBJECT_COMMA:
-                        state = State.OBJECT_NAME;
-                        break;
-                    default:
-                        throw unexpectedToken(event2);
-                }
-                skipToNextEvent();
-                break;
-            case COLON:
-                switch (state) {
-                    case OBJECT_COLON:
-                        state = State.OBJECT_VALUE;
-                        break;
-                    default:
-                        throw unexpectedToken(event2);
-                }
-                skipToNextEvent();
-                break;
         }
     }
 

@@ -8,7 +8,7 @@ import java.text.*;
 import java.util.*;
 
 /**
- * A parser for JSON streams.
+ * A parser for JSON values.
  * The parser allows token look-ahead.
  */
 public class JsonParser {
