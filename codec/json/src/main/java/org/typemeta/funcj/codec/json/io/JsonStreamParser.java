@@ -119,12 +119,12 @@ public class JsonStreamParser implements JsonTypes.InStream {
                     }
                 }
 
-                if (++pos == eventBuffer.length) {
-                    pos = 0;
-                }
-
                 if (ahead-- == 0) {
                     return eventBuffer[pos];
+                }
+
+                if (++pos == eventBuffer.length) {
+                    pos = 0;
                 }
             }
         }
