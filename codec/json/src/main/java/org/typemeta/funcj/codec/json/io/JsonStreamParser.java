@@ -52,10 +52,6 @@ public class JsonStreamParser implements JsonTypes.InStream {
         return new CodecException(msg + " at position " + tokeniser.position());
     }
 
-    private CodecException raiseError(Supplier<String> msg) {
-        return new CodecException(msg.get() + " at position " + tokeniser.position());
-    }
-
     private CodecException unexpectedToken(JsonEvent event) {
         return raiseError("Unexpected token " + event.type());
     }

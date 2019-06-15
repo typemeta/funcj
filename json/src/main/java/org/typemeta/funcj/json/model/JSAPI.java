@@ -2,6 +2,7 @@ package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.data.IList;
 
+import java.text.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.*;
@@ -60,6 +61,14 @@ public class JSAPI {
 
     public static JsNumber num(Number value) {
         return new JsNumber(value.doubleValue());
+    }
+
+    public static JsNumber num(String s) {
+        try {
+            return new JsNumber(NumberFormat.getInstance().parse(s).doubleValue());
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex.getMessage());
+        }
     }
 
     public static JsString str(String value) {

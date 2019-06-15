@@ -54,12 +54,10 @@ public class JsonParser {
         final JsValue jsv = parser.readValue();
         if (consume.equals(Consume.ALL) && !parser.isEof()) {
             throw parser.tokeniser.raiseError("Input not at EOF after parsing JSON value");
+        } else if (jsv.isArray() || jsv.isObject()) {
+            return jsv;
         } else {
-            if (jsv.isArray() || jsv.isObject()) {
-                return jsv;
-            } else {
-                throw new JsonException("A JSON payload should be an object or array, not a " + jsv.type());
-            }
+            throw new JsonException("A JSON payload should be an object or array, not a " + jsv.type());
         }
     }
 
@@ -87,14 +85,14 @@ public class JsonParser {
     }
 
     private void consumeEvent() {
-        nextEvent = tokeniser.getNextEvent();
+        nextEvent = null;
     }
 
     private void consumeEvent(Type eventType) {
         if (nextEvent.type() != eventType) {
             throw tokeniser.raiseError("Expected " + eventType + " but got a " + nextEvent().type());
         } else {
-            nextEvent = tokeniser.getNextEvent();
+            nextEvent = null;
         }
     }
 
@@ -131,14 +129,9 @@ public class JsonParser {
                 return JsNull.NULL;
             case NUMBER: {
                 final String value = ((JsonEvent.JNumber) event).value;
-                try {
-                    final JsNumber jsNum = JSAPI.num(NumberFormat.getInstance().parse(value));
-                    consumeEvent();
-                    return jsNum;
-                } catch (ParseException ex) {
-                    final String excerpt = value.length() > 16 ? value.substring(0, 16) + "..." : value;
-                    throw tokeniser.raiseError("Number token '" + excerpt + "' is not a valid number");
-                }
+                final JsNumber jsNum = JSAPI.num(value);
+                consumeEvent();
+                return jsNum;
             }
             case STRING: {
                 final String value = ((JsonEvent.JString) event).value;
@@ -164,9 +157,13 @@ public class JsonParser {
         final List<JsObject.Field> fields = new ArrayList<>();
 
         while (true) {
+            nextEvent();
+
             checkEventType(Type.FIELD_NAME);
             final String name = ((JsonEvent.FieldName)nextEvent()).value;
             consumeEvent();
+
+            nextEvent();
 
             consumeEvent(Type.COLON);
 
@@ -174,12 +171,16 @@ public class JsonParser {
 
             fields.add(JSAPI.field(name, value));
 
-            if (nextEvent().type() == Type.OBJECT_END) {
+            final JsonEvent.Type type = nextEvent().type();
+
+            if (type == Type.OBJECT_END) {
                 break;
-            } else if (nextEvent().type() == Type.COMMA) {
+            } else if (type == Type.COMMA) {
                 consumeEvent();
             } else {
-                checkEventType(Type.COMMA, Type.OBJECT_END);
+                throw tokeniser.raiseError(
+                        "Expected " + Type.OBJECT_END + " or " + Type.COMMA + " but got a " + type
+                );
             }
         }
 
@@ -201,12 +202,16 @@ public class JsonParser {
         while (true) {
             values.add(readValue());
 
-            if (nextEvent().type() == Type.ARRAY_END) {
+            final JsonEvent.Type type = nextEvent().type();
+
+            if (type == Type.ARRAY_END) {
                 break;
-            } else if (nextEvent().type() == Type.COMMA) {
+            } else if (type == Type.COMMA) {
                 consumeEvent();
             } else {
-                checkEventType(Type.COMMA, Type.OBJECT_END);
+                throw tokeniser.raiseError(
+                        "Expected " + Type.ARRAY_END + " or " + Type.COMMA + " but got a " + type
+                );
             }
         }
 

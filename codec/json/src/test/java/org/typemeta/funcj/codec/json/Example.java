@@ -3,6 +3,7 @@ package org.typemeta.funcj.codec.json;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.xml.XmlCodecCore;
 
+import java.io.*;
 import java.time.*;
 import java.util.*;
 
@@ -45,7 +46,8 @@ public class Example {
     public static void main(String[] args) {
         jsonTest(true);
         jsonTest(false);
-        xmlTest();
+        xmlTest(true);
+        xmlTest(false);
     }
 
     static class ZonedDateTimeJsonCodec
@@ -96,7 +98,7 @@ public class Example {
             Colour.GREEN, Colour.BLUE);
 
     static void jsonTest(boolean stream) {
-        System.out.println(stream ? "Streaming" : "JsValue");
+        System.out.println(stream ? "JSON Streaming" : "JSON node");
         final CodecAPI.RW jsonCodecCore = stream ? Codecs.jsonCodec() : Codecs.jsonNodeCodec();
         jsonCodecCore.config().registerAllowedPackage(Example.class.getPackage());
         jsonCodecCore.registerStringProxyCodec(
@@ -107,17 +109,20 @@ public class Example {
         //jsonCodecCore.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec());
 
         // Encode to JSON.
-        jsonCodecCore.encode(Person.class, person, System.out);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        jsonCodecCore.encode(Person.class, person, baos);
 
-        System.out.flush();
+        System.out.println(baos);
 
         // Decode back to Java.
-        final Person person2 = jsonCodecCore.decode(Person.class, System.in);
+        final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        final Person person2 = jsonCodecCore.decode(Person.class, bais);
 
         assert(person.equals(person2));
     }
 
-    static void xmlTest() {
+    static void xmlTest(boolean stream) {
+        System.out.println(stream ? "XML Streaming" : "XML node");
         final String root = "root";
 
         final XmlCodecCore xmlCodecCore = Codecs.xmlCodec();
@@ -128,12 +133,14 @@ public class Example {
                 ZonedDateTime::parse);
 
         // Encode to XML.
-        xmlCodecCore.encode(Person.class, person, System.out);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        xmlCodecCore.encode(Person.class, person, baos);
 
-        System.out.flush();
+        System.out.println(baos);
 
         // Decode back to Java.
-        final Person person2 = xmlCodecCore.decode(Person.class, System.in);
+        final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        final Person person2 = xmlCodecCore.decode(Person.class, bais);
 
         assert(person.equals(person2));
     }

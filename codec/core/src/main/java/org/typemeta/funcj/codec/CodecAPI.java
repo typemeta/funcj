@@ -124,8 +124,10 @@ public interface CodecAPI<IN, OUT> {
          * @return          the output stream
          */
         default <T> OutputStream encode(Class<? super T> clazz, T value, OutputStream os) {
-            try(Writer wtr = new BufferedWriter(new OutputStreamWriter(os))) {
+            try {
+                final Writer wtr = new BufferedWriter(new OutputStreamWriter(os));
                 encode(clazz, value, wtr);
+                wtr.flush();
                 return os;
             } catch (IOException ex) {
                 throw new CodecException(ex);
@@ -141,11 +143,8 @@ public interface CodecAPI<IN, OUT> {
          * @return          the decoded value
          */
         default <T> T decode(Class<? super T> clazz, InputStream is) {
-            try(Reader rdr = new BufferedReader(new InputStreamReader(is))){
-                return decode(clazz, rdr);
-            } catch (IOException ex) {
-                throw new CodecException(ex);
-            }
+            final Reader rdr = new BufferedReader(new InputStreamReader(is));
+            return decode(clazz, rdr);
         }
 
         /**
