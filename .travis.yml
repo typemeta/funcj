@@ -1,9 +1,9 @@
 language:
-    java
+  java
 
 jdk:
-    oraclejdk8
-    openjdk8
+  oraclejdk8
+  openjdk8
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
