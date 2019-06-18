@@ -12,34 +12,12 @@ import java.util.Set;
 public interface CodecConfig {
 
     /**
-     * Add this package to the list of allowed packages.
-     * Classes in allowed packages can be constructed from their name.
-     * @param pkg       the package
-     */
-    void registerAllowedPackage(Package pkg);
-
-    /**
-     * Add this class to the list of allowed classes.
-     * Allowed classes can be constructed from their name.
-     * @param clazz     the class
-     */
-    void registerAllowedClass(Class<?> clazz);
-
-    /**
      * Check this class is allowed.
      * @param clazz     the class
      * @param <T>       the class type
-     * @return          the class, if it is allowed, otherwisde throws a {@link CodecException}
+     * @return          the class, if it is allowed, otherwise throws a {@link CodecException}
      */
     <T> Class<T> checkClassIsAllowed(Class<T> clazz);
-
-    /**
-     * Register a type proxy for a class.
-     * A type proxy is used in place of a class when selecting its {@code Codec}.
-     * @param clazz     the class to be mapped
-     * @param proxy     the proxy type
-     */
-    void registerTypeProxy(Class<?> clazz, Class<?> proxy);
 
     /**
      * Map a class to its proxy if it has one.
@@ -48,14 +26,6 @@ public interface CodecConfig {
      * @return          the proxy if it has one, otherwise the original class
      */
     <T> Class<T> mapToProxy(Class<T> clazz);
-
-    /**
-     * Register a type alias.
-     * A type alias is used in place of the class name in the encoded data.
-     * @param clazz     the clas to be mapped
-     * @param name      the proxy type
-     */
-    void registerTypeAlias(Class<?> clazz, String name);
 
     /**
      * Convert a class to a name.
@@ -95,15 +65,6 @@ public interface CodecConfig {
     int resizeArray(int size);
 
     /**
-     * Register a collection implementation as a default for that collection type.
-     * This prevents the implementation type name from being encoded.
-     * @param intfClass the collection interface
-     * @param implClass the collection implementation
-     * @param <T>       the collection interface type
-     */
-    <T> void registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass);
-
-    /**
      * Check whether a collection class is a default for that collection type.
      * @param intfClass the collection interface
      * @param implClass the collection implementation
@@ -130,26 +91,10 @@ public interface CodecConfig {
     <T> boolean dynamicTypeMatch(Class<T> stcClass, Class<? extends T> dynClass);
 
     /**
-     * Specify whether dynamic type information should be encoded.
-     * By default this is enabled.
-     * Disabling it may prevent data from round-tripping successfully.
-     * @param enable    specify whether dynamic type information should be encoded
-     */
-    void dynamicTypeTags(boolean enable);
-
-    /**
      * Indicates whether dynamic type information should be encoded.
      * @return          whether dynamic type information should be encoded
      */
     boolean dynamicTypeTags();
-
-    /**
-     * Specify whether the codec should fail if no type constructor is found.
-     * By default this is enabled.
-     * Disabling it may prevent data from round-tripping successfully.
-     * @param enable    specify whether the the codec should fail if no type constructor is found.
-     */
-    void failOnNoTypeConstructor(boolean enable);
 
     /**
      * Indicates whether the codec should fail if no type constructor is found.
@@ -157,7 +102,71 @@ public interface CodecConfig {
      */
     boolean failOnNoTypeConstructor();
 
-    void failOnUnrecognisedFields(boolean enable);
-
     boolean failOnUnrecognisedFields();
+
+    /**
+     * Interface for classes which provide configuration information
+     * for CodecCore implementations.
+     */
+    interface Builder<T extends CodecConfig> {
+
+        T build();
+
+        /**
+         * Add this package to the list of allowed packages.
+         * Classes in allowed packages can be constructed from their name.
+         * @param pkg       the package
+         */
+        void registerAllowedPackage(Package pkg);
+
+        /**
+         * Add this class to the list of allowed classes.
+         * Allowed classes can be constructed from their name.
+         * @param clazz     the class
+         */
+        void registerAllowedClass(Class<?> clazz);
+
+        /**
+         * Register a type proxy for a class.
+         * A type proxy is used in place of a class when selecting its {@code Codec}.
+         * @param clazz     the class to be mapped
+         * @param proxy     the proxy type
+         */
+        void registerTypeProxy(Class<?> clazz, Class<?> proxy);
+
+        /**
+         * Register a type alias.
+         * A type alias is used in place of the class name in the encoded data.
+         * @param clazz     the type to be mapped
+         * @param name      the proxy type
+         */
+        void registerTypeAlias(Class<?> clazz, String name);
+
+        /**
+         * Register a collection implementation as a default for that collection type.
+         * This prevents the implementation type name from being encoded.
+         * @param intfClass the collection interface
+         * @param implClass the collection implementation
+         * @param <T>       the collection interface type
+         */
+        <T> void registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass);
+
+        /**
+         * Specify whether dynamic type information should be encoded.
+         * By default this is enabled.
+         * Disabling it may prevent data from round-tripping successfully.
+         * @param enable    specify whether dynamic type information should be encoded
+         */
+        void dynamicTypeTags(boolean enable);
+
+        /**
+         * Specify whether the codec should fail if no type constructor is found.
+         * By default this is enabled.
+         * Disabling it may prevent data from round-tripping successfully.
+         * @param enable    specify whether the the codec should fail if no type constructor is found.
+         */
+        void failOnNoTypeConstructor(boolean enable);
+
+        void failOnUnrecognisedFields(boolean enable);
+    }
 }

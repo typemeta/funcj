@@ -3,6 +3,7 @@ package org.typemeta.funcj.codec;
 import org.junit.Test;
 import org.typemeta.funcj.codec.misc.SimpleType;
 import org.typemeta.funcj.codec.utils.CodecException;
+import org.typemeta.funcj.functions.Functions;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -22,10 +23,16 @@ public abstract class TestBase {
     protected abstract <T> void roundTrip(T val, Class<T> clazz) throws Exception;
 
     @SuppressWarnings("unchecked")
-    protected static <IN, OUT, CFG extends CodecConfig, CC extends CodecCore<IN, OUT, CFG>>
-    CC prepareCodecCore(CC core) {
+    protected static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
+    CORE prepareCodecCore(
+            CodecConfig.Builder<CFG> cfgBldr,
+            Functions.F<CodecConfig.Builder<CFG>, CORE> coreBldr
+    ) {
 
-        core.config().registerAllowedPackage(TestTypes.class.getPackage());
+        cfgBldr.registerAllowedPackage(TestTypes.class.getPackage());
+
+        // Construct the CodecCore implementation.
+        final CORE core = coreBldr.apply(cfgBldr);
 
         core.registerCodecWithArgMap(Custom.class)
                 .field("colour", c -> c.colour, Custom.Colour.class)

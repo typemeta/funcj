@@ -10,7 +10,8 @@ public class BytesCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final ByteCodecCore codec = prepareCodecCore(Codecs.byteCodec());
+        final ByteConfigImpl.BuilderImpl cfgBldr = new ByteConfigImpl.BuilderImpl();
+        final ByteCodecCore codec = prepareCodecCore(cfgBldr, Codecs::byteCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

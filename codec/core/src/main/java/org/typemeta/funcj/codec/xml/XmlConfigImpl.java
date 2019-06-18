@@ -10,6 +10,21 @@ import java.util.Set;
  */
 public class XmlConfigImpl extends CodecConfigImpl implements XmlTypes.Config {
 
+    public static class BuilderImpl extends CodecConfigImpl.BuilderImpl<XmlTypes.Config> {
+
+        @Override
+        public XmlTypes.Config build() {
+            return new XmlConfigImpl(this);
+        }
+    }
+
+    public XmlConfigImpl() {
+    }
+
+    public XmlConfigImpl(BuilderImpl builder) {
+        super(builder);
+    }
+
     @Override
     public String getFieldName(Field field, int depth, Set<String> existingNames) {
         String name = field.getName();

@@ -11,8 +11,8 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
      * Construct and return a new instance of a {@link MpackCodecCore}.
      * @return the new {@code MpackCodecCore}
      */
-    public static MpackCodecCore mpackCodec() {
-        final MpackCodecCore core = registerAll(new MpackCodecCore());
+    public static MpackCodecCore mpackCodec(CodecConfig.Builder<MpackTypes.Config> cfgBldr) {
+        final MpackCodecCore core = registerAll(cfgBldr, MpackCodecCore::new);
 
         core.registerCodec(BigInteger.class, new BigIntegerCodec());
 

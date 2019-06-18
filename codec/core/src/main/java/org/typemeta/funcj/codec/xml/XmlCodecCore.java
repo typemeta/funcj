@@ -22,7 +22,7 @@ public class XmlCodecCore
     }
 
     public XmlCodecCore() {
-        this(new XmlConfigImpl());
+        this(new XmlCodecFormat());
     }
 
     /**

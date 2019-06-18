@@ -10,6 +10,14 @@ import java.util.Set;
  */
 public class XmlNodeConfigImpl extends CodecConfigImpl implements XmlNodeConfig {
 
+    public static class BuilderImpl extends CodecConfigImpl.BuilderImpl<XmlNodeConfig> {
+
+        @Override
+        public XmlNodeConfig build() {
+            return new XmlNodeConfigImpl(this);
+        }
+    }
+
     @Override
     public String getFieldName(Field field, int depth, Set<String> existingNames) {
         String name = field.getName();
@@ -17,6 +25,13 @@ public class XmlNodeConfigImpl extends CodecConfigImpl implements XmlNodeConfig 
             name = "_" + name;
         }
         return name;
+    }
+
+    public XmlNodeConfigImpl() {
+    }
+
+    public XmlNodeConfigImpl(BuilderImpl builder) {
+        super(builder);
     }
 
     @Override

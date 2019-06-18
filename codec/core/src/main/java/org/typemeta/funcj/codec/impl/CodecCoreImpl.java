@@ -63,7 +63,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
 
     @Override
     public <T> void registerCodec(Class<? extends T> clazz, Codec<T, IN, OUT, CFG> codec) {
-        config().registerAllowedClass(clazz);
+        config().checkClassIsAllowed(clazz);
         synchronized (codecRegistry) {
             codecRegistry.put(ClassKey.valueOf(clazz), codec);
         }
@@ -96,7 +96,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
             Class<T> clazz,
             Functions.F<T, String> encode,
             Functions.F<String, T> decode) {
-        config().registerAllowedClass(clazz);
+        config().checkClassIsAllowed(clazz);
         registerCodec(clazz, new Codecs.StringProxyCodec<>(clazz, encode, decode));
     }
 
@@ -104,7 +104,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <T> void registerNoArgsCtor(
             Class<? extends T> clazz,
             NoArgsTypeCtor<T> typeCtor) {
-        config().registerAllowedClass(clazz);
+        config().checkClassIsAllowed(clazz);
         noArgsCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
     }
 
@@ -112,13 +112,13 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <T> void registerArgArrayCtor(
             Class<? extends T> clazz,
             ArgArrayTypeCtor<T> typeCtor) {
-        config().registerAllowedClass(clazz);
+        config().checkClassIsAllowed(clazz);
         argArrayCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
     }
 
     @Override
     public <T> void registerArgMapTypeCtor(Class<? extends T> clazz, ArgMapTypeCtor<T> typeCtor) {
-        config().registerAllowedClass(clazz);
+        config().checkClassIsAllowed(clazz);
         argMapCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
     }
 

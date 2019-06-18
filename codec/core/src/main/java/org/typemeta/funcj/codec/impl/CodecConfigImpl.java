@@ -11,39 +11,117 @@ import java.util.*;
  */
 public class CodecConfigImpl implements CodecConfig {
 
-    protected final Set<Package> allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));
+    public static abstract class BuilderImpl<T extends CodecConfig> implements Builder<T> {
 
-    protected final Set<Class<?>> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
+        protected final Set<Package> allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));
 
-    protected final Map<Class<?>, String> classToNameMap = new TreeMap<>(Comparator.comparing(Class::getName));
+        protected final Set<Class<?>> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
 
-    protected final Map<String, Class<?>> nameToClassMap = new HashMap<>();
+        protected final Map<Class<?>, String> classToNameMap = new TreeMap<>(Comparator.comparing(Class::getName));
 
-    protected final Map<Class<?>, List<Class<?>>> defaultCollectionTypes = new TreeMap<>(Comparator.comparing(Class::getName));
+        protected final Map<String, Class<?>> nameToClassMap = new HashMap<>();
+
+        protected final Map<Class<?>, List<Class<?>>> defaultCollectionTypes = new TreeMap<>(Comparator.comparing(Class::getName));
+
+        /**
+         * A map that associates a class with its proxy.
+         * Where a class has a proxy, the codec for the proxy will be used for the class.
+         */
+        protected final Map<Class<?>, Class<?>> typeProxyRegistry = new TreeMap<>(Comparator.comparing(Class::getName));
+
+        protected boolean dynamicTypeTags = true;
+
+        protected boolean failOnNoTypeConstructor = true;
+
+        protected boolean failOnUnrecognisedFields = true;
+
+        @Override
+        public void registerAllowedPackage(Package pkg) {
+            allowedPackages.add(pkg);
+        }
+
+        @Override
+        public void registerAllowedClass(Class<?> clazz) {
+            allowedClasses.add(clazz);
+        }
+
+        @Override
+        public void registerTypeProxy(Class<?> clazz, Class<?> proxy) {
+            typeProxyRegistry.put(clazz, proxy);
+        }
+
+        @Override
+        public void registerTypeAlias(Class<?> clazz, String name) {
+            classToNameMap.put(clazz, name);
+            nameToClassMap.put(name, clazz);
+        }
+
+        @Override
+        public <T> void registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass) {
+            defaultCollectionTypes.computeIfAbsent(intfClass, u -> new ArrayList<>())
+                    .add(implClass);
+        }
+
+        @Override
+        public void dynamicTypeTags(boolean enable) {
+            dynamicTypeTags = enable;
+        }
+
+        @Override
+        public void failOnNoTypeConstructor(boolean enable) {
+            failOnNoTypeConstructor = enable;
+        }
+
+        @Override
+        public void failOnUnrecognisedFields(boolean enable) {
+            failOnUnrecognisedFields = enable;
+        }
+    }
+
+    protected final Set<Package> allowedPackages;
+
+    protected final Set<Class<?>> allowedClasses;
+
+    protected final Map<Class<?>, String> classToNameMap;
+
+    protected final Map<String, Class<?>> nameToClassMap;
+
+    protected final Map<Class<?>, List<Class<?>>> defaultCollectionTypes;
 
     /**
      * A map that associates a class with its proxy.
      * Where a class has a proxy, the codec for the proxy will be used for the class.
      */
-    protected final Map<Class<?>, Class<?>> typeProxyRegistry = new TreeMap<>(Comparator.comparing(Class::getName));
+    protected final Map<Class<?>, Class<?>> typeProxyRegistry;
 
-    protected boolean dynamicTypeTags = true;
+    protected boolean dynamicTypeTags;
 
-    protected boolean failOnNoTypeConstructor = true;
+    protected boolean failOnNoTypeConstructor;
 
-    protected boolean failOnUnrecognisedFields = true;
+    protected boolean failOnUnrecognisedFields;
 
     protected CodecConfigImpl() {
+        this.allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));;
+        this.allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
+        this.classToNameMap = new TreeMap<>(Comparator.comparing(Class::getName));
+        this.nameToClassMap = new HashMap<>();
+        this.defaultCollectionTypes = new TreeMap<>(Comparator.comparing(Class::getName));
+        this.typeProxyRegistry = new TreeMap<>(Comparator.comparing(Class::getName));
+        this.dynamicTypeTags = true;
+        this.failOnNoTypeConstructor = true;
+        this.failOnUnrecognisedFields = true;
     }
 
-    @Override
-    public void registerAllowedPackage(Package pkg) {
-        allowedPackages.add(pkg);
-    }
-
-    @Override
-    public void registerAllowedClass(Class<?> clazz) {
-        allowedClasses.add(clazz);
+    protected CodecConfigImpl(BuilderImpl<? extends CodecConfig> builder) {
+        this.allowedPackages = builder.allowedPackages;
+        this.allowedClasses = builder.allowedClasses;
+        this.classToNameMap = builder.classToNameMap;
+        this.nameToClassMap = builder.nameToClassMap;
+        this.defaultCollectionTypes = builder.defaultCollectionTypes;
+        this.typeProxyRegistry = builder.typeProxyRegistry;
+        this.dynamicTypeTags = builder.dynamicTypeTags;
+        this.failOnNoTypeConstructor = builder.failOnNoTypeConstructor;
+        this.failOnUnrecognisedFields = builder.failOnUnrecognisedFields;
     }
 
     @Override
@@ -70,11 +148,6 @@ public class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
-    public void registerTypeProxy(Class<?> clazz, Class<?> proxy) {
-        typeProxyRegistry.put(clazz, proxy);
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public <T> Class<T> mapToProxy(Class<T> clazz) {
         if (typeProxyRegistry.containsKey(clazz)) {
@@ -82,12 +155,6 @@ public class CodecConfigImpl implements CodecConfig {
         } else {
             return clazz;
         }
-    }
-
-    @Override
-    public void registerTypeAlias(Class<?> clazz, String name) {
-        classToNameMap.put(clazz, name);
-        nameToClassMap.put(name, clazz);
     }
 
     @Override
@@ -131,12 +198,6 @@ public class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
-    public <T> void registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass) {
-        defaultCollectionTypes.computeIfAbsent(intfClass, u -> new ArrayList<>())
-                .add(implClass);
-    }
-
-    @Override
     public boolean isDefaultCollectionType(Class<?> intfClass, Class<?> implClass) {
         final List<Class<?>> implTypes = defaultCollectionTypes.get(intfClass);
         if (implTypes == null) {
@@ -170,28 +231,13 @@ public class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
-    public void dynamicTypeTags(boolean enable) {
-        dynamicTypeTags = enable;
-    }
-
-    @Override
     public boolean dynamicTypeTags() {
         return dynamicTypeTags;
     }
 
     @Override
-    public void failOnNoTypeConstructor(boolean enable) {
-        failOnNoTypeConstructor = enable;
-    }
-
-    @Override
     public boolean failOnNoTypeConstructor() {
         return failOnNoTypeConstructor;
-    }
-
-    @Override
-    public void failOnUnrecognisedFields(boolean enable) {
-        failOnUnrecognisedFields = enable;
     }
 
     @Override

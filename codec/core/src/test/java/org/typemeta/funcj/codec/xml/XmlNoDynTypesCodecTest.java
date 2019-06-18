@@ -2,23 +2,28 @@ package org.typemeta.funcj.codec.xml;
 
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.functions.Functions;
 
 import java.io.*;
 
 public class XmlNoDynTypesCodecTest extends TestBase {
 
-    protected static <IN, OUT, CFG extends CodecConfig, CC extends CodecCore<IN, OUT, CFG>>
-    CC prepareCodecCore(CC core) {
-        core.config().registerAllowedPackage(TestTypes.class.getPackage());
-        return core;
+    protected static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
+    CORE prepareCodecCore(
+            CodecConfig.Builder<CFG> cfgBldr,
+            Functions.F<CodecConfig.Builder<CFG>, CORE> coreBldr
+    ) {
+        cfgBldr.registerAllowedPackage(TestTypes.class.getPackage());
+        return TestBase.prepareCodecCore(cfgBldr, coreBldr);
     }
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final XmlCodecCore codec = prepareCodecCore(Codecs.xmlCodec());
-        final XmlTypes.Config config = codec.config();
-        config.dynamicTypeTags(false);
-        config.failOnNoTypeConstructor(false);
+        final CodecConfig.Builder<XmlTypes.Config> cfgBldr = new XmlConfigImpl.BuilderImpl();
+        cfgBldr.dynamicTypeTags(false);
+        cfgBldr.failOnNoTypeConstructor(false);
+
+        final XmlCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         codec.encode(clazz, val, baos);
@@ -33,6 +38,7 @@ public class XmlNoDynTypesCodecTest extends TestBase {
             System.out.println("Encoded XML " + clazz.getSimpleName() + " data size = " + data.length() + " chars");
         }
 
+        final XmlTypes.Config config = codec.config();
         Assert.assertFalse(data.contains(config.typeAttrName()));
     }
 }

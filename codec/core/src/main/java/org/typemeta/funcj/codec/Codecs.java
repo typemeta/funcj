@@ -1,9 +1,9 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.bytes.ByteCodecCore;
+import org.typemeta.funcj.codec.bytes.*;
 import org.typemeta.funcj.codec.utils.*;
-import org.typemeta.funcj.codec.xml.XmlCodecCore;
-import org.typemeta.funcj.codec.xmlnode.XmlNodeCodecCore;
+import org.typemeta.funcj.codec.xml.*;
+import org.typemeta.funcj.codec.xmlnode.*;
 import org.typemeta.funcj.functions.Functions.F;
 
 import java.math.*;
@@ -20,7 +20,11 @@ public abstract class Codecs {
      * @return the new {@code XmlCodecCore}
      */
     public static XmlCodecCore xmlCodec() {
-        return registerAll(new XmlCodecCore());
+        return xmlCodec(new XmlConfigImpl.BuilderImpl());
+    }
+
+    public static XmlCodecCore xmlCodec(CodecConfig.Builder<XmlTypes.Config> cfgBldr) {
+        return registerAll(cfgBldr, XmlCodecCore::new);
     }
 
     /**
@@ -28,7 +32,11 @@ public abstract class Codecs {
      * @return the new {@code XmlCodecCore}
      */
     public static XmlNodeCodecCore xmlNodeCodec() {
-        return registerAll(new XmlNodeCodecCore());
+        return xmlNodeCodec(new XmlNodeConfigImpl.BuilderImpl());
+    }
+
+    public static XmlNodeCodecCore xmlNodeCodec(CodecConfig.Builder<XmlNodeConfig> cfgBldr) {
+        return registerAll(cfgBldr, XmlNodeCodecCore::new);
     }
 
     /**
@@ -36,35 +44,66 @@ public abstract class Codecs {
      * @return the new {@code ByteCodecCore}
      */
     public static ByteCodecCore byteCodec() {
-        return registerAll(new ByteCodecCore());
+        return byteCodec(new ByteConfigImpl.BuilderImpl());
+    }
+
+    public static ByteCodecCore byteCodec(CodecConfig.Builder<ByteTypes.Config> cfgBldr) {
+        return registerAll(cfgBldr, ByteCodecCore::new);
     }
 
     @SuppressWarnings("unchecked")
-    public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>> CORE registerAll(CORE core) {
+    public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
+    CORE registerAll(CodecConfig.Builder<CFG> cfgBldr, F<CFG, CORE> coreBldr) {
 
         // Register allowed packages and classes.
 
         for (Class<?> clazz : new Class<?>[]{
-                Boolean.class, Byte.class, Character.class, Double.class, Float.class, Integer.class, Long.class, Short.class,
-                boolean.class, byte.class, char.class, double.class, float.class, int.class, long.class, short.class,
-                String.class
+                java.math.BigInteger.class,
+                java.lang.String.class,
+                java.time.LocalDate.class,
+                java.util.Collection.class
+
         }) {
-            core.config().registerTypeAlias(clazz, clazz.getSimpleName());
+            cfgBldr.registerAllowedPackage(clazz.getPackage());
         }
 
-        core.config().registerAllowedPackage(java.lang.String.class.getPackage());
-        core.config().registerAllowedPackage(java.util.Collection.class.getPackage());
-        core.config().registerAllowedPackage(java.time.LocalDate.class.getPackage());
+        for (Class<?> clazz : new Class<?>[]{
+                Boolean.class,
+                Byte.class,
+                Character.class,
+                Double.class,
+                Float.class,
+                Integer.class,
+                Long.class,
+                Short.class,
+                boolean.class,
+                byte.class,
+                char.class,
+                double.class,
+                float.class,
+                int.class,
+                long.class,
+                short.class,
+                String.class
+        }) {
+            cfgBldr.registerTypeAlias(clazz, clazz.getSimpleName());
+        }
 
         // Register default collection types.
-        core.config().registerDefaultCollectionType(List.class, ArrayList.class);
-        core.config().registerDefaultCollectionType(Set.class, HashSet.class);
-        core.config().registerDefaultCollectionType(Map.class, HashMap.class);
+        cfgBldr.registerDefaultCollectionType(List.class, ArrayList.class);
+        cfgBldr.registerDefaultCollectionType(Set.class, HashSet.class);
+        cfgBldr.registerDefaultCollectionType(Map.class, HashMap.class);
 
-        core.config().registerDefaultCollectionType(
+        cfgBldr.registerDefaultCollectionType(
                 List.class,
                 (Class)ReflectionUtils.classForName("java.util.Arrays$ArrayList")
         );
+
+        // Register a type proxy for ZoneRegion.
+        cfgBldr.registerTypeProxy(ReflectionUtils.classForName("java.time.ZoneRegion"), ZoneId.class);
+
+        // Construct the CodecCore implementation.
+        final CORE core = coreBldr.apply(cfgBldr.build());
 
         // Register string proxies for big numbers.
 
@@ -198,15 +237,12 @@ public abstract class Codecs {
                     }
                 });
 
-        // Register codec for Class.
+        // Register codec for the Class type.
         core.registerStringProxyCodec(
                 Class.class,
                 core.config()::classToName,
                 core.config()::nameToClass
         );
-
-        // Register a type proxy for ZoneRegion.
-        core.config().registerTypeProxy(ReflectionUtils.classForName("java.time.ZoneRegion"), ZoneId.class);
 
         // Register codecs for Java 8 date/time classes.
 

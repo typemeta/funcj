@@ -21,7 +21,11 @@ public class XmlNodeCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final XmlNodeCodecCore codec = prepareCodecCore(Codecs.xmlNodeCodec());
+        final XmlNodeCodecCore codec =
+                prepareCodecCore(
+                        new XmlNodeConfigImpl.BuilderImpl(),
+                        Codecs::xmlNodeCodec
+                );
 
         final Document doc = docBuilder.newDocument();
         final Element out = doc.createElement("Custom");
@@ -48,9 +52,11 @@ public class XmlNodeCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final XmlNodeCodecCore codec = prepareCodecCore(Codecs.xmlNodeCodec());
+        final CodecConfig.Builder<XmlNodeConfig> cfgBldr = new XmlNodeConfigImpl.BuilderImpl();
+        cfgBldr.failOnUnrecognisedFields(false);
 
-        codec.config().failOnUnrecognisedFields(false);
+        final XmlNodeCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlNodeCodec);
+
         final TestTypes.Custom val = new TestTypes.Custom(TestTypes.Init.INIT);
 
         final Document doc = docBuilder.newDocument();

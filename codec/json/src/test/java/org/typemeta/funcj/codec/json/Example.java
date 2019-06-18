@@ -1,7 +1,9 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.xml.XmlCodecCore;
+import org.typemeta.funcj.codec.jsonnode.*;
+import org.typemeta.funcj.codec.xml.*;
+import org.typemeta.funcj.codec.xmlnode.XmlNodeConfigImpl;
 
 import java.io.*;
 import java.time.*;
@@ -98,9 +100,20 @@ public class Example {
             Colour.GREEN, Colour.BLUE);
 
     static void jsonTest(boolean stream) {
-        System.out.println(stream ? "JSON Streaming" : "JSON node");
-        final CodecAPI.RW jsonCodecCore = stream ? Codecs.jsonCodec() : Codecs.jsonNodeCodec();
-        jsonCodecCore.config().registerAllowedPackage(Example.class.getPackage());
+
+        final CodecAPI.RW jsonCodecCore;
+        if (stream) {
+            System.out.println("JSON Streaming");
+            final JsonConfigImpl.BuilderImpl cfgBldr = new JsonConfigImpl.BuilderImpl();
+            cfgBldr.registerAllowedPackage(Example.class.getPackage());
+            jsonCodecCore = Codecs.jsonCodec(cfgBldr);
+        } else {
+            System.out.println("JSON node");
+            final JsonNodeConfigImpl.BuilderImpl cfgBldr = new JsonNodeConfigImpl.BuilderImpl();
+            cfgBldr.registerAllowedPackage(Example.class.getPackage());
+            jsonCodecCore = Codecs.jsonNodeCodec(cfgBldr);
+        }
+
         jsonCodecCore.registerStringProxyCodec(
                 ZonedDateTime.class,
                 ZonedDateTime::toString,
@@ -122,11 +135,19 @@ public class Example {
     }
 
     static void xmlTest(boolean stream) {
-        System.out.println(stream ? "XML Streaming" : "XML node");
-        final String root = "root";
+        final CodecAPI.IO xmlCodecCore;
+        if (stream) {
+            System.out.println("XML Streaming");
+            final XmlConfigImpl.BuilderImpl cfgBldr = new XmlConfigImpl.BuilderImpl();
+            cfgBldr.registerAllowedPackage(Example.class.getPackage());
+            xmlCodecCore = Codecs.xmlCodec(cfgBldr);
+        } else {
+            System.out.println("XML node");
+            final XmlNodeConfigImpl.BuilderImpl cfgBldr = new XmlNodeConfigImpl.BuilderImpl();
+            cfgBldr.registerAllowedPackage(Example.class.getPackage());
+            xmlCodecCore = Codecs.xmlNodeCodec(cfgBldr);
+        }
 
-        final XmlCodecCore xmlCodecCore = Codecs.xmlCodec();
-        xmlCodecCore.config().registerAllowedPackage(Example.class.getPackage());
         xmlCodecCore.registerStringProxyCodec(
                 ZonedDateTime.class,
                 ZonedDateTime::toString,

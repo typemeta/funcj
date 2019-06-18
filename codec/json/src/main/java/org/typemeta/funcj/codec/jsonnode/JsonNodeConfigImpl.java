@@ -7,6 +7,21 @@ import org.typemeta.funcj.codec.impl.CodecConfigImpl;
  */
 public class JsonNodeConfigImpl extends CodecConfigImpl implements JsonNodeConfig {
 
+    public static class BuilderImpl extends CodecConfigImpl.BuilderImpl<JsonNodeConfig> {
+
+        @Override
+        public JsonNodeConfig build() {
+            return new JsonNodeConfigImpl(this);
+        }
+    }
+
+    public JsonNodeConfigImpl() {
+    }
+
+    public JsonNodeConfigImpl(BuilderImpl builder) {
+        super(builder);
+    }
+
     @Override
     public String typeFieldName() {
         return "@type";

@@ -2,6 +2,7 @@ package org.typemeta.funcj.codec.xml;
 
 import org.junit.*;
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.xml.XmlTypes.Config;
 
 import java.io.*;
 import java.nio.file.*;
@@ -10,7 +11,8 @@ public class XmlCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) throws IOException {
-        final XmlCodecCore codec = prepareCodecCore(Codecs.xmlCodec());
+        final XmlConfigImpl.BuilderImpl cfgBldr = new XmlConfigImpl.BuilderImpl();
+        final XmlCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         codec.encode(clazz, val, baos);
@@ -48,8 +50,9 @@ public class XmlCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final XmlCodecCore codec = prepareCodecCore(Codecs.xmlCodec());
-        codec.config().failOnUnrecognisedFields(false);
+        final CodecConfig.Builder<Config> cfgBldr = new XmlConfigImpl.BuilderImpl();
+        cfgBldr.failOnUnrecognisedFields(false);
+        final XmlCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlCodec);
         final TestTypes.Custom val = new TestTypes.Custom(TestTypes.Init.INIT);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
