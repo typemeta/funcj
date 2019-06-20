@@ -8,7 +8,7 @@ import org.typemeta.funcj.codec.utils.NotSupportedException;
  */
 public class ByteConfigImpl extends CodecConfigImpl implements ByteTypes.Config {
 
-    public static class BuilderImpl extends CodecConfigImpl.BuilderImpl<ByteTypes.Config> {
+    public static class BuilderImpl extends AbstractBuilder<ByteTypes.Config> {
 
         @Override
         public ByteTypes.Config build() {

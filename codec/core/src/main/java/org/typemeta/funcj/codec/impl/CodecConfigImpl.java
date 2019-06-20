@@ -11,23 +11,32 @@ import java.util.*;
  */
 public class CodecConfigImpl implements CodecConfig {
 
-    public static abstract class BuilderImpl<T extends CodecConfig> implements Builder<T> {
+    /**
+     * Abstract base class for {@link Builder} implementations.
+     * @param <T>       the {@code CodecConfig} implementation type
+     */
+    public static abstract class AbstractBuilder<T extends CodecConfig> implements Builder<T> {
 
-        protected final Set<Package> allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));
+        protected final Set<Package> allowedPackages =
+                new TreeSet<>(Comparator.comparing(Package::getName));
 
-        protected final Set<Class<?>> allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
+        protected final Set<Class<?>> allowedClasses =
+                new TreeSet<>(Comparator.comparing(Class::getName));
 
-        protected final Map<Class<?>, String> classToNameMap = new TreeMap<>(Comparator.comparing(Class::getName));
+        protected final Map<Class<?>, String> classToNameMap =
+                new TreeMap<>(Comparator.comparing(Class::getName));
 
         protected final Map<String, Class<?>> nameToClassMap = new HashMap<>();
 
-        protected final Map<Class<?>, List<Class<?>>> defaultCollectionTypes = new TreeMap<>(Comparator.comparing(Class::getName));
+        protected final Map<Class<?>, List<Class<?>>> defaultCollectionTypes =
+                new TreeMap<>(Comparator.comparing(Class::getName));
 
         /**
          * A map that associates a class with its proxy.
          * Where a class has a proxy, the codec for the proxy will be used for the class.
          */
-        protected final Map<Class<?>, Class<?>> typeProxyRegistry = new TreeMap<>(Comparator.comparing(Class::getName));
+        protected final Map<Class<?>, Class<?>> typeProxyRegistry =
+                new TreeMap<>(Comparator.comparing(Class::getName));
 
         protected boolean dynamicTypeTags = true;
 
@@ -112,7 +121,7 @@ public class CodecConfigImpl implements CodecConfig {
         this.failOnUnrecognisedFields = true;
     }
 
-    protected CodecConfigImpl(BuilderImpl<? extends CodecConfig> builder) {
+    protected CodecConfigImpl(AbstractBuilder<? extends CodecConfig> builder) {
         this.allowedPackages = builder.allowedPackages;
         this.allowedClasses = builder.allowedClasses;
         this.classToNameMap = builder.classToNameMap;

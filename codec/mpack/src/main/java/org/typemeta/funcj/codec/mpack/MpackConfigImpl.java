@@ -8,7 +8,7 @@ import org.typemeta.funcj.codec.utils.NotSupportedException;
  */
 public class MpackConfigImpl extends CodecConfigImpl implements MpackTypes.Config {
 
-    public static class BuilderImpl extends CodecConfigImpl.BuilderImpl<MpackTypes.Config> {
+    public static class BuilderImpl extends AbstractBuilder<MpackTypes.Config> {
 
         @Override
         public MpackTypes.Config build() {

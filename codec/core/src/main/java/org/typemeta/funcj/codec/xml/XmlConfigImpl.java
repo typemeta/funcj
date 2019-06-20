@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class XmlConfigImpl extends CodecConfigImpl implements XmlTypes.Config {
 
-    public static class BuilderImpl extends CodecConfigImpl.BuilderImpl<XmlTypes.Config> {
+    public static class BuilderImpl extends AbstractBuilder<XmlTypes.Config> {
 
         @Override
         public XmlTypes.Config build() {

@@ -102,14 +102,22 @@ public interface CodecConfig {
      */
     boolean failOnNoTypeConstructor();
 
+    /**
+     * Indicates whether an unrecognised field should give rise to an error.
+     * @return          whether an unrecognised field should give rise to an error
+     */
     boolean failOnUnrecognisedFields();
 
     /**
-     * Interface for classes which provide configuration information
-     * for CodecCore implementations.
+     * Interface for classes which build {@link CodecConfig} implementations.
+     * @param <T>       the {@code CodecConfig} implementation type
      */
     interface Builder<T extends CodecConfig> {
 
+        /**
+         * Build an immutable {@code CodecConfig} instance
+         * @return          the {@code CodecConfig} instance
+         */
         T build();
 
         /**
@@ -162,11 +170,15 @@ public interface CodecConfig {
         /**
          * Specify whether the codec should fail if no type constructor is found.
          * By default this is enabled.
-         * Disabling it may prevent data from round-tripping successfully.
          * @param enable    specify whether the the codec should fail if no type constructor is found.
          */
         void failOnNoTypeConstructor(boolean enable);
 
+        /**
+         * Specify whether an unrecognised field should give rise to an error.
+         * By default this is enabled.
+         * @param enable    specify whether an unrecognised field should give rise to an error.
+         */
         void failOnUnrecognisedFields(boolean enable);
     }
 }
