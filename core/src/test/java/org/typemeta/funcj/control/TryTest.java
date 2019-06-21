@@ -4,7 +4,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.control.Try.Kleisli;
+import org.typemeta.funcj.kleisli.TryK;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.util.Functors;
 
@@ -120,19 +120,19 @@ public class TryTest {
     }
 
     static class Utils {
-        static final Kleisli<Integer, Integer> pure = Kleisli.of(Try::success);
+        static final TryK<Integer, Integer> pure = TryK.of(Try::success);
 
-        static final Kleisli<Integer, Integer> isPositive = i ->
+        static final TryK<Integer, Integer> isPositive = i ->
                 (i >= 0) ?
                         Try.success(i) :
                         Try.failure(new Error("Negative value"));
 
-        static final Kleisli<Integer, Double> isEven = i ->
+        static final TryK<Integer, Double> isEven = i ->
                 (i % 2 == 0) ?
                         Try.success((double)i) :
                         Try.failure(new Error("Odd value"));
 
-        static final Kleisli<Double, String> upToFirstZero = d -> {
+        static final TryK<Double, String> upToFirstZero = d -> {
             final String s = Double.toString(d);
             final int i = s.indexOf('0');
             if (i != -1) {
@@ -145,8 +145,8 @@ public class TryTest {
         static <T> void check(
                 String msg,
                 int i,
-                Kleisli<Integer, T> lhs,
-                Kleisli<Integer, T> rhs) {
+                TryK<Integer, T> lhs,
+                TryK<Integer, T> rhs) {
             assertEquals(
                     msg,
                     lhs.apply(i),

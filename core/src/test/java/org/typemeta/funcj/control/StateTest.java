@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.kleisli.StateK;
 import org.typemeta.funcj.tuples.Tuple2;
 
 import java.util.*;
@@ -100,15 +101,15 @@ public class StateTest {
     }
 
     static class Utils {
-        static final State.Kleisli<Double, Double, Double> pure = State.Kleisli.of(State::pure);
+        static final StateK<Double, Double, Double> pure = StateK.of(State::pure);
 
-        static final State.Kleisli<Double, Double, Double> add = d ->
+        static final StateK<Double, Double, Double> add = d ->
                 State.<Double>get().flatMap(x -> State.put(x + d)).flatMap(u -> pure(d));
 
-        static final State.Kleisli<Double, Double, Double> sub = d ->
+        static final StateK<Double, Double, Double> sub = d ->
                 State.<Double>get().flatMap(x -> State.put(x - d)).flatMap(u -> pure(d));
 
-        static final State.Kleisli<Double, Double, Double> div = d ->
+        static final StateK<Double, Double, Double> div = d ->
                 State.<Double>get().flatMap(x -> State.put(x / d)).flatMap(u -> pure(d));
 
         static final double EPSILON = 1e-32;
@@ -117,8 +118,8 @@ public class StateTest {
         static void check(
                 String msg,
                 double d,
-                State.Kleisli<Double, Double, Double> lhs,
-                State.Kleisli<Double, Double, Double> rhs) {
+                StateK<Double, Double, Double> lhs,
+                StateK<Double, Double, Double> rhs) {
             assertEquals(
                     msg,
                     lhs.apply(d).exec(INIT),

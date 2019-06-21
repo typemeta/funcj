@@ -4,7 +4,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.control.Either.Kleisli;
+import org.typemeta.funcj.kleisli.EitherK;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.util.Functors;
 
@@ -109,19 +109,19 @@ public class EitherTest {
     }
 
     static class Utils {
-        static final Kleisli<Error, Integer, Integer> pure = Kleisli.of(Either::right);
+        static final EitherK<Error, Integer, Integer> pure = EitherK.of(Either::right);
 
-        static final Kleisli<Error, Integer, Integer> isPositive = i ->
+        static final EitherK<Error, Integer, Integer> isPositive = i ->
                 (i >= 0) ?
                         Either.right(i) :
                         Either.left(new Error("Negative value"));
 
-        static final Kleisli<Error, Integer, Double> isEven = i ->
+        static final EitherK<Error, Integer, Double> isEven = i ->
             (i % 2 == 0) ?
                 Either.right((double)i) :
                 Either.left(new Error("Odd value"));
 
-        static final Kleisli<Error, Double, String> upToFirstZero = d -> {
+        static final EitherK<Error, Double, String> upToFirstZero = d -> {
             final String s = Double.toString(d);
             final int i = s.indexOf('0');
             if (i != -1) {
@@ -134,8 +134,8 @@ public class EitherTest {
         static <T> void check(
                 String msg,
                 int i,
-                Kleisli<Error, Integer, T> lhs,
-                Kleisli<Error, Integer, T> rhs) {
+                EitherK<Error, Integer, T> lhs,
+                EitherK<Error, Integer, T> rhs) {
             assertEquals(
                     msg,
                     lhs.apply(i),

@@ -2,6 +2,7 @@ package org.typemeta.funcj.algebra;
 
 import org.typemeta.funcj.data.IList;
 
+import java.math.*;
 import java.util.*;
 
 public abstract class MonoidInstances {
@@ -67,6 +68,30 @@ public abstract class MonoidInstances {
         }
     };
 
+    public static final Monoid<BigInteger> monoidBigInteger = new Monoid<BigInteger>() {
+        @Override
+        public BigInteger zero() {
+            return BigInteger.ZERO;
+        }
+
+        @Override
+        public BigInteger combine(BigInteger x, BigInteger y) {
+            return x.add(y);
+        }
+    };
+
+    public static final Monoid<BigDecimal> monoidBigDecimal = new Monoid<BigDecimal>() {
+        @Override
+        public BigDecimal zero() {
+            return BigDecimal.ZERO;
+        }
+
+        @Override
+        public BigDecimal combine(BigDecimal x, BigDecimal y) {
+            return x.add(y);
+        }
+    };
+
     public static final Monoid<String> monoidString = new Monoid<String>() {
         @Override
         public String zero() {
@@ -128,6 +153,10 @@ public abstract class MonoidInstances {
             return (Monoid<T>)monoidLong;
         } else if (clazz.equals(Short.class)) {
             return (Monoid<T>)monoidShort;
+        } else if (clazz.equals(BigInteger.class)) {
+            return (Monoid<T>)monoidBigInteger;
+        } else if (clazz.equals(BigDecimal.class)) {
+            return (Monoid<T>)monoidBigDecimal;
         } else if (clazz.equals(String.class)) {
             return (Monoid<T>)monoidString;
         } else if (clazz.equals(IList.class)) {

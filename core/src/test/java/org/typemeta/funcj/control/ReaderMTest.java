@@ -4,7 +4,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.control.ReaderM.Kleisli;
+import org.typemeta.funcj.kleisli.ReaderMK;
 import org.typemeta.funcj.functions.Functions.*;
 
 import java.util.*;
@@ -26,17 +26,17 @@ public class ReaderMTest {
         assertEquals("add combined with times", exp, addTimes.apply(i).intValue());
     }
 
-    private static final Kleisli<Integer, Integer, Integer> kPure = Kleisli.of(ReaderM::pure);
-    private static final Kleisli<Integer, Integer, Integer> kA = x -> y -> x + y;
-    private static final Kleisli<Integer, Integer, Integer> kB = x -> y -> x * y;
-    private static final Kleisli<Integer, Integer, Integer> kC = x -> y -> x - y;
+    private static final ReaderMK<Integer, Integer, Integer> kPure = ReaderMK.of(ReaderM::pure);
+    private static final ReaderMK<Integer, Integer, Integer> kA = x -> y -> x + y;
+    private static final ReaderMK<Integer, Integer, Integer> kB = x -> y -> x * y;
+    private static final ReaderMK<Integer, Integer, Integer> kC = x -> y -> x - y;
 
     private static <T> void check(
             String msg,
             int i,
             int j,
-            Kleisli<Integer, Integer, T> lhs,
-            Kleisli<Integer, Integer, T> rhs) {
+            ReaderMK<Integer, Integer, T> lhs,
+            ReaderMK<Integer, Integer, T> rhs) {
         assertEquals(
                 msg,
                 lhs.apply(i).run(j),

@@ -136,7 +136,7 @@ public interface Validated<E, T> {
      * Standard applicative sequencing.
      * <p>
      * Translate a {@link IList} of {@code Validated} into a {@code Validated} of an {@code IList},
-     * by composing each consecutive {@code Validated} using the {@link Validated#app(Validated)} method.
+     * by composing each successive {@code Validated} using the {@link Validated#app(Validated)} method.
      * @param lvt       the list of {@code Validated} values
      * @param <E>       the error type
      * @param <T>       the value type of the {@code Validated}s in the list

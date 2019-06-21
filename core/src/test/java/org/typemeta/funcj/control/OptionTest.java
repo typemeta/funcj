@@ -4,7 +4,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.control.Option.Kleisli;
+import org.typemeta.funcj.kleisli.OptionK;
 import org.typemeta.funcj.data.IList;
 import org.typemeta.funcj.util.Functors;
 
@@ -107,19 +107,19 @@ public class OptionTest {
     }
 
     static class Utils {
-        static final Kleisli<Integer, Integer> pure = Kleisli.of(Option::some);
+        static final OptionK<Integer, Integer> pure = OptionK.of(Option::some);
 
-        static final Kleisli<Integer, Integer> isPositive = i ->
+        static final OptionK<Integer, Integer> isPositive = i ->
                 (i >= 0) ?
                         Option.some(i) :
                         Option.none();
 
-        static final Kleisli<Integer, Double> isEven = i ->
+        static final OptionK<Integer, Double> isEven = i ->
                 (i % 2 == 0) ?
                         Option.some((double)i) :
                         Option.none();
 
-        static final Kleisli<Double, String> upToFirstZero = d -> {
+        static final OptionK<Double, String> upToFirstZero = d -> {
             final String s = Double.toString(d);
             final int i = s.indexOf('0');
             if (i != -1) {
@@ -132,8 +132,8 @@ public class OptionTest {
         static <T> void check(
                 String msg,
                 int i,
-                Kleisli<Integer, T> lhs,
-                Kleisli<Integer, T> rhs) {
+                OptionK<Integer, T> lhs,
+                OptionK<Integer, T> rhs) {
             assertEquals(
                     msg,
                     lhs.apply(i),

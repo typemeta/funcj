@@ -117,68 +117,6 @@ public interface ReaderM<ENV, A> {
     }
 
     /**
-     * Kleisli models composable operations that return a {@code Reader}.
-     * @param <ENV>       the input type of the returned {@code Reader} type
-     * @param <A>       the input type of the returned {@code F} type
-     * @param <B>       the return type of the returned {@code Reader} type
-     */
-    @FunctionalInterface
-    interface Kleisli<ENV, A, B> {
-        /**
-         * Construct a {@code Kleisli} value from a reader.
-         * @param rB        the reader
-         * @param <ENV>     the reader (fixed) input type
-         * @param <A>       the input type of the returned {@code F} type
-         * @param <B>       the return type of the returned {@code F} type
-         * @return          the new {@code Kleisli}
-         */
-        static <ENV, A, B> Kleisli<ENV, A, B> of(F<A, ReaderM<ENV, B>> rB) {
-            return rB::apply;
-        }
-
-        /**
-         * Apply this {@code Kleisli} operation
-         * @param a         the input value
-         * @return          the result of the operation
-         */
-        ReaderM<ENV, B> apply(A a);
-
-        /**
-         * Compose this {@code Kleisli} with another by applying this one first,
-         * then the other.
-         * @param kBC       the {@code Kleisli} to be applied after this one
-         * @param <C>       the second {@code Kleisli}'s return type
-         * @return          the composed {@code Kleisli}
-         */
-        default <C> Kleisli<ENV, A, C> andThen(Kleisli<ENV, B, C> kBC) {
-            return a -> apply(a).flatMap(kBC::apply);
-        }
-
-        /**
-         * Compose this {@code Kleisli} with another by applying the other one first,
-         * and then this one.
-         * @param kCA       the {@code Kleisli} to be applied after this one
-         * @param <C>       the first {@code Kleisli}'s input type
-         * @return          the composed {@code Kleisli}
-         */
-        default <C> Kleisli<ENV, C, B> compose(Kleisli<ENV, C, A> kCA) {
-            return c -> kCA.apply(c).flatMap(this::apply);
-        }
-
-        /**
-         * Compose this {@code Kleisli} with a function,
-         * by applying this {@code Kleisli} first,
-         * and then mapping the function over the result.
-         * @param fC         the function
-         * @param <C>       the function return type
-         * @return          the composed {@code Kleisli}
-         */
-        default <C> Kleisli<ENV, A, C> map(F<B, C> fC) {
-            return a -> apply(a).map(fC);
-        }
-    }
-
-    /**
      * Run this reader.
      * @param a         the function argument
      * @return          the result of applying this function
