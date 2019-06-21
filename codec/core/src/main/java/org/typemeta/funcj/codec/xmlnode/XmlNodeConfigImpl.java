@@ -63,4 +63,14 @@ public class XmlNodeConfigImpl extends CodecConfigImpl implements XmlNodeConfig 
     public String nullAttrVal() {
         return "true";
     }
+
+    @Override
+    public String defaultRootElemName(Class<?> type) {
+        return type.getSimpleName();
+    }
+
+    @Override
+    public String defaultRootElemName() {
+        return "Root";
+    }
 }

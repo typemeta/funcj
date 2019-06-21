@@ -18,4 +18,8 @@ public interface XmlNodeConfig extends CodecConfig {
     String nullAttrName();
 
     String nullAttrVal();
+
+    String defaultRootElemName(Class<?> type);
+
+    String defaultRootElemName();
 }

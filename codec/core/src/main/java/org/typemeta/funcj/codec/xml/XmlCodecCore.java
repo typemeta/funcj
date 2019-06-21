@@ -30,8 +30,26 @@ public class XmlCodecCore
      * The static type determines whether type information is written to recover the value's
      * dynamic type.
      * @param type      the static type of the value
+     * @param value     the value to encode
+     * @param os        the output stream to which the XML is written
+     * @param <T>       the static type of the value
+     * @return          the output stream
+     */
+    @Override
+    public <T> OutputStream encode(Class<? super T> type, T value, OutputStream os) {
+        try(final OutStream out = XmlTypes.outputOf(os, config().defaultRootElemName(type))) {
+            encodeImpl(type, value, out);
+            return os;
+        }
+    }
+
+    /**
+     * Encode the given value into XML and write the results to the {@link Writer} object.
+     * The static type determines whether type information is written to recover the value's
+     * dynamic type.
+     * @param type      the static type of the value
      * @param value     the value to be encoded
-     * @param writer    the output stream to which the XML is written
+     * @param writer    the writer to which the XML is written
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
      */
@@ -43,8 +61,21 @@ public class XmlCodecCore
 
     /**
      * Encode the given value into XML and write the results to the {@link Writer} object.
+     * The static type determines whether type information is written to recover the value's
+     * dynamic type.
+     * @param type      the static type of the value
      * @param value     the value to be encoded
-     * @param writer    the output stream to which the XML is written
+     * @param writer    the writer to which the XML is written
+     * @param <T>       the static type of the value
+     */
+    public <T> void encode(Class<? super T> type, T value, Writer writer) {
+        encode(type, value, writer, config().defaultRootElemName(type));
+    }
+
+    /**
+     * Encode the given value into XML and write the results to the {@link Writer} object.
+     * @param value     the value to be encoded
+     * @param writer    the writer to which the XML is written
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
      */
@@ -53,9 +84,33 @@ public class XmlCodecCore
     }
 
     /**
+     * Encode the given value into XML and write the results to the {@link Writer} object.
+     * @param value     the value to be encoded
+     * @param writer    the writer to which the XML is written
+     * @param <T>       the static type of the value
+     */
+    public <T> void encode(T value, Writer writer) {
+        encode(Object.class, value, writer, config().defaultRootElemName());
+    }
+
+    /**
+     * Encode the given value into XML and write the results to the {@link InputStream} object.
+     * @param type      the static type of the value to be encoded.
+     * @param is        the input stream from which XML is read
+     * @param <T>       the static type of the value
+     * @return          the decoded value
+     */
+    @Override
+    public <T> T decode(Class<? super T> type, InputStream is) {
+        try(final InStream in = XmlTypes.inputOf(is, config().defaultRootElemName(type))) {
+            return decodeImpl(type, in);
+        }
+    }
+
+    /**
      * Decode a value by reading XML from the given {@link Reader} object.
      * @param type      the static type of the value to be decoded.
-     * @param reader    the input stream from which XML is read
+     * @param reader    the reader from which the XML is read
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
      * @return          the decoded value
@@ -68,7 +123,18 @@ public class XmlCodecCore
 
     /**
      * Decode a value by reading XML from the given {@link Reader} object.
+     * @param type      the static type of the value to be decoded.
      * @param reader    the input stream from which XML is read
+     * @param <T>       the static type of the value
+     * @return          the decoded value
+     */
+    public <T> T decode(Class<? super T> type, Reader reader) {
+        return decode(type, reader, config().defaultRootElemName(type));
+    }
+
+    /**
+     * Decode a value by reading XML from the given {@link Reader} object.
+     * @param reader    the reader from which XML is read
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
      * @return          the decoded value
@@ -77,18 +143,13 @@ public class XmlCodecCore
         return decode(Object.class, reader, rootElemName);
     }
 
-    @Override
-    public <T> OutputStream encode(Class<? super T> clazz, T value, OutputStream os) {
-        try(final OutStream out = XmlTypes.outputOf(os, clazz.getSimpleName())) {
-            encodeImpl(clazz, value, out);
-            return os;
-        }
-    }
-
-    @Override
-    public <T> T decode(Class<? super T> clazz, InputStream is) {
-        try(final InStream in = XmlTypes.inputOf(is, clazz.getSimpleName())) {
-            return decodeImpl(clazz, in);
-        }
+    /**
+     * Decode a value by reading XML from the given {@link Reader} object.
+     * @param reader    the reader from which XML is read
+     * @param <T>       the static type of the value
+     * @return          the decoded value
+     */
+    public <T> T decode(Reader reader) {
+        return decode(reader, config().defaultRootElemName());
     }
 }

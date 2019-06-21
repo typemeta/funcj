@@ -5,6 +5,7 @@ import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.xml.XmlTypes.Config;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
 public class XmlCodecTest extends TestBase {
@@ -15,7 +16,7 @@ public class XmlCodecTest extends TestBase {
         final XmlCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        codec.encode(clazz, val, baos);
+        codec.encode(clazz, val, new OutputStreamWriter(baos, StandardCharsets.UTF_8));
 
         final String data = baos.toString();
 

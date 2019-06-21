@@ -26,6 +26,10 @@ public class XmlTypes {
         String nullAttrName();
 
         String nullAttrVal();
+
+        String defaultRootElemName(Class<?> type);
+
+        String defaultRootElemName();
     }
 
     /**

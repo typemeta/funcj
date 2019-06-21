@@ -62,6 +62,23 @@ public class XmlNodeCodecCore
      * dynamic type.
      * @param type      the static type of the value
      * @param value     the value to be encoded
+     * @param writer    the writer to which the XML is written
+     * @param <T>       the static type of the value
+     * @return          the writer
+     */
+    public <T> Writer encode(Class<? super T> type, T value, Writer writer) {
+        final Document doc = docBuilder.newDocument();
+        final Element out = doc.createElement(config().defaultRootElemName(type));
+        encodeImpl(type, value, out);
+        return XmlUtils.write(doc, writer, true);
+    }
+
+    /**
+     * Encode the given value into XML and write the results to the {@link Writer} object.
+     * The static type determines whether type information is written to recover the value's
+     * dynamic type.
+     * @param type      the static type of the value
+     * @param value     the value to be encoded
      * @param os        the output stream to which the XML is written
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
@@ -73,6 +90,22 @@ public class XmlNodeCodecCore
         encodeImpl(type, value, out);
         return XmlUtils.write(doc, os, true);
     }
+
+    /**
+     * Encode the given value into XML and write the results to the {@link Writer} object.
+     * The static type determines whether type information is written to recover the value's
+     * dynamic type.
+     * @param type      the static type of the value
+     * @param value     the value to be encoded
+     * @param os        the output stream to which the XML is written
+     * @param <T>       the static type of the value
+     * @return          the output stream
+     */
+    @Override
+    public <T> OutputStream encode(Class<? super T> type, T value, OutputStream os) {
+        return encode(type, value, os, config().defaultRootElemName(type));
+    }
+
 
     /**
      * Encode the given value into XML and write the results to the {@link Writer} object.
@@ -88,7 +121,7 @@ public class XmlNodeCodecCore
 
     /**
      * Decode a value by reading XML from the given {@link Reader} object.
-     * @param type      the static type of the value to be decoded.
+     * @param type      the static type of the value to be decoded
      * @param is        the reader from which JSON is read
      * @param rootElemName the name of the root element under which the output data is written
      * @param <T>       the static type of the value
@@ -122,13 +155,15 @@ public class XmlNodeCodecCore
         return decode(Object.class, is, rootElemName);
     }
 
+    /**
+     * Decode a value by reading JSON from the given {@link Reader} object.
+     * @param type      the static type of the value to be decoded
+     * @param is        the reader from which JSON is read
+     * @param <T>       the static type of the value
+     * @return          the decoded value
+     */
     @Override
-    public <T> OutputStream encode(Class<? super T> clazz, T value, OutputStream os) {
-        return encode(clazz, value, os, "_");
-    }
-
-    @Override
-    public <T> T decode(Class<? super T> clazz, InputStream is) {
-        return decode(clazz, is, "_");
+    public <T> T decode(Class<? super T> type, InputStream is) {
+        return decode(type, is, config().defaultRootElemName(type));
     }
 }
