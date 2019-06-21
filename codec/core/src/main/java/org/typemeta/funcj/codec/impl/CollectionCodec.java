@@ -124,7 +124,8 @@ public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
 
         public CollProxy2(
                 Class<T> elemType,
-                ArgArrayTypeCtor<Collection<T>> argArrCtor) {
+                ArgArrayTypeCtor<Collection<T>> argArrCtor
+        ) {
             this.elemType = elemType;
             this.argArrCtor = argArrCtor;
         }

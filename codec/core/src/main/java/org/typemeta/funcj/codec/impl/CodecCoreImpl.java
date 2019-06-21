@@ -95,7 +95,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <T> void registerStringProxyCodec(
             Class<T> clazz,
             Functions.F<T, String> encode,
-            Functions.F<String, T> decode) {
+            Functions.F<String, T> decode
+    ) {
         config().checkClassIsAllowed(clazz);
         registerCodec(clazz, new Codecs.StringProxyCodec<>(clazz, encode, decode));
     }
@@ -103,7 +104,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> void registerNoArgsCtor(
             Class<? extends T> clazz,
-            NoArgsTypeCtor<T> typeCtor) {
+            NoArgsTypeCtor<T> typeCtor
+    ) {
         config().checkClassIsAllowed(clazz);
         noArgsCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
     }
@@ -111,7 +113,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> void registerArgArrayCtor(
             Class<? extends T> clazz,
-            ArgArrayTypeCtor<T> typeCtor) {
+            ArgArrayTypeCtor<T> typeCtor
+    ) {
         config().checkClassIsAllowed(clazz);
         argArrayCtorRegistry.put(ClassKey.valueOf(clazz), typeCtor);
     }
@@ -184,7 +187,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> Codec<T, IN, OUT, CFG> getCodec(
             ClassKey<?> key,
-            Supplier<Codec<T, IN, OUT, CFG>> codecSupp) {
+            Supplier<Codec<T, IN, OUT, CFG>> codecSupp
+    ) {
         // First attempt, without locking.
         if (codecRegistry.containsKey(key)) {
             return (Codec<T, IN, OUT, CFG>)codecRegistry.get(key);
@@ -195,7 +199,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                 if (codecRegistry.containsKey(key)) {
                     return (Codec<T, IN, OUT, CFG>) codecRegistry.get(key);
                 } else {
-                    // Ok, it's definitely not there, so add a CodecRef.
+                    // Ok, it's definitely not there, so add a CodecRef
+                    // (in case the class has a recursive self-reference).
                     codecRef = new CodecRef<>();
                     codecRegistry.put(key, codecRef);
                 }
@@ -211,7 +216,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(
             Class<Collection<T>> collType,
-            Class<T> elemType) {
+            Class<T> elemType
+    ) {
         final ClassKey<?> key = ClassKey.valueOf(collType, elemType);
         return getCodec(key, () -> format().createCollCodec((Class)collType, getCodec(elemType)));
     }
@@ -219,7 +225,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(
             Class<Collection<T>> collType,
-            Codec<T, IN, OUT, CFG> elemCodec) {
+            Codec<T, IN, OUT, CFG> elemCodec
+    ) {
         final ClassKey<?> key = ClassKey.valueOf(collType, elemCodec.type());
         return getCodec(key, () -> format().createCollCodec(collType, elemCodec));
     }
@@ -228,7 +235,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <K, V> Codec<Map<K, V>, IN, OUT, CFG> getMapCodec(
             Class<Map<K, V>> mapType,
             Class<K> keyType,
-            Class<V> valType) {
+            Class<V> valType
+    ) {
         final ClassKey<?> key = ClassKey.valueOf(mapType, keyType, valType);
         return getCodec(key, () -> createMapCodec(mapType, keyType, valType));
     }
@@ -237,7 +245,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <K, V> Codec<Map<K, V>, IN, OUT, CFG> getMapCodec(
             Class<Map<K, V>> mapType,
             Codec<K, IN, OUT, CFG> keyCodec,
-            Codec<V, IN, OUT, CFG> valueCodec) {
+            Codec<V, IN, OUT, CFG> valueCodec
+    ) {
         final ClassKey<?> key = ClassKey.valueOf(mapType, keyCodec.type(), valueCodec.type());
         return getCodec(key, () -> format().createMapCodec((Class)mapType, keyCodec, valueCodec));
     }
@@ -245,7 +254,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     @Override
     public <V> Codec<Map<String, V>, IN, OUT, CFG> getMapCodec(
             Class<Map<String, V>> mapType,
-            Codec<V, IN, OUT, CFG> valueCodec) {
+            Codec<V, IN, OUT, CFG> valueCodec
+    ) {
         final ClassKey<?> key = ClassKey.valueOf(mapType, String.class, valueCodec.type());
         return getCodec(key, () -> format().createMapCodec((Class)mapType, valueCodec));
     }
@@ -254,7 +264,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <K, V> Codec<Map<K, V>, IN, OUT, CFG> createMapCodec(
             Class<Map<K, V>> mapType,
             Class<K> keyType,
-            Class<V> valType)  {
+            Class<V> valType
+    )  {
         final Codec<V, IN, OUT, CFG> valueCodec = getCodec(valType);
         if (String.class.equals(keyType)) {
             return (Codec)format().createMapCodec((Class<Map<String, V>>)(Class)mapType, valueCodec);
