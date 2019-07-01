@@ -60,13 +60,13 @@ public class JsonCombParserTest {
     private static final String json =
         FileUtils.openResource("/example.json")
             .map(FileUtils::read)
-            .getOrThrow();
+            .orElseThrow();
 
     @Test
     public void testSuccessParse() {
         final Result<Chr, JsValue> result =
             JsonCombParser.parser.parse(
-                Input.of(FileUtils.openResource("/example.json").getOrThrow()));
+                Input.of(FileUtils.openResource("/example.json").orElseThrow()));
         final JsValue node = result.getOrThrow();
         final String json2 = node.toString(100);
 
@@ -77,7 +77,7 @@ public class JsonCombParserTest {
     @Test
     public void testJsonSuite() {
         FileUtils.openDir("json")
-                .getOrThrow()
+                .orElseThrow()
                 .forEach(t2 -> t2.map2(FileUtils::read)
                         .applyFrom(FileUtils::roundTripJson));
     }
@@ -99,7 +99,7 @@ abstract class FileUtils {
 
         return Try.sequence(
                 openResource(dir)
-                        .getOrThrow()
+                        .orElseThrow()
                         .lines()
                         .map(file -> openResource(dir + file)
                                 .map(br -> Tuple2.of(file, br)))

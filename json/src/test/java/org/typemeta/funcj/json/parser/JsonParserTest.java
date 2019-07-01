@@ -51,7 +51,7 @@ public class JsonParserTest {
     private static final String json =
             FileUtils.openResource("/example.json")
                     .map(FileUtils::read)
-                    .getOrThrow();
+                    .orElseThrow();
 
     @Test
     public void testSuccessParse() {
@@ -64,7 +64,7 @@ public class JsonParserTest {
 
     @Test
     public void testJsonSuite() {
-        FileUtils.openDir("json").getOrThrow().stream()
+        FileUtils.openDir("json").orElseThrow().stream()
                 .filter(t2 -> t2._1.equals("fail10.json"))
                 .forEach(t2 -> t2.map2(FileUtils::read)
                         .applyFrom(FileUtils::roundTrip));
@@ -87,7 +87,7 @@ abstract class FileUtils {
 
         return Try.sequence(
                 openResource(dir)
-                        .getOrThrow()
+                        .orElseThrow()
                         .lines()
                         .map(file -> openResource(dir + file)
                                 .map(br -> Tuple2.of(file, br)))
@@ -111,7 +111,7 @@ abstract class FileUtils {
         } else {
             assertTrue("Parse expected to succeed: " + name, result.isSuccess());
 
-            final JsValue node = result.getOrThrow();
+            final JsValue node = result.orElseThrow();
             final String json2 = node.toString(100);
 
             final JsValue node2 = JsonParser.parse(json);
@@ -139,7 +139,7 @@ abstract class FileUtils {
             return false;
         }
 
-        expTry.forEach(exp -> Compare.compare("/", exp, actTry.getOrThrow()));
+        expTry.forEach(exp -> Compare.compare("/", exp, actTry.orElseThrow()));
 
         return true;
     }

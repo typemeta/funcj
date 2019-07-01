@@ -10,8 +10,7 @@ import org.typemeta.funcj.functions.Functions;
  * @param <B>       the return type of the returned {@code Reader} type
  */
 @FunctionalInterface
-public
-interface WriterMK<W, A, B> {
+public interface WriterMK<W, A, B> {
     /**
      * Construct a {@code Kleisli} value from a writer.
      * @param wB        the writer

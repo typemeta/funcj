@@ -214,7 +214,7 @@ public class KVStore {
                 .flatMap(vo ->
                         vo.map(v ->
                                 put(key, f.apply(v))
-                        ).getOrElse(DSL.Free.pure(Unit.UNIT)));
+                        ).orElseGet(DSL.Free.pure(Unit.UNIT)));
     }
 
     static final DSL.Free<Option<String>> program =

@@ -10,8 +10,7 @@ import org.typemeta.funcj.functions.Functions;
  * @param <B>       the return type of the returned {@code Reader} type
  */
 @FunctionalInterface
-public
-interface ReaderMK<ENV, A, B> {
+public interface ReaderMK<ENV, A, B> {
     /**
      * Construct a {@code Kleisli} value from a reader.
      * @param rB        the reader

@@ -13,7 +13,7 @@ public class JsValueCodecTest {
     final static String json =
             FileUtils.openResource("/example.json")
                     .map(FileUtils::read)
-                    .getOrThrow();
+                    .orElseThrow();
 
     final JsArray value0 = (JsArray)JsonParser.parse(json);
 

@@ -205,13 +205,13 @@ public interface Either<E, S> {
      * @return          the success result value if it's a {@code Right},
      *                  otherwise return the given default value.
      */
-    S getOrElse(S defaultValue);
+    S orElse(S defaultValue);
 
     /**
      * Return the wrapped value if it's a {@code Right}, otherwise throw an exception.
      * @return          the wrapped value if it's a {@code Right}
      */
-    S getOrThrow();
+    S orElseThrow();
 
     /**
      * Push the result to a {@link SideEffect.F}.
@@ -352,13 +352,13 @@ public interface Either<E, S> {
         }
 
         @Override
-        public S getOrElse(S defaultValue) {
+        public S orElse(S defaultValue) {
             return defaultValue;
         }
 
         @Override
-        public S getOrThrow() {
-            throw new RuntimeException("getOrThrow() called on a Left value");
+        public S orElseThrow() {
+            throw new NoSuchElementException("orElseThrow() called on a Left value");
         }
 
         @Override
@@ -464,12 +464,12 @@ public interface Either<E, S> {
         }
 
         @Override
-        public S getOrElse(S defaultValue) {
+        public S orElse(S defaultValue) {
             return value;
         }
 
         @Override
-        public S getOrThrow() {
+        public S orElseThrow() {
             return value;
         }
 

@@ -209,13 +209,13 @@ public interface Validated<E, T> {
      * @return          the success result value if it's a {@code Success},
      *                  otherwise return the given default value.
      */
-    T getOrElse(T defaultValue);
+    T orElse(T defaultValue);
 
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
      * @return          the wrapped value if it's a {@code Success}
      */
-    T getOrThrow();
+    T orElseThrow();
 
     /**
      * Push the result to a {@link SideEffect.F}.
@@ -366,12 +366,12 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public T getOrElse(T defaultValue) {
+        public T orElse(T defaultValue) {
             return value;
         }
 
         @Override
-        public T getOrThrow() {
+        public T orElseThrow() {
             return value;
         }
     }
@@ -451,13 +451,13 @@ public interface Validated<E, T> {
         }
 
         @Override
-        public T getOrElse(T defaultValue) {
+        public T orElse(T defaultValue) {
             return defaultValue;
         }
 
         @Override
-        public T getOrThrow() {
-            throw new RuntimeException("getOrThrow() called on a Failure value");
+        public T orElseThrow() {
+            throw new NoSuchElementException("orElseThrow() called on a Failure value");
         }
 
         @SuppressWarnings("unchecked")

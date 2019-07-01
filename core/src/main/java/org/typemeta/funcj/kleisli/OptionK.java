@@ -9,8 +9,7 @@ import org.typemeta.funcj.functions.Functions;
  * @param <U>       the value type of the returned {@code Option} type
  */
 @FunctionalInterface
-public
-interface OptionK<T, U> {
+public interface OptionK<T, U> {
     /**
      * Construct a {@code Kleisli} value from a function.
      * @param f         the function

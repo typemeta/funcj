@@ -10,8 +10,7 @@ import org.typemeta.funcj.functions.Functions;
  * @param <B>       the value type of the returned {@code State} type
  */
 @FunctionalInterface
-public
-interface StateK<S, A, B> {
+public interface StateK<S, A, B> {
     /**
      * Construct a {@code Kleisli} value from a function.
      * @param f         the function

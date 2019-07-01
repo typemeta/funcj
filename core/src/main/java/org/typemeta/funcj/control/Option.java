@@ -170,17 +170,13 @@ public interface Option<T> {
      * @param defaultValue value to be returned if this is a failure value.
      * @return          the success result value if it's a {@code Some}, otherwise return the given default value.
      */
-    T getOrElse(T defaultValue);
+    T orElseGet(T defaultValue);
 
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
      * @return          the wrapped value if it's a {@code Success}
      */
-    T getOrThrow();
-
-    T orElse(T value);
-
-    T orElseGet(F0<T> getter);
+    T orElseThrow();
 
     /**
      * Return the wrapped value if it's a {@code Some},
@@ -190,7 +186,11 @@ public interface Option<T> {
      * @return          the wrapped value if this is a {@code Some}
      * @throws X        if no value is present
      */
-    <X extends Throwable> T getOrThrow(F0<X> exSupp) throws X;
+    <X extends Throwable> T orElseThrow(F0<X> exSupp) throws X;
+
+    T orElse(T value);
+
+    T orElseGet(F0<T> getter);
 
     /**
      * Return the wrapped value if it's a {@code Some}, otherwise throw a RuntimeException.
@@ -322,12 +322,12 @@ public interface Option<T> {
         }
 
         @Override
-        public T getOrElse(T defaultValue) {
+        public T orElseGet(T defaultValue) {
             return value;
         }
 
         @Override
-        public T getOrThrow() {
+        public T orElseThrow() {
             return value;
         }
 
@@ -342,7 +342,7 @@ public interface Option<T> {
         }
 
         @Override
-        public <X extends Throwable> T getOrThrow(F0<X> exSupp) throws X {
+        public <X extends Throwable> T orElseThrow(F0<X> exSupp) throws X {
             return value;
         }
 
@@ -428,13 +428,13 @@ public interface Option<T> {
         }
 
         @Override
-        public T getOrElse(T defaultValue) {
+        public T orElseGet(T defaultValue) {
             return defaultValue;
         }
 
         @Override
-        public T getOrThrow() {
-            throw new RuntimeException("Option.getOrThrow() called on Option.None");
+        public T orElseThrow() {
+            throw new NoSuchElementException("Option.orElseThrow() called on Option.None");
         }
 
         @Override
@@ -448,13 +448,13 @@ public interface Option<T> {
         }
 
         @Override
-        public <X extends Throwable> T getOrThrow(F0<X> exSupp) throws X {
+        public <X extends Throwable> T orElseThrow(F0<X> exSupp) throws X {
             throw exSupp.apply();
         }
 
         @Override
         public T get() {
-            throw new RuntimeException("Option.getOrThrow() called on Option.None");
+            throw new RuntimeException("Option.orElseThrow() called on Option.None");
         }
 
         @Override

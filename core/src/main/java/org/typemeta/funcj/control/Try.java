@@ -176,13 +176,13 @@ public interface Try<T> {
      * @return          the success result value if it's a {@code Success},
      *                  otherwise return the given default value.
      */
-    T getOrElse(T defaultValue);
+    T orElse(T defaultValue);
 
     /**
      * Return the wrapped value if it's a {@code Success}, otherwise throw the result exception.
      * @return          the wrapped value if it's a {@code Success}
      */
-    T getOrThrow();
+    T orElseThrow();
 
     /**
      * Push the result to a {@link SideEffect.F}.
@@ -308,12 +308,12 @@ public interface Try<T> {
         }
 
         @Override
-        public T getOrElse(T defaultValue) {
+        public T orElse(T defaultValue) {
             return value;
         }
 
         @Override
-        public T getOrThrow() {
+        public T orElseThrow() {
             return value;
         }
 
@@ -403,12 +403,12 @@ public interface Try<T> {
         }
 
         @Override
-        public T getOrElse(T defaultValue) {
+        public T orElse(T defaultValue) {
             return defaultValue;
         }
 
         @Override
-        public T getOrThrow() {
+        public T orElseThrow() {
             if (error instanceof RuntimeException) {
                 throw (RuntimeException)error;
             } else {

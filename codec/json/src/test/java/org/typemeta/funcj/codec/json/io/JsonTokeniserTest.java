@@ -15,6 +15,6 @@ public class JsonTokeniserTest {
                         //System.out.println(ev);
                     }
                     return 0;
-                }).getOrThrow();
+                }).orElseThrow();
     }
 }

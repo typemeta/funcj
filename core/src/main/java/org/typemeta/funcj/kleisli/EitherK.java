@@ -10,8 +10,7 @@ import org.typemeta.funcj.functions.Functions;
  * @param <U>       the value type of the returned {@code Either} type
  */
 @FunctionalInterface
-public
-interface EitherK<E, T, U> {
+public interface EitherK<E, T, U> {
     /**
      * Construct a {@code Kleisli} value from a function.
      * @param f         the function
