@@ -8,8 +8,10 @@ import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.tuples.Tuple2;
 import org.typemeta.funcj.util.Folds;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Encoding via MessagePack byte streams.

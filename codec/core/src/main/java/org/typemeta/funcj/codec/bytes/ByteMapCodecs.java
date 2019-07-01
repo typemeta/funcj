@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.bytes;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codec;
+import org.typemeta.funcj.codec.CodecCoreEx;
 import org.typemeta.funcj.codec.MapCodecs.*;
 import org.typemeta.funcj.codec.bytes.ByteTypes.*;
 

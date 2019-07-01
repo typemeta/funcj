@@ -2,7 +2,7 @@ package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.CodecConfig;
 import org.typemeta.funcj.codec.jsonnode.*;
-import org.typemeta.funcj.json.model.*;
+import org.typemeta.funcj.json.model.JsArray;
 
 /**
  * Factory methods for creating CodecCore instances.

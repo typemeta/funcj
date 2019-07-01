@@ -1,11 +1,10 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.jsonnode.*;
-import org.typemeta.funcj.codec.xml.*;
-import org.typemeta.funcj.codec.xmlnode.XmlNodeConfigImpl;
+import org.typemeta.funcj.codec.jsonnode.JsonNodeConfigImpl;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.*;
 import java.util.*;
 
@@ -48,8 +47,6 @@ public class Example {
     public static void main(String[] args) {
         jsonTest(true);
         jsonTest(false);
-        xmlTest(true);
-        xmlTest(false);
     }
 
     static class ZonedDateTimeJsonCodec
@@ -106,7 +103,9 @@ public class Example {
             System.out.println("JSON Streaming");
             final JsonConfigImpl.BuilderImpl cfgBldr = new JsonConfigImpl.BuilderImpl();
             cfgBldr.registerAllowedPackage(Example.class.getPackage());
-            jsonCodecCore = Codecs.jsonCodec(cfgBldr);
+            final JsonCodecCore codec = Codecs.jsonCodec(cfgBldr);
+            codec.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec());
+            jsonCodecCore = codec;
         } else {
             System.out.println("JSON node");
             final JsonNodeConfigImpl.BuilderImpl cfgBldr = new JsonNodeConfigImpl.BuilderImpl();
@@ -119,7 +118,6 @@ public class Example {
                 ZonedDateTime::toString,
                 ZonedDateTime::parse);
 
-        //jsonCodecCore.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec());
 
         // Encode to JSON.
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -130,38 +128,6 @@ public class Example {
         // Decode back to Java.
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         final Person person2 = jsonCodecCore.decode(Person.class, bais);
-
-        assert(person.equals(person2));
-    }
-
-    static void xmlTest(boolean stream) {
-        final CodecAPI.IO xmlCodecCore;
-        if (stream) {
-            System.out.println("XML Streaming");
-            final XmlConfigImpl.BuilderImpl cfgBldr = new XmlConfigImpl.BuilderImpl();
-            cfgBldr.registerAllowedPackage(Example.class.getPackage());
-            xmlCodecCore = Codecs.xmlCodec(cfgBldr);
-        } else {
-            System.out.println("XML node");
-            final XmlNodeConfigImpl.BuilderImpl cfgBldr = new XmlNodeConfigImpl.BuilderImpl();
-            cfgBldr.registerAllowedPackage(Example.class.getPackage());
-            xmlCodecCore = Codecs.xmlNodeCodec(cfgBldr);
-        }
-
-        xmlCodecCore.registerStringProxyCodec(
-                ZonedDateTime.class,
-                ZonedDateTime::toString,
-                ZonedDateTime::parse);
-
-        // Encode to XML.
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        xmlCodecCore.encode(Person.class, person, baos);
-
-        System.out.println(baos);
-
-        // Decode back to Java.
-        final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final Person person2 = xmlCodecCore.decode(Person.class, bais);
 
         assert(person.equals(person2));
     }

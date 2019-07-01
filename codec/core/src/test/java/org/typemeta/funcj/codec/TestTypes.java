@@ -2,7 +2,8 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.misc.SimpleType;
 
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 

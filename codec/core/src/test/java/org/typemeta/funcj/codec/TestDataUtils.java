@@ -5,10 +5,8 @@ import java.util.*;
 public abstract class TestDataUtils {
 
     @SafeVarargs
-    public static <T> ArrayList<T> arrayList(T... vals) {
-        final ArrayList<T> l = new ArrayList<T>(vals.length);
-        l.addAll(Arrays.asList(vals));
-        return l;
+    public static <T> List<T> arrayList(T... vals) {
+        return Arrays.asList(vals);
     }
 
     public static <K, V> HashMap<K, V> hashMap(K k0, V v0, K k1, V v1) {

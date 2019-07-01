@@ -1,10 +1,10 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
-import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.functions.Functions;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Interface for classes which provide an encoding of values of any type,

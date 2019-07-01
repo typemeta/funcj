@@ -1,12 +1,12 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.bytes.*;
-import org.typemeta.funcj.codec.utils.*;
-import org.typemeta.funcj.codec.xml.*;
-import org.typemeta.funcj.codec.xmlnode.*;
+import org.typemeta.funcj.codec.utils.CodecException;
+import org.typemeta.funcj.codec.utils.ReflectionUtils;
 import org.typemeta.funcj.functions.Functions.F;
 
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.*;
 import java.util.*;
 
@@ -14,30 +14,6 @@ import java.util.*;
  * Factory methods for creating CodecCore instances.
  */
 public abstract class Codecs {
-
-    /**
-     * Construct and return a new instance of a {@link XmlCodecCore}.
-     * @return the new {@code XmlCodecCore}
-     */
-    public static XmlCodecCore xmlCodec() {
-        return xmlCodec(new XmlConfigImpl.BuilderImpl());
-    }
-
-    public static XmlCodecCore xmlCodec(CodecConfig.Builder<XmlTypes.Config> cfgBldr) {
-        return registerAll(cfgBldr, XmlCodecCore::new);
-    }
-
-    /**
-     * Construct and return a new instance of a {@link XmlCodecCore}.
-     * @return the new {@code XmlCodecCore}
-     */
-    public static XmlNodeCodecCore xmlNodeCodec() {
-        return xmlNodeCodec(new XmlNodeConfigImpl.BuilderImpl());
-    }
-
-    public static XmlNodeCodecCore xmlNodeCodec(CodecConfig.Builder<XmlNodeConfig> cfgBldr) {
-        return registerAll(cfgBldr, XmlNodeCodecCore::new);
-    }
 
     /**
      * Construct and return a new instance of a {@link ByteCodecCore}.
@@ -122,6 +98,11 @@ public abstract class Codecs {
         // Register arg-array constructors for singleton collections..
 
         core.registerArgArrayCtor(
+                ReflectionUtils.classForName("java.util.Arrays$ArrayList"),
+                Arrays::asList
+        );
+
+        core.registerArgArrayCtor(
                 ReflectionUtils.classForName("java.util.Collections$SingletonList"),
                 args -> Collections.singletonList(args[0]));
 
@@ -147,7 +128,7 @@ public abstract class Codecs {
                     if (args.length == 0) {
                         return Collections.unmodifiableSet(Collections.emptySet());
                     } else {
-                        final Set set;
+                        final Set<Object> set;
 
                         if (args[0] instanceof Comparable) {
                             set = new TreeSet<>();
@@ -166,7 +147,7 @@ public abstract class Codecs {
                     if (args.length == 0) {
                         return Collections.unmodifiableSet(Collections.emptySet());
                     } else {
-                        final NavigableSet set = new TreeSet<>();
+                        final NavigableSet<Object> set = new TreeSet<>();
                         Collections.addAll(set, args);
                         return Collections.unmodifiableNavigableSet(set);
                     }
@@ -178,7 +159,7 @@ public abstract class Codecs {
                     if (args.length == 0) {
                         return Collections.unmodifiableSet(Collections.emptySet());
                     } else {
-                        final SortedSet set = new TreeSet<>();
+                        final SortedSet<Object> set = new TreeSet<>();
                         Collections.addAll(set, args);
                         return Collections.unmodifiableSortedSet(set);
                     }
@@ -188,15 +169,15 @@ public abstract class Codecs {
                 ReflectionUtils.classForName("java.util.Collections$UnmodifiableMap"),
                 args -> {
                     if (args.length == 0) {
-                        return Collections.unmodifiableMap(Collections.emptyMap());
+                        return Collections.emptyMap();
                     } else if (args.length % 2 != 0) {
                         throw new CodecException("Argument list length (" + args.length + ") it not a multiple of 2");
                     } else {
-                        final Map map;
+                        final Map<Object, Object> map;
                         if (args[0] instanceof Comparable) {
-                            map = new TreeMap();
+                            map = new TreeMap<>();
                         } else {
-                            map = new HashMap();
+                            map = new HashMap<>();
                         }
                         for (int i = 0; i < args.length; i += 2) {
                             map.put(args[i], args[i+1]);
@@ -209,11 +190,11 @@ public abstract class Codecs {
                 ReflectionUtils.classForName("java.util.Collections$UnmodifiableNavigableMap"),
                 args -> {
                     if (args.length == 0) {
-                        return Collections.unmodifiableMap(Collections.emptyMap());
+                        return Collections.emptyMap();
                     } else if (args.length % 2 != 0) {
                         throw new CodecException("Argument list length (" + args.length + ") it not a multiple of 2");
                     } else {
-                        final NavigableMap map = new TreeMap();
+                        final NavigableMap<Object, Object> map = new TreeMap<>();
                         for (int i = 0; i < args.length; i += 2) {
                             map.put(args[i], args[i+1]);
                         }
@@ -225,11 +206,11 @@ public abstract class Codecs {
                 ReflectionUtils.classForName("java.util.Collections$UnmodifiableSortedMap"),
                 args -> {
                     if (args.length == 0) {
-                        return Collections.unmodifiableMap(Collections.emptyMap());
+                        return Collections.emptyMap();
                     } else if (args.length % 2 != 0) {
                         throw new CodecException("Argument list length (" + args.length + ") it not a multiple of 2");
                     } else {
-                        final NavigableMap map = new TreeMap();
+                        final NavigableMap<Object, Object> map = new TreeMap<>();
                         for (int i = 0; i < args.length; i += 2) {
                             map.put(args[i], args[i+1]);
                         }

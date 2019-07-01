@@ -1,7 +1,8 @@
 package org.typemeta.funcj.codec.bytes;
 
 import org.typemeta.funcj.codec.CodecConfig;
-import org.typemeta.funcj.codec.bytes.io.*;
+import org.typemeta.funcj.codec.bytes.io.InputImpl;
+import org.typemeta.funcj.codec.bytes.io.OutputImpl;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 
 import java.io.*;

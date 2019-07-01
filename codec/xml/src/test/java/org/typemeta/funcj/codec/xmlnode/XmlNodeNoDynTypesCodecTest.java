@@ -2,8 +2,10 @@ package org.typemeta.funcj.codec.xmlnode;
 
 import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.xml.Codecs;
 import org.typemeta.funcj.functions.Functions;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.parsers.*;
 import java.io.StringWriter;

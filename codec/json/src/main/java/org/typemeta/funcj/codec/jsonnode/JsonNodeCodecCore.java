@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.jsonnode;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecAPI;
+import org.typemeta.funcj.codec.CodecCoreDelegate;
 import org.typemeta.funcj.codec.impl.CodecCoreImpl;
 import org.typemeta.funcj.json.model.JSAPI;
 import org.typemeta.funcj.json.model.JsValue;

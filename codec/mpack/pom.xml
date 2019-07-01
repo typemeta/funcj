@@ -12,7 +12,7 @@
     </parent>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>MessagePack codec.</description>
+    <description>MessagePack codec</description>
 
     <packaging>jar</packaging>
 

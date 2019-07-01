@@ -1,9 +1,11 @@
 package org.typemeta.funcj.codec.xmlnode;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecAPI;
+import org.typemeta.funcj.codec.CodecCoreDelegate;
 import org.typemeta.funcj.codec.impl.CodecCoreImpl;
 import org.typemeta.funcj.codec.utils.CodecException;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.*;

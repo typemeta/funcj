@@ -3,12 +3,13 @@ package org.typemeta.funcj.codec.impl;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.codec.utils.*;
-import org.typemeta.funcj.codec.xml.*;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;

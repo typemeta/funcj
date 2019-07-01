@@ -1,11 +1,14 @@
 package org.typemeta.funcj.codec.xmlnode;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.typemeta.funcj.codec.*;
-import org.w3c.dom.*;
+import org.typemeta.funcj.codec.xml.Codecs;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.parsers.*;
-import java.io.*;
+import java.io.StringWriter;
 
 public class XmlNodeCodecTest extends TestBase {
 

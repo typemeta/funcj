@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.functions.Functions;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
 
 public class XmlNoDynTypesCodecTest extends TestBase {
 

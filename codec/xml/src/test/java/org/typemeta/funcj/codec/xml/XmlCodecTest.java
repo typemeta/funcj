@@ -1,6 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.xml.XmlTypes.Config;
 
