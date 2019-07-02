@@ -49,4 +49,8 @@ public abstract class MpackTypes {
     public static OutStream outputOf(OutputStream os) {
         return new OutputImpl(MessagePack.newDefaultPacker(os));
     }
+
+    public static MpackConfigImpl.BuilderImpl configBuilder() {
+        return new MpackConfigImpl.BuilderImpl();
+    }
 }

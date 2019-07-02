@@ -11,7 +11,7 @@ public class MpackCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final MpackConfigImpl.BuilderImpl cfgBldr = new MpackConfigImpl.BuilderImpl();
+        final MpackConfigImpl.BuilderImpl cfgBldr = MpackTypes.configBuilder();
         final MpackCodecCore codec = prepareCodecCore(cfgBldr, Codecs::mpackCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();

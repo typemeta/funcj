@@ -10,8 +10,8 @@ public class XmlNoDynTypesCodecTest extends TestBase {
 
     protected static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
     CORE prepareCodecCore(
-            CodecConfig.Builder<CFG> cfgBldr,
-            Functions.F<CodecConfig.Builder<CFG>, CORE> coreBldr
+            CodecConfig.Builder<?, CFG> cfgBldr,
+            Functions.F<CodecConfig.Builder<?, CFG>, CORE> coreBldr
     ) {
         cfgBldr.registerAllowedPackage(TestTypes.class.getPackage());
         return TestBase.prepareCodecCore(cfgBldr, coreBldr);
@@ -19,7 +19,7 @@ public class XmlNoDynTypesCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final CodecConfig.Builder<XmlTypes.Config> cfgBldr = new XmlConfigImpl.BuilderImpl();
+        final XmlConfigImpl.BuilderImpl cfgBldr = XmlTypes.configBuilder();
         cfgBldr.dynamicTypeTags(false);
         cfgBldr.failOnNoTypeConstructor(false);
 

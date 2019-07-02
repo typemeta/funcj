@@ -134,8 +134,9 @@ public class JsValueCodecTest {
 
     @Test
     public void testMixedJsv() {
-        final JsonConfigImpl.BuilderImpl cfgBldr = new JsonConfigImpl.BuilderImpl();
-        cfgBldr.registerAllowedClass(Mixed.class);
+        final JsonConfigImpl.BuilderImpl cfgBldr =
+                JsonTypes.configBuilder()
+                        .registerAllowedClass(Mixed.class);
 
         final JsonCodecCore codec = Codecs.jsonCodec(cfgBldr);
 

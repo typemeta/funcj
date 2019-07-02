@@ -8,7 +8,7 @@ import org.typemeta.funcj.codec.utils.NotSupportedException;
  */
 public class MpackConfigImpl extends CodecConfigImpl implements MpackTypes.Config {
 
-    public static class BuilderImpl extends AbstractBuilder<MpackTypes.Config> {
+    public static class BuilderImpl extends AbstractBuilder<BuilderImpl, MpackTypes.Config> {
 
         @Override
         public MpackTypes.Config build() {
@@ -16,17 +16,17 @@ public class MpackConfigImpl extends CodecConfigImpl implements MpackTypes.Confi
         }
 
         @Override
-        public void dynamicTypeTags(boolean enable) {
+        public BuilderImpl dynamicTypeTags(boolean enable) {
             throw new NotSupportedException();
         }
 
         @Override
-        public void failOnNoTypeConstructor(boolean enable) {
+        public BuilderImpl failOnNoTypeConstructor(boolean enable) {
             throw new NotSupportedException();
         }
 
         @Override
-        public void failOnUnrecognisedFields(boolean enable) {
+        public BuilderImpl failOnUnrecognisedFields(boolean enable) {
             throw new NotSupportedException();
         }
     }

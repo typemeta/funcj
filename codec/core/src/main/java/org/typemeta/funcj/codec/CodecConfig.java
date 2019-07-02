@@ -110,29 +110,30 @@ public interface CodecConfig {
 
     /**
      * Interface for classes which build {@link CodecConfig} implementations.
-     * @param <T>       the {@code CodecConfig} implementation type
+     * @param <B>       the builder implementation type
+     * @param <CC>      the {@code CodecConfig} implementation type
      */
-    interface Builder<T extends CodecConfig> {
+    interface Builder<B extends Builder<B, CC>, CC extends CodecConfig> {
 
         /**
          * Build an immutable {@code CodecConfig} instance
          * @return          the {@code CodecConfig} instance
          */
-        T build();
+        CC build();
 
         /**
          * Add this package to the list of allowed packages.
          * Classes in allowed packages can be constructed from their name.
          * @param pkg       the package
          */
-        void registerAllowedPackage(Package pkg);
+        B registerAllowedPackage(Package pkg);
 
         /**
          * Add this class to the list of allowed classes.
          * Allowed classes can be constructed from their name.
          * @param clazz     the class
          */
-        void registerAllowedClass(Class<?> clazz);
+        B registerAllowedClass(Class<?> clazz);
 
         /**
          * Register a type proxy for a class.
@@ -140,7 +141,7 @@ public interface CodecConfig {
          * @param clazz     the class to be mapped
          * @param proxy     the proxy type
          */
-        void registerTypeProxy(Class<?> clazz, Class<?> proxy);
+        B registerTypeProxy(Class<?> clazz, Class<?> proxy);
 
         /**
          * Register a type alias.
@@ -148,7 +149,7 @@ public interface CodecConfig {
          * @param clazz     the type to be mapped
          * @param name      the proxy type
          */
-        void registerTypeAlias(Class<?> clazz, String name);
+        B registerTypeAlias(Class<?> clazz, String name);
 
         /**
          * Register a collection implementation as a default for that collection type.
@@ -157,7 +158,7 @@ public interface CodecConfig {
          * @param implClass the collection implementation
          * @param <T>       the collection interface type
          */
-        <T> void registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass);
+        <T> B registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass);
 
         /**
          * Specify whether dynamic type information should be encoded.
@@ -165,20 +166,20 @@ public interface CodecConfig {
          * Disabling it may prevent data from round-tripping successfully.
          * @param enable    specify whether dynamic type information should be encoded
          */
-        void dynamicTypeTags(boolean enable);
+        B dynamicTypeTags(boolean enable);
 
         /**
          * Specify whether the codec should fail if no type constructor is found.
          * By default this is enabled.
          * @param enable    specify whether the the codec should fail if no type constructor is found.
          */
-        void failOnNoTypeConstructor(boolean enable);
+        B failOnNoTypeConstructor(boolean enable);
 
         /**
          * Specify whether an unrecognised field should give rise to an error.
          * By default this is enabled.
          * @param enable    specify whether an unrecognised field should give rise to an error.
          */
-        void failOnUnrecognisedFields(boolean enable);
+        B failOnUnrecognisedFields(boolean enable);
     }
 }

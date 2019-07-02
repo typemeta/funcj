@@ -23,13 +23,13 @@ public abstract class Codecs {
         return byteCodec(new ByteConfigImpl.BuilderImpl());
     }
 
-    public static ByteCodecCore byteCodec(CodecConfig.Builder<ByteTypes.Config> cfgBldr) {
+    public static ByteCodecCore byteCodec(CodecConfig.Builder<?, ByteTypes.Config> cfgBldr) {
         return registerAll(cfgBldr, ByteCodecCore::new);
     }
 
     @SuppressWarnings("unchecked")
     public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
-    CORE registerAll(CodecConfig.Builder<CFG> cfgBldr, F<CFG, CORE> coreBldr) {
+    CORE registerAll(CodecConfig.Builder<?, CFG> cfgBldr, F<CFG, CORE> coreBldr) {
 
         // Register allowed packages and classes.
 

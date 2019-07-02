@@ -16,7 +16,7 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
         return xmlCodec(new XmlConfigImpl.BuilderImpl());
     }
 
-    public static XmlCodecCore xmlCodec(CodecConfig.Builder<XmlTypes.Config> cfgBldr) {
+    public static XmlCodecCore xmlCodec(CodecConfig.Builder<?, XmlTypes.Config> cfgBldr) {
         return registerAll(cfgBldr, XmlCodecCore::new);
     }
 
@@ -28,7 +28,7 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
         return xmlNodeCodec(new XmlNodeConfigImpl.BuilderImpl());
     }
 
-    public static XmlNodeCodecCore xmlNodeCodec(CodecConfig.Builder<XmlNodeConfig> cfgBldr) {
+    public static XmlNodeCodecCore xmlNodeCodec(CodecConfig.Builder<?, XmlNodeConfig> cfgBldr) {
         return registerAll(cfgBldr, XmlNodeCodecCore::new);
     }
 }

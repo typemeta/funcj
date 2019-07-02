@@ -55,8 +55,9 @@ public class XmlNodeCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final CodecConfig.Builder<XmlNodeConfig> cfgBldr = new XmlNodeConfigImpl.BuilderImpl();
-        cfgBldr.failOnUnrecognisedFields(false);
+        final XmlNodeConfigImpl.BuilderImpl cfgBldr =
+                XmlNodeTypes.configBuilder()
+                        .failOnUnrecognisedFields(false);
 
         final XmlNodeCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlNodeCodec);
 

@@ -17,7 +17,7 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
         return jsonCodec(new JsonConfigImpl.BuilderImpl());
     }
 
-    public static JsonCodecCore jsonCodec(CodecConfig.Builder<JsonTypes.Config> cfgBldr) {
+    public static JsonCodecCore jsonCodec(CodecConfig.Builder<?, JsonTypes.Config> cfgBldr) {
         cfgBldr.registerAllowedPackage(JsArray.class.getPackage());
         final JsonCodecCore core = registerAll(cfgBldr, JsonCodecCore::new);
         return JsValueCodec.registerAll(core);
@@ -31,7 +31,7 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
         return jsonNodeCodec(new JsonNodeConfigImpl.BuilderImpl());
     }
 
-    public static JsonNodeCodecCore jsonNodeCodec(CodecConfig.Builder<JsonNodeConfig> cfgBldr) {
+    public static JsonNodeCodecCore jsonNodeCodec(CodecConfig.Builder<?, JsonNodeConfig> cfgBldr) {
         return registerAll(cfgBldr, JsonNodeCodecCore::new);
     }
 }

@@ -13,9 +13,11 @@ public class CodecConfigImpl implements CodecConfig {
 
     /**
      * Abstract base class for {@link Builder} implementations.
-     * @param <T>       the {@code CodecConfig} implementation type
+     * @param <B>       the builder implementation type
+     * @param <CC>      the {@code CodecConfig} implementation type
      */
-    public static abstract class AbstractBuilder<T extends CodecConfig> implements Builder<T> {
+    @SuppressWarnings("unchecked")
+    public static abstract class AbstractBuilder<B extends Builder<B, CC>, CC extends CodecConfig> implements Builder<B, CC> {
 
         protected final Set<Package> allowedPackages =
                 new TreeSet<>(Comparator.comparing(Package::getName));
@@ -45,45 +47,53 @@ public class CodecConfigImpl implements CodecConfig {
         protected boolean failOnUnrecognisedFields = true;
 
         @Override
-        public void registerAllowedPackage(Package pkg) {
+        public B registerAllowedPackage(Package pkg) {
             allowedPackages.add(pkg);
+            return (B)this;
         }
 
         @Override
-        public void registerAllowedClass(Class<?> clazz) {
+        public B registerAllowedClass(Class<?> clazz) {
             allowedClasses.add(clazz);
+            return (B)this;
         }
 
         @Override
-        public void registerTypeProxy(Class<?> clazz, Class<?> proxy) {
+        public B registerTypeProxy(Class<?> clazz, Class<?> proxy) {
             typeProxyRegistry.put(clazz, proxy);
+            return (B)this;
         }
 
         @Override
-        public void registerTypeAlias(Class<?> clazz, String name) {
+        public B registerTypeAlias(Class<?> clazz, String name) {
             classToNameMap.put(clazz, name);
             nameToClassMap.put(name, clazz);
+            return (B)this;
         }
 
         @Override
-        public <T> void registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass) {
+        public <T> B registerDefaultCollectionType(Class<T> intfClass, Class<? extends T> implClass) {
             defaultCollectionTypes.computeIfAbsent(intfClass, u -> new ArrayList<>())
                     .add(implClass);
+            return (B)this;
         }
 
         @Override
-        public void dynamicTypeTags(boolean enable) {
+        public B dynamicTypeTags(boolean enable) {
             dynamicTypeTags = enable;
+            return (B)this;
         }
 
         @Override
-        public void failOnNoTypeConstructor(boolean enable) {
+        public B failOnNoTypeConstructor(boolean enable) {
             failOnNoTypeConstructor = enable;
+            return (B)this;
         }
 
         @Override
-        public void failOnUnrecognisedFields(boolean enable) {
+        public B failOnUnrecognisedFields(boolean enable) {
             failOnUnrecognisedFields = enable;
+            return (B)this;
         }
     }
 
@@ -121,7 +131,7 @@ public class CodecConfigImpl implements CodecConfig {
         this.failOnUnrecognisedFields = true;
     }
 
-    protected CodecConfigImpl(AbstractBuilder<? extends CodecConfig> builder) {
+    protected CodecConfigImpl(AbstractBuilder<? extends Builder, ? extends CodecConfig> builder) {
         this.allowedPackages = builder.allowedPackages;
         this.allowedClasses = builder.allowedClasses;
         this.classToNameMap = builder.classToNameMap;

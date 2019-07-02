@@ -10,8 +10,8 @@ public class JsonCodecNoDynTypesTest extends TestBase {
 
     protected static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
     CORE prepareCodecCore(
-            CodecConfig.Builder<CFG> cfgBldr,
-            Functions.F<CodecConfig.Builder<CFG>, CORE> coreBldr
+            CodecConfig.Builder<?, CFG> cfgBldr,
+            Functions.F<CodecConfig.Builder<?, CFG>, CORE> coreBldr
     ) {
         cfgBldr.registerAllowedPackage(TestTypes.class.getPackage());
         return TestBase.prepareCodecCore(cfgBldr, coreBldr);
@@ -19,9 +19,10 @@ public class JsonCodecNoDynTypesTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final JsonConfigImpl.BuilderImpl cfgBldr = new JsonConfigImpl.BuilderImpl();
-        cfgBldr.dynamicTypeTags(false);
-        cfgBldr.failOnNoTypeConstructor(false);
+        final JsonConfigImpl.BuilderImpl cfgBldr =
+                JsonTypes.configBuilder()
+                        .dynamicTypeTags(false)
+                        .failOnNoTypeConstructor(false);
 
         final JsonCodecCore codec = prepareCodecCore(cfgBldr, Codecs::jsonCodec);
 

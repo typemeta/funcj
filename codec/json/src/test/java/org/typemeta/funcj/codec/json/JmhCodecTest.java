@@ -14,7 +14,7 @@ public class JmhCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final JsonConfigImpl.BuilderImpl cfgBldr = new JsonConfigImpl.BuilderImpl();
+        final JsonConfigImpl.BuilderImpl cfgBldr = JsonTypes.configBuilder();
         final JsonCodecCore codec = prepareCodecCore(cfgBldr, Codecs::jsonCodec);
 
         final StringWriter sw = new StringWriter();

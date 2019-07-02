@@ -14,7 +14,8 @@ public class GzipBytesCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) throws Exception {
-        final ByteCodecCore codec = prepareCodecCore(new ByteConfigImpl.BuilderImpl(), Codecs::byteCodec);
+        final ByteConfigImpl.BuilderImpl cfgBldr = ByteTypes.configBuilder();
+        final ByteCodecCore codec = prepareCodecCore(cfgBldr, Codecs::byteCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final GZIPOutputStream gzos = new GZIPOutputStream(baos);

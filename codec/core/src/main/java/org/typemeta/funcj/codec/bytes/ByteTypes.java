@@ -43,4 +43,8 @@ public abstract class ByteTypes {
     public static OutStream outputOf(DataOutput output) {
         return new OutputImpl(output);
     }
+
+    public static ByteConfigImpl.BuilderImpl configBuilder() {
+        return new ByteConfigImpl.BuilderImpl();
+    }
 }

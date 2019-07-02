@@ -24,8 +24,8 @@ public class XmlNodeNoDynTypesCodecTest extends TestBase {
 
     protected static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
     CORE prepareCodecCore(
-            CodecConfig.Builder<CFG> cfgBldr,
-            Functions.F<CodecConfig.Builder<CFG>, CORE> coreBldr
+            CodecConfig.Builder<?, CFG> cfgBldr,
+            Functions.F<CodecConfig.Builder<?, CFG>, CORE> coreBldr
     ) {
         cfgBldr.registerAllowedPackage(TestTypes.class.getPackage());
         return TestBase.prepareCodecCore(cfgBldr, coreBldr);
@@ -33,9 +33,10 @@ public class XmlNodeNoDynTypesCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final CodecConfig.Builder<XmlNodeConfig> cfgBldr = new XmlNodeConfigImpl.BuilderImpl();
-        cfgBldr.dynamicTypeTags(false);
-        cfgBldr.failOnNoTypeConstructor(false);
+        final XmlNodeConfigImpl.BuilderImpl cfgBldr =
+                XmlNodeTypes.configBuilder()
+                        .dynamicTypeTags(false)
+                        .failOnNoTypeConstructor(false);
 
         final XmlNodeCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlNodeCodec);
 

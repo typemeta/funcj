@@ -12,7 +12,7 @@ public class BytesCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final ByteConfigImpl.BuilderImpl cfgBldr = new ByteConfigImpl.BuilderImpl();
+        final ByteConfigImpl.BuilderImpl cfgBldr = ByteTypes.configBuilder();
         final ByteCodecCore codec = prepareCodecCore(cfgBldr, Codecs::byteCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();

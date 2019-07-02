@@ -14,7 +14,7 @@ public class JsonCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final JsonNodeConfigImpl.BuilderImpl cfgBldr = new JsonNodeConfigImpl.BuilderImpl();
+        final JsonNodeConfigImpl.BuilderImpl cfgBldr = JsonNodeTypes.configBuilder();
         final JsonNodeCodecCore codec = prepareCodecCore(cfgBldr, Codecs::jsonNodeCodec);
 
         final JsValue jsv = codec.encode(clazz, val);
@@ -40,8 +40,9 @@ public class JsonCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final JsonNodeConfigImpl.BuilderImpl cfgBldr = new JsonNodeConfigImpl.BuilderImpl();
-        cfgBldr.failOnUnrecognisedFields(false);
+        final JsonNodeConfigImpl.BuilderImpl cfgBldr =
+                JsonNodeTypes.configBuilder()
+                        .failOnUnrecognisedFields(false);
 
         final JsonNodeCodecCore codec = prepareCodecCore(cfgBldr, Codecs::jsonNodeCodec);
 

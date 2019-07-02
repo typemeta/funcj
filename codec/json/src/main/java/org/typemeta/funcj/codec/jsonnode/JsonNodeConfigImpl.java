@@ -7,7 +7,7 @@ import org.typemeta.funcj.codec.impl.CodecConfigImpl;
  */
 public class JsonNodeConfigImpl extends CodecConfigImpl implements JsonNodeConfig {
 
-    public static class BuilderImpl extends AbstractBuilder<JsonNodeConfig> {
+    public static class BuilderImpl extends AbstractBuilder<BuilderImpl, JsonNodeConfig> {
 
         @Override
         public JsonNodeConfig build() {

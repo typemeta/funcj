@@ -13,7 +13,7 @@ public class XmlCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) throws IOException {
-        final XmlConfigImpl.BuilderImpl cfgBldr = new XmlConfigImpl.BuilderImpl();
+        final XmlConfigImpl.BuilderImpl cfgBldr = XmlTypes.configBuilder();
         final XmlCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -52,9 +52,11 @@ public class XmlCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final CodecConfig.Builder<Config> cfgBldr = new XmlConfigImpl.BuilderImpl();
-        cfgBldr.failOnUnrecognisedFields(false);
+        final XmlConfigImpl.BuilderImpl cfgBldr =
+                XmlTypes.configBuilder()
+                        .failOnUnrecognisedFields(false);
         final XmlCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlCodec);
+
         final TestTypes.Custom val = new TestTypes.Custom(TestTypes.Init.INIT);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();

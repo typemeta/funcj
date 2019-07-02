@@ -10,7 +10,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.math.BigDecimal;
 
-public class JsonTypes {
+public abstract class JsonTypes {
 
     /**
      * Interface for classes which provide configuration information
@@ -84,4 +84,7 @@ public class JsonTypes {
         return new JsonGenerator(writer);
     }
 
+    public static JsonConfigImpl.BuilderImpl configBuilder() {
+        return new JsonConfigImpl.BuilderImpl();
+    }
 }

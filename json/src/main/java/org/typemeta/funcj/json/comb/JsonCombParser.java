@@ -12,7 +12,7 @@ import static org.typemeta.funcj.parser.Parser.pure;
 import static org.typemeta.funcj.parser.Text.*;
 
 /**
- * A parser for JSON.
+ * A combinator parser for JSON.
  * Adapted from the Haskell Parsec-based JSON parser:
  * https://hackage.haskell.org/package/json
  */

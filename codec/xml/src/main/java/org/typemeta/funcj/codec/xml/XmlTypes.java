@@ -10,7 +10,7 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 import java.math.BigDecimal;
 
-public class XmlTypes {
+public abstract class XmlTypes {
 
     /**
      * Interface for classes which provide configuration information
@@ -120,5 +120,9 @@ public class XmlTypes {
 
     public static OutStream outputOf(OutputStream os, String rootElemName) {
         return OutputImpl.outputOf(os, rootElemName);
+    }
+
+    public static XmlConfigImpl.BuilderImpl configBuilder() {
+        return new XmlConfigImpl.BuilderImpl();
     }
 }

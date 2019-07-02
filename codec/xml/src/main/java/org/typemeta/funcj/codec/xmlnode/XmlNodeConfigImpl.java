@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class XmlNodeConfigImpl extends CodecConfigImpl implements XmlNodeConfig {
 
-    public static class BuilderImpl extends AbstractBuilder<XmlNodeConfig> {
+    public static class BuilderImpl extends AbstractBuilder<BuilderImpl, XmlNodeConfig> {
 
         @Override
         public XmlNodeConfig build() {

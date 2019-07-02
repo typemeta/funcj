@@ -26,10 +26,9 @@ public abstract class TestBase {
     @SuppressWarnings("unchecked")
     protected static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
     CORE prepareCodecCore(
-            CodecConfig.Builder<CFG> cfgBldr,
-            Functions.F<CodecConfig.Builder<CFG>, CORE> coreBldr
+            CodecConfig.Builder<?, CFG> cfgBldr,
+            Functions.F<CodecConfig.Builder<?, CFG>, CORE> coreBldr
     ) {
-
         cfgBldr.registerAllowedPackage(TestTypes.class.getPackage());
 
         // Construct the CodecCore implementation.
