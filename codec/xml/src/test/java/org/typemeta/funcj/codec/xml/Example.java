@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecAPI;
 import org.typemeta.funcj.codec.xmlnode.XmlNodeConfigImpl;
 
 import java.io.ByteArrayInputStream;

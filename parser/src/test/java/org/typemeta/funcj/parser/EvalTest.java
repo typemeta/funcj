@@ -2,10 +2,12 @@ package org.typemeta.funcj.parser;
 
 import org.junit.Test;
 import org.typemeta.funcj.data.Chr;
-import org.typemeta.funcj.functions.Functions.*;
+import org.typemeta.funcj.functions.Functions.Op;
+import org.typemeta.funcj.functions.Functions.Op2;
 
 import static org.typemeta.funcj.parser.Combinators.choice;
-import static org.typemeta.funcj.parser.Text.*;
+import static org.typemeta.funcj.parser.Text.chr;
+import static org.typemeta.funcj.parser.Text.intr;
 
 public class EvalTest {
 

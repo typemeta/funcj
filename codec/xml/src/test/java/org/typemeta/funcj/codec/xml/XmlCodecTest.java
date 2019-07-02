@@ -2,8 +2,8 @@ package org.typemeta.funcj.codec.xml;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.xml.XmlTypes.Config;
+import org.typemeta.funcj.codec.TestBase;
+import org.typemeta.funcj.codec.TestTypes;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

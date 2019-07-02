@@ -2,7 +2,8 @@ package org.typemeta.funcj.json.algebras;
 
 import org.typemeta.funcj.json.model.*;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * An identity object algebra,

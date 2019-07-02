@@ -1,7 +1,6 @@
 package org.typemeta.funcj.json.algebras;
 
 import org.typemeta.funcj.functions.SideEffect;
-import org.typemeta.funcj.json.model.Utils;
 import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.util.Exceptions;
 

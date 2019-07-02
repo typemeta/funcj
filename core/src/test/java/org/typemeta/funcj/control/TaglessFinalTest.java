@@ -3,8 +3,10 @@ package org.typemeta.funcj.control;
 import org.typemeta.funcj.data.Unit;
 import org.typemeta.funcj.functions.Functions.F;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class TaglessFinalTest {
 

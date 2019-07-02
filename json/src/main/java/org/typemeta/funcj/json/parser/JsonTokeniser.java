@@ -1,6 +1,7 @@
 package org.typemeta.funcj.json.parser;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.*;
 
 /**

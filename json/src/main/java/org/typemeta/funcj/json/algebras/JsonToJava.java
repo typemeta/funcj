@@ -3,7 +3,8 @@ package org.typemeta.funcj.json.algebras;
 import org.typemeta.funcj.json.comb.JsonCombParser;
 import org.typemeta.funcj.json.model.JsonAlg;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * An algebra for converting JsValue objects to raw java data.

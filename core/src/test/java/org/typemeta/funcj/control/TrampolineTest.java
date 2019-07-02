@@ -1,8 +1,10 @@
 package org.typemeta.funcj.control;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 
-import static org.typemeta.funcj.control.Trampoline.*;
+import static org.typemeta.funcj.control.Trampoline.defer;
+import static org.typemeta.funcj.control.Trampoline.done;
 
 public class TrampolineTest {
     @Test

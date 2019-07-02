@@ -2,10 +2,11 @@ package org.typemeta.funcj.control;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.kleisli.OptionK;
 import org.typemeta.funcj.data.IList;
+import org.typemeta.funcj.kleisli.OptionK;
 import org.typemeta.funcj.util.Functors;
 
 import java.util.*;

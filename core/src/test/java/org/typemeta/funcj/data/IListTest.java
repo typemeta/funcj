@@ -1,6 +1,7 @@
 package org.typemeta.funcj.data;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 

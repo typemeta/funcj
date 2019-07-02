@@ -2,7 +2,8 @@ package org.typemeta.funcj.codec.xmlnode;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.TestBase;
+import org.typemeta.funcj.codec.TestTypes;
 import org.typemeta.funcj.codec.xml.Codecs;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

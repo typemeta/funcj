@@ -1,6 +1,7 @@
 package org.typemeta.funcj.functions;
 
-import org.typemeta.funcj.tuples.*;
+import org.typemeta.funcj.tuples.Tuple2;
+import org.typemeta.funcj.tuples.Tuple3;
 
 import java.util.Objects;
 

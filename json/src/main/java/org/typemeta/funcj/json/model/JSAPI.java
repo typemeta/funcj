@@ -2,10 +2,12 @@ package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.data.IList;
 
-import java.text.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.*;
+import java.util.stream.Collector;
+import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toMap;
 

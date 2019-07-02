@@ -3,8 +3,10 @@ package org.typemeta.funcj.json.parser;
 import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.json.parser.JsonEvent.Type;
 
-import java.io.*;
-import java.util.*;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A parser for JSON values.
