@@ -1,7 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.tuples.Tuple2;
-
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -34,14 +32,14 @@ public abstract class MapCodecs {
 
         @Override
         public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Map<K, V> value, OUT out) {
-            final Tuple2<Boolean, OUT> nullRes = core.format().encodeNull(value, out);
-            if (nullRes._1) {
-                return nullRes._2;
+            final CodecFormat.IsNull<OUT> nullRes = core.format().encodeNull(value, out);
+            if (nullRes.isNull) {
+                return nullRes.out;
             } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
                 final Class<Map<K, V>> implCollType = core.config().getDefaultCollectionType(type());
                 return getCodec(core, implCollType).encode(core, value, out);
             } else {
-                final Tuple2<Boolean, OUT> dynRes =
+                final CodecFormat.IsNull<OUT> dynRes =
                         core.format().encodeDynamicType(
                                 core,
                                 this,
@@ -49,8 +47,8 @@ public abstract class MapCodecs {
                                 out,
                                 clazz -> getCodec(core, clazz)
                         );
-                if (dynRes._1) {
-                    return dynRes._2;
+                if (dynRes.isNull) {
+                    return dynRes.out;
                 } else {
                     return encode(core, value, out);
                 }
@@ -84,10 +82,10 @@ public abstract class MapCodecs {
         protected MapProxy<K, V> getMapProxy(CodecCoreEx<IN, OUT, CFG> core) {
             final ArgArrayTypeCtor<Map<K, V>> argArrCtor = core.getArgArrayCtor(mapType);
             if (argArrCtor != null) {
-                return new MapProxy2<K, V>(keyCodec.type(), valueCodec.type(), argArrCtor);
+                return new ArgArrayMapProxyImpl<K, V>(keyCodec.type(), valueCodec.type(), argArrCtor);
             } else {
                 final NoArgsTypeCtor<Map<K, V>> noaCtor = core.getNoArgsCtor(mapType);
-                return new MapProxy1<K, V>(noaCtor.construct());
+                return new MapProxyImpl<K, V>(noaCtor.construct());
             }
         }
     }
@@ -118,14 +116,14 @@ public abstract class MapCodecs {
 
         @Override
         public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Map<String, V> value, OUT out) {
-            final Tuple2<Boolean, OUT> nullRes = core.format().encodeNull(value, out);
-            if (nullRes._1) {
-                return nullRes._2;
+            final CodecFormat.IsNull<OUT> nullRes = core.format().encodeNull(value, out);
+            if (nullRes.isNull) {
+                return nullRes.out;
             } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
                 final Class<Map<String, V>> implCollType = core.config().getDefaultCollectionType(type());
                 return getCodec(core, implCollType).encode(core, value, out);
             } else {
-                final Tuple2<Boolean, OUT> dynRes =
+                final CodecFormat.IsNull<OUT> dynRes =
                         core.format().encodeDynamicType(
                                 core,
                                 this,
@@ -133,8 +131,8 @@ public abstract class MapCodecs {
                                 out,
                                 clazz -> getCodec(core, clazz)
                         );
-                if (dynRes._1) {
-                    return dynRes._2;
+                if (dynRes.isNull) {
+                    return dynRes.out;
                 } else {
                     return encode(core, value, out);
                 }
@@ -168,10 +166,10 @@ public abstract class MapCodecs {
         protected MapProxy<String, V> getMapProxy(CodecCoreEx<IN, OUT, CFG> core) {
             final ArgArrayTypeCtor<Map<String, V>> argArrCtor = core.getArgArrayCtor(mapType);
             if (argArrCtor != null) {
-                return new MapProxy2<String, V>(String.class, valueCodec.type(), argArrCtor);
+                return new ArgArrayMapProxyImpl<String, V>(String.class, valueCodec.type(), argArrCtor);
             } else {
                 final NoArgsTypeCtor<Map<String, V>> noaCtor = core.getNoArgsCtor(mapType);
-                return new MapProxy1<String, V>(noaCtor.construct());
+                return new MapProxyImpl<String, V>(noaCtor.construct());
             }
         }
     }
@@ -181,10 +179,10 @@ public abstract class MapCodecs {
         Map<K, V> construct();
     }
 
-    protected static class MapProxy1<K, V> implements MapProxy<K, V> {
+    protected static class MapProxyImpl<K, V> implements MapProxy<K, V> {
         protected final Map<K, V> map;
 
-        public MapProxy1(Map<K, V> map) {
+        public MapProxyImpl(Map<K, V> map) {
             this.map = map;
         }
 
@@ -199,13 +197,13 @@ public abstract class MapCodecs {
         }
     }
 
-    protected static class MapProxy2<K, V> implements MapProxy<K, V> {
+    protected static class ArgArrayMapProxyImpl<K, V> implements MapProxy<K, V> {
         final Class<K> keyType;
         final Class<V> valueType;
         final List<Object> args = new ArrayList<>();
         final ArgArrayTypeCtor<Map<K, V>> argArrCtor;
 
-        public MapProxy2(Class<K> keyType, Class<V> valueType, ArgArrayTypeCtor<Map<K, V>> argArrCtor) {
+        public ArgArrayMapProxyImpl(Class<K> keyType, Class<V> valueType, ArgArrayTypeCtor<Map<K, V>> argArrCtor) {
             this.keyType = keyType;
             this.valueType = valueType;
             this.argArrCtor = argArrCtor;
@@ -224,5 +222,4 @@ public abstract class MapCodecs {
             return argArrCtor.construct(arr);
         }
     }
-
 }

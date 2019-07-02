@@ -7,7 +7,6 @@ import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.json.parser.JsonEvent;
-import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
@@ -33,12 +32,12 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> Tuple2<Boolean, OutStream> encodeNull(T val, OutStream out) {
+    public <T> IsNull<OutStream> encodeNull(T val, OutStream out) {
         if (val == null) {
             out.writeNull();
-            return Tuple2.of(true, out);
+            return IsNull.of(true, out);
         } else {
-            return Tuple2.of(false, out);
+            return IsNull.of(false, out);
         }
     }
 
@@ -53,7 +52,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T> Tuple2<Boolean, OutStream> encodeDynamicType(
+    public <T> IsNull<OutStream> encodeDynamicType(
             CodecCoreEx<InStream, OutStream, Config> core,
             Codec<T, InStream, OutStream, Config> codec,
             T val,
@@ -62,11 +61,11 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     ) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
-            return Tuple2.of(false, out);
+            return IsNull.of(false, out);
         } else if (!config().dynamicTypeTags()) {
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             dynCodec.encode(core, val, out);
-            return Tuple2.of(true, out);
+            return IsNull.of(true, out);
         } else {
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             out.startObject();
@@ -77,7 +76,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             dynCodec.encode(core, val, out);
 
             out.endObject();
-            return Tuple2.of(true, out);
+            return IsNull.of(true, out);
         }
     }
 
@@ -691,7 +690,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, InStream, OutStream, Config> createObjectCodec(
+    public <T, RA extends ObjectMeta.Builder<T>> Codec<T, InStream, OutStream, Config> createObjectCodec(
             Class<T> type,
             ObjectMeta<T, InStream, OutStream, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
@@ -701,7 +700,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
         }
     }
 
-    protected class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected class ObjectCodec<T, RA extends ObjectMeta.Builder<T>>
             implements Codec<T, InStream, OutStream, Config> {
 
         private final Class<T> type;
@@ -773,7 +772,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
         }
     }
 
-    protected class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected class FinalObjectCodec<T, RA extends ObjectMeta.Builder<T>>
             extends ObjectCodec<T, RA>
             implements Codec.FinalCodec<T, InStream, OutStream, Config> {
 

@@ -8,15 +8,15 @@ import java.util.stream.StreamSupport;
  * @param <T>       the type of object being created
  * @param <IN>      the encoded input type
  * @param <OUT>     the encoded output type
- * @param <RA>      the concrete implementation type for {@code ResultAccumlator}
+ * @param <B>       the concrete implementation type for {@code Builder}
  */
 public interface ObjectMeta<
         T,
         IN,
         OUT,
-        RA extends ObjectMeta.ResultAccumlator<T>
-        > extends Iterable<ObjectMeta.Field<T, IN, OUT, RA>> {
-    interface ResultAccumlator<T> {
+        B extends ObjectMeta.Builder<T>
+> extends Iterable<ObjectMeta.Field<T, IN, OUT, B>> {
+    interface Builder<T> {
         T construct();
     }
 
@@ -26,9 +26,9 @@ public interface ObjectMeta<
         RA decodeField(RA acc, IN in);
     }
 
-    RA startDecode();
+    B startDecode();
 
-    default Stream<Field<T, IN, OUT, RA>> stream() {
+    default Stream<Field<T, IN, OUT, B>> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
 }

@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec.impl;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -39,21 +38,21 @@ public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
 
     @Override
     public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Collection<T> value, OUT out) {
-        final Tuple2<Boolean, OUT> nullRes = core.format().encodeNull(value, out);
-        if (nullRes._1) {
-            return nullRes._2;
+        final CodecFormat.IsNull<OUT> nullRes = core.format().encodeNull(value, out);
+        if (nullRes.isNull) {
+            return nullRes.out;
         } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
             final Class<Collection<T>> implCollType = core.config().getDefaultCollectionType(type());
             return getCodec(core, implCollType).encode(core, value, out);
         } else {
-            final Tuple2<Boolean, OUT> dynRes = core.format().encodeDynamicType(
+            final CodecFormat.IsNull<OUT> dynRes = core.format().encodeDynamicType(
                     core,
                     this,
                     value,
                     out,
                     type -> getCodec(core, type));
-            if (dynRes._1) {
-                return dynRes._2;
+            if (dynRes.isNull) {
+                return dynRes.out;
             } else {
                 return encode(core, value, out);
             }

@@ -19,13 +19,17 @@ public abstract class ByteMapCodecs {
         }
 
         @Override
-        public OutStream encodeWithCheck(CodecCoreEx<InStream, OutStream, Config> core, Map<K, V> value, OutStream out) {
-            if (core.format().encodeNull(value, out)._1) {
+        public OutStream encodeWithCheck(
+                CodecCoreEx<InStream, OutStream, Config> core,
+                Map<K, V> value,
+                OutStream out
+        ) {
+            if (core.format().encodeNull(value, out).isNull) {
                 return out;
             } else if (!core.format().encodeDynamicType(
                     core,this,
                     value, out,
-                    clazz -> getCodec(core, clazz))._1) {
+                    clazz -> getCodec(core, clazz)).isNull) {
                 return encode(core, value, out);
             } else {
                 return out;
@@ -33,7 +37,11 @@ public abstract class ByteMapCodecs {
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Map<K, V> value, OutStream out) {
+        public OutStream encode(
+                CodecCoreEx<InStream, OutStream, Config> core,
+                Map<K, V> value,
+                OutStream out
+        ) {
             core.format().intCodec().encodePrim(value.size(), out);
 
             for (Map.Entry<K, V> entry : value.entrySet()) {
@@ -72,15 +80,16 @@ public abstract class ByteMapCodecs {
         public OutStream encodeWithCheck(
                 CodecCoreEx<InStream, OutStream, Config> core,
                 Map<String, V> value,
-                OutStream out) {
-            if (core.format().encodeNull(value, out)._1) {
+                OutStream out
+        ) {
+            if (core.format().encodeNull(value, out).isNull) {
                 return out;
             } else if (!core.format().encodeDynamicType(
                     core,
                     this,
                     value,
                     out,
-                    clazz -> getCodec(core, clazz))._1) {
+                    clazz -> getCodec(core, clazz)).isNull) {
                 return encode(core, value, out);
             } else {
                 return out;
@@ -88,7 +97,11 @@ public abstract class ByteMapCodecs {
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Map<String, V> value, OutStream out) {
+        public OutStream encode(
+                CodecCoreEx<InStream, OutStream, Config> core,
+                Map<String, V> value,
+                OutStream out
+        ) {
             core.format().intCodec().encodePrim(value.size(), out);
 
             for (Map.Entry<String, V> entry : value.entrySet()) {

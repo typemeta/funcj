@@ -1,8 +1,6 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.codec.utils.ClassKey;
-import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -16,11 +14,6 @@ import java.util.function.Supplier;
  * @param <CFG>     the config type
  */
 public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore<IN, OUT, CFG> {
-
-    @Override
-    default CodecCoreEx<IN, OUT, CFG> getCodecCoreEx() {
-        return this;
-    }
 
     CodecFormat<IN, OUT, CFG> format();
 
@@ -48,13 +41,14 @@ public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore
      */
     <T> ArgMapTypeCtor<T> getArgMapTypeCtor(Class<T> clazz);
 
-    default <T> Tuple2<Boolean, OUT> encodeDynamicType(Codec<T, IN, OUT, CFG> codec, T val, OUT out) {
+    default <T> CodecFormat.IsNull<OUT> encodeDynamicType(Codec<T, IN, OUT, CFG> codec, T val, OUT out) {
         return format().encodeDynamicType(this, codec, val, out, this::getCodec);
     }
 
-    default <T> T decodeDynamicType(Class<T> clazz, IN in) {
+    default <T> T decodeDynamicType(IN in) {
         return format().decodeDynamicType(this, in);
     }
+
     /**
      * Lookup a {@code Codec} for a name, and, if one doesn't exist,
      * then create a new one using the supplier.

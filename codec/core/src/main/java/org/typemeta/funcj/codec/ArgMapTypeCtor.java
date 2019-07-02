@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.bytes;
+package org.typemeta.funcj.codec;
 
 import java.util.Map;
 

@@ -26,7 +26,7 @@ public class ObjectCodecBuilderWithArgArray<
     private final CodecCoreEx<IN, OUT, CFG> core;
     private final Class<T> clazz;
 
-    protected final Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fields = new LinkedHashMap<>();
+    protected final Map<String, FieldCodec<T, IN, OUT, CFG>> fields = new LinkedHashMap<>();
 
     public ObjectCodecBuilderWithArgArray(CodecCoreEx<IN, OUT, CFG> core, Class<T> clazz) {
         this.core = core;
@@ -42,7 +42,7 @@ public class ObjectCodecBuilderWithArgArray<
     }
 
     public <A> _1<A> field(String name, F<T, A> getter, Codec<A, IN, OUT, CFG> codec) {
-        fields.put(name, new ObjectCodecBuilder.FieldCodec<>(getter, codec));
+        fields.put(name, new FieldCodec<>(getter, codec));
         return new _1<A>();
     }
 
@@ -72,7 +72,7 @@ public class ObjectCodecBuilderWithArgArray<
         }
 
         public <B> _2<B> field(String name, F<T, B> getter, Codec<B, IN, OUT, CFG> codec) {
-            fields.put(name, new ObjectCodecBuilder.FieldCodec<>(getter, codec));
+            fields.put(name, new FieldCodec<>(getter, codec));
             return new _2<B>();
         }
 
@@ -102,7 +102,7 @@ public class ObjectCodecBuilderWithArgArray<
             }
 
             public <C> _3<C> field(String name, F<T, C> getter, Codec<C, IN, OUT, CFG> codec) {
-                fields.put(name, new ObjectCodecBuilder.FieldCodec<>(getter, codec));
+                fields.put(name, new FieldCodec<>(getter, codec));
                 return new _3<C>();
             }
 
@@ -132,7 +132,7 @@ public class ObjectCodecBuilderWithArgArray<
                 }
 
                 public <D> _4<D> field(String name, F<T, D> getter, Codec<D, IN, OUT, CFG> codec) {
-                    fields.put(name, new ObjectCodecBuilder.FieldCodec<>(getter, codec));
+                    fields.put(name, new FieldCodec<>(getter, codec));
                     return new _4<D>();
                 }
 
@@ -162,7 +162,7 @@ public class ObjectCodecBuilderWithArgArray<
                     }
 
                     public <N> _N field(String name, F<T, N> getter, Codec<N, IN, OUT, CFG> codec) {
-                        fields.put(name, new ObjectCodecBuilder.FieldCodec<>(getter, codec));
+                        fields.put(name, new FieldCodec<>(getter, codec));
                         return new _N();
                     }
 
@@ -188,7 +188,7 @@ public class ObjectCodecBuilderWithArgArray<
                         }
 
                         public <N> _N field(String name, F<T, N> getter, Codec<N, IN, OUT, CFG> codec) {
-                            fields.put(name, new ObjectCodecBuilder.FieldCodec<>(getter, codec));
+                            fields.put(name, new FieldCodec<>(getter, codec));
                             return new _N();
                         }
 

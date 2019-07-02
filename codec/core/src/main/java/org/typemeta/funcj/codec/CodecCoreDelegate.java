@@ -1,6 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.functions.Functions;
 
 import java.util.Collection;
@@ -18,11 +17,6 @@ public class CodecCoreDelegate<IN, OUT, CFG extends CodecConfig>
     @Override
     public CFG config() {
         return delegate.config();
-    }
-
-    @Override
-    public CodecCoreEx<IN, OUT, CFG> getCodecCoreEx() {
-        return delegate;
     }
 
     @Override

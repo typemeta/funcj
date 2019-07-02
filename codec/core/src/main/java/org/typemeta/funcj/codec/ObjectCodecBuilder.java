@@ -8,7 +8,7 @@ public class ObjectCodecBuilder {
             IN,
             OUT,
             CFG extends CodecConfig
-            > {
+    > {
         protected final Functions.F3<CodecCoreEx<IN, OUT, CFG>, T, OUT, OUT> encoder;
         protected final Functions.F2<CodecCoreEx<IN, OUT, CFG>, IN, Object> decoder;
 

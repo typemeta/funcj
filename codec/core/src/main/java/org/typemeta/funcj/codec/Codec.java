@@ -1,8 +1,5 @@
 package org.typemeta.funcj.codec;
 
-
-import org.typemeta.funcj.tuples.Tuple2;
-
 /**
  * Interface for classes that encapsulates the logic for encoding a value of type {@code T}
  * into an encoded value and vice versa.
@@ -23,9 +20,9 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
 
         @Override
         default OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
-            final Tuple2<Boolean, OUT> nullRes = core.format().encodeNull(value, out);
-            if (nullRes._1) {
-                return nullRes._2;
+            final CodecFormat.IsNull<OUT> nullRes = core.format().encodeNull(value, out);
+            if (nullRes.isNull) {
+                return nullRes.out;
             } else {
                 return encode(core, value, out);
             }
@@ -290,13 +287,13 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
      * @return          the encoded output stream
      */
     default OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
-        final Tuple2<Boolean, OUT> nullRes = core.format().encodeNull(value, out);
-        if (nullRes._1) {
-            return nullRes._2;
+        final CodecFormat.IsNull<OUT> nullRes = core.format().encodeNull(value, out);
+        if (nullRes.isNull) {
+            return nullRes.out;
         } else {
-            final Tuple2<Boolean, OUT> dynRes = core.encodeDynamicType(this, value, out);
-            if (dynRes._1) {
-                return dynRes._2;
+            final CodecFormat.IsNull<OUT> dynRes = core.encodeDynamicType(this, value, out);
+            if (dynRes.isNull) {
+                return dynRes.out;
             } else {
                 return encode(core, value, out);
             }
@@ -305,7 +302,7 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
 
     /**
      * Decode an encoded value of type {@code IN} back into a value of type {@code T},
-     * where the unencoded value maybe either null or of a different (sub-) type.
+     * where the decoded value maybe either null or of a different (sub-) type.
      * @param core      the codec core
      * @param in        the encoded input stream
      * @return          the decoded value
@@ -314,7 +311,7 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
         if (core.format().decodeNull(in)) {
             return null;
         } else {
-            final T value = core.decodeDynamicType(type(), in);
+            final T value = core.decodeDynamicType(in);
             if (value != null) {
                 return value;
             } else {

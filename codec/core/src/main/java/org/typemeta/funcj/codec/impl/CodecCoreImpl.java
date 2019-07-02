@@ -1,7 +1,6 @@
 package org.typemeta.funcj.codec.impl;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.codec.utils.*;
 import org.typemeta.funcj.functions.Functions;
 
@@ -140,23 +139,19 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <T> NoArgsTypeCtor<T> getNoArgsCtor(Class<T> clazz) {
         final ClassKey<?> key = ClassKey.valueOf(clazz);
 
-        NoArgsTypeCtor<T> ctor = (NoArgsTypeCtor<T>)noArgsCtorRegistry.get(key);
-
-        if (ctor != null) {
-            return ctor;
+        if (noArgsCtorRegistry.containsKey(key)) {
+            return (NoArgsTypeCtor<T>)noArgsCtorRegistry.get(key);
         } else {
-            // TODO: review this.
+            // Nothing registered, so let's try an create one.
             final NoArgsTypeCtor<T> newCtor = NoArgsTypeCtor.create(clazz);
             if (newCtor != null) {
-                ctor = (NoArgsTypeCtor<T>) noArgsCtorRegistry.putIfAbsent(key, newCtor);
-                if (ctor != null) {
-                    return ctor;
-                } else {
-                    return newCtor;
-                }
-            } else if (config().failOnNoTypeConstructor()){
+                final NoArgsTypeCtor<T> ctor = (NoArgsTypeCtor<T>) noArgsCtorRegistry.putIfAbsent(key, newCtor);
+                return ctor != null ? ctor : newCtor;
+            } else if (config().failOnNoTypeConstructor()) {
+                // Fail-fast.
                 return raiseNoTypeCtorException(clazz);
             } else {
+                // Fail lazily.
                 return () -> raiseNoTypeCtorException(clazz);
             }
         }
@@ -449,11 +444,12 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <T> Codec<T, IN, OUT, CFG> createObjectCodec(
             Class<T> clazz,
             Map<String, FieldCodec<IN, OUT, CFG>> fieldCodecs,
-            NoArgsTypeCtor<T> ctor) {
-        final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
+            NoArgsTypeCtor<T> ctor
+    ) {
+        final class BuilderImpl implements ObjectMeta.Builder<T> {
             final T val;
 
-            ResultAccumlatorImpl() {
+            BuilderImpl() {
                 this.val = ctor.construct();
             }
 
@@ -463,12 +459,12 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
             }
         }
 
-        final List<ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>> fieldMetas =
+        final List<ObjectMeta.Field<T, IN, OUT, BuilderImpl>> fieldMetas =
                 fieldCodecs.entrySet().stream()
                         .map(en -> {
                             final String name = en.getKey();
                             final FieldCodec<IN, OUT, CFG> codec = en.getValue();
-                            return new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
+                            return new ObjectMeta.Field<T, IN, OUT, BuilderImpl>() {
                                 @Override
                                 public String name() {
                                     return name;
@@ -480,7 +476,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                                 }
 
                                 @Override
-                                public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN in) {
+                                public BuilderImpl decodeField(BuilderImpl acc, IN in) {
                                     codec.decodeField(CodecCoreImpl.this, acc.val, in);
                                     return acc;
                                 }
@@ -489,15 +485,15 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
 
         return format().createObjectCodec(
                 clazz,
-                new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
+                new ObjectMeta<T, IN, OUT, BuilderImpl>() {
                         @Override
-                        public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
+                        public Iterator<Field<T, IN, OUT, BuilderImpl>> iterator() {
                             return fieldMetas.iterator();
                         }
 
                         @Override
-                        public ResultAccumlatorImpl startDecode() {
-                            return new ResultAccumlatorImpl();
+                        public BuilderImpl startDecode() {
+                            return new BuilderImpl();
                         }
                 }
         );
@@ -533,11 +529,12 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgMap(
             Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs,
-            ArgMapTypeCtor<T> ctor) {
-        final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
+            ArgMapTypeCtor<T> ctor
+    ) {
+        final class BuilderImpl implements ObjectMeta.Builder<T> {
             final Map<String, Object> ctorArgs;
 
-            ResultAccumlatorImpl() {
+            BuilderImpl() {
                 this.ctorArgs = new HashMap<>();
             }
 
@@ -547,12 +544,12 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
             }
         }
 
-        final List<ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>> fieldMetas =
+        final List<ObjectMeta.Field<T, IN, OUT, BuilderImpl>> fieldMetas =
                 fieldCodecs.entrySet().stream()
                         .map(en -> {
                             final String name = en.getKey();
                             final ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG> codec = en.getValue();
-                            return new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
+                            return new ObjectMeta.Field<T, IN, OUT, BuilderImpl>() {
                                 @Override
                                 public String name() {
                                     return name;
@@ -564,7 +561,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                                 }
 
                                 @Override
-                                public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN in) {
+                                public BuilderImpl decodeField(BuilderImpl acc, IN in) {
                                     acc.ctorArgs.put(name, codec.decodeField(CodecCoreImpl.this, in));
                                     return acc;
                                 }
@@ -573,15 +570,15 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
 
         return format().createObjectCodec(
                 clazz,
-                new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
+                new ObjectMeta<T, IN, OUT, BuilderImpl>() {
                     @Override
-                    public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
+                    public Iterator<Field<T, IN, OUT, BuilderImpl>> iterator() {
                         return fieldMetas.iterator();
                     }
 
                     @Override
-                    public ResultAccumlatorImpl startDecode() {
-                        return new ResultAccumlatorImpl();
+                    public BuilderImpl startDecode() {
+                        return new BuilderImpl();
                     }
                 }
         );
@@ -590,7 +587,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgArray(
             Class<T> clazz,
-            ArgArrayTypeCtor<T> ctor) {
+            ArgArrayTypeCtor<T> ctor
+    ) {
         final Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs = buildFieldCodecs(clazz);
         return createObjectCodecWithArgArray(clazz, fieldCodecs, ctor);
     }
@@ -599,12 +597,13 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     public <T> Codec<T, IN, OUT, CFG> createObjectCodecWithArgArray(
             Class<T> clazz,
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs,
-            ArgArrayTypeCtor<T> ctor) {
-        final class ResultAccumlatorImpl implements ObjectMeta.ResultAccumlator<T> {
+            ArgArrayTypeCtor<T> ctor
+    ) {
+        final class BuilderImpl implements ObjectMeta.Builder<T> {
             final Object[] ctorArgs;
             int i = 0;
 
-            ResultAccumlatorImpl() {
+            BuilderImpl() {
                 this.ctorArgs = new Object[fieldCodecs.size()];
             }
 
@@ -614,12 +613,12 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
             }
         }
 
-        final List<ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>> fieldMetas =
+        final List<ObjectMeta.Field<T, IN, OUT, BuilderImpl>> fieldMetas =
                 fieldCodecs.entrySet().stream()
                         .map(en -> {
                             final String name = en.getKey();
                             final ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG> codec = en.getValue();
-                            return new ObjectMeta.Field<T, IN, OUT, ResultAccumlatorImpl>() {
+                            return new ObjectMeta.Field<T, IN, OUT, BuilderImpl>() {
                                 @Override
                                 public String name() {
                                     return name;
@@ -631,7 +630,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                                 }
 
                                 @Override
-                                public ResultAccumlatorImpl decodeField(ResultAccumlatorImpl acc, IN in) {
+                                public BuilderImpl decodeField(BuilderImpl acc, IN in) {
                                     acc.ctorArgs[acc.i++] = codec.decodeField(CodecCoreImpl.this, in);
                                     return acc;
                                 }
@@ -640,15 +639,15 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
 
         return format().createObjectCodec(
                 clazz,
-                new ObjectMeta<T, IN, OUT, ResultAccumlatorImpl>() {
+                new ObjectMeta<T, IN, OUT, BuilderImpl>() {
                     @Override
-                    public Iterator<Field<T, IN, OUT, ResultAccumlatorImpl>> iterator() {
+                    public Iterator<Field<T, IN, OUT, BuilderImpl>> iterator() {
                         return fieldMetas.iterator();
                     }
 
                     @Override
-                    public ResultAccumlatorImpl startDecode() {
-                        return new ResultAccumlatorImpl();
+                    public BuilderImpl startDecode() {
+                        return new BuilderImpl();
                     }
                 }
         );
@@ -656,7 +655,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
 
     protected <T, FT> ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG> createFieldCodec(
             Field field,
-            Codec<FT, IN, OUT, CFG> codec) {
+            Codec<FT, IN, OUT, CFG> codec
+    ) {
         return new ObjectCodecBuilder.FieldCodec<>(
                 t -> CodecException.wrap(() -> {
                     field.setAccessible(true);

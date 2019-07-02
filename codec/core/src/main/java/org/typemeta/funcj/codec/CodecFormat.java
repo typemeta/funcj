@@ -2,7 +2,6 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.tuples.Tuple2;
 
 import java.util.*;
 
@@ -17,11 +16,25 @@ public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
 
     CFG config();
 
-    <T> Tuple2<Boolean, OUT> encodeNull(T val, OUT out);
+    class IsNull<OUT> {
+        public static <OUT> IsNull<OUT> of(boolean isNull, OUT out) {
+            return new IsNull<>(isNull, out);
+        }
+
+        public final boolean isNull;
+        public final OUT out;
+
+        public IsNull(boolean isNull, OUT out) {
+            this.isNull = isNull;
+            this.out = out;
+        }
+    }
+
+    <T> IsNull<OUT> encodeNull(T val, OUT out);
 
     boolean decodeNull(IN in);
 
-    <T> Tuple2<Boolean, OUT> encodeDynamicType(
+    <T> IsNull<OUT> encodeDynamicType(
             CodecCoreEx<IN, OUT, CFG> core,
             Codec<T, IN, OUT, CFG> codec,
             T val,
@@ -91,7 +104,7 @@ public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
             Class<T> elemType,
             Codec<T, IN, OUT, CFG> elemCodec);
 
-    <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, IN, OUT, CFG> createObjectCodec(
+    <T, RA extends ObjectMeta.Builder<T>> Codec<T, IN, OUT, CFG> createObjectCodec(
             Class<T> clazz,
             ObjectMeta<T, IN, OUT, RA> objMeta);
 

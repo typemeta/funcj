@@ -5,7 +5,6 @@ import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.mpack.MpackTypes.*;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.tuples.Tuple2;
 import org.typemeta.funcj.util.Folds;
 
 import java.lang.reflect.Array;
@@ -36,10 +35,10 @@ public class MpackCodecFormat
     }
 
     @Override
-    public <T> Tuple2<Boolean, OutStream> encodeNull(T val, OutStream out) {
+    public <T> IsNull<OutStream> encodeNull(T val, OutStream out) {
         final boolean isNull = val == null;
         out.writeBoolean(isNull);
-        return Tuple2.of(isNull, out);
+        return IsNull.of(isNull, out);
     }
 
     @Override
@@ -48,7 +47,7 @@ public class MpackCodecFormat
     }
 
     @Override
-    public <T> Tuple2<Boolean, OutStream> encodeDynamicType(
+    public <T> IsNull<OutStream> encodeDynamicType(
             CodecCoreEx<InStream, OutStream, Config> core,
             Codec<T, InStream, OutStream, Config> codec,
             T val,
@@ -58,13 +57,13 @@ public class MpackCodecFormat
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             out.writeBoolean(false);
-            return Tuple2.of(false, out);
+            return IsNull.of(false, out);
         } else {
             out.writeBoolean(true);
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             out.writeString(config().classToName(dynType));
             dynCodec.encode(core, val, out);
-            return Tuple2.of(true, out);
+            return IsNull.of(true, out);
         }
     }
 
@@ -568,15 +567,16 @@ public class MpackCodecFormat
             public OutStream encodeWithCheck(
                     CodecCoreEx<InStream, OutStream, Config> core,
                     Collection<T> value,
-                    OutStream out) {
-                if (core.format().encodeNull(value, out)._1) {
+                    OutStream out
+            ) {
+                if (core.format().encodeNull(value, out).isNull) {
                     return out;
                 } else if (!core.format().encodeDynamicType(
                         core,
                         this,
                         value,
                         out,
-                        type -> getCodec(core, type))._1) {
+                        type -> getCodec(core, type)).isNull) {
                     return encode(core, value, out);
                 } else {
                     return out;
@@ -584,7 +584,11 @@ public class MpackCodecFormat
             }
 
             @Override
-            public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, Collection<T> value, OutStream out) {
+            public OutStream encode(
+                    CodecCoreEx<InStream, OutStream, Config> core,
+                    Collection<T> value,
+                    OutStream out
+            ) {
                 out.startArray(value.size());
                 for (T val : value) {
                     elemCodec.encodeWithCheck(core, val, out);
@@ -610,7 +614,8 @@ public class MpackCodecFormat
     public <T> Codec<T[], InStream, OutStream, Config> createObjectArrayCodec(
             Class<T[]> arrType,
             Class<T> elemType,
-            Codec<T, InStream, OutStream, Config> elemCodec) {
+            Codec<T, InStream, OutStream, Config> elemCodec
+    ) {
         return new Codec<T[], InStream, OutStream, Config>() {
 
             @Override
@@ -619,7 +624,11 @@ public class MpackCodecFormat
             }
 
             @Override
-            public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, T[] value, OutStream out) {
+            public OutStream encode(
+                    CodecCoreEx<InStream, OutStream, Config> core,
+                    T[] value,
+                    OutStream out
+            ) {
                 out.startArray(value.length);
                 for (T val : value) {
                     elemCodec.encodeWithCheck(core, val, out);
@@ -642,7 +651,7 @@ public class MpackCodecFormat
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, InStream, OutStream, Config> createObjectCodec(
+    public <T, RA extends ObjectMeta.Builder<T>> Codec<T, InStream, OutStream, Config> createObjectCodec(
             Class<T> type,
             ObjectMeta<T, InStream, OutStream, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
@@ -652,7 +661,7 @@ public class MpackCodecFormat
         }
     }
 
-    protected static class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected static class ObjectCodec<T, RA extends ObjectMeta.Builder<T>>
             implements Codec<T, InStream, OutStream, Config> {
 
         private final Class<T> type;
@@ -671,7 +680,11 @@ public class MpackCodecFormat
         }
 
         @Override
-        public OutStream encode(CodecCoreEx<InStream, OutStream, Config> core, T value, OutStream out) {
+        public OutStream encode(
+                CodecCoreEx<InStream, OutStream, Config> core,
+                T value,
+                OutStream out
+        ) {
             objMeta.forEach(field ->
                     field.encodeField(value, out)
             );
@@ -688,7 +701,7 @@ public class MpackCodecFormat
         }
     }
 
-    protected static class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected static class FinalObjectCodec<T, RA extends ObjectMeta.Builder<T>>
             extends ObjectCodec<T, RA>
             implements Codec.FinalCodec<T, InStream, OutStream, Config> {
 

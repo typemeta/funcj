@@ -1,6 +1,5 @@
 package org.typemeta.funcj.codec;
 
-import org.typemeta.funcj.codec.bytes.ArgMapTypeCtor;
 import org.typemeta.funcj.functions.Functions.F;
 
 import java.util.LinkedHashMap;

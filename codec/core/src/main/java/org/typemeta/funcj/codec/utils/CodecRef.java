@@ -48,7 +48,7 @@ public class CodecRef<T, IN, OUT, CFG extends CodecConfig>
         }
     }
 
-    private Codec<T, IN, OUT, CFG> impl;
+    private volatile Codec<T, IN, OUT, CFG> impl;
 
     @SuppressWarnings("unchecked")
     public CodecRef() {

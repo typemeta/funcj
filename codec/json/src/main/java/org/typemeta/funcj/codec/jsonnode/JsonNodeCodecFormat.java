@@ -5,7 +5,6 @@ import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.json.model.*;
-import org.typemeta.funcj.tuples.Tuple2;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
@@ -31,11 +30,11 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, JsonNo
     }
 
     @Override
-    public <T> Tuple2<Boolean, JsValue> encodeNull(T val, JsValue out) {
+    public <T> IsNull<JsValue> encodeNull(T val, JsValue out) {
         if (val == null) {
-            return Tuple2.of(true, JSAPI.nul());
+            return IsNull.of(true, JSAPI.nul());
         } else {
-            return Tuple2.of(false, out);
+            return IsNull.of(false, out);
         }
     }
 
@@ -45,7 +44,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, JsonNo
     }
 
     @Override
-    public <T> Tuple2<Boolean, JsValue> encodeDynamicType(
+    public <T> IsNull<JsValue> encodeDynamicType(
             CodecCoreEx<JsValue, JsValue, JsonNodeConfig> core,
             Codec<T, JsValue, JsValue, JsonNodeConfig> codec,
             T val,
@@ -54,11 +53,11 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, JsonNo
     ) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
-            return Tuple2.of(false, out);
+            return IsNull.of(false, out);
         } else if (!config().dynamicTypeTags()) {
             final Codec<T, JsValue, JsValue, JsonNodeConfig> dynCodec = getDynCodec.apply(dynType);
             dynCodec.encode(core, val, out);
-            return Tuple2.of(true, out);
+            return IsNull.of(true, out);
         } else {
             final Codec<T, JsValue, JsValue, JsonNodeConfig> dynCodec = getDynCodec.apply(dynType);
 
@@ -67,7 +66,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, JsonNo
                             JSAPI.field(config.typeFieldName(), JSAPI.str(config().classToName(dynType))),
                             JSAPI.field(config.valueFieldName(), dynCodec.encode(core, val, out))
                     );
-            return Tuple2.of(true, jsv);
+            return IsNull.of(true, jsv);
         }
     }
 
@@ -652,7 +651,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, JsonNo
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, JsValue, JsValue, JsonNodeConfig> createObjectCodec(
+    public <T, RA extends ObjectMeta.Builder<T>> Codec<T, JsValue, JsValue, JsonNodeConfig> createObjectCodec(
             Class<T> type,
             ObjectMeta<T, JsValue, JsValue, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
@@ -662,7 +661,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, JsonNo
         }
     }
 
-    protected class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected class ObjectCodec<T, RA extends ObjectMeta.Builder<T>>
             implements Codec<T, JsValue, JsValue, JsonNodeConfig> {
 
         private final Class<T> type;
@@ -725,7 +724,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, JsonNo
         }
     }
 
-    protected class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected class FinalObjectCodec<T, RA extends ObjectMeta.Builder<T>>
             extends ObjectCodec<T, RA>
             implements Codec.FinalCodec<T, JsValue, JsValue, JsonNodeConfig> {
 

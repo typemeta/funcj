@@ -4,7 +4,6 @@ import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.tuples.Tuple2;
 import org.w3c.dom.*;
 
 import java.lang.reflect.Array;
@@ -39,12 +38,12 @@ public class XmlNodeCodecFormat implements CodecFormat<Element, Element, XmlNode
     }
 
     @Override
-    public <T> Tuple2<Boolean, Element> encodeNull(T val, Element out) {
+    public <T> IsNull<Element> encodeNull(T val, Element out) {
         if (val == null) {
             XmlUtils.setAttrValue(out, config().nullAttrName(), config().nullAttrVal());
-            return Tuple2.of(true, out);
+            return IsNull.of(true, out);
         } else {
-            return Tuple2.of(false, out);
+            return IsNull.of(false, out);
         }
     }
 
@@ -55,7 +54,7 @@ public class XmlNodeCodecFormat implements CodecFormat<Element, Element, XmlNode
     }
 
     @Override
-    public <T> Tuple2<Boolean, Element> encodeDynamicType(
+    public <T> IsNull<Element> encodeDynamicType(
             CodecCoreEx<Element, Element, XmlNodeConfig> core,
             Codec<T, Element, Element, XmlNodeConfig> codec,
             T val,
@@ -64,16 +63,16 @@ public class XmlNodeCodecFormat implements CodecFormat<Element, Element, XmlNode
     ) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
-            return Tuple2.of(false, out);
+            return IsNull.of(false, out);
         } else if (!config().dynamicTypeTags()) {
             final Codec<T, Element, Element, XmlNodeConfig> dynCodec = getDynCodec.apply(dynType);
             dynCodec.encode(core, val, out);
-            return Tuple2.of(true, out);
+            return IsNull.of(true, out);
         } else {
             final Codec<T, Element, Element, XmlNodeConfig> dynCodec = getDynCodec.apply(dynType);
             XmlUtils.setAttrValue(out, config.typeAttrName(), config().classToName(dynType));
             dynCodec.encode(core, val, out);
-            return Tuple2.of(true, out);
+            return IsNull.of(true, out);
         }
     }
 
@@ -735,7 +734,7 @@ public class XmlNodeCodecFormat implements CodecFormat<Element, Element, XmlNode
     }
 
     @Override
-    public <T, RA extends ObjectMeta.ResultAccumlator<T>> Codec<T, Element, Element, XmlNodeConfig> createObjectCodec(
+    public <T, RA extends ObjectMeta.Builder<T>> Codec<T, Element, Element, XmlNodeConfig> createObjectCodec(
             Class<T> type,
             ObjectMeta<T, Element, Element, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
@@ -745,7 +744,7 @@ public class XmlNodeCodecFormat implements CodecFormat<Element, Element, XmlNode
         }
     }
 
-    protected class ObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected class ObjectCodec<T, RA extends ObjectMeta.Builder<T>>
             implements Codec<T, Element, Element, XmlNodeConfig> {
 
         private final Class<T> type;
@@ -811,7 +810,7 @@ public class XmlNodeCodecFormat implements CodecFormat<Element, Element, XmlNode
         }
     }
 
-    protected class FinalObjectCodec<T, RA extends ObjectMeta.ResultAccumlator<T>>
+    protected class FinalObjectCodec<T, RA extends ObjectMeta.Builder<T>>
             extends ObjectCodec<T, RA>
             implements Codec.FinalCodec<T, Element, Element, XmlNodeConfig> {
 
