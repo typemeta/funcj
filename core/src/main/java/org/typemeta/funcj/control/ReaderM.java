@@ -65,7 +65,7 @@ public interface ReaderM<ENV, A> {
     static <ENV, A, B> ReaderM<ENV, IList<B>> traverse(IList<A> la, F<A, ReaderM<ENV, B>> frb) {
         return la.foldRight(
                 (a, rlb) -> rlb.app(frb.apply(a).map(b -> lb -> lb.add(b))),
-                pure(IList.nil())
+                pure(IList.empty())
         );
     }
 
@@ -97,7 +97,7 @@ public interface ReaderM<ENV, A> {
     static <ENV, A> ReaderM<ENV, IList<A>> sequence(IList<ReaderM<ENV, A>> lrb) {
         return lrb.foldRight(
                 (ra, rla) -> rla.app(ra.map(a -> la -> la.add(a))),
-                pure(IList.nil())
+                pure(IList.empty())
         );
     }
 

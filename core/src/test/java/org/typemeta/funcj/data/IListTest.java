@@ -36,14 +36,14 @@ public class IListTest {
 
     @Test
     public void testFoldl() {
-        assertEquals("Reversal on lists", l.reverse(), l.foldLeft(IList::add, IList.nil()));
+        assertEquals("Reversal on lists", l.reverse(), l.foldLeft(IList::add, IList.empty()));
         assertEquals("foldLeft for an empty list", 0, empty.foldLeft((x, y) -> x - y, 0).intValue());
         assertEquals("foldLeft for a non-empty list", (((10-1)-2)-3)-4, l.foldLeft((x, y) -> x - y, 10).intValue());
     }
 
     @Test
     public void testFoldr() {
-        assertEquals("Identity function on lists", l, l.foldRight((i, acc) -> acc.add(i), IList.nil()));
+        assertEquals("Identity function on lists", l, l.foldRight((i, acc) -> acc.add(i), IList.empty()));
         assertEquals("foldRight for an empty list", 0, empty.foldRight((x, y) -> x - y, 0).intValue());
         assertEquals("foldRight for a non-empty list", 1-(2-(3-(4-10))), l.foldRight((x, y) -> x - y, 10).intValue());
     }

@@ -105,7 +105,7 @@ public final class Chr implements Comparable<Chr> {
      * @return          the list of {@code Chr}s
      */
     public static IList<Chr> stringToList(String s) {
-        IList<Chr> r = IList.nil();
+        IList<Chr> r = IList.empty();
         for (int i = s.length() - 1; i >= 0; --i) {
             r = r.add(Chr.valueOf(s.charAt(i)));
         }

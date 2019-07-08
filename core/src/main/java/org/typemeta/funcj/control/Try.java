@@ -86,7 +86,7 @@ public interface Try<T> {
     static <T, U> Try<IList<U>> traverse(IList<T> lt, F<T, Try<U>> f) {
         return lt.foldRight(
                 (t, tlu) -> tlu.app(f.apply(t).map(b -> l -> l.add(b))),
-                success(IList.nil())
+                success(IList.empty())
         );
     }
 
@@ -116,7 +116,7 @@ public interface Try<T> {
     static <T> Try<IList<T>> sequence(IList<Try<T>> ltt) {
         return ltt.foldRight(
                 (tt, tlt) -> tlt.app(tt.map(a -> l -> l.add(a))),
-                success(IList.nil())
+                success(IList.empty())
         );
     }
 

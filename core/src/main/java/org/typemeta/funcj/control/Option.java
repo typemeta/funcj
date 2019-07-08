@@ -75,7 +75,7 @@ public interface Option<T> {
     static <T, U> Option<IList<U>> traverse(IList<T> lt, F<T, Option<U>> fou) {
         return lt.foldRight(
                 (t, olu) -> olu.app(fou.apply(t).map(b -> lu -> lu.add(b))),
-                some(IList.nil())
+                some(IList.empty())
         );
     }
 
@@ -105,7 +105,7 @@ public interface Option<T> {
     static <T> Option<IList<T>> sequence(IList<Option<T>> lot) {
         return lot.foldRight(
             (ot, olt) -> olt.app(ot.map(t -> lt -> lt.add(t))),
-                some(IList.nil())
+                some(IList.empty())
         );
     }
 
