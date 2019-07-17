@@ -56,8 +56,8 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, JsonNo
             return IsNull.of(false, out);
         } else if (!config().dynamicTypeTags()) {
             final Codec<T, JsValue, JsValue, JsonNodeConfig> dynCodec = getDynCodec.apply(dynType);
-            dynCodec.encode(core, val, out);
-            return IsNull.of(true, out);
+            final JsValue jsv = dynCodec.encode(core, val, out);
+            return IsNull.of(true, jsv);
         } else {
             final Codec<T, JsValue, JsValue, JsonNodeConfig> dynCodec = getDynCodec.apply(dynType);
 
@@ -66,6 +66,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, JsonNo
                             JSAPI.field(config.typeFieldName(), JSAPI.str(config().classToName(dynType))),
                             JSAPI.field(config.valueFieldName(), dynCodec.encode(core, val, out))
                     );
+
             return IsNull.of(true, jsv);
         }
     }
