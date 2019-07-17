@@ -111,7 +111,7 @@ public interface State<S, A> {
     static <S, A, B> State<S, IList<B>> traverse(IList<A> la, F<A, State<S, B>> f) {
         return la.foldRight(
                 (a, slb) -> slb.apply(f.apply(a).map(b -> l -> l.add(b))),
-                pure(IList.nil())
+                pure(IList.empty())
         );
     }
 
@@ -143,7 +143,7 @@ public interface State<S, A> {
     static <S, A> State<S, IList<A>> sequence(IList<? extends State<S, A>> lsa) {
         return lsa.foldRight(
                 (sa, sla) -> sla.apply(sa.map(a -> l -> l.add(a))),
-                pure(IList.nil())
+                pure(IList.empty())
         );
     }
 

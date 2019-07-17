@@ -24,7 +24,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @return          an empty list
      */
     @SuppressWarnings("unchecked")
-    public static <T> IList<T> nil() {
+    public static <T> IList<T> empty() {
         return (IList<T>)Empty.EMPTY;
     }
 
@@ -34,7 +34,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @return          an empty list
      */
     public static <T> IList<T> of() {
-        return nil();
+        return empty();
     }
 
     /**
@@ -44,7 +44,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @return          the new list with one element
      */
     public static <T> NonEmpty<T> of(T elem) {
-        return IList.<T>nil().add(elem);
+        return IList.<T>empty().add(elem);
     }
 
     /**
@@ -66,7 +66,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @return          the new list with multiple elements
      */
     public static <T> IList<T> ofIterable(Iterable<T> elems) {
-        IList<T> r = nil();
+        IList<T> r = empty();
         for (T elem : elems) {
             r = r.add(elem);
         }
@@ -80,7 +80,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @return          the new list with multiple elements
      */
     public static <T> IList<T> ofArray(T[] elems) {
-        IList<T> r = nil();
+        IList<T> r = empty();
         for (int i = elems.length-1; i >= 0; --i) {
             r = r.add(elems[i]);
         }
@@ -122,7 +122,7 @@ public abstract class IList<T> implements Iterable<T> {
      * @return          a list of {@code Character}s
      */
     public static IList<Character> stringToList(String s) {
-        IList<Character> r = nil();
+        IList<Character> r = empty();
         for (int i = s.length() - 1; i >= 0; --i) {
             r = r.add(s.charAt(i));
         }
@@ -270,7 +270,7 @@ public abstract class IList<T> implements Iterable<T> {
 
     /**
      * Type-safe list equality.
-     * @param rhs       the list to be cpmpared
+     * @param rhs       the list to be compared
      * @return          true if this list and rhs are equal in terms of their elements.
      */
     public abstract boolean equals(IList<T> rhs);
@@ -445,17 +445,17 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public IList<T> reverse() {
-            return nil();
+            return empty();
         }
 
         @Override
         public <U> IList<U> map(F<? super T, ? extends U> f) {
-            return nil();
+            return empty();
         }
 
         @Override
         public <U> IList<U> flatMap(F<? super T, IList<? extends U>> f) {
-            return nil();
+            return empty();
         }
 
         @Override
@@ -643,7 +643,7 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public <U> NonEmpty<U> map(F<? super T, ? extends U> f) {
-            IList<U> r = nil();
+            IList<U> r = empty();
             for (IList<T> n = reverse(); !n.isEmpty(); n = n.tail()) {
                 r = r.add(f.apply(n.head()));
             }
@@ -652,7 +652,7 @@ public abstract class IList<T> implements Iterable<T> {
 
         @Override
         public <U> IList<U> flatMap(F<? super T, IList<? extends U>> f) {
-            IList<U> r = nil();
+            IList<U> r = empty();
             for (IList<T> n = reverse(); !n.isEmpty(); n = n.tail()) {
                 r = r.addAll(f.apply(n.head()));
             }

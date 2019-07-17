@@ -115,7 +115,7 @@ public interface Validated<E, T> {
     static <E, T, U> Validated<E, IList<U>> traverse(IList<T> lt, F<T, Validated<E, U>> f) {
         return lt.foldRight(
                 (t, vlt) -> vlt.app(f.apply(t).map(b -> l -> l.add(b))),
-                success(IList.nil())
+                success(IList.empty())
         );
     }
 
@@ -147,7 +147,7 @@ public interface Validated<E, T> {
     static <E, T> Validated<E, IList<T>> sequence(IList<Validated<E, T>> lvt) {
         return lvt.foldRight(
                 (vt, vlt) -> vlt.app(vt.map(a -> l -> l.add(a))),
-                success(IList.nil())
+                success(IList.empty())
         );
     }
 

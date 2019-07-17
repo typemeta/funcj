@@ -48,7 +48,7 @@ public class RNGTest {
     }
 
     private static <T> IList<T> generate(T value, int n) {
-        IList<T> result = IList.nil();
+        IList<T> result = IList.empty();
         for (int i = 0; i < n; ++i) {
             result = result.add(value);
         }

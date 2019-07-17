@@ -108,7 +108,7 @@ public abstract class API {
         final IList<Document> docs2 =
                 docs.foldRight(
                         (doc, acc) -> acc.add(lbreak).add(doc),
-                        IList.nil());
+                        IList.empty());
         return concat(docs2);
     }
 

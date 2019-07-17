@@ -91,7 +91,7 @@ public interface Either<E, S> {
     static <E, S, T> Either<E, IList<T>> traverse(IList<S> ls, F<S, Either<E, T>> f) {
         return ls.foldRight(
             (s, elt) -> elt.app(f.apply(s).map(b -> l -> l.add(b))),
-            right(IList.nil())
+            right(IList.empty())
         );
     }
 
@@ -120,7 +120,7 @@ public interface Either<E, S> {
     static <E, S> Either<E, IList<S>> sequence(IList<Either<E, S>> les) {
         return les.foldRight(
                 (es, els) -> els.app(es.map(a -> l -> l.add(a))),
-                right(IList.nil())
+                right(IList.empty())
         );
     }
 

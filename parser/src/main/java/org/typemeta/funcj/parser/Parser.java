@@ -137,7 +137,7 @@ public interface Parser<I, A> {
     static <I, T, U> Parser<I, IList<U>> traverse(IList<T> lt, F<T, Parser<I, U>> f) {
         return lt.foldRight(
                 (t, plu) -> ap(plu.map(lu -> lu::add), f.apply(t)),
-                pure(IList.nil())
+                pure(IList.empty())
         );
     }
 
@@ -154,7 +154,7 @@ public interface Parser<I, A> {
     static <I, T> Parser<I, IList<T>> sequence(IList<Parser<I, T>> lpt) {
         return lpt.foldRight(
                 (pt, plt) -> ap(plt.map(lt -> lt::add), pt),
-                pure(IList.nil())
+                pure(IList.empty())
         );
     }
 
@@ -167,7 +167,7 @@ public interface Parser<I, A> {
      */
     static <E, T> Parser<E, Stream<T>> sequence(Stream<Parser<E, T>> spt) {
         final Iterator<Parser<E, T>> iter = spt.iterator();
-        Parser<E, IList<T>> plt = pure(IList.nil());
+        Parser<E, IList<T>> plt = pure(IList.empty());
         while (iter.hasNext()) {
             final Parser<E, T> pt = iter.next();
             plt = ap(plt.map(lt -> lt::add), pt);
@@ -509,7 +509,7 @@ public interface Parser<I, A> {
      */
     default <SEP> Parser<I, IList<A>> sepBy(Parser<I, SEP> sep) {
         return this.sepBy1(sep)
-                .or(Parser.pure(IList.nil()));
+                .or(Parser.pure(IList.empty()));
     }
 
     /**
