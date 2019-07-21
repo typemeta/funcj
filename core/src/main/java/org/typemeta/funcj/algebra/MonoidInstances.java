@@ -2,8 +2,7 @@ package org.typemeta.funcj.algebra;
 
 import org.typemeta.funcj.data.IList;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.util.*;
 
 public abstract class MonoidInstances {

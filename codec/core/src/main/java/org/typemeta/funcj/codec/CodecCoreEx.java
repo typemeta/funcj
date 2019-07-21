@@ -3,8 +3,7 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.codec.utils.ClassKey;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**

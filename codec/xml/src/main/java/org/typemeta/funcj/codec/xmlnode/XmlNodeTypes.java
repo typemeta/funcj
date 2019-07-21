@@ -1,8 +1,27 @@
 package org.typemeta.funcj.codec.xmlnode;
 
-public abstract class XmlNodeTypes {
+import org.typemeta.funcj.codec.CodecConfig;
 
-    public static XmlNodeConfigImpl.BuilderImpl configBuilder() {
-        return new XmlNodeConfigImpl.BuilderImpl();
+public abstract class XmlNodeTypes {
+    /**
+     * Interface for classes which provide configuration information
+     * for {@link XmlNodeCodecCore} implementations.
+     */
+    public interface Config extends CodecConfig {
+        String entryElemName();
+
+        String typeAttrName();
+
+        String keyElemName();
+
+        String valueElemName();
+
+        String nullAttrName();
+
+        String nullAttrVal();
+
+        String defaultRootElemName(Class<?> type);
+
+        String defaultRootElemName();
     }
 }

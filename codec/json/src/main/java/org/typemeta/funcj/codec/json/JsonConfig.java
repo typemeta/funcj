@@ -5,20 +5,23 @@ import org.typemeta.funcj.codec.impl.CodecConfigImpl;
 /**
  * Base class for {@link JsonTypes.Config} implementations.
  */
-public class JsonConfigImpl extends CodecConfigImpl implements JsonTypes.Config {
+public class JsonConfig extends CodecConfigImpl implements JsonTypes.Config {
 
-    public static class BuilderImpl extends AbstractBuilder<BuilderImpl, JsonTypes.Config> {
-
+    public static class Builder extends AbstractBuilder<Builder, JsonTypes.Config> {
         @Override
         public JsonTypes.Config build() {
-            return new JsonConfigImpl(this);
+            return new JsonConfig(this);
         }
     }
 
-    public JsonConfigImpl() {
+    public static JsonConfig.Builder builder() {
+        return new JsonConfig.Builder();
     }
 
-    public JsonConfigImpl(BuilderImpl builder) {
+    public JsonConfig() {
+    }
+
+    public JsonConfig(Builder builder) {
         super(builder);
     }
 

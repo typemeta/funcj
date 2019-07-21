@@ -7,8 +7,7 @@ import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.xml.XmlTypes.*;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
@@ -26,7 +25,7 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
     }
 
     public XmlCodecFormat() {
-        this(new XmlConfigImpl());
+        this(new XmlConfig());
     }
 
     @Override

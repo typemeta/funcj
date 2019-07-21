@@ -3,8 +3,7 @@ package org.typemeta.funcj.codec;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.functions.Functions.*;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provides a builder interface for building an object {@link Codec},

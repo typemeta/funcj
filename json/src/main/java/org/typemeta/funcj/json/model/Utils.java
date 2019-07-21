@@ -1,7 +1,6 @@
 package org.typemeta.funcj.json.model;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 
 public abstract class Utils {
 

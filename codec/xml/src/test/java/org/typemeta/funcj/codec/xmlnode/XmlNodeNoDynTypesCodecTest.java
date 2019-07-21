@@ -4,8 +4,7 @@ import org.junit.Assert;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.xml.Codecs;
 import org.typemeta.funcj.functions.Functions;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.*;
 import java.io.StringWriter;
@@ -33,8 +32,8 @@ public class XmlNodeNoDynTypesCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final XmlNodeConfigImpl.BuilderImpl cfgBldr =
-                XmlNodeTypes.configBuilder()
+        final XmlNodeConfig.Builder cfgBldr =
+                XmlNodeConfig.builder()
                         .dynamicTypeTags(false)
                         .failOnNoTypeConstructor(false);
 
@@ -55,7 +54,7 @@ public class XmlNodeNoDynTypesCodecTest extends TestBase {
             System.out.println("Encoded XML " + clazz.getSimpleName() + " data size = " + data.length() + " chars");
         }
 
-        final XmlNodeConfig config = codec.config();
+        final XmlNodeTypes.Config config = codec.config();
         Assert.assertFalse(data.contains(config.typeAttrName()));
     }
 }

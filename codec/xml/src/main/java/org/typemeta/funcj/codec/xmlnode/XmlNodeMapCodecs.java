@@ -1,26 +1,25 @@
 package org.typemeta.funcj.codec.xmlnode;
 
-import org.typemeta.funcj.codec.Codec;
-import org.typemeta.funcj.codec.CodecCoreEx;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.MapCodecs.*;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.typemeta.funcj.codec.xmlnode.XmlNodeTypes.Config;
+import org.w3c.dom.*;
 
 import java.util.Map;
 
 public abstract class XmlNodeMapCodecs {
 
-    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Element, Element, XmlNodeConfig> {
+    public static class MapCodec<K, V> extends AbstractMapCodec<K, V, Element, Element, Config> {
 
         public MapCodec(
                 Class<Map<K, V>> mapType,
-                Codec<K, Element, Element, XmlNodeConfig> keyCodec,
-                Codec<V, Element, Element, XmlNodeConfig> valueCodec) {
+                Codec<K, Element, Element, Config> keyCodec,
+                Codec<V, Element, Element, Config> valueCodec) {
             super(mapType, keyCodec, valueCodec);
         }
 
         @Override
-        public Element encode(CodecCoreEx<Element, Element, XmlNodeConfig> core, Map<K, V> value, Element out) {
+        public Element encode(CodecCoreEx<Element, Element, Config> core, Map<K, V> value, Element out) {
             final String entryName = core.config().entryElemName();
             final String keyName = core.config().keyElemName();
             final String valueName = core.config().valueElemName();
@@ -39,7 +38,7 @@ public abstract class XmlNodeMapCodecs {
         }
 
         @Override
-        public Map<K, V> decode(CodecCoreEx<Element, Element, XmlNodeConfig> core, Element in) {
+        public Map<K, V> decode(CodecCoreEx<Element, Element, Config> core, Element in) {
             final NodeList nodes = in.getChildNodes();
             final int l = nodes.getLength();
 
@@ -59,16 +58,16 @@ public abstract class XmlNodeMapCodecs {
         }
     }
 
-    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, Element, Element, XmlNodeConfig> {
+    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, Element, Element, Config> {
 
         public StringMapCodec(
                 Class<Map<String, V>> type,
-                Codec<V, Element, Element, XmlNodeConfig> valueCodec) {
+                Codec<V, Element, Element, Config> valueCodec) {
             super(type, valueCodec);
         }
 
         @Override
-        public Element encode(CodecCoreEx<Element, Element, XmlNodeConfig> core, Map<String, V> value, Element out) {
+        public Element encode(CodecCoreEx<Element, Element, Config> core, Map<String, V> value, Element out) {
 
             value.forEach((key, val) ->
                 valueCodec.encodeWithCheck(core, val, XmlUtils.addElement(out, key))
@@ -78,7 +77,7 @@ public abstract class XmlNodeMapCodecs {
         }
 
         @Override
-        public Map<String, V> decode(CodecCoreEx<Element, Element, XmlNodeConfig> core, Element in) {
+        public Map<String, V> decode(CodecCoreEx<Element, Element, Config> core, Element in) {
             final MapProxy<String, V> mapProxy = getMapProxy(core);
 
             final NodeList nodes = in.getChildNodes();

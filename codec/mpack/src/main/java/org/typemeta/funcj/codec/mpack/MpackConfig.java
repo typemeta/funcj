@@ -6,35 +6,39 @@ import org.typemeta.funcj.codec.utils.NotSupportedException;
 /**
  * Base class for {@link MpackTypes.Config} implementations.
  */
-public class MpackConfigImpl extends CodecConfigImpl implements MpackTypes.Config {
+public class MpackConfig extends CodecConfigImpl implements MpackTypes.Config {
 
-    public static class BuilderImpl extends AbstractBuilder<BuilderImpl, MpackTypes.Config> {
+    public static class Builder extends AbstractBuilder<Builder, MpackTypes.Config> {
 
         @Override
         public MpackTypes.Config build() {
-            return new MpackConfigImpl(this);
+            return new MpackConfig(this);
         }
 
         @Override
-        public BuilderImpl dynamicTypeTags(boolean enable) {
+        public Builder dynamicTypeTags(boolean enable) {
             throw new NotSupportedException();
         }
 
         @Override
-        public BuilderImpl failOnNoTypeConstructor(boolean enable) {
+        public Builder failOnNoTypeConstructor(boolean enable) {
             throw new NotSupportedException();
         }
 
         @Override
-        public BuilderImpl failOnUnrecognisedFields(boolean enable) {
+        public Builder failOnUnrecognisedFields(boolean enable) {
             throw new NotSupportedException();
         }
     }
 
-    public MpackConfigImpl() {
+    public static MpackConfig.Builder builder() {
+        return new MpackConfig.Builder();
     }
 
-    public MpackConfigImpl(BuilderImpl builder) {
+    public MpackConfig() {
+    }
+
+    public MpackConfig(Builder builder) {
         super(builder);
     }
 }

@@ -1,13 +1,11 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.CodecConfig;
-import org.typemeta.funcj.codec.json.io.JsonGenerator;
-import org.typemeta.funcj.codec.json.io.JsonStreamParser;
+import org.typemeta.funcj.codec.json.io.*;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 import org.typemeta.funcj.json.parser.JsonEvent;
 
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.math.BigDecimal;
 
 public abstract class JsonTypes {
@@ -82,9 +80,5 @@ public abstract class JsonTypes {
 
     public static JsonGenerator outputOf(Writer writer) {
         return new JsonGenerator(writer);
-    }
-
-    public static JsonConfigImpl.BuilderImpl configBuilder() {
-        return new JsonConfigImpl.BuilderImpl();
     }
 }

@@ -1,12 +1,10 @@
 package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.codec.bytes.*;
-import org.typemeta.funcj.codec.utils.CodecException;
-import org.typemeta.funcj.codec.utils.ReflectionUtils;
+import org.typemeta.funcj.codec.utils.*;
 import org.typemeta.funcj.functions.Functions.F;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.time.*;
 import java.util.*;
 
@@ -20,7 +18,7 @@ public abstract class Codecs {
      * @return the new {@code ByteCodecCore}
      */
     public static ByteCodecCore byteCodec() {
-        return byteCodec(new ByteConfigImpl.BuilderImpl());
+        return byteCodec(new ByteConfig.Builder());
     }
 
     public static ByteCodecCore byteCodec(CodecConfig.Builder<?, ByteTypes.Config> cfgBldr) {

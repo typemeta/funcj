@@ -1,18 +1,15 @@
 package org.typemeta.funcj.codec.json;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.typemeta.funcj.codec.TestBase;
-import org.typemeta.funcj.codec.TestTypes;
+import org.junit.*;
+import org.typemeta.funcj.codec.*;
 
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 
 public class JsonCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final JsonConfigImpl.BuilderImpl cfgBldr = JsonTypes.configBuilder();
+        final JsonConfig.Builder cfgBldr = JsonConfig.builder();
         final JsonCodecCore codec = prepareCodecCore(cfgBldr, Codecs::jsonCodec);
 
         final StringWriter sw = new StringWriter();
@@ -41,8 +38,8 @@ public class JsonCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final JsonConfigImpl.BuilderImpl cfgBldr =
-                JsonTypes.configBuilder()
+        final JsonConfig.Builder cfgBldr =
+                JsonConfig.builder()
                         .failOnUnrecognisedFields(false);
 
         final JsonCodecCore codec = prepareCodecCore(cfgBldr, Codecs::jsonCodec);

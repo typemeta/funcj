@@ -1,20 +1,17 @@
 package org.typemeta.funcj.codec.jsonnode;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.typemeta.funcj.codec.TestBase;
-import org.typemeta.funcj.codec.TestTypes;
+import org.junit.*;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.json.Codecs;
 import org.typemeta.funcj.json.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class JsonCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final JsonNodeConfigImpl.BuilderImpl cfgBldr = JsonNodeTypes.configBuilder();
+        final JsonNodeConfig.Builder cfgBldr = JsonNodeConfig.builder();
         final JsonNodeCodecCore codec = prepareCodecCore(cfgBldr, Codecs::jsonNodeCodec);
 
         final JsValue jsv = codec.encode(clazz, val);
@@ -40,8 +37,8 @@ public class JsonCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final JsonNodeConfigImpl.BuilderImpl cfgBldr =
-                JsonNodeTypes.configBuilder()
+        final JsonNodeConfig.Builder cfgBldr =
+                JsonNodeConfig.builder()
                         .failOnUnrecognisedFields(false);
 
         final JsonNodeCodecCore codec = prepareCodecCore(cfgBldr, Codecs::jsonNodeCodec);

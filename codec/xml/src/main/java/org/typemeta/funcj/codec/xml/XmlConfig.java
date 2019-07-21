@@ -1,4 +1,4 @@
-package org.typemeta.funcj.codec.xmlnode;
+package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.impl.CodecConfigImpl;
 
@@ -6,16 +6,26 @@ import java.lang.reflect.Field;
 import java.util.Set;
 
 /**
- * Base class for {@link XmlNodeConfig} implementations.
+ * Base class for {@link XmlTypes.Config} implementations.
  */
-public class XmlNodeConfigImpl extends CodecConfigImpl implements XmlNodeConfig {
+public class XmlConfig extends CodecConfigImpl implements XmlTypes.Config {
 
-    public static class BuilderImpl extends AbstractBuilder<BuilderImpl, XmlNodeConfig> {
-
+    public static class Builder extends AbstractBuilder<Builder, XmlTypes.Config> {
         @Override
-        public XmlNodeConfig build() {
-            return new XmlNodeConfigImpl(this);
+        public XmlTypes.Config build() {
+            return new XmlConfig(this);
         }
+    }
+
+    public static XmlConfig.Builder builder() {
+        return new XmlConfig.Builder();
+    }
+
+    public XmlConfig() {
+    }
+
+    public XmlConfig(Builder builder) {
+        super(builder);
     }
 
     @Override
@@ -25,13 +35,6 @@ public class XmlNodeConfigImpl extends CodecConfigImpl implements XmlNodeConfig 
             name = "_" + name;
         }
         return name;
-    }
-
-    public XmlNodeConfigImpl() {
-    }
-
-    public XmlNodeConfigImpl(BuilderImpl builder) {
-        super(builder);
     }
 
     @Override

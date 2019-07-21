@@ -19,8 +19,8 @@ public class JsonCodecNoDynTypesTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final JsonConfigImpl.BuilderImpl cfgBldr =
-                JsonTypes.configBuilder()
+        final JsonConfig.Builder cfgBldr =
+                JsonConfig.builder()
                         .dynamicTypeTags(false)
                         .failOnNoTypeConstructor(false);
 

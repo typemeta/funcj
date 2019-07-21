@@ -1,9 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.typemeta.funcj.codec.TestBase;
-import org.typemeta.funcj.codec.TestTypes;
+import org.junit.*;
+import org.typemeta.funcj.codec.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +11,7 @@ public class XmlCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) throws IOException {
-        final XmlConfigImpl.BuilderImpl cfgBldr = XmlTypes.configBuilder();
+        final XmlConfig.Builder cfgBldr = XmlConfig.builder();
         final XmlCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -52,8 +50,8 @@ public class XmlCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final XmlConfigImpl.BuilderImpl cfgBldr =
-                XmlTypes.configBuilder()
+        final XmlConfig.Builder cfgBldr =
+                XmlConfig.builder()
                         .failOnUnrecognisedFields(false);
         final XmlCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlCodec);
 

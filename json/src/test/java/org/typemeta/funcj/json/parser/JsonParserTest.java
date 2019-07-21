@@ -10,8 +10,7 @@ import javax.json.*;
 import java.io.*;
 import java.util.*;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static org.junit.Assert.*;
 
 public class JsonParserTest {

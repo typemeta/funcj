@@ -1,11 +1,8 @@
 package org.typemeta.funcj.codec.utils;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
 
 public abstract class StreamUtils {
     public static <T, K, U> Collector<T, ?, Map<K,U>> toLinkedHashMap(

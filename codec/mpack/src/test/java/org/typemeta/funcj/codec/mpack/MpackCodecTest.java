@@ -4,14 +4,13 @@ import org.junit.Assert;
 import org.typemeta.funcj.codec.TestBase;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 
 public class MpackCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final MpackConfigImpl.BuilderImpl cfgBldr = MpackTypes.configBuilder();
+        final MpackConfig.Builder cfgBldr = MpackConfig.builder();
         final MpackCodecCore codec = prepareCodecCore(cfgBldr, Codecs::mpackCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();

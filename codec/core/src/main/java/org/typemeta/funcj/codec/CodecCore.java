@@ -2,8 +2,7 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.functions.Functions;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Interface for classes which provide an encoding of values of any type,

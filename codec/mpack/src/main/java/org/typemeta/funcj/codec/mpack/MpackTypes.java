@@ -2,12 +2,10 @@ package org.typemeta.funcj.codec.mpack;
 
 import org.msgpack.core.MessagePack;
 import org.typemeta.funcj.codec.CodecConfig;
-import org.typemeta.funcj.codec.mpack.io.InputImpl;
-import org.typemeta.funcj.codec.mpack.io.OutputImpl;
+import org.typemeta.funcj.codec.mpack.io.*;
 import org.typemeta.funcj.codec.stream.StreamCodecFormat;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigInteger;
 
 public abstract class MpackTypes {
@@ -48,9 +46,5 @@ public abstract class MpackTypes {
 
     public static OutStream outputOf(OutputStream os) {
         return new OutputImpl(MessagePack.newDefaultPacker(os));
-    }
-
-    public static MpackConfigImpl.BuilderImpl configBuilder() {
-        return new MpackConfigImpl.BuilderImpl();
     }
 }

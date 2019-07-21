@@ -1,7 +1,6 @@
 package org.typemeta.funcj.control;
 
-import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.functions.Functions.F0;
+import org.typemeta.funcj.functions.Functions.*;
 
 /**
  * Trampoline monad.

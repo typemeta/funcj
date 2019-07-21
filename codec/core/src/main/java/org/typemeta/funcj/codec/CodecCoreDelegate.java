@@ -2,8 +2,7 @@ package org.typemeta.funcj.codec;
 
 import org.typemeta.funcj.functions.Functions;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 public class CodecCoreDelegate<IN, OUT, CFG extends CodecConfig>
         implements CodecCore<IN, OUT, CFG> {

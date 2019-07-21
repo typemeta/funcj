@@ -19,9 +19,10 @@ public class XmlNoDynTypesCodecTest extends TestBase {
 
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final XmlConfigImpl.BuilderImpl cfgBldr = XmlTypes.configBuilder();
-        cfgBldr.dynamicTypeTags(false);
-        cfgBldr.failOnNoTypeConstructor(false);
+        final XmlConfig.Builder cfgBldr =
+                XmlConfig.builder()
+                        .dynamicTypeTags(false)
+                        .failOnNoTypeConstructor(false);
 
         final XmlCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlCodec);
 

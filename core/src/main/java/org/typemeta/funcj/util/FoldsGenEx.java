@@ -1,7 +1,6 @@
 package org.typemeta.funcj.util;
 
-import org.typemeta.funcj.functions.FunctionsGenEx.F2;
-import org.typemeta.funcj.functions.FunctionsGenEx.Op2;
+import org.typemeta.funcj.functions.FunctionsGenEx.*;
 
 import java.util.*;
 import java.util.stream.Stream;

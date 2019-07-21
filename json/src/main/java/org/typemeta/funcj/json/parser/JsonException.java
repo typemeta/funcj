@@ -1,7 +1,6 @@
 package org.typemeta.funcj.json.parser;
 
-import org.typemeta.funcj.functions.FunctionsEx;
-import org.typemeta.funcj.functions.SideEffectEx;
+import org.typemeta.funcj.functions.*;
 
 /**
  * Exception class for JSON exceptions.

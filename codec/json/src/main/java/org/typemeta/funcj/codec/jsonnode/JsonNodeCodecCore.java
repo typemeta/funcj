@@ -1,32 +1,29 @@
 package org.typemeta.funcj.codec.jsonnode;
 
-import org.typemeta.funcj.codec.CodecAPI;
-import org.typemeta.funcj.codec.CodecCoreDelegate;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.impl.CodecCoreImpl;
-import org.typemeta.funcj.json.model.JSAPI;
-import org.typemeta.funcj.json.model.JsValue;
+import org.typemeta.funcj.json.model.*;
 import org.typemeta.funcj.json.parser.JsonParser;
 
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * Interface for classes which implement an encoding via JSON node values.
  */
 public class JsonNodeCodecCore
-        extends CodecCoreDelegate<JsValue, JsValue, JsonNodeConfig>
+        extends CodecCoreDelegate<JsValue, JsValue, JsonNodeTypes.Config>
         implements CodecAPI.RW {
 
     public JsonNodeCodecCore(JsonNodeCodecFormat format) {
         super(new CodecCoreImpl<>(format));
     }
 
-    public JsonNodeCodecCore(JsonNodeConfig config) {
+    public JsonNodeCodecCore(JsonNodeTypes.Config config) {
         this(new JsonNodeCodecFormat(config));
     }
 
     public JsonNodeCodecCore() {
-        this(new JsonNodeConfigImpl());
+        this(new JsonNodeConfig());
     }
 
     public <T> JsValue encode(Class<? super T> type, T value) {

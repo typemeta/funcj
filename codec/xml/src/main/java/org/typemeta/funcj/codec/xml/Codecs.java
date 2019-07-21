@@ -13,7 +13,7 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
      * @return the new {@code XmlCodecCore}
      */
     public static XmlCodecCore xmlCodec() {
-        return xmlCodec(new XmlConfigImpl.BuilderImpl());
+        return xmlCodec(new XmlConfig.Builder());
     }
 
     public static XmlCodecCore xmlCodec(CodecConfig.Builder<?, XmlTypes.Config> cfgBldr) {
@@ -25,10 +25,10 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
      * @return the new {@code XmlCodecCore}
      */
     public static XmlNodeCodecCore xmlNodeCodec() {
-        return xmlNodeCodec(new XmlNodeConfigImpl.BuilderImpl());
+        return xmlNodeCodec(new XmlNodeConfig.Builder());
     }
 
-    public static XmlNodeCodecCore xmlNodeCodec(CodecConfig.Builder<?, XmlNodeConfig> cfgBldr) {
+    public static XmlNodeCodecCore xmlNodeCodec(CodecConfig.Builder<?, XmlNodeTypes.Config> cfgBldr) {
         return registerAll(cfgBldr, XmlNodeCodecCore::new);
     }
 }

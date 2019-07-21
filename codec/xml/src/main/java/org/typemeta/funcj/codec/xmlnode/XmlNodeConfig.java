@@ -1,25 +1,79 @@
 package org.typemeta.funcj.codec.xmlnode;
 
-import org.typemeta.funcj.codec.CodecConfig;
+import org.typemeta.funcj.codec.impl.CodecConfigImpl;
+
+import java.lang.reflect.Field;
+import java.util.Set;
 
 /**
- * Interface for classes which provide configuration information
- * for {@link XmlNodeCodecCore} implementations.
+ * Base class for {@link XmlNodeTypes.Config} implementations.
  */
-public interface XmlNodeConfig extends CodecConfig {
-    String entryElemName();
+public class XmlNodeConfig extends CodecConfigImpl implements XmlNodeTypes.Config {
 
-    String typeAttrName();
+    public static class Builder extends AbstractBuilder<Builder, XmlNodeTypes.Config> {
+        @Override
+        public XmlNodeTypes.Config build() {
+            return new XmlNodeConfig(this);
+        }
+    }
 
-    String keyElemName();
+    public static XmlNodeConfig.Builder builder() {
+        return new XmlNodeConfig.Builder();
+    }
 
-    String valueElemName();
+    @Override
+    public String getFieldName(Field field, int depth, Set<String> existingNames) {
+        String name = field.getName();
+        while (existingNames.contains(name)) {
+            name = "_" + name;
+        }
+        return name;
+    }
 
-    String nullAttrName();
+    public XmlNodeConfig() {
+    }
 
-    String nullAttrVal();
+    public XmlNodeConfig(Builder builder) {
+        super(builder);
+    }
 
-    String defaultRootElemName(Class<?> type);
+    @Override
+    public String entryElemName() {
+        return "_";
+    }
 
-    String defaultRootElemName();
+    @Override
+    public String typeAttrName() {
+        return "type";
+    }
+
+    @Override
+    public String keyElemName() {
+        return "key";
+    }
+
+    @Override
+    public String valueElemName() {
+        return "value";
+    }
+
+    @Override
+    public String nullAttrName() {
+        return "null";
+    }
+
+    @Override
+    public String nullAttrVal() {
+        return "true";
+    }
+
+    @Override
+    public String defaultRootElemName(Class<?> type) {
+        return type.getSimpleName();
+    }
+
+    @Override
+    public String defaultRootElemName() {
+        return "Root";
+    }
 }

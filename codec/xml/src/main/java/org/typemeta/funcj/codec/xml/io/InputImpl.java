@@ -4,13 +4,10 @@ import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.xml.XmlTypes;
 
 import javax.xml.stream.*;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Map;
-import java.util.TreeMap;
+import java.text.*;
+import java.util.*;
 
 public class InputImpl implements XmlTypes.InStream {
     public static XmlTypes.InStream inputOf(XMLStreamReader reader) {

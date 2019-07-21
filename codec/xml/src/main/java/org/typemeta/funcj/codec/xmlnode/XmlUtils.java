@@ -6,8 +6,7 @@ import org.w3c.dom.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.*;
 import java.util.Optional;
 
 public abstract class XmlUtils {

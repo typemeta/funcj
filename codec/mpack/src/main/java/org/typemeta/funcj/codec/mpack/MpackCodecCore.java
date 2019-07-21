@@ -1,12 +1,10 @@
 package org.typemeta.funcj.codec.mpack;
 
-import org.typemeta.funcj.codec.CodecAPI;
-import org.typemeta.funcj.codec.CodecCoreDelegate;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.impl.CodecCoreImpl;
 import org.typemeta.funcj.codec.mpack.MpackTypes.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * Interface for classes which implement an encoding via MessagePack.
@@ -24,7 +22,7 @@ public class MpackCodecCore
     }
 
     public MpackCodecCore() {
-        this(new MpackConfigImpl());
+        this(new MpackConfig());
     }
 
     /**

@@ -1,16 +1,42 @@
 package org.typemeta.funcj.codec.jsonnode;
 
-import org.typemeta.funcj.codec.CodecConfig;
+import org.typemeta.funcj.codec.impl.CodecConfigImpl;
 
 /**
- * Interface for classes which provide configuration information
- * for {@link JsonNodeCodecCore} implementations.
+ * Base class for {@link JsonNodeTypes.Config} implementations.
  */
-public interface JsonNodeConfig extends CodecConfig {
+public class JsonNodeConfig extends CodecConfigImpl implements JsonNodeTypes.Config {
 
-    String typeFieldName();
+    public static class Builder extends AbstractBuilder<Builder, JsonNodeTypes.Config> {
+        @Override
+        public JsonNodeTypes.Config build() {
+            return new JsonNodeConfig(this);
+        }
+    }
 
-    String keyFieldName();
+    public static JsonNodeConfig.Builder builder() {
+        return new JsonNodeConfig.Builder();
+    }
 
-    String valueFieldName();
+    public JsonNodeConfig() {
+    }
+
+    public JsonNodeConfig(Builder builder) {
+        super(builder);
+    }
+
+    @Override
+    public String typeFieldName() {
+        return "@type";
+    }
+
+    @Override
+    public String keyFieldName() {
+        return "@key";
+    }
+
+    @Override
+    public String valueFieldName() {
+        return "@value";
+    }
 }

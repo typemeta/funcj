@@ -1,10 +1,9 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.CodecAPI;
-import org.typemeta.funcj.codec.xmlnode.XmlNodeConfigImpl;
+import org.typemeta.funcj.codec.xmlnode.XmlNodeConfig;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.time.*;
 import java.util.*;
 
@@ -61,12 +60,12 @@ public class Example {
         final CodecAPI.IO xmlCodecCore;
         if (stream) {
             System.out.println("XML Streaming");
-            final XmlConfigImpl.BuilderImpl cfgBldr = new XmlConfigImpl.BuilderImpl();
+            final XmlConfig.Builder cfgBldr = new XmlConfig.Builder();
             cfgBldr.registerAllowedPackage(Example.class.getPackage());
             xmlCodecCore = Codecs.xmlCodec(cfgBldr);
         } else {
             System.out.println("XML node");
-            final XmlNodeConfigImpl.BuilderImpl cfgBldr = new XmlNodeConfigImpl.BuilderImpl();
+            final XmlNodeConfig.Builder cfgBldr = new XmlNodeConfig.Builder();
             cfgBldr.registerAllowedPackage(Example.class.getPackage());
             xmlCodecCore = Codecs.xmlNodeCodec(cfgBldr);
         }

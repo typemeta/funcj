@@ -1,12 +1,9 @@
 package org.typemeta.funcj.codec.xmlnode;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.typemeta.funcj.codec.TestBase;
-import org.typemeta.funcj.codec.TestTypes;
+import org.junit.*;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.xml.Codecs;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.*;
 import java.io.StringWriter;
@@ -27,7 +24,7 @@ public class XmlNodeCodecTest extends TestBase {
     protected <T> void roundTrip(T val, Class<T> clazz) {
         final XmlNodeCodecCore codec =
                 prepareCodecCore(
-                        new XmlNodeConfigImpl.BuilderImpl(),
+                        new XmlNodeConfig.Builder(),
                         Codecs::xmlNodeCodec
                 );
 
@@ -56,8 +53,8 @@ public class XmlNodeCodecTest extends TestBase {
 
     @Test
     public void testDontFailOnUnrecognisedFields() {
-        final XmlNodeConfigImpl.BuilderImpl cfgBldr =
-                XmlNodeTypes.configBuilder()
+        final XmlNodeConfig.Builder cfgBldr =
+                XmlNodeConfig.builder()
                         .failOnUnrecognisedFields(false);
 
         final XmlNodeCodecCore codec = prepareCodecCore(cfgBldr, Codecs::xmlNodeCodec);

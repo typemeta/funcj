@@ -1,11 +1,10 @@
 package org.typemeta.funcj.codec.xmlnode;
 
-import org.typemeta.funcj.codec.CodecAPI;
-import org.typemeta.funcj.codec.CodecCoreDelegate;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.impl.CodecCoreImpl;
 import org.typemeta.funcj.codec.utils.CodecException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.typemeta.funcj.codec.xmlnode.XmlNodeTypes.Config;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.*;
@@ -15,7 +14,7 @@ import java.io.*;
  * Interface for classes which implement an encoding via XML.
  */
 public class XmlNodeCodecCore
-        extends CodecCoreDelegate<Element, Element, XmlNodeConfig>
+        extends CodecCoreDelegate<Element, Element, Config>
         implements CodecAPI.IO {
 
     public static final DocumentBuilder docBuilder;
@@ -32,12 +31,12 @@ public class XmlNodeCodecCore
         super(new CodecCoreImpl<>(format));
     }
 
-    public XmlNodeCodecCore(XmlNodeConfig config) {
+    public XmlNodeCodecCore(Config config) {
         this(new XmlNodeCodecFormat(config));
     }
 
     public XmlNodeCodecCore() {
-        this(new XmlNodeConfigImpl());
+        this(new XmlNodeConfig());
     }
 
     /**

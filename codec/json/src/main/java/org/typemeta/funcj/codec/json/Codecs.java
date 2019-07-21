@@ -14,7 +14,7 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
      * @return      the JSON codec
      */
     public static JsonCodecCore jsonCodec() {
-        return jsonCodec(new JsonConfigImpl.BuilderImpl());
+        return jsonCodec(new JsonConfig.Builder());
     }
 
     public static JsonCodecCore jsonCodec(CodecConfig.Builder<?, JsonTypes.Config> cfgBldr) {
@@ -28,10 +28,10 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
      * @return      the JSON codec
      */
     public static JsonNodeCodecCore jsonNodeCodec() {
-        return jsonNodeCodec(new JsonNodeConfigImpl.BuilderImpl());
+        return jsonNodeCodec(new JsonNodeConfig.Builder());
     }
 
-    public static JsonNodeCodecCore jsonNodeCodec(CodecConfig.Builder<?, JsonNodeConfig> cfgBldr) {
+    public static JsonNodeCodecCore jsonNodeCodec(CodecConfig.Builder<?, JsonNodeTypes.Config> cfgBldr) {
         return registerAll(cfgBldr, JsonNodeCodecCore::new);
     }
 }

@@ -1,10 +1,9 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.jsonnode.JsonNodeConfigImpl;
+import org.typemeta.funcj.codec.jsonnode.JsonNodeConfig;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.time.*;
 import java.util.*;
 
@@ -101,14 +100,14 @@ public class Example {
         final CodecAPI.RW jsonCodecCore;
         if (stream) {
             System.out.println("JSON Streaming");
-            final JsonConfigImpl.BuilderImpl cfgBldr = new JsonConfigImpl.BuilderImpl();
+            final JsonConfig.Builder cfgBldr = new JsonConfig.Builder();
             cfgBldr.registerAllowedPackage(Example.class.getPackage());
             final JsonCodecCore codec = Codecs.jsonCodec(cfgBldr);
             codec.registerCodec(ZonedDateTime.class, new ZonedDateTimeJsonCodec());
             jsonCodecCore = codec;
         } else {
             System.out.println("JSON node");
-            final JsonNodeConfigImpl.BuilderImpl cfgBldr = new JsonNodeConfigImpl.BuilderImpl();
+            final JsonNodeConfig.Builder cfgBldr = new JsonNodeConfig.Builder();
             cfgBldr.registerAllowedPackage(Example.class.getPackage());
             jsonCodecCore = Codecs.jsonNodeCodec(cfgBldr);
         }
