@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.impl.CodecCoreImpl;
+import org.typemeta.funcj.codec.impl.*;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
 
 import java.io.*;

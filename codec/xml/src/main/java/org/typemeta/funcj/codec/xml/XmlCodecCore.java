@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.xml;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.impl.CodecCoreImpl;
+import org.typemeta.funcj.codec.impl.*;
 import org.typemeta.funcj.codec.xml.XmlTypes.*;
 
 import java.io.*;

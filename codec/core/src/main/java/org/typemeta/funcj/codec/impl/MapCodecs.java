@@ -1,4 +1,6 @@
-package org.typemeta.funcj.codec;
+package org.typemeta.funcj.codec.impl;
+
+import org.typemeta.funcj.codec.*;
 
 import java.lang.reflect.Array;
 import java.util.*;

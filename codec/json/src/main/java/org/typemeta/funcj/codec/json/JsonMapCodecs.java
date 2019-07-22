@@ -1,7 +1,8 @@
 package org.typemeta.funcj.codec.json;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.MapCodecs.*;
+import org.typemeta.funcj.codec.impl.MapCodecs;
+import org.typemeta.funcj.codec.impl.MapCodecs.*;
 import org.typemeta.funcj.codec.json.JsonTypes.*;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.json.parser.JsonEvent;

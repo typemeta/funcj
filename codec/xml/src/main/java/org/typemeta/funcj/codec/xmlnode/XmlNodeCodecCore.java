@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.xmlnode;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.impl.CodecCoreImpl;
+import org.typemeta.funcj.codec.impl.*;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.xmlnode.XmlNodeTypes.Config;
 import org.w3c.dom.*;

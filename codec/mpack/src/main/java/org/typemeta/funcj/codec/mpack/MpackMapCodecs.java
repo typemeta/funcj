@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.mpack;
 
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.MapCodecs.*;
+import org.typemeta.funcj.codec.impl.MapCodecs.*;
 import org.typemeta.funcj.codec.mpack.MpackTypes.*;
 
 import java.util.Map;

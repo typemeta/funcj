@@ -17,7 +17,7 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class ObjectCodecBuilderWithArgArray<
         T,
-        IN ,
+        IN,
         OUT,
         CFG extends CodecConfig
         > extends ObjectCodecBuilder {
