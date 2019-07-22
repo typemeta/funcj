@@ -40,6 +40,33 @@ public abstract class Functions {
          * @return          the result of applying this function
          */
         R apply();
+
+        /**
+         * Compose this function with another,
+         * to create a function that first applies {@code f}
+         * and then applies this function to the result.
+         * @param f         the function to compose with
+         * @param <T>       the argument type to {@code f}
+         * @return          a function that first applies {@code f} and then applies this function to the result.
+         */
+        default <T> F<T, R> compose(SideEffect.F<? super T> f) {
+            return t -> {
+                f.apply(t);
+                return this.apply();
+            };
+        }
+
+        /**
+         * Compose this function with another,
+         * to create a function that first applies this function
+         * and then applies {@code f} to the result.
+         * @param f         the function to compose with
+         * @param <T>       the argument type to {@code f}
+         * @return          a function that first applies this function and then applies {@code f} to the result.
+         */
+        default <T> F0<T> andThen(F<? super R, ? extends T> f) {
+            return () -> f.apply(this.apply());
+        }
     }
 
     /**
@@ -114,9 +141,9 @@ public abstract class Functions {
         }
 
         /**
-         * Map a function over this oemn.
+         * Map a function over this function.
          * Essentially {@link F#compose} without the wildcard generic types.
-         * @param f         the function to compose with
+         * @param f         the function to map with
          * @param <T>       the argument type to {@code f}
          * @return          a function that first applies {@code f} and then applies this function to the result.
          */

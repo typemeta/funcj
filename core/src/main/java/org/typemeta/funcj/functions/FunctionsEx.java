@@ -41,6 +41,33 @@ public abstract class FunctionsEx {
          * @throws          Exception the exception
          */
         R apply() throws Exception;
+
+        /**
+         * Compose this function with another,
+         * to create a function that first applies {@code f}
+         * and then applies this function to the result.
+         * @param f         the function to compose with
+         * @param <T>       the argument type to {@code f}
+         * @return          a function that first applies {@code f} and then applies this function to the result.
+         */
+        default <T> F<T, R> compose(SideEffectEx.F<? super T> f) {
+            return t -> {
+                f.apply(t);
+                return this.apply();
+            };
+        }
+
+        /**
+         * Compose this function with another,
+         * to create a function that first applies this function
+         * and then applies {@code f} to the result.
+         * @param f         the function to compose with
+         * @param <T>       the argument type to {@code f}
+         * @return          a function that first applies this function and then applies {@code f} to the result.
+         */
+        default <T> F0<T> andThen(F<? super R, ? extends T> f) {
+            return () -> f.apply(this.apply());
+        }
     }
 
     /**
