@@ -53,7 +53,8 @@ public class ObjectCodecBuilderWithArgArray<
             String name,
             F<T, A> getter,
             Class<A> clazz,
-            Class<?> elemClass) {
+            Class<?> elemClass
+    ) {
         return field(
                 name,
                 getter,
@@ -83,7 +84,8 @@ public class ObjectCodecBuilderWithArgArray<
                 String name,
                 F<T, B> getter,
                 Class<B> clazz,
-                Class<?> elemClass) {
+                Class<?> elemClass
+        ) {
             return field(
                     name,
                     getter,
@@ -113,7 +115,8 @@ public class ObjectCodecBuilderWithArgArray<
                     String name,
                     F<T, C> getter,
                     Class<C> clazz,
-                    Class<?> elemClass) {
+                    Class<?> elemClass
+            ) {
                 return field(
                         name,
                         getter,
@@ -143,7 +146,8 @@ public class ObjectCodecBuilderWithArgArray<
                         String name,
                         F<T, D> getter,
                         Class<D> clazz,
-                        Class<?> elemClass) {
+                        Class<?> elemClass
+                ) {
                     return field(
                             name,
                             getter,
@@ -173,7 +177,8 @@ public class ObjectCodecBuilderWithArgArray<
                             String name,
                             F<T, N> getter,
                             Class<N> clazz,
-                            Class<?> elemClass) {
+                            Class<?> elemClass
+                    ) {
                         return field(
                                 name,
                                 getter,
@@ -199,7 +204,8 @@ public class ObjectCodecBuilderWithArgArray<
                                 String name,
                                 F<T, N> getter,
                                 Class<N> clazz,
-                                Class<?> elemClass) {
+                                Class<?> elemClass
+                        ) {
                             return field(
                                     name,
                                     getter,

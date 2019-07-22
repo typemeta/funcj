@@ -14,7 +14,8 @@ public class ObjectCodecBuilder {
 
         public <FT> FieldCodec(
                 Functions.F<T, FT> getter,
-                Codec<FT, IN, OUT, CFG> codec) {
+                Codec<FT, IN, OUT, CFG> codec
+        ) {
             encoder = (core, val, out) -> codec.encodeWithCheck(core, getter.apply(val), out);
             decoder = codec::decodeWithCheck;
         }
