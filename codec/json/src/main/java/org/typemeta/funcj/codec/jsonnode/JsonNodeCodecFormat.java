@@ -30,11 +30,11 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, Config
     }
 
     @Override
-    public <T> IsNull<JsValue> encodeNull(T val, JsValue out) {
+    public <T> WasEncoded<JsValue> encodeNull(T val, JsValue out) {
         if (val == null) {
-            return IsNull.of(true, JSAPI.nul());
+            return WasEncoded.of(true, JSAPI.nul());
         } else {
-            return IsNull.of(false, out);
+            return WasEncoded.of(false, out);
         }
     }
 
@@ -44,7 +44,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, Config
     }
 
     @Override
-    public <T> IsNull<JsValue> encodeDynamicType(
+    public <T> WasEncoded<JsValue> encodeDynamicType(
             CodecCoreEx<JsValue, JsValue, Config> core,
             Codec<T, JsValue, JsValue, Config> codec,
             T val,
@@ -53,11 +53,11 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, Config
     ) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
-            return IsNull.of(false, out);
+            return WasEncoded.of(false, out);
         } else if (!config().dynamicTypeTags()) {
             final Codec<T, JsValue, JsValue, Config> dynCodec = getDynCodec.apply(dynType);
             final JsValue jsv = dynCodec.encode(core, val, out);
-            return IsNull.of(true, jsv);
+            return WasEncoded.of(true, jsv);
         } else {
             final Codec<T, JsValue, JsValue, Config> dynCodec = getDynCodec.apply(dynType);
 
@@ -67,7 +67,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, Config
                             JSAPI.field(config.valueFieldName(), dynCodec.encode(core, val, out))
                     );
 
-            return IsNull.of(true, jsv);
+            return WasEncoded.of(true, jsv);
         }
     }
 

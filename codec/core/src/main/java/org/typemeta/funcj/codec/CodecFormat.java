@@ -16,25 +16,29 @@ public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
 
     CFG config();
 
-    class IsNull<OUT> {
-        public static <OUT> IsNull<OUT> of(boolean isNull, OUT out) {
-            return new IsNull<>(isNull, out);
+    /**
+     * Simple wrapper type to indicate whether an encoding took place or not.
+     * @param <OUT>     the encoded output type
+     */
+    class WasEncoded<OUT> {
+        public static <OUT> WasEncoded<OUT> of(boolean isNull, OUT out) {
+            return new WasEncoded<>(isNull, out);
         }
 
-        public final boolean isNull;
+        public final boolean wasEncoded;
         public final OUT out;
 
-        public IsNull(boolean isNull, OUT out) {
-            this.isNull = isNull;
+        public WasEncoded(boolean wasEncoded, OUT out) {
+            this.wasEncoded = wasEncoded;
             this.out = out;
         }
     }
 
-    <T> IsNull<OUT> encodeNull(T val, OUT out);
+    <T> WasEncoded<OUT> encodeNull(T val, OUT out);
 
     boolean decodeNull(IN in);
 
-    <T> IsNull<OUT> encodeDynamicType(
+    <T> WasEncoded<OUT> encodeDynamicType(
             CodecCoreEx<IN, OUT, CFG> core,
             Codec<T, IN, OUT, CFG> codec,
             T val,

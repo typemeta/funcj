@@ -34,12 +34,12 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
     }
 
     @Override
-    public <T> IsNull<OutStream> encodeNull(T val, OutStream out) {
+    public <T> WasEncoded<OutStream> encodeNull(T val, OutStream out) {
         if (val == null) {
             out.attribute(config.nullAttrName(), config.nullAttrVal());
-            return IsNull.of(true, out);
+            return WasEncoded.of(true, out);
         } else {
-            return IsNull.of(false, out);
+            return WasEncoded.of(false, out);
         }
     }
 
@@ -49,7 +49,7 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
     }
 
     @Override
-    public <T> IsNull<OutStream> encodeDynamicType(
+    public <T> WasEncoded<OutStream> encodeDynamicType(
             CodecCoreEx<InStream, OutStream, Config> core,
             Codec<T, InStream, OutStream, Config> codec,
             T val,
@@ -58,16 +58,16 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
     ) {
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
-            return IsNull.of(false, out);
+            return WasEncoded.of(false, out);
         } else if (!config().dynamicTypeTags()) {
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             dynCodec.encode(core, val, out);
-            return IsNull.of(true, out);
+            return WasEncoded.of(true, out);
         } else {
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             out.attribute(config.typeAttrName(), config().classToName(dynType));
             dynCodec.encode(core, val, out);
-            return IsNull.of(true, out);
+            return WasEncoded.of(true, out);
         }
     }
 

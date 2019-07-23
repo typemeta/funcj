@@ -34,14 +34,14 @@ public abstract class MapCodecs {
 
         @Override
         public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Map<K, V> value, OUT out) {
-            final CodecFormat.IsNull<OUT> nullRes = core.format().encodeNull(value, out);
-            if (nullRes.isNull) {
+            final CodecFormat.WasEncoded<OUT> nullRes = core.format().encodeNull(value, out);
+            if (nullRes.wasEncoded) {
                 return nullRes.out;
             } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
                 final Class<Map<K, V>> implCollType = core.config().getDefaultCollectionType(type());
                 return getCodec(core, implCollType).encode(core, value, out);
             } else {
-                final CodecFormat.IsNull<OUT> dynRes =
+                final CodecFormat.WasEncoded<OUT> dynRes =
                         core.format().encodeDynamicType(
                                 core,
                                 this,
@@ -49,7 +49,7 @@ public abstract class MapCodecs {
                                 out,
                                 clazz -> getCodec(core, clazz)
                         );
-                if (dynRes.isNull) {
+                if (dynRes.wasEncoded) {
                     return dynRes.out;
                 } else {
                     return encode(core, value, out);
@@ -118,14 +118,14 @@ public abstract class MapCodecs {
 
         @Override
         public OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, Map<String, V> value, OUT out) {
-            final CodecFormat.IsNull<OUT> nullRes = core.format().encodeNull(value, out);
-            if (nullRes.isNull) {
+            final CodecFormat.WasEncoded<OUT> nullRes = core.format().encodeNull(value, out);
+            if (nullRes.wasEncoded) {
                 return nullRes.out;
             } else if (core.config().isDefaultCollectionType(type(), value.getClass())) {
                 final Class<Map<String, V>> implCollType = core.config().getDefaultCollectionType(type());
                 return getCodec(core, implCollType).encode(core, value, out);
             } else {
-                final CodecFormat.IsNull<OUT> dynRes =
+                final CodecFormat.WasEncoded<OUT> dynRes =
                         core.format().encodeDynamicType(
                                 core,
                                 this,
@@ -133,7 +133,7 @@ public abstract class MapCodecs {
                                 out,
                                 clazz -> getCodec(core, clazz)
                         );
-                if (dynRes.isNull) {
+                if (dynRes.wasEncoded) {
                     return dynRes.out;
                 } else {
                     return encode(core, value, out);

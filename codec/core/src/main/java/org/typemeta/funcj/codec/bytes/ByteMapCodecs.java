@@ -23,12 +23,12 @@ public abstract class ByteMapCodecs {
                 Map<K, V> value,
                 OutStream out
         ) {
-            if (core.format().encodeNull(value, out).isNull) {
+            if (core.format().encodeNull(value, out).wasEncoded) {
                 return out;
             } else if (!core.format().encodeDynamicType(
                     core,this,
                     value, out,
-                    clazz -> getCodec(core, clazz)).isNull) {
+                    clazz -> getCodec(core, clazz)).wasEncoded) {
                 return encode(core, value, out);
             } else {
                 return out;
@@ -81,14 +81,14 @@ public abstract class ByteMapCodecs {
                 Map<String, V> value,
                 OutStream out
         ) {
-            if (core.format().encodeNull(value, out).isNull) {
+            if (core.format().encodeNull(value, out).wasEncoded) {
                 return out;
             } else if (!core.format().encodeDynamicType(
                     core,
                     this,
                     value,
                     out,
-                    clazz -> getCodec(core, clazz)).isNull) {
+                    clazz -> getCodec(core, clazz)).wasEncoded) {
                 return encode(core, value, out);
             } else {
                 return out;

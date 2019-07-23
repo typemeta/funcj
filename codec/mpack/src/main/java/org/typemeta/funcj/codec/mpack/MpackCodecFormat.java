@@ -33,10 +33,10 @@ public class MpackCodecFormat
     }
 
     @Override
-    public <T> IsNull<OutStream> encodeNull(T val, OutStream out) {
+    public <T> WasEncoded<OutStream> encodeNull(T val, OutStream out) {
         final boolean isNull = val == null;
         out.writeBoolean(isNull);
-        return IsNull.of(isNull, out);
+        return WasEncoded.of(isNull, out);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class MpackCodecFormat
     }
 
     @Override
-    public <T> IsNull<OutStream> encodeDynamicType(
+    public <T> WasEncoded<OutStream> encodeDynamicType(
             CodecCoreEx<InStream, OutStream, Config> core,
             Codec<T, InStream, OutStream, Config> codec,
             T val,
@@ -55,13 +55,13 @@ public class MpackCodecFormat
         final Class<T> dynType = (Class<T>) val.getClass();
         if (config().dynamicTypeMatch(codec.type(), dynType)) {
             out.writeBoolean(false);
-            return IsNull.of(false, out);
+            return WasEncoded.of(false, out);
         } else {
             out.writeBoolean(true);
             final Codec<T, InStream, OutStream, Config> dynCodec = getDynCodec.apply(dynType);
             out.writeString(config().classToName(dynType));
             dynCodec.encode(core, val, out);
-            return IsNull.of(true, out);
+            return WasEncoded.of(true, out);
         }
     }
 
@@ -567,14 +567,14 @@ public class MpackCodecFormat
                     Collection<T> value,
                     OutStream out
             ) {
-                if (core.format().encodeNull(value, out).isNull) {
+                if (core.format().encodeNull(value, out).wasEncoded) {
                     return out;
                 } else if (!core.format().encodeDynamicType(
                         core,
                         this,
                         value,
                         out,
-                        type -> getCodec(core, type)).isNull) {
+                        type -> getCodec(core, type)).wasEncoded) {
                     return encode(core, value, out);
                 } else {
                     return out;

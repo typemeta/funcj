@@ -20,8 +20,8 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
 
         @Override
         default OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
-            final CodecFormat.IsNull<OUT> nullRes = core.format().encodeNull(value, out);
-            if (nullRes.isNull) {
+            final CodecFormat.WasEncoded<OUT> nullRes = core.format().encodeNull(value, out);
+            if (nullRes.wasEncoded) {
                 return nullRes.out;
             } else {
                 return encode(core, value, out);
@@ -287,12 +287,12 @@ public interface Codec<T, IN, OUT, CFG extends CodecConfig> {
      * @return          the encoded output stream
      */
     default OUT encodeWithCheck(CodecCoreEx<IN, OUT, CFG> core, T value, OUT out) {
-        final CodecFormat.IsNull<OUT> nullRes = core.format().encodeNull(value, out);
-        if (nullRes.isNull) {
+        final CodecFormat.WasEncoded<OUT> nullRes = core.format().encodeNull(value, out);
+        if (nullRes.wasEncoded) {
             return nullRes.out;
         } else {
-            final CodecFormat.IsNull<OUT> dynRes = core.encodeDynamicType(this, value, out);
-            if (dynRes.isNull) {
+            final CodecFormat.WasEncoded<OUT> dynRes = core.encodeDynamicType(this, value, out);
+            if (dynRes.wasEncoded) {
                 return dynRes.out;
             } else {
                 return encode(core, value, out);

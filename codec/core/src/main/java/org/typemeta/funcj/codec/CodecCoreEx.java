@@ -40,7 +40,7 @@ public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore
      */
     <T> ArgMapTypeCtor<T> getArgMapTypeCtor(Class<T> clazz);
 
-    default <T> CodecFormat.IsNull<OUT> encodeDynamicType(Codec<T, IN, OUT, CFG> codec, T val, OUT out) {
+    default <T> CodecFormat.WasEncoded<OUT> encodeDynamicType(Codec<T, IN, OUT, CFG> codec, T val, OUT out) {
         return format().encodeDynamicType(this, codec, val, out, this::getCodec);
     }
 
