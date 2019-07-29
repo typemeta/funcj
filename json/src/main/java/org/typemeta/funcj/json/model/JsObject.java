@@ -56,11 +56,11 @@ public final class JsObject
     private final LinkedHashMap<String, Field> fields;
 
     protected JsObject(Map<String, Field> fields) {
-        this.fields = new LinkedHashMap<String, Field>(fields);
+        this.fields = new LinkedHashMap<String, Field>(Objects.requireNonNull(fields));
     }
 
     protected JsObject(LinkedHashMap<String, Field> fields) {
-        this.fields = fields;
+        this.fields = Objects.requireNonNull(fields);
     }
 
     public boolean isEmpty() {
