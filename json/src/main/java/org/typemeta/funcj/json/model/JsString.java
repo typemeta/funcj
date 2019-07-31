@@ -2,6 +2,8 @@ package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions;
 
+import java.util.Objects;
+
 /**
  * Models a JSON string.
  */
@@ -10,7 +12,7 @@ public final class JsString implements JsValue {
     private final String value;
 
     protected JsString(String value) {
-        this.value = value;
+        this.value = Objects.requireNonNull(value);
     }
 
     public String value() {
