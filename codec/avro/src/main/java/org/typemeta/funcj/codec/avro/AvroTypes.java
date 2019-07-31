@@ -16,17 +16,25 @@ public abstract class AvroTypes {
     public interface Config extends CodecConfig {
     }
 
-    public static class WithSchema<T> {
-        public static <T> WithSchema<T> of(T value, Schema schema) {
-            return new WithSchema<>(value, schema);
+    public static class WithSchema {
+        public static WithSchema of(Object value, Schema schema) {
+            return new WithSchema(value, schema);
         }
 
-        public final T value;
-        public final Schema schema;
+        private final Object value;
+        private final Schema schema;
 
-        public WithSchema(T value, Schema schema) {
+        public WithSchema(Object value, Schema schema) {
             this.value = value;
             this.schema = schema;
+        }
+
+        public <T> T value() {
+            return (T)value;
+        }
+
+        public Schema schema() {
+            return schema;
         }
     }
 }
