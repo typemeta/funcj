@@ -2,10 +2,6 @@ package org.typemeta.funcj.codec.avro;
 
 import org.apache.avro.Schema;
 import org.typemeta.funcj.codec.CodecConfig;
-import org.typemeta.funcj.codec.stream.StreamCodecFormat;
-
-import java.io.*;
-import java.math.BigInteger;
 
 public abstract class AvroTypes {
 

@@ -22,7 +22,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
     protected final Config config;
 
-    private static void checkSchemaType(Schema schema, Schema.Type type) {
+    protected static void checkSchemaType(Schema schema, Schema.Type type) {
         if (schema.getType() != type) {
             throw new CodecException(
                     "Expecting a schema of type " + type + " but got " + schema.getType() +
@@ -639,7 +639,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
             Codec<K, WithSchema, Object, Config> keyCodec,
             Codec<V, WithSchema, Object, Config> valueCodec
     ) {
-        return new AvroMapCodecs.MapCodec<K, V>(type, keyCodec, valueCodec);
+        throw new CodecException("AvroCodecformat does not handle Maps with a non-String key type");
     }
 
     @Override
