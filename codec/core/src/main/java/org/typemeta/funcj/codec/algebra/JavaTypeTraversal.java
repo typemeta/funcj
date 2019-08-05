@@ -80,7 +80,7 @@ public class JavaTypeTraversal<T> {
                     } else if (elemType.equals(Double.class)) {
                         return alg.doubleArr();
                     } else {
-                        return alg.objectArr(alg.object());
+                        return alg.objectArr(applyAlg(alg, elemType));
                     }
                 }
             } else if (clazz.isEnum()) {
