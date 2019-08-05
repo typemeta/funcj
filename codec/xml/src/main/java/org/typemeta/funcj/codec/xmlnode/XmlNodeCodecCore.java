@@ -15,7 +15,7 @@ import java.io.*;
  */
 public class XmlNodeCodecCore
         extends CodecCoreDelegate<Element, Element, Config>
-        implements CodecAPI.IO {
+        implements CodecStrAPI.IO {
 
     public static final DocumentBuilder docBuilder;
 

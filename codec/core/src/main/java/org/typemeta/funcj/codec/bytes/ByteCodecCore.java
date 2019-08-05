@@ -11,7 +11,7 @@ import java.io.*;
  */
 public class ByteCodecCore
         extends CodecCoreDelegate<InStream, OutStream, Config>
-        implements CodecAPI.IO {
+        implements CodecStrAPI.IO {
 
     public ByteCodecCore(ByteCodecFormat format) {
         super(new CodecCoreImpl<>(format));

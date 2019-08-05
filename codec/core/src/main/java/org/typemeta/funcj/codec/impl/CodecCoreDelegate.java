@@ -72,7 +72,8 @@ public class CodecCoreDelegate<IN, OUT, CFG extends CodecConfig>
     @Override
     public <T> Codec<Collection<T>, IN, OUT, CFG> getCollCodec(
             Class<Collection<T>> collType,
-            Class<T> elemType) {
+            Class<T> elemType
+    ) {
         return delegate.getCollCodec(collType, elemType);
     }
 
@@ -80,7 +81,8 @@ public class CodecCoreDelegate<IN, OUT, CFG extends CodecConfig>
     public <K, V> Codec<Map<K, V>, IN, OUT, CFG> getMapCodec(
             Class<Map<K, V>> mapType,
             Class<K> keyType,
-            Class<V> valType) {
+            Class<V> valType
+    ) {
         return delegate.getMapCodec(mapType, keyType, valType);
     }
 }

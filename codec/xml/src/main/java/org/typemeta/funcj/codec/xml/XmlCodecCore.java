@@ -11,7 +11,7 @@ import java.io.*;
  */
 public class XmlCodecCore
         extends CodecCoreDelegate<InStream, OutStream, Config>
-        implements CodecAPI.IO {
+        implements CodecStrAPI.IO {
 
     public XmlCodecCore(XmlCodecFormat format) {
         super(new CodecCoreImpl<>(format));

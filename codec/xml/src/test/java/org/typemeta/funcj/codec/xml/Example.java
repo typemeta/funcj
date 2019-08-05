@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.xml;
 
-import org.typemeta.funcj.codec.CodecAPI;
+import org.typemeta.funcj.codec.CodecStrAPI;
 import org.typemeta.funcj.codec.xmlnode.XmlNodeConfig;
 
 import java.io.*;
@@ -57,7 +57,7 @@ public class Example {
             Colour.GREEN, Colour.BLUE);
 
     static void xmlTest(boolean stream) {
-        final CodecAPI.IO xmlCodecCore;
+        final CodecStrAPI.IO xmlCodecCore;
         if (stream) {
             System.out.println("XML Streaming");
             final XmlConfig.Builder cfgBldr = new XmlConfig.Builder();

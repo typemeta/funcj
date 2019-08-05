@@ -21,6 +21,7 @@
         <module>json</module>
         <module>xml</module>
         <module>mpack</module>
+        <module>avro</module>
     </modules>
 
 </project>

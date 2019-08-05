@@ -12,7 +12,7 @@ import java.io.*;
  */
 public class JsonNodeCodecCore
         extends CodecCoreDelegate<JsValue, JsValue, JsonNodeTypes.Config>
-        implements CodecAPI.RW {
+        implements CodecStrAPI.RW {
 
     public JsonNodeCodecCore(JsonNodeCodecFormat format) {
         super(new CodecCoreImpl<>(format));

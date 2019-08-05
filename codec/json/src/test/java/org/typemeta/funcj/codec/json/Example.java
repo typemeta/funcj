@@ -97,7 +97,7 @@ public class Example {
 
     static void jsonTest(boolean stream) {
 
-        final CodecAPI.RW jsonCodecCore;
+        final CodecStrAPI.RW jsonCodecCore;
         if (stream) {
             System.out.println("JSON Streaming");
             final JsonConfig.Builder cfgBldr = new JsonConfig.Builder();

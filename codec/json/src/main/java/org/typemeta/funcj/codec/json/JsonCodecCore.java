@@ -11,7 +11,7 @@ import java.io.*;
  */
 public class JsonCodecCore
         extends CodecCoreDelegate<InStream, OutStream, Config>
-        implements CodecAPI.RW {
+        implements CodecStrAPI.RW {
 
     public JsonCodecCore(JsonCodecFormat format) {
         super(new CodecCoreImpl<>(format));

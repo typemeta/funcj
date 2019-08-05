@@ -11,7 +11,7 @@ import java.io.*;
  */
 public class MpackCodecCore
         extends CodecCoreDelegate<InStream, OutStream, Config>
-        implements CodecAPI.IO {
+        implements CodecStrAPI.IO {
 
     public MpackCodecCore(MpackCodecFormat format) {
         super(new CodecCoreImpl<>(format));

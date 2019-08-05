@@ -1,6 +1,9 @@
 package org.typemeta.funcj.codec.avro;
 
-import org.typemeta.funcj.codec.CodecAPI;
+import org.apache.avro.Schema;
+import org.apache.avro.file.*;
+import org.apache.avro.generic.GenericRecord;
+import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
 import org.typemeta.funcj.codec.impl.*;
 
@@ -11,7 +14,7 @@ import java.io.*;
  */
 public class AvroCodecCore
         extends CodecCoreDelegate<WithSchema, Object, Config>
-        implements CodecAPI<Object, Object> {
+        implements CodecAPI {
 
     public AvroCodecCore(AvroCodecFormat format) {
         super(new CodecCoreImpl<>(format));
@@ -25,14 +28,18 @@ public class AvroCodecCore
         this(new AvroConfig());
     }
 
-    @Override
-    public <T> Writer encode(Class<? super T> type, T value, Writer writer) {
-        encodeImpl(type, value, JsonTypes.outputOf(writer));
+    public <T> DataFileWriter<GenericRecord> encode(
+            Schema schema,
+            T value,
+            DataFileWriter<GenericRecord> writer
+    ) throws IOException {
+        final GenericRecord genRec = (GenericRecord)encodeImpl(Object.class, value, schema);
+        writer.append(genRec);
         return writer;
     }
 
-    @Override
-    public <T> T decode(Class<? super T> type, Reader reader) {
-        return decodeImpl(type, JsonTypes.inputOf(reader));
+    public <T> T decode(Schema schema, DataFileReader<GenericRecord> reader) {
+        final GenericRecord genRec = reader.next();
+        return decodeImpl(Object.class, WithSchema.of(genRec, schema));
     }
 }
