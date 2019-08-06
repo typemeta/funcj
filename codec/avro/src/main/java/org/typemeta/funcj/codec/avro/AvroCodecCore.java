@@ -2,10 +2,11 @@ package org.typemeta.funcj.codec.avro;
 
 import org.apache.avro.Schema;
 import org.apache.avro.file.*;
-import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.generic.*;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
 import org.typemeta.funcj.codec.impl.*;
+import org.typemeta.funcj.codec.utils.CodecException;
 
 import java.io.*;
 
@@ -14,7 +15,7 @@ import java.io.*;
  */
 public class AvroCodecCore
         extends CodecCoreDelegate<WithSchema, Object, Config>
-        implements CodecAPI {
+        implements CodecStrAPI.IO {
 
     public AvroCodecCore(AvroCodecFormat format) {
         super(new CodecCoreImpl<>(format));
@@ -38,8 +39,50 @@ public class AvroCodecCore
         return writer;
     }
 
-    public <T> T decode(Schema schema, DataFileReader<GenericRecord> reader) {
-        final GenericRecord genRec = reader.next();
-        return decodeImpl(Object.class, WithSchema.of(genRec, schema));
+    public <T> DataFileWriter<GenericRecord> encode(
+            Schema schema,
+            T value,
+            OutputStream os
+    ) throws IOException {
+        final DataFileWriter<GenericRecord> writer =
+                new DataFileWriter<GenericRecord>(new GenericDatumWriter<GenericRecord>(schema))
+                        .create(schema, os);
+        return encode(schema, value, writer);
+    }
+
+    public <T> T decode(DataFileStream<GenericRecord> dfs) {
+        final GenericRecord genRec = dfs.next();
+        return decodeImpl(Object.class, WithSchema.of(genRec, genRec.getSchema()));
+    }
+
+    public <T> T decode(Schema schema, InputStream is) throws IOException {
+        try (final DataFileStream<GenericRecord> dfs =
+                new DataFileStream<GenericRecord>(is, new GenericDatumReader<GenericRecord>(schema))) {
+            return decode(dfs);
+        }
+    }
+
+    @Override
+    public <T> OutputStream encode(
+            Class<? super T> clazz,
+            T value,
+            OutputStream os
+    ) {
+        final Schema schema = GenerateSchema.apply(clazz);
+        try (DataFileWriter<GenericRecord> dfw = encode(schema, value, os)) {
+            return os;
+        } catch (IOException ex) {
+            throw new CodecException(ex);
+        }
+    }
+
+    @Override
+    public <T> T decode(Class<? super T> clazz, InputStream is) {
+        final Schema schema = GenerateSchema.apply(clazz);
+        try {
+            return decode(schema, is);
+        } catch (IOException ex) {
+            throw new CodecException(ex);
+        }
     }
 }

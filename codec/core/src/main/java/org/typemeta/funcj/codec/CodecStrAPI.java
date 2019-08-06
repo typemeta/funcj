@@ -17,38 +17,38 @@ public interface CodecStrAPI<IS, OS> extends CodecAPI {
      * Encode a value of type {@code T} into an {@link OS}.
      * @param clazz     the class of the decoded value
      * @param value     the value to encode
-     * @param wtr       the writer
+     * @param os        the output stream
      * @param <T>       the decoded value type
      * @return          the writer
      */
-    <T> OS encode(Class<? super T> clazz, T value, OS wtr);
+    <T> OS encode(Class<? super T> clazz, T value, OS os);
 
     /**
      * Decode a value of type {@code T} from an {@link IS}.
      * @param clazz     the type of the decoded value
-     * @param rdr       the reader
+     * @param is        the input stream
      * @param <T>       the decoded value type
      * @return          the decoded value
      */
-    <T> T decode(Class<? super T> clazz, IS rdr);
+    <T> T decode(Class<? super T> clazz, IS is);
 
     /**
      * Encode the given value into JSON and write the results to the {@link OS} object.
      * @param value     the value to be encoded
-     * @param writer    the output stream to which the JSON is written
+     * @param os        the output stream to which the JSON is written
      * @return          the writer
      */
-    default OS encode(Object value, OS writer) {
-        return encode(Object.class, value, writer);
+    default OS encode(Object value, OS os) {
+        return encode(Object.class, value, os);
     }
 
     /**
      * Decode a value of type {@code T} from an {@link IS}.
-     * @param rdr       the reader
+     * @param is        the input stream
      * @return          the decoded value
      */
-    default Object decode(IS rdr) {
-        return decode(Object.class, rdr);
+    default Object decode(IS is) {
+        return decode(Object.class, is);
     }
 
     /**

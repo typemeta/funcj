@@ -31,6 +31,15 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
         }
     }
 
+    protected static void checkArraySchemaType(Schema schema, Schema.Type elemType) {
+        if (schema.getType() != Schema.Type.ARRAY && schema.getElementType().getType() != elemType) {
+            throw new CodecException(
+                    "Expecting an ARRAY schema with element type " + elemType + " but got " + schema.getType() +
+                            ", from schema '" + schema.getFullName() + "'"
+            );
+        }
+    }
+
     public AvroCodecFormat(Config config) {
         this.config = config;
     }
@@ -106,7 +115,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, boolean[] value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.ARRAY);
+            checkArraySchemaType((Schema)out, Schema.Type.BOOLEAN);
 
             final List<Boolean> list = new ArrayList<>(value.length);
             for (boolean val : value) {
@@ -117,7 +126,8 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public boolean[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.ARRAY);
+            checkArraySchemaType(in.schema(), Schema.Type.BOOLEAN);
+
             final Schema elemSchema = in.schema().getElementType();
 
             final List<Boolean> values = in.value();
@@ -155,8 +165,20 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public byte decodePrim(WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.BOOLEAN);
-            return in.value();
+            switch (in.schema().getType()) {
+                case BYTES:
+                    final ByteBuffer buff = in.value();
+                    return buff.array()[0];
+                case FIXED:
+                    final GenericData.Fixed fixed = in.value();
+                    return fixed.bytes()[0];
+                default:
+                    throw new CodecException(
+                            "Expecting a schema of type " + Schema.Type.BYTES + " or " + Schema.Type.FIXED +
+                                    " but got " + in.schema().getType() +
+                                    ", from schema '" + in.schema().getFullName() + "'"
+                    );
+            }
         }
     }
 
@@ -177,26 +199,15 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, byte[] value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.ARRAY);
-
-            final List<Byte> list = new ArrayList<>(value.length);
-            for (byte val : value) {
-                list.add(val);
-            }
-            return list;
+            checkSchemaType((Schema)out, Schema.Type.BYTES);
+            return ByteBuffer.wrap(value);
         }
 
         @Override
         public byte[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.ARRAY);
-            final Schema elemSchema = in.schema().getElementType();
-
-            final List<Byte> values = in.value();
-            final byte[] arr = new byte[values.size()];
-            for (int i = 0; i < values.size(); ++i) {
-                arr[i] = byteCodec().decodePrim(WithSchema.of(values.get(i), elemSchema));
-            }
-            return arr;
+            checkSchemaType(in.schema(), Schema.Type.BYTES);
+            final ByteBuffer buff = in.value();
+            return buff.array();
         }
     };
 
@@ -209,15 +220,37 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encodePrim(char value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.STRING);
-            return Character.toString(value);
+            final Schema schema = (Schema)out;
+            switch (schema.getType()) {
+                case STRING:
+                    return String.valueOf(value);
+                case FIXED:
+                    return new GenericData.Fixed(schema, String.valueOf(value).getBytes());
+                default:
+                    throw new CodecException(
+                            "Expecting a schema of type " + Schema.Type.STRING + " or " + Schema.Type.FIXED +
+                                    " but got " + schema.getType() +
+                                    ", from schema '" + schema.getFullName() + "'"
+                    );
+            }
         }
 
         @Override
         public char decodePrim(WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.STRING);
-            final String s = in.value();
-            return s.charAt(0);
+            switch (in.schema().getType()) {
+                case STRING:
+                    final String s = in.value();
+                    return s.charAt(0);
+                case FIXED:
+                    final GenericData.Fixed fixed = in.value();
+                    return fixed.toString().charAt(0);
+                default:
+                    throw new CodecException(
+                            "Expecting a schema of type " + Schema.Type.STRING + " or " + Schema.Type.FIXED +
+                                    " but got " + in.schema().getType() +
+                                    ", from schema '" + in.schema().getFullName() + "'"
+                    );
+            }
         }
     }
 
@@ -238,26 +271,15 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, char[] value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.ARRAY);
-
-            final List<Character> list = new ArrayList<>(value.length);
-            for (char val : value) {
-                list.add(val);
-            }
-            return list;
+            checkSchemaType((Schema)out, Schema.Type.STRING);
+            return new String(value);
         }
 
         @Override
         public char[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.ARRAY);
-            final Schema elemSchema = in.schema().getElementType();
-
-            final List<Character> values = in.value();
-            final char[] arr = new char[values.size()];
-            for (int i = 0; i < values.size(); ++i) {
-                arr[i] = charCodec().decodePrim(WithSchema.of(values.get(i), elemSchema));
-            }
-            return arr;
+            checkSchemaType(in.schema(), Schema.Type.STRING);
+            final String s = in.value();
+            return s.toCharArray();
         }
     };
 
@@ -298,7 +320,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, short[] value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.ARRAY);
+            checkArraySchemaType((Schema)out, Schema.Type.INT);
 
             final List<Short> list = new ArrayList<>(value.length);
             for (short val : value) {
@@ -309,7 +331,8 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public short[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.ARRAY);
+            checkArraySchemaType(in.schema(), Schema.Type.INT);
+
             final Schema elemSchema = in.schema().getElementType();
 
             final List<Short> values = in.value();
@@ -358,7 +381,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, int[] value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.ARRAY);
+            checkArraySchemaType((Schema)out, Schema.Type.INT);
 
             final List<Integer> list = new ArrayList<>(value.length);
             for (int val : value) {
@@ -369,7 +392,8 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public int[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.ARRAY);
+            checkArraySchemaType(in.schema(), Schema.Type.INT);
+
             final Schema elemSchema = in.schema().getElementType();
 
             final List<Integer> values = in.value();
@@ -418,7 +442,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, long[] value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.ARRAY);
+            checkArraySchemaType((Schema)out, Schema.Type.LONG);
 
             final List<Long> list = new ArrayList<>(value.length);
             for (long val : value) {
@@ -429,7 +453,8 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public long[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.ARRAY);
+            checkArraySchemaType(in.schema(), Schema.Type.LONG);
+
             final Schema elemSchema = in.schema().getElementType();
 
             final List<Long> values = in.value();
@@ -478,7 +503,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, float[] value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.ARRAY);
+            checkArraySchemaType((Schema)out, Schema.Type.FLOAT);
 
             final List<Float> list = new ArrayList<>(value.length);
             for (float val : value) {
@@ -489,7 +514,8 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public float[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.ARRAY);
+            checkArraySchemaType(in.schema(), Schema.Type.FLOAT);
+
             final Schema elemSchema = in.schema().getElementType();
 
             final List<Float> values = in.value();
@@ -538,7 +564,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, double[] value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.ARRAY);
+            checkArraySchemaType((Schema)out, Schema.Type.DOUBLE);
 
             final List<Double> list = new ArrayList<>(value.length);
             for (double val : value) {
@@ -549,7 +575,8 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public double[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.ARRAY);
+            checkArraySchemaType(in.schema(), Schema.Type.DOUBLE);
+
             final Schema elemSchema = in.schema().getElementType();
 
             final List<Double> values = in.value();

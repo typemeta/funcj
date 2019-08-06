@@ -9,10 +9,48 @@ import java.io.ByteArrayOutputStream;
 
 public class AvroCodecTest extends TestBase {
 
+    static class AvroTestType {
+        final boolean p_bo;
+        final byte p_by;
+        final char p_ch;
+        final short p_sh;
+        final int p_in;
+        final long p_lo;
+        final float p_fl;
+        final double p_du;
+
+        final Boolean b_bo;
+        final Byte b_by;
+        final Character b_ch;
+        final Short b_sh;
+        final Integer b_in;
+        final Long b_lo;
+        final Float b_fl;
+        final Double b_du;
+
+        final boolean p_bo;
+        final byte p_by;
+        final char p_ch;
+        final short p_sh;
+        final int p_in;
+        final long p_lo;
+        final float p_fl;
+        final double p_du;
+
+        final Boolean b_bo;
+        final Byte b_by;
+        final Character b_ch;
+        final Short b_sh;
+        final Integer b_in;
+        final Long b_lo;
+        final Float b_fl;
+        final Double b_du;
+    }
+
     @Override
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final AvroConfigImpl.BuilderImpl cfgBldr = AvroTypes.configBuilder();
-        final AvroCodecCore codec = prepareCodecCore(cfgBldr, Codecs::mpackCodec);
+        final AvroConfig.Builder cfgBldr = AvroConfig.builder();
+        final AvroCodecCore codec = prepareCodecCore(cfgBldr, Codecs::avroCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

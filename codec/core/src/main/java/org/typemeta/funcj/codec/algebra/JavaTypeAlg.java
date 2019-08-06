@@ -1,50 +1,52 @@
 package org.typemeta.funcj.codec.algebra;
 
+import org.typemeta.funcj.data.IList;
+
 import java.util.Map;
 
 public interface JavaTypeAlg<T> {
-    T booleanB();
-    T booleanP();
-    T booleanArr();
+    T booleanB(IList<String> path, String name);
+    T booleanP(IList<String> path, String name);
+    T booleanArr(IList<String> path, String name);
 
-    T byteB();
-    T byteP();
-    T byteArr();
+    T byteB(IList<String> path, String name);
+    T byteP(IList<String> path, String name);
+    T byteArr(IList<String> path, String name);
 
-    T charB();
-    T charP();
-    T charArr();
+    T charB(IList<String> path, String name);
+    T charP(IList<String> path, String name);
+    T charArr(IList<String> path, String name);
 
-    T shortB();
-    T shortP();
-    T shortArr();
+    T shortB(IList<String> path, String name);
+    T shortP(IList<String> path, String name);
+    T shortArr(IList<String> path, String name);
 
-    T integerB();
-    T integerP();
-    T integerArr();
+    T integerB(IList<String> path, String name);
+    T integerP(IList<String> path, String name);
+    T integerArr(IList<String> path, String name);
 
-    T longB();
-    T longP();
-    T longArr();
+    T longB(IList<String> path, String name);
+    T longP(IList<String> path, String name);
+    T longArr(IList<String> path, String name);
 
-    T floatB();
-    T floatP();
-    T floatArr();
+    T floatB(IList<String> path, String name);
+    T floatP(IList<String> path, String name);
+    T floatArr(IList<String> path, String name);
 
-    T doubleB();
-    T doubleP();
-    T doubleArr();
+    T doubleB(IList<String> path, String name);
+    T doubleP(IList<String> path, String name);
+    T doubleArr(IList<String> path, String name);
 
-    T string();
+    T string(IList<String> path, String name);
 
-    T object(Map<String, T> fields);
-    T objectArr(T elem);
+    T object(IList<String> path, String name, Map<String, T> fields);
+    T objectArr(IList<String> path, String name, T elem);
 
-    T enumT(Class<?> enumType);
+    T enumT(IList<String> path, String name, Class<?> enumType);
 
-    T coll(T elem);
-    T stringMap(T value);
-    T map(T key, T value);
+    T coll(IList<String> path, String name, T elem);
+    T stringMap(IList<String> path, String name, T value);
+    T map(IList<String> path, String name, T key, T value);
 
-    T interfaceT(Class<?> ifaceType);
+    T interfaceT(IList<String> path, String name, Class<?> ifaceType);
 }
