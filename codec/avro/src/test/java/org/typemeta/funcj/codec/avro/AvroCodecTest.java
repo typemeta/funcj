@@ -372,7 +372,8 @@ public class AvroCodecTest {
     }
 
     protected <T> void roundTrip(T val, Class<T> clazz) {
-        final AvroConfig.Builder cfgBldr = AvroConfig.builder();
+        final AvroConfig.Builder cfgBldr = AvroConfig.builder()
+                .registerAllowedPackage(AvroTestType.class.getPackage());
         final AvroCodecCore codec = TestBase.prepareCodecCore(cfgBldr, Codecs::avroCodec);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();

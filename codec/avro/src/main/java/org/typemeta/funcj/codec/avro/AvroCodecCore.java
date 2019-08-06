@@ -69,6 +69,7 @@ public class AvroCodecCore
             OutputStream os
     ) {
         final Schema schema = GenerateSchema.apply(clazz);
+        System.out.println(schema);
         try (DataFileWriter<GenericRecord> dfw = encode(schema, value, os)) {
             return os;
         } catch (IOException ex) {

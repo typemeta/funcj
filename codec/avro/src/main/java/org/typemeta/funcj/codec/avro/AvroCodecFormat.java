@@ -22,8 +22,25 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
     protected final Config config;
 
-    protected static void checkSchemaType(Schema schema, Schema.Type type) {
-        if (schema.getType() != type) {
+    protected static Schema findType(Schema schema, Schema.Type type) {
+        if (schema.isUnion()) {
+            for (Schema subSchema : schema.getTypes()) {
+                final Schema match = findType(subSchema, type);
+                if (match != null) {
+                    return match;
+                }
+            }
+            return null;
+        } else {
+            return schema.getType() == type ? schema : null;
+        }
+    }
+
+    protected static Schema checkSchemaType(Schema schema, Schema.Type type) {
+        final Schema match = findType(schema, type);
+        if (match != null) {
+            return match;
+        } else {
             throw new CodecException(
                     "Expecting a schema of type " + type + " but got " + schema.getType() +
                             ", from schema '" + schema.getFullName() + "'"
@@ -31,13 +48,19 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
         }
     }
 
-    protected static void checkArraySchemaType(Schema schema, Schema.Type elemType) {
-        if (schema.getType() != Schema.Type.ARRAY && schema.getElementType().getType() != elemType) {
-            throw new CodecException(
-                    "Expecting an ARRAY schema with element type " + elemType + " but got " + schema.getType() +
-                            ", from schema '" + schema.getFullName() + "'"
-            );
+    protected static Schema checkArraySchemaType(Schema schema, Schema.Type elemType) {
+        final Schema match = findType(schema, Schema.Type.ARRAY);
+        if (match != null) {
+            final Schema elemMatch = findType(match, elemType);
+            if (elemMatch != null) {
+                return elemMatch;
+            }
         }
+
+        throw new CodecException(
+                "Expecting an ARRAY schema with element type " + elemType + " but got " + schema.getType() +
+                        ", from schema '" + schema.getFullName() + "'"
+        );
     }
 
     public AvroCodecFormat(Config config) {
@@ -148,37 +171,15 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encodePrim(byte value, Object out) {
-            final Schema schema = (Schema)out;
-            switch (schema.getType()) {
-                case BYTES:
-                    return ByteBuffer.wrap(new byte[]{value});
-                case FIXED:
-                    return new GenericData.Fixed(schema, new byte[]{value});
-                default:
-                    throw new CodecException(
-                            "Expecting a schema of type " + Schema.Type.BYTES + " or " + Schema.Type.FIXED +
-                                    " but got " + schema.getType() +
-                                    ", from schema '" + schema.getFullName() + "'"
-                    );
-            }
+            final Schema schema = checkSchemaType((Schema)out, Schema.Type.FIXED);
+            return new GenericData.Fixed(schema, new byte[]{value});
         }
 
         @Override
         public byte decodePrim(WithSchema in) {
-            switch (in.schema().getType()) {
-                case BYTES:
-                    final ByteBuffer buff = in.value();
-                    return buff.array()[0];
-                case FIXED:
-                    final GenericData.Fixed fixed = in.value();
-                    return fixed.bytes()[0];
-                default:
-                    throw new CodecException(
-                            "Expecting a schema of type " + Schema.Type.BYTES + " or " + Schema.Type.FIXED +
-                                    " but got " + in.schema().getType() +
-                                    ", from schema '" + in.schema().getFullName() + "'"
-                    );
-            }
+            final Schema schema = checkSchemaType(in.schema(), Schema.Type.FIXED);
+            final GenericData.Fixed fixed = in.value();
+            return fixed.bytes()[0];
         }
     }
 
@@ -220,37 +221,15 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encodePrim(char value, Object out) {
-            final Schema schema = (Schema)out;
-            switch (schema.getType()) {
-                case STRING:
-                    return String.valueOf(value);
-                case FIXED:
-                    return new GenericData.Fixed(schema, String.valueOf(value).getBytes());
-                default:
-                    throw new CodecException(
-                            "Expecting a schema of type " + Schema.Type.STRING + " or " + Schema.Type.FIXED +
-                                    " but got " + schema.getType() +
-                                    ", from schema '" + schema.getFullName() + "'"
-                    );
-            }
+            checkSchemaType((Schema)out, Schema.Type.STRING);
+            return String.valueOf(value);
         }
 
         @Override
         public char decodePrim(WithSchema in) {
-            switch (in.schema().getType()) {
-                case STRING:
-                    final String s = in.value();
-                    return s.charAt(0);
-                case FIXED:
-                    final GenericData.Fixed fixed = in.value();
-                    return fixed.toString().charAt(0);
-                default:
-                    throw new CodecException(
-                            "Expecting a schema of type " + Schema.Type.STRING + " or " + Schema.Type.FIXED +
-                                    " but got " + in.schema().getType() +
-                                    ", from schema '" + in.schema().getFullName() + "'"
-                    );
-            }
+            checkSchemaType(in.schema(), Schema.Type.STRING);
+            final String s = in.value();
+            return s.charAt(0);
         }
     }
 
@@ -635,8 +614,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
                     EM value,
                     Object out
             ) {
-                final Schema schema = (Schema)out;
-                checkSchemaType(schema, Schema.Type.ENUM);
+                final Schema schema = checkSchemaType((Schema)out, Schema.Type.ENUM);
                 return new GenericData.EnumSymbol(schema, value);
             }
 
@@ -689,8 +667,7 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
             @Override
             public Collection<T> decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-                checkSchemaType(in.schema(), Schema.Type.ARRAY);
-                final Schema elemSchema = in.schema().getElementType();
+                final Schema elemSchema = checkArraySchemaType(in.schema(), Schema.Type.ARRAY);
 
                 final List<Object> values = in.value();
 
@@ -730,8 +707,8 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
             @Override
             public T[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-                checkSchemaType(in.schema(), Schema.Type.ARRAY);
-                final Schema elemSchema = in.schema().getElementType();
+                final Schema elemSchema = checkArraySchemaType(in.schema(), Schema.Type.ARRAY);
+
 
                 final List<Object> values = in.value();
 
@@ -784,11 +761,9 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, T value, Object out) {
-            checkSchemaType((Schema)out, Schema.Type.RECORD);
+            final Schema schema = checkSchemaType((Schema)out, Schema.Type.RECORD);
 
-            final Schema schema = (Schema)out;
-
-            final GenericData.Record record = new  GenericData.Record(schema);
+            final GenericData.Record record = new GenericData.Record(schema);
             fields.forEach((name, field) -> {
                 record.put(name, field.encodeField(value, schema.getField(name).schema()));
             });
@@ -797,9 +772,8 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         @Override
         public T decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            checkSchemaType(in.schema(), Schema.Type.RECORD);
+            final Schema schema = checkSchemaType(in.schema(), Schema.Type.RECORD);
 
-            final Schema schema = in.schema();
             final GenericData.Record record = in.value();
 
             final Set<String> expNames = fields.keySet();

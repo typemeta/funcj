@@ -26,7 +26,7 @@ public abstract class GenerateSchema {
     public static class Alg implements JavaTypeAlg<Schema> {
 
         private static String toName(IList<String> path, String name) {
-            return path.foldRight((s, sb) -> sb.append(s), new StringBuilder())
+            return path.foldRight((s, sb) -> sb.append(".").append(s), new StringBuilder())
                     .append(name)
                     .toString();
         }

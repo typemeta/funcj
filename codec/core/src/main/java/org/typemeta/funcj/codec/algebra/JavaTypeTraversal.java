@@ -127,7 +127,6 @@ public class JavaTypeTraversal<T> {
                     final Class<?> keyType = typeArgs.get(0);
                     final Class<?> valueType = typeArgs.get(1);
                     if (keyType.equals(String.class)) {
-
                         return alg.stringMap(path, clazz.getSimpleName(), apply(valueType));
                     } else {
                         return alg.map(path, clazz.getSimpleName(), apply(keyType), apply(valueType));
@@ -162,7 +161,35 @@ public class JavaTypeTraversal<T> {
                 if (!Modifier.isStatic(fm) && !Modifier.isTransient(fm)) {
                     final String fieldName = field.getName();
                     final Class<?> fldClass = field.getType();
-                    //fieldTs.put(fieldName, apply(path.add(fieldName), fldClass));
+
+                    final T valueT;
+                    if (Map.class.isAssignableFrom(fldClass)) {
+                        final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Map.class);
+                        if (typeArgs.size() == 2) {
+                            final Class<?> keyType = typeArgs.get(0);
+                            final Class<?> valueType = typeArgs.get(1);
+                            if (keyType.equals(String.class)) {
+                                valueT = alg.stringMap(path, fldClass.getSimpleName(), apply(valueType));
+                            } else {
+                                valueT = alg.map(path, fldClass.getSimpleName(), apply(keyType), apply(valueType));
+                            }
+                        } else {
+                            valueT = alg.map(path, fldClass.getSimpleName(), apply(Object.class), apply(Object.class));
+                        }
+                    } else if (Collection.class.isAssignableFrom(fldClass)) {
+                        final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Collection.class);
+                        if (typeArgs.size() == 1) {
+                            @SuppressWarnings("unchecked")
+                            final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
+                            valueT = alg.coll(path, fldClass.getSimpleName(), apply(elemType));
+                        } else {
+                            valueT = alg.coll(path, fldClass.getSimpleName(), apply(Object.class));
+                        }
+                    } else {
+                        valueT = apply(path.add(fieldName), fldClass);
+                    }
+
+                    fieldTs.put(fieldName, valueT);
                 }
             }
             clazz2 = clazz2.getSuperclass();
