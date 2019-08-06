@@ -162,7 +162,7 @@ public class JavaTypeTraversal<T> {
                 if (!Modifier.isStatic(fm) && !Modifier.isTransient(fm)) {
                     final String fieldName = field.getName();
                     final Class<?> fldClass = field.getType();
-                    fieldTs.put(fieldName, apply(fldClass));
+                    //fieldTs.put(fieldName, apply(path.add(fieldName), fldClass));
                 }
             }
             clazz2 = clazz2.getSuperclass();

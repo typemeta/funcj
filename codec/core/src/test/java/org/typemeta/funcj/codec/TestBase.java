@@ -23,7 +23,7 @@ public abstract class TestBase {
     protected abstract <T> void roundTrip(T val, Class<T> clazz) throws Exception;
 
     @SuppressWarnings("unchecked")
-    protected static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
+    public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
     CORE prepareCodecCore(
             CodecConfig.Builder<?, CFG> cfgBldr,
             Functions.F<CodecConfig.Builder<?, CFG>, CORE> coreBldr
