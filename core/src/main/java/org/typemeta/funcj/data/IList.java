@@ -129,66 +129,6 @@ public abstract class IList<T> implements Iterable<T> {
     }
 
     /**
-     * Kleisli models composable operations that return an {@code IList}.
-     * @param <T>       the input type
-     * @param <U>       the value type of the returned {@code IList} type
-     */
-    @FunctionalInterface
-    interface Kleisli<T, U> {
-        /**
-         * Construct a {@code Kleisli} value from a function.
-         * @param f         the function
-         * @param <T>       the input type
-         * @param <U>       the value type of the returned {@code Option} value
-         * @return          the new {@code Kleisli}
-         */
-        static <T, U> Kleisli<T, U> of(F<T, IList<U>> f) {
-            return f::apply;
-        }
-
-        /**
-         * Run this {@code Kleisli} operation
-         * @param t         the input value
-         * @return          the result of the operation
-         */
-        IList<U> run(T t);
-
-        /**
-         * Compose this {@code Kleisli} with another by applying this one first,
-         * then the other.
-         * @param kUV       the {@code Kleisli} to be applied after this one
-         * @param <V>       the second {@code Kleisli}'s return type
-         * @return          the composed {@code Kleisli}
-         */
-        default <V> Kleisli<T, V> andThen(Kleisli<U, V> kUV) {
-            return t -> run(t).flatMap(kUV::run);
-        }
-
-        /**
-         * Compose this {@code Kleisli} with another by applying the other one first,
-         * and then this one.
-         * @param kST       the {@code Kleisli} to be applied after this one
-         * @param <S>       the first {@code Kleisli}'s input type
-         * @return          the composed {@code Kleisli}
-         */
-        default <S> Kleisli<S, U> compose(Kleisli<S, T> kST) {
-            return s -> kST.run(s).flatMap(this::run);
-        }
-
-        /**
-         * Compose this {@code Kleisli} with a function,
-         * by applying this {@code Kleisli} first,
-         * and then mapping the function over the result.
-         * @param f         the function
-         * @param <V>       the function return type
-         * @return          the composed {@code Kleisli}
-         */
-        default <V> Kleisli<T, V> map(F<U, V> f) {
-            return t -> run(t).map(f);
-        }
-    }
-
-    /**
      * Create a new list by adding an element to the head of this list.
      * @param head      the element to add onto head of this list
      * @return          the new list

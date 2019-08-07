@@ -4,14 +4,14 @@ import org.typemeta.funcj.control.Try;
 import org.typemeta.funcj.functions.Functions;
 
 /**
- * Kleisli models composable operations that return a {@code Try}.
+ * {@code TryK} models composable operations that return a {@code Try}.
  * @param <T>       the input type
  * @param <U>       the value type of the returned {@code Try} type
  */
 @FunctionalInterface
 public interface TryK<T, U> {
     /**
-     * Construct a {@code Kleisli} value from a function.
+     * Construct a {@code TryK} value from a function.
      * @param f         the function
      * @param <T>       the input type
      * @param <U>       the value type of the returned {@code Try} value
