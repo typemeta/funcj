@@ -26,9 +26,10 @@ public abstract class GenerateSchema {
     public static class Alg implements JavaTypeAlg<Schema> {
 
         private static String toName(IList<String> path, String name) {
-            return path.foldRight((s, sb) -> sb.append(".").append(s), new StringBuilder())
-                    .append(name)
-                    .toString();
+            return path.match(
+                    nel -> nel.reverse().foldLeft1((ls, rs) -> ls + "." + rs),
+                    el -> ""
+            );
         }
 
         @Override

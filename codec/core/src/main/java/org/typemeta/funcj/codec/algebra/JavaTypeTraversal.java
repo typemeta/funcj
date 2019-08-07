@@ -26,7 +26,7 @@ public class JavaTypeTraversal<T> {
     }
 
     public T apply(Class<?> clazz) {
-        return getCache(clazz, c -> applyAlg(IList.empty(), c));
+        return getCache(clazz, c -> applyAlg(IList.of(clazz.getSimpleName()), c));
     }
 
     public T apply(IList<String> path, Class<?> clazz) {

@@ -1,11 +1,12 @@
 package org.typemeta.funcj.codec.avro;
 
+import org.apache.avro.Schema;
 import org.junit.*;
 import org.typemeta.funcj.codec.TestBase;
+import org.typemeta.funcj.util.Exceptions;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -353,6 +354,21 @@ public class AvroCodecTest {
         }
     }
 
+    private static final AvroTestType nullVal = new AvroTestType();
+
+    private static final AvroTestType nonNullVal = new AvroTestType(
+            new AvroTestType.Prims(),
+            new AvroTestType.PrimArrs(),
+            new AvroTestType.Boxed(),
+            new AvroTestType.BoxedArrs(),
+            AvroTestType.Colour.GREEN,
+            new AvroTestType.Colour[]{AvroTestType.Colour.RED, AvroTestType.Colour.BLUE},
+            Arrays.asList(LocalDate.of(2019, 04, 19)),
+            new HashSet<String>(Arrays.asList("Alpha", "Beta")),
+            Collections.singletonMap("Now", LocalDate.of(2019, 04, 19)),
+            Optional.of(LocalDate.of(2019, 04, 19))
+    );
+
     protected boolean printData() {
         return false;
     }
@@ -363,12 +379,12 @@ public class AvroCodecTest {
 
     @Test
     public void testNulls() {
-        roundTrip(new AvroTestType(), AvroTestType.class);
+        roundTrip(nullVal, AvroTestType.class);
     }
 
     @Test
     public void testNonNull() {
-        roundTrip(new AvroTestType(), AvroTestType.class);
+        roundTrip(nonNullVal, AvroTestType.class);
     }
 
     protected <T> void roundTrip(T val, Class<T> clazz) {

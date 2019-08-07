@@ -96,14 +96,13 @@ public abstract class AvroMapCodecs {
 
         @Override
         public Object encode(CodecCoreEx<WithSchema, Object, Config> core, Map<String, V> value, Object out) {
-            final Schema schema = (Schema)out;
-            checkSchemaType(schema, Schema.Type.MAP);
+            final Schema schema = checkSchemaType((Schema)out, Schema.Type.MAP);
+            final Schema valueSchema = schema.getValueType();
 
             final Map<CharSequence, Object> map = new HashMap<>();
 
             value.forEach((key, val) -> {
-                final Schema fieldSchema = schema.getField(key).schema();
-                map.put(new Utf8(key), valueCodec.encodeWithCheck(core, val, fieldSchema));
+                map.put(new Utf8(key), valueCodec.encodeWithCheck(core, val, valueSchema));
             });
 
             return map;
@@ -111,8 +110,8 @@ public abstract class AvroMapCodecs {
 
         @Override
         public Map<String, V> decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
-            final Schema schema = in.schema();
-            checkSchemaType(schema, Schema.Type.MAP);
+            final Schema schema = checkSchemaType(in.schema(), Schema.Type.MAP);
+            final Schema valueSchema = schema.getValueType();
 
             final Map<CharSequence, Object> inMap = in.value();
 
@@ -120,8 +119,7 @@ public abstract class AvroMapCodecs {
 
             inMap.forEach((key, value) -> {
                 final String name = key.toString();
-                final Schema fieldSchema = schema.getField(name).schema();
-                map.put(name, valueCodec.decodeWithCheck(core, WithSchema.of(value, fieldSchema)));
+                map.put(name, valueCodec.decodeWithCheck(core, WithSchema.of(value, valueSchema)));
             });
 
             return map;
