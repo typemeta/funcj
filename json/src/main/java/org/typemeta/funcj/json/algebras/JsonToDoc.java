@@ -18,8 +18,8 @@ public class JsonToDoc implements JsonAlg<Document> {
      * @param width     the maximum line length
      * @return          the string representation of formatted JSON
      */
-    public static String toString(JsValue jv, int width) {
-        return DocFormat.format(width, jv.apply(JsonToDoc.INSTANCE));
+    public static String toString(JsValue jv, int indent, int width) {
+        return DocFormat.format(indent, width, jv.apply(JsonToDoc.INSTANCE));
     }
 
     @Override

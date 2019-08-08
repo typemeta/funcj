@@ -3,7 +3,8 @@ package org.typemeta.funcj.json.model;
 import org.typemeta.funcj.functions.Functions.F;
 import org.typemeta.funcj.json.algebras.*;
 
-import java.io.Writer;
+import java.io.*;
+import java.util.OptionalInt;
 
 /**
  * Common interface for classes that represent JSON values.
@@ -22,13 +23,61 @@ public interface JsValue {
         STRING
     }
 
+    interface Formatter {
+
+        int DEFAULT_INDENT_SIZE = 4;
+
+        /**
+         * Set the indent size
+         * @param size      the indent size
+         * @return          this formatter object
+         */
+        Formatter indent(int size);
+
+        /**
+         * Set the width size
+         * @param size      the width size
+         * @return          this formatter object
+         */
+        Formatter width(int size);
+
+        /**
+         * Format the parent {@code JsValue} using the formatting settings within this {@code Formatter}.
+         * @return          the formatted JSON string
+         */
+        String format();
+    }
+
     /**
-     * Pretty-print a JSON value as a JSON string.
-     * @param width     the maximum line length
-     * @return          the string representation of formatted JSON
+     * @return          a {@code Formatter} object, which can be used to configure the formatting.
      */
-    default String toString(int width) {
-        return JsonToDoc.toString(this, width);
+    default Formatter formatter() {
+        return new Formatter() {
+            OptionalInt widthOpt = OptionalInt.empty();
+            OptionalInt indentOpt = OptionalInt.empty();
+
+            @Override
+            public Formatter indent(int size) {
+                indentOpt = OptionalInt.of(size);
+                return this;
+            }
+
+            @Override
+            public Formatter width(int size) {
+                widthOpt = OptionalInt.of(size);
+                return this;
+            }
+
+            @Override
+            public String format() {
+                final int indent = indentOpt.orElse(DEFAULT_INDENT_SIZE);
+                if (widthOpt.isPresent()) {
+                    return JsonToDoc.toString(JsValue.this, indent, widthOpt.getAsInt());
+                } else {
+                    return write(new StringWriter(), indent).toString();
+                }
+            }
+        };
     }
 
     /**
@@ -38,6 +87,16 @@ public interface JsValue {
      */
     default Writer write(Writer w) {
         return JsonWriter.toString(this, w);
+    }
+
+    /**
+     * Write this value into the given {@link Writer}.
+     * @param w         the {@code Writer}
+     * @param indent    the indent size
+     * @return          the {@code Writer}
+     */
+    default Writer write(Writer w, int indent) {
+        return JsonIndentWriter.toString(this, w, indent);
     }
 
     /**

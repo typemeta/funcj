@@ -16,14 +16,14 @@ public class DocFormat {
     private static final int indentStrLen = indentStr.length();
 
     public static String format(int width, Document doc) {
-        return format(width, DEFAULT_INDENT_SIZE, doc);
+        return format(DEFAULT_INDENT_SIZE, width, doc);
     }
 
     public static void format(Writer wtr, int width, Document doc) {
         format(wtr, DEFAULT_INDENT_SIZE, width, doc);
     }
 
-    public static String format(int width, int indent, Document doc) {
+    public static String format(int indent, int width, Document doc) {
         final StringWriter wtr = new StringWriter();
         format(wtr, indent, width, doc);
         return wtr.toString();

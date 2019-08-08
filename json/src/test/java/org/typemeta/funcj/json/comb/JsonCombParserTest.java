@@ -60,7 +60,9 @@ public class JsonCombParserTest {
     private static final String json =
         FileUtils.openResource("/example.json")
             .map(FileUtils::read)
-            .orElseThrow();
+            .orElseThrow()
+            .replace("\r\n", "\n")
+            .replace("\n", System.lineSeparator());
 
     @Test
     public void testSuccessParse() {
@@ -68,7 +70,7 @@ public class JsonCombParserTest {
             JsonCombParser.parser.parse(
                 Input.of(FileUtils.openResource("/example.json").orElseThrow()));
         final JsValue node = result.getOrThrow();
-        final String json2 = node.toString(100);
+        final String json2 = node.formatter().format();
 
         //System.out.println(node.toString());
         assertEquals("Round-tripped JSON", json, json2);
@@ -123,7 +125,7 @@ abstract class FileUtils {
             assertTrue("Parse expected to succeed: " + name, result.isSuccess());
 
             final JsValue node = result.getOrThrow();
-            final String json2 = node.toString(100);
+            final String json2 = node.formatter().format();
 
             final JsValue node2 = JsonCombParser.parser.parse(Input.of(json)).getOrThrow();
 

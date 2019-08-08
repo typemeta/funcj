@@ -51,12 +51,14 @@ public class JsonParserTest {
     private static final String json =
             FileUtils.openResource("/example.json")
                     .map(FileUtils::read)
-                    .orElseThrow();
+                    .orElseThrow()
+                    .replace("\r\n", "\n")
+                    .replace("\n", System.lineSeparator());
 
     @Test
     public void testSuccessParse() {
         final JsValue node = JsonParser.parse(json);
-        final String json2 = node.toString(100);
+        final String json2 = node.formatter().format();
 
         //System.out.println(node.toString());
         assertEquals("Round-tripped JSON", json, json2);
@@ -112,7 +114,7 @@ abstract class FileUtils {
             assertTrue("Parse expected to succeed: " + name, result.isSuccess());
 
             final JsValue node = result.orElseThrow();
-            final String json2 = node.toString(100);
+            final String json2 = node.formatter().format();
 
             final JsValue node2 = JsonParser.parse(json);
 

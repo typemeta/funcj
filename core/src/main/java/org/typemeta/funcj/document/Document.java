@@ -154,7 +154,7 @@ public interface Document {
         Functions.F<Nest, T> nest,
         Functions.F<Concat, T> concat);
 
-    default void format(Writer wtr, int width) {
-        DocFormat.format(wtr, width, this);
+    default void format(Writer wtr, int indent, int width) {
+        DocFormat.format(wtr, indent, width, this);
     }
 }

@@ -36,7 +36,7 @@ public class JsonToStrDocTest {
     }
 
     private static void checkJsonNode(JsValue jsv, int lines, int width) {
-        final String text = JsonToDoc.toString(jsv, width);
+        final String text = JsonToDoc.toString(jsv, JsValue.Formatter.DEFAULT_INDENT_SIZE, width);
         //System.out.println(text);
         checkSize(text, lines, width);
     }
