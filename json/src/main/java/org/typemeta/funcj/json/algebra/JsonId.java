@@ -1,4 +1,4 @@
-package org.typemeta.funcj.json.algebras;
+package org.typemeta.funcj.json.algebra;
 
 import org.typemeta.funcj.json.model.*;
 

@@ -1,7 +1,6 @@
-package org.typemeta.funcj.json.algebras;
+package org.typemeta.funcj.json.algebra;
 
 import org.typemeta.funcj.json.comb.JsonCombParser;
-import org.typemeta.funcj.json.model.JsonAlg;
 
 import java.util.*;
 

@@ -21,7 +21,7 @@ public class XmlNodeNoDynTypesCodecTest extends TestBase {
         }
     }
 
-    protected static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
+    public static <IN, OUT, CFG extends CodecConfig, CORE extends CodecCore<IN, OUT, CFG>>
     CORE prepareCodecCore(
             CodecConfig.Builder<?, CFG> cfgBldr,
             Functions.F<CodecConfig.Builder<?, CFG>, CORE> coreBldr

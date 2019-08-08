@@ -1,7 +1,7 @@
 package org.typemeta.funcj.json.model;
 
 import org.typemeta.funcj.functions.Functions.F;
-import org.typemeta.funcj.json.algebras.*;
+import org.typemeta.funcj.json.algebra.*;
 
 import java.io.*;
 import java.util.OptionalInt;

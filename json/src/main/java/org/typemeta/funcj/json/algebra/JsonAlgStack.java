@@ -1,11 +1,11 @@
-package org.typemeta.funcj.json.algebras;
+package org.typemeta.funcj.json.algebra;
 
 import org.typemeta.funcj.json.model.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.typemeta.funcj.json.algebras.JsonAlgStackUtils.*;
+import static org.typemeta.funcj.json.algebra.JsonAlgStackUtils.*;
 
 /**
  * Iterative, stack-based implementation of applying an object algebra.

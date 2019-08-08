@@ -1,6 +1,7 @@
-package org.typemeta.funcj.json.model;
+package org.typemeta.funcj.json.algebra;
 
 import org.typemeta.funcj.algebra.Monoid;
+import org.typemeta.funcj.json.model.*;
 
 import java.util.*;
 
