@@ -41,7 +41,6 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
         if (match != null) {
             return match;
         } else {
-            final Schema DEBUG = findType(schema, type);
             throw new CodecException(
                     "Expecting a schema of type " + type + " but got " + schema.getType() +
                             ", from schema '" + schema.getFullName() + "'"
@@ -817,7 +816,8 @@ public class AvroCodecFormat implements CodecFormat<WithSchema, Object, Config> 
 
         protected FinalObjectCodec(
                 Class<T> type,
-                ObjectMeta<T, WithSchema, Object, RA> objMeta) {
+                ObjectMeta<T, WithSchema, Object, RA> objMeta
+        ) {
             super(type, objMeta);
         }
     }

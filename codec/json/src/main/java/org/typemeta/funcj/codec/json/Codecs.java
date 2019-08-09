@@ -11,7 +11,7 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
 
     /**
      * Construct and return a new instance of a {@link JsonCodecCore}.
-     * @return      the JSON codec
+     * @return          the JSON codec
      */
     public static JsonCodecCore jsonCodec() {
         return jsonCodec(new JsonConfig.Builder());
@@ -25,7 +25,7 @@ public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
 
     /**
      * Construct and return a new instance of a {@link JsonNodeCodecCore}.
-     * @return      the JSON codec
+     * @return          the JSON codec
      */
     public static JsonNodeCodecCore jsonNodeCodec() {
         return jsonNodeCodec(new JsonNodeConfig.Builder());
