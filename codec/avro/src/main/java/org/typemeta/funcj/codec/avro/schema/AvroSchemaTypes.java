@@ -11,7 +11,7 @@ public abstract class AvroSchemaTypes {
 
     /**
      * Interface for classes which provide configuration information
-     * for {@link AvroCodecCore} implementations.
+     * for {@link AvroSchemaCodecCore} implementations.
      */
     public interface Config extends CodecConfig {
     }

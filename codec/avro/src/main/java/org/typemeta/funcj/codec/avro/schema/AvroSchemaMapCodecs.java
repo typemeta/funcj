@@ -2,15 +2,16 @@ package org.typemeta.funcj.codec.avro.schema;
 
 import org.apache.avro.Schema;
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.avro.AvroTypes.*;
-import org.typemeta.funcj.codec.impl.MapCodecs.AbstractStringMapCodec;
+import org.typemeta.funcj.codec.impl.MapCodecs;
 import org.typemeta.funcj.control.Either;
 import org.typemeta.funcj.data.Unit;
 
-import java.util.*;
+import java.util.Map;
+
+import static org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.Config;
 
 public abstract class AvroSchemaMapCodecs {
-    public static class StringMapCodec<V> extends AbstractStringMapCodec<V, Unit, Either<String, Schema>, Config> {
+    public static class StringMapCodec<V> extends MapCodecs.AbstractStringMapCodec<V, Unit, Either<String, Schema>, Config> {
 
         public StringMapCodec(
                 Class<Map<String, V>> type,
@@ -25,8 +26,12 @@ public abstract class AvroSchemaMapCodecs {
                 Map<String, V> value,
                 Either<String, Schema> out
         ) {
+            final Schema schema = value.values().stream()
+                    .map(t -> valueCodec.encode(core, t, out.mapLeft(s -> s + ".map")).right())
+                    .reduce(SchemaMerge::merge)
+                    .orElseGet(() -> Schema.create(Schema.Type.NULL));
             return Either.right(Schema.createUnion(
-                    Schema.createMap(valueCodec.encode(core, null, out.mapLeft(s -> s + "Map")).right()),
+                    Schema.createMap(schema),
                     Schema.create(Schema.Type.NULL)
             ));
         }

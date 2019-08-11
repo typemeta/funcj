@@ -4,8 +4,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.util.Utf8;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
-import org.typemeta.funcj.codec.impl.MapCodecs.*;
-import org.typemeta.funcj.codec.utils.CodecException;
+import org.typemeta.funcj.codec.impl.MapCodecs.AbstractStringMapCodec;
 
 import java.util.*;
 

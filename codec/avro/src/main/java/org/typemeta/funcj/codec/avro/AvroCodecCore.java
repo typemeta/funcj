@@ -1,13 +1,13 @@
 package org.typemeta.funcj.codec.avro;
 
 import org.apache.avro.Schema;
-import org.apache.avro.data.Json;
 import org.apache.avro.file.*;
 import org.apache.avro.generic.*;
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecStrAPI;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
 import org.typemeta.funcj.codec.impl.*;
 import org.typemeta.funcj.codec.utils.CodecException;
+import org.typemeta.funcj.control.Either;
 
 import java.io.*;
 
@@ -60,7 +60,7 @@ public class AvroCodecCore
 
     public <T> T decode(Class<? super T> clazz, Schema schema, InputStream is) throws IOException {
         try (final DataFileStream<GenericRecord> dfs =
-                new DataFileStream<GenericRecord>(is, new GenericDatumReader<GenericRecord>(schema))) {
+                new DataFileStream<>(is, new GenericDatumReader<>(schema))) {
             return decode(clazz, dfs);
         }
     }
@@ -71,7 +71,7 @@ public class AvroCodecCore
             T value,
             OutputStream os
     ) {
-        final Schema schema = GenerateSchema.apply(clazz);
+        final Schema schema = Codecs.avroSchemaCodec().encodeImpl(clazz, value, Either.left("/")).right();
         System.out.println(schema);
         try (DataFileWriter<GenericRecord> dfw = encode(clazz, schema, value, os)) {
             return os;

@@ -1,21 +1,19 @@
 package org.typemeta.funcj.codec.avro.schema;
 
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.typemeta.funcj.codec.*;
-import org.typemeta.funcj.codec.avro.AvroTypes.*;
 import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.control.Either;
 import org.typemeta.funcj.data.Unit;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
+import static org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.Config;
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
-
 /**
  * Encoding via JSON nodes.
  */
@@ -659,11 +657,19 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         return new CollectionCodec<T, Unit, Either<String, Schema>, Config>(collType, elemCodec) {
 
             @Override
-            public Either<String, Schema> encode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Collection<T> value, Either<String, Schema> out) {
-                return Schema.createUnion(
-                        Schema.createArray(Schema.create(Schema.Type.BOOLEAN)),
+            public Either<String, Schema> encode(
+                    CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+                    Collection<T> value,
+                    Either<String, Schema> out
+            ) {
+                final Schema schema = value.stream()
+                        .map(t -> elemCodec.encode(core, t, out.mapLeft(s -> s + ".coll")).right())
+                        .reduce(SchemaMerge::merge)
+                        .orElseGet(() -> Schema.create(Schema.Type.NULL));
+                return Either.right(Schema.createUnion(
+                        Schema.createArray(schema),
                         Schema.create(Schema.Type.NULL)
-                );
+                ));
             }
 
             @Override
@@ -686,11 +692,19 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
             }
 
             @Override
-            public Either<String, Schema> encode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, T[] value, Either<String, Schema> out) {
-                return Schema.createUnion(
+            public Either<String, Schema> encode(
+                    CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+                    T[] value,
+                    Either<String, Schema> out
+            ) {
+                final Schema schema = Arrays.stream(value)
+                        .map(t -> elemCodec.encode(core, t, out.mapLeft(s -> s + ".array")).right())
+                        .reduce(SchemaMerge::merge)
+                        .orElseGet(() -> Schema.create(Schema.Type.NULL));
+                return Either.right(Schema.createUnion(
                         Schema.createArray(Schema.create(Schema.Type.BOOLEAN)),
                         Schema.create(Schema.Type.NULL)
-                );
+                ));
             }
 
             @Override
@@ -737,14 +751,18 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, T value, Either<String, Schema> out) {
-            final Schema schema = checkSchemaType((Schema)out, Schema.Type.RECORD);
-
-            final GenericData.Record record = new GenericData.Record(schema);
-            fields.forEach((name, field) -> {
-                record.put(name, field.encodeField(value, schema.getField(name).schema()));
-            });
-            return record;
+        public Either<String, Schema> encode(
+                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+                T value,
+                Either<String, Schema> out
+        ) {
+            final List<Schema.Field> fieldSchema =
+                    fields.entrySet().stream()
+                            .map(en -> new Schema.Field(
+                                    en.getKey(),
+                                    en.getValue().encodeField(value, out).right()))
+                            .collect(toList());
+            return Either.right(Schema.createRecord(fieldSchema));
         }
 
         @Override

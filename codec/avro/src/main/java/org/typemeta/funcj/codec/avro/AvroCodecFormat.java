@@ -1,7 +1,7 @@
 package org.typemeta.funcj.codec.avro;
 
 import org.apache.avro.Schema;
-import org.apache.avro.generic.*;
+import org.apache.avro.generic.GenericData;
 import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
 import org.typemeta.funcj.codec.impl.CollectionCodec;
