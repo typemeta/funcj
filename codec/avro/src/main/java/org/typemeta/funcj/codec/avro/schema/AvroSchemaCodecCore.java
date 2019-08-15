@@ -1,7 +1,9 @@
 package org.typemeta.funcj.codec.avro.schema;
 
 import org.apache.avro.Schema;
-import org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.Config;
+import static org.typemeta.funcj.codec.avro.AvroTypes.Config;
+
+import org.typemeta.funcj.codec.avro.AvroConfig;
 import org.typemeta.funcj.codec.impl.*;
 import org.typemeta.funcj.control.Either;
 import org.typemeta.funcj.data.Unit;
@@ -17,6 +19,6 @@ public class AvroSchemaCodecCore
     }
 
     public AvroSchemaCodecCore() {
-        this(new AvroSchemaConfig());
+        this(new AvroConfig());
     }
 }

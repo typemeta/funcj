@@ -8,7 +8,7 @@ import org.typemeta.funcj.data.Unit;
 
 import java.util.Map;
 
-import static org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.Config;
+import static org.typemeta.funcj.codec.avro.AvroTypes.Config;
 
 public abstract class AvroSchemaMapCodecs {
     public static class StringMapCodec<V> extends MapCodecs.AbstractStringMapCodec<V, Unit, Either<String, Schema>, Config> {

@@ -12,7 +12,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
-import static org.typemeta.funcj.codec.avro.schema.AvroSchemaTypes.Config;
+import static org.typemeta.funcj.codec.avro.AvroTypes.Config;
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 /**
  * Encoding via JSON nodes.

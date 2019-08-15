@@ -9,10 +9,10 @@ import org.typemeta.funcj.codec.avro.schema.*;
 public abstract class Codecs extends org.typemeta.funcj.codec.Codecs {
 
     public static AvroSchemaCodecCore avroSchemaCodec() {
-        return avroSchemaCodec(new AvroSchemaConfig.Builder());
+        return avroSchemaCodec(new AvroConfig.Builder());
     }
 
-    public static AvroSchemaCodecCore avroSchemaCodec(CodecConfig.Builder<?, AvroSchemaTypes.Config> cfgBldr) {
+    public static AvroSchemaCodecCore avroSchemaCodec(CodecConfig.Builder<?, AvroTypes.Config> cfgBldr) {
         return registerAll(cfgBldr, AvroSchemaCodecCore::new);
     }
 

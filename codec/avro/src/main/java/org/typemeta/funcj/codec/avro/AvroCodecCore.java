@@ -5,9 +5,11 @@ import org.apache.avro.file.*;
 import org.apache.avro.generic.*;
 import org.typemeta.funcj.codec.CodecStrAPI;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
+import org.typemeta.funcj.codec.avro.schema.AvroSchemaCodecCore;
 import org.typemeta.funcj.codec.impl.*;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.control.Either;
+import org.typemeta.funcj.util.Exceptions;
 
 import java.io.*;
 
@@ -18,8 +20,11 @@ public class AvroCodecCore
         extends CodecCoreDelegate<WithSchema, Object, Config>
         implements CodecStrAPI.IO {
 
+    protected final AvroSchemaCodecCore avroSchemaCodec;
+
     public AvroCodecCore(AvroCodecFormat format) {
         super(new CodecCoreImpl<>(format));
+        this.avroSchemaCodec = new AvroSchemaCodecCore(config());
     }
 
     public AvroCodecCore(Config config) {
@@ -58,20 +63,13 @@ public class AvroCodecCore
         return decodeImpl(clazz, WithSchema.of(genRec, genRec.getSchema()));
     }
 
-    public <T> T decode(Class<? super T> clazz, Schema schema, InputStream is) throws IOException {
-        try (final DataFileStream<GenericRecord> dfs =
-                new DataFileStream<>(is, new GenericDatumReader<>(schema))) {
-            return decode(clazz, dfs);
-        }
-    }
-
     @Override
     public <T> OutputStream encode(
             Class<? super T> clazz,
             T value,
             OutputStream os
     ) {
-        final Schema schema = Codecs.avroSchemaCodec().encodeImpl(clazz, value, Either.left("/")).right();
+        final Schema schema = avroSchemaCodec.encodeImpl(clazz, value, Either.left("/")).right();
         System.out.println(schema);
         try (DataFileWriter<GenericRecord> dfw = encode(clazz, schema, value, os)) {
             return os;
@@ -82,11 +80,11 @@ public class AvroCodecCore
 
     @Override
     public <T> T decode(Class<? super T> clazz, InputStream is) {
-        final Schema schema = GenerateSchema.apply(clazz);
-        try {
-            return decode(clazz, schema, is);
-        } catch (IOException ex) {
-            throw new CodecException(ex);
-        }
+        return Exceptions.wrap(() -> {;
+            try (final DataFileStream<GenericRecord> dfs =
+                         new DataFileStream<>(is, new GenericDatumReader<>())) {
+                return decode(clazz, dfs);
+            }
+        });
     }
 }
