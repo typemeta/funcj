@@ -6,7 +6,7 @@ import org.typemeta.funcj.codec.utils.CodecException;
 import java.util.*;
 
 public abstract class SchemaMerge {
-    
+
     public static Schema merge(Schema lhs, Schema rhs) {
 
         switch (lhs.getType()) {
@@ -38,13 +38,13 @@ public abstract class SchemaMerge {
                     break;
                 }
             case UNION:
-                final List<Schema> subSchemas = new ArrayList<>(lhs.getTypes());
+                final Set<Schema> subSchemas = new HashSet<>(lhs.getTypes());
                 if (rhs.getType() == Schema.Type.UNION) {
                     subSchemas.addAll(rhs.getTypes());
                 } else {
                     subSchemas.add(rhs);
                 }
-                return Schema.createUnion(subSchemas);
+                return Schema.createUnion(new ArrayList<>(subSchemas));
             default:
                 throw new CodecException("Unexpected schema type - " + lhs.getType());
         }

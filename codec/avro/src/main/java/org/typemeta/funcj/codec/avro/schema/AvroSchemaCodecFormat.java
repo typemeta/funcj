@@ -2,10 +2,9 @@ package org.typemeta.funcj.codec.avro.schema;
 
 import org.apache.avro.Schema;
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.avro.AvroTypes.WithSchema;
 import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.utils.CodecException;
-import org.typemeta.funcj.control.Either;
-import org.typemeta.funcj.data.Unit;
 import org.typemeta.funcj.functions.Functions;
 
 import java.lang.reflect.Modifier;
@@ -18,7 +17,7 @@ import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
  * Encoding via JSON nodes.
  */
 @SuppressWarnings("unchecked")
-public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, Schema>, Config> {
+public class AvroSchemaCodecFormat implements CodecFormat<WithSchema, Object, Config> {
 
     protected final Config config;
 
@@ -32,69 +31,69 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
     }
 
     @Override
-    public <T> WasEncoded<Either<String, Schema>> encodeNull(T val, Either<String, Schema> out) {
+    public <T> WasEncoded<Object> encodeNull(T val, Object out) {
         if (val == null) {
-            return WasEncoded.of(true, Either.right(Schema.create(Schema.Type.NULL)));
+            return WasEncoded.of(true, Schema.create(Schema.Type.NULL));
         } else {
             return WasEncoded.of(false, null);
         }
     }
 
     @Override
-    public boolean decodeNull(Unit in) {
+    public boolean decodeNull(WithSchema in) {
         throw AvroSchemaTypes.notImplemented();
     }
 
     @Override
-    public <T> WasEncoded<Either<String, Schema>> encodeDynamicType(
-            CodecCoreEx<Unit, Either<String, Schema>, Config> core,
-            Codec<T, Unit, Either<String, Schema>, Config> codec,
+    public <T> WasEncoded<Object> encodeDynamicType(
+            CodecCoreEx<WithSchema, Object, Config> core,
+            Codec<T, WithSchema, Object, Config> codec,
             T val,
-            Either<String, Schema> out,
-            Functions.F<Class<T>, Codec<T, Unit, Either<String, Schema>, Config>> getDynCodec
+            Object out,
+            Functions.F<Class<T>, Codec<T, WithSchema, Object, Config>> getDynCodec
     ) {
         return WasEncoded.of(false, null);
     }
 
     @Override
-    public <T> T decodeDynamicType(Unit in, Functions.F2<String, Unit, T> decoder) {
+    public <T> T decodeDynamicType(WithSchema in, Functions.F2<String, WithSchema, T> decoder) {
         throw AvroSchemaTypes.notImplemented();
     }
 
-    protected static class BooleanCodec implements Codec.BooleanCodec<Unit, Either<String, Schema>, Config> {
+    protected static class BooleanCodec implements Codec.BooleanCodec<WithSchema, Object, Config> {
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 Boolean value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
-                    encodePrim(value, out).right(),
+            return Schema.createUnion(
+                    (Schema)encodePrim(value, out),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public Either<String, Schema> encodePrim(boolean val, Either<String, Schema> out) {
-            return Either.right(Schema.create(Schema.Type.BOOLEAN));
+        public Object encodePrim(boolean val, Object out) {
+            return Schema.create(Schema.Type.BOOLEAN);
         }
 
         @Override
-        public boolean decodePrim(Unit in) {
+        public boolean decodePrim(WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
-    protected final Codec.BooleanCodec<Unit, Either<String, Schema>, Config> booleanCodec = new BooleanCodec();
+    protected final Codec.BooleanCodec<WithSchema, Object, Config> booleanCodec = new BooleanCodec();
 
     @Override
-    public Codec.BooleanCodec<Unit, Either<String, Schema>, Config> booleanCodec() {
+    public Codec.BooleanCodec<WithSchema, Object, Config> booleanCodec() {
         return booleanCodec;
     }
 
-    protected final Codec<boolean[], Unit, Either<String, Schema>, Config> booleanArrayCodec =
-            new Codec<boolean[], Unit, Either<String, Schema>, Config>() {
+    protected final Codec<boolean[], WithSchema, Object, Config> booleanArrayCodec =
+            new Codec<boolean[], WithSchema, Object, Config>() {
 
         @Override
         public Class<boolean[]> type() {
@@ -102,62 +101,62 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 boolean[] value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.createArray(Schema.create(Schema.Type.BOOLEAN)),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public boolean[] decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public boolean[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     };
 
     @Override
-    public Codec<boolean[], Unit, Either<String, Schema>, Config> booleanArrayCodec() {
+    public Codec<boolean[], WithSchema, Object, Config> booleanArrayCodec() {
         return booleanArrayCodec;
     }
 
-    protected static class ByteCodec implements Codec.ByteCodec<Unit, Either<String, Schema>, Config> {
+    protected static class ByteCodec implements Codec.ByteCodec<WithSchema, Object, Config> {
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 Byte value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
-                    encodePrim(value, out).right(),
+            return Schema.createUnion(
+                    (Schema)encodePrim(value, out),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public Either<String, Schema> encodePrim(byte value, Either<String, Schema> out) {
-            return Either.right(Schema.createFixed(out.left(), null, null, 1));
+        public Object encodePrim(byte value, Object out) {
+            return Schema.createFixed((String)out, null, null, 1);
         }
 
         @Override
-        public byte decodePrim(Unit in) {
+        public byte decodePrim(WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
-    protected final Codec.ByteCodec<Unit, Either<String, Schema>, Config> byteCodec = new ByteCodec();
+    protected final Codec.ByteCodec<WithSchema, Object, Config> byteCodec = new ByteCodec();
 
     @Override
-    public Codec.ByteCodec<Unit, Either<String, Schema>, Config> byteCodec() {
+    public Codec.ByteCodec<WithSchema, Object, Config> byteCodec() {
         return byteCodec;
     }
 
-    protected final Codec<byte[], Unit, Either<String, Schema>, Config> byteArrayCodec =
-            new Codec<byte[], Unit, Either<String, Schema>, Config>() {
+    protected final Codec<byte[], WithSchema, Object, Config> byteArrayCodec =
+            new Codec<byte[], WithSchema, Object, Config>() {
 
         @Override
         public Class<byte[]> type() {
@@ -165,62 +164,62 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 byte[] value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.create(Schema.Type.BYTES),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public byte[] decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public byte[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     };
 
     @Override
-    public Codec<byte[], Unit, Either<String, Schema>, Config> byteArrayCodec() {
+    public Codec<byte[], WithSchema, Object, Config> byteArrayCodec() {
         return byteArrayCodec;
     }
 
-    protected static class CharCodec implements Codec.CharCodec<Unit, Either<String, Schema>, Config> {
+    protected static class CharCodec implements Codec.CharCodec<WithSchema, Object, Config> {
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 Character value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
-                    encodePrim(value, out).right(),
+            return Schema.createUnion(
+                    (Schema)encodePrim(value, out),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public Either<String, Schema> encodePrim(char value, Either<String, Schema> out) {
-            return Either.right(Schema.create(Schema.Type.STRING));
+        public Object encodePrim(char value, Object out) {
+            return Schema.create(Schema.Type.STRING);
         }
 
         @Override
-        public char decodePrim(Unit in) {
+        public char decodePrim(WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
-    protected final Codec.CharCodec<Unit, Either<String, Schema>, Config> charCodec = new CharCodec();
+    protected final Codec.CharCodec<WithSchema, Object, Config> charCodec = new CharCodec();
 
     @Override
-    public Codec.CharCodec<Unit, Either<String, Schema>, Config> charCodec() {
+    public Codec.CharCodec<WithSchema, Object, Config> charCodec() {
         return charCodec;
     }
 
-    protected final Codec<char[], Unit, Either<String, Schema>, Config> charArrayCodec =
-            new Codec<char[], Unit, Either<String, Schema>, Config>() {
+    protected final Codec<char[], WithSchema, Object, Config> charArrayCodec =
+            new Codec<char[], WithSchema, Object, Config>() {
 
         @Override
         public Class<char[]> type() {
@@ -228,62 +227,62 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 char[] value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.create(Schema.Type.STRING),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public char[] decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public char[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     };
 
     @Override
-    public Codec<char[], Unit, Either<String, Schema>, Config> charArrayCodec() {
+    public Codec<char[], WithSchema, Object, Config> charArrayCodec() {
         return charArrayCodec;
     }
 
-    protected static class ShortCodec implements Codec.ShortCodec<Unit, Either<String, Schema>, Config> {
+    protected static class ShortCodec implements Codec.ShortCodec<WithSchema, Object, Config> {
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 Short value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
-                    encodePrim(value, out).right(),
+            return Schema.createUnion(
+                    (Schema)encodePrim(value, out),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public Either<String, Schema> encodePrim(short value, Either<String, Schema> out) {
-            return Either.right(Schema.create(Schema.Type.INT));
+        public Object encodePrim(short value, Object out) {
+            return Schema.create(Schema.Type.INT);
         }
 
         @Override
-        public short decodePrim(Unit in) {
+        public short decodePrim(WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
-    protected final Codec.ShortCodec<Unit, Either<String, Schema>, Config> shortCodec = new ShortCodec();
+    protected final Codec.ShortCodec<WithSchema, Object, Config> shortCodec = new ShortCodec();
 
     @Override
-    public Codec.ShortCodec<Unit, Either<String, Schema>, Config> shortCodec() {
+    public Codec.ShortCodec<WithSchema, Object, Config> shortCodec() {
         return shortCodec;
     }
 
-    protected final Codec<short[], Unit, Either<String, Schema>, Config> shortArrayCodec =
-            new Codec<short[], Unit, Either<String, Schema>, Config>() {
+    protected final Codec<short[], WithSchema, Object, Config> shortArrayCodec =
+            new Codec<short[], WithSchema, Object, Config>() {
 
         @Override
         public Class<short[]> type() {
@@ -291,65 +290,65 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 short[] value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.createArray(Schema.create(Schema.Type.INT)),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public short[] decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public short[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     };
 
     @Override
-    public Codec<short[], Unit, Either<String, Schema>, Config> shortArrayCodec() {
+    public Codec<short[], WithSchema, Object, Config> shortArrayCodec() {
         return shortArrayCodec;
     }
 
-    protected static class IntCodec implements Codec.IntCodec<Unit, Either<String, Schema>, Config> {
+    protected static class IntCodec implements Codec.IntCodec<WithSchema, Object, Config> {
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 Integer value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
-                    encodePrim(value, out).right(),
+            return Schema.createUnion(
+                    (Schema)encodePrim(value, out),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public Either<String, Schema> encodePrim(int value, Either<String, Schema> out) {
-            return Either.right(Schema.createUnion(
+        public Object encodePrim(int value, Object out) {
+            return Schema.createUnion(
                     Schema.createArray(Schema.create(Schema.Type.INT)),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public int decodePrim(Unit in ) {
+        public int decodePrim(WithSchema in ) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
-    protected final Codec.IntCodec<Unit, Either<String, Schema>, Config> intCodec = new IntCodec();
+    protected final Codec.IntCodec<WithSchema, Object, Config> intCodec = new IntCodec();
 
     @Override
-    public Codec.IntCodec<Unit, Either<String, Schema>, Config> intCodec() {
+    public Codec.IntCodec<WithSchema, Object, Config> intCodec() {
         return intCodec;
     }
 
-    protected final Codec<int[], Unit, Either<String, Schema>, Config> intArrayCodec =
-            new Codec<int[], Unit, Either<String, Schema>, Config>() {
+    protected final Codec<int[], WithSchema, Object, Config> intArrayCodec =
+            new Codec<int[], WithSchema, Object, Config>() {
 
         @Override
         public Class<int[]> type() {
@@ -357,62 +356,62 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 int[] value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.createArray(Schema.create(Schema.Type.INT)),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public int[] decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public int[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     };
 
     @Override
-    public Codec<int[], Unit, Either<String, Schema>, Config> intArrayCodec() {
+    public Codec<int[], WithSchema, Object, Config> intArrayCodec() {
         return intArrayCodec;
     }
 
-    protected static class LongCodec implements Codec.LongCodec<Unit, Either<String, Schema>, Config> {
+    protected static class LongCodec implements Codec.LongCodec<WithSchema, Object, Config> {
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 Long value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
-                    encodePrim(value, out).right(),
+            return Schema.createUnion(
+                    (Schema)encodePrim(value, out),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public Either<String, Schema> encodePrim(long value, Either<String, Schema> out) {
-            return Either.right(Schema.create(Schema.Type.LONG));
+        public Object encodePrim(long value, Object out) {
+            return Schema.create(Schema.Type.LONG);
         }
 
         @Override
-        public long decodePrim(Unit in) {
+        public long decodePrim(WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
-    protected final Codec.LongCodec<Unit, Either<String, Schema>, Config> longCodec = new LongCodec();
+    protected final Codec.LongCodec<WithSchema, Object, Config> longCodec = new LongCodec();
 
     @Override
-    public Codec.LongCodec<Unit, Either<String, Schema>, Config> longCodec() {
+    public Codec.LongCodec<WithSchema, Object, Config> longCodec() {
         return longCodec;
     }
 
-    protected final Codec<long[], Unit, Either<String, Schema>, Config> longArrayCodec =
-            new Codec<long[], Unit, Either<String, Schema>, Config>() {
+    protected final Codec<long[], WithSchema, Object, Config> longArrayCodec =
+            new Codec<long[], WithSchema, Object, Config>() {
 
         @Override
         public Class<long[]> type() {
@@ -420,62 +419,62 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 long[] value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.createArray(Schema.create(Schema.Type.LONG)),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public long[] decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public long[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     };
 
     @Override
-    public Codec<long[], Unit, Either<String, Schema>, Config> longArrayCodec() {
+    public Codec<long[], WithSchema, Object, Config> longArrayCodec() {
         return longArrayCodec;
     }
 
-    protected static class FloatCodec implements Codec.FloatCodec<Unit, Either<String, Schema>, Config> {
+    protected static class FloatCodec implements Codec.FloatCodec<WithSchema, Object, Config> {
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 Float value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
-                    encodePrim(value, out).right(),
+            return Schema.createUnion(
+                    (Schema)encodePrim(value, out),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public Either<String, Schema> encodePrim(float value, Either<String, Schema> out) {
-            return Either.right(Schema.create(Schema.Type.FLOAT));
+        public Object encodePrim(float value, Object out) {
+            return Schema.create(Schema.Type.FLOAT);
         }
 
         @Override
-        public float decodePrim(Unit in ) {
+        public float decodePrim(WithSchema in ) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
-    protected final Codec.FloatCodec<Unit, Either<String, Schema>, Config> floatCodec = new FloatCodec();
+    protected final Codec.FloatCodec<WithSchema, Object, Config> floatCodec = new FloatCodec();
 
     @Override
-    public Codec.FloatCodec<Unit, Either<String, Schema>, Config> floatCodec() {
+    public Codec.FloatCodec<WithSchema, Object, Config> floatCodec() {
         return floatCodec;
     }
 
-    protected final Codec<float[], Unit, Either<String, Schema>, Config> floatArrayCodec =
-            new Codec<float[], Unit, Either<String, Schema>, Config>() {
+    protected final Codec<float[], WithSchema, Object, Config> floatArrayCodec =
+            new Codec<float[], WithSchema, Object, Config>() {
 
         @Override
         public Class<float[]> type() {
@@ -483,62 +482,62 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 float[] value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.createArray(Schema.create(Schema.Type.FLOAT)),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public float[] decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public float[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     };
 
     @Override
-    public Codec<float[], Unit, Either<String, Schema>, Config> floatArrayCodec() {
+    public Codec<float[], WithSchema, Object, Config> floatArrayCodec() {
         return floatArrayCodec;
     }
 
-    protected static class DoubleCodec implements Codec.DoubleCodec<Unit, Either<String, Schema>, Config> {
+    protected static class DoubleCodec implements Codec.DoubleCodec<WithSchema, Object, Config> {
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 Double value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
-                    encodePrim(value, out).right(),
+            return Schema.createUnion(
+                    (Schema)encodePrim(value, out),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public Either<String, Schema> encodePrim(double value, Either<String, Schema> out) {
-            return Either.right(Schema.create(Schema.Type.DOUBLE));
+        public Object encodePrim(double value, Object out) {
+            return Schema.create(Schema.Type.DOUBLE);
         }
 
         @Override
-        public double decodePrim(Unit in ) {
+        public double decodePrim(WithSchema in ) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
-    protected final Codec.DoubleCodec<Unit, Either<String, Schema>, Config> doubleCodec = new DoubleCodec();
+    protected final Codec.DoubleCodec<WithSchema, Object, Config> doubleCodec = new DoubleCodec();
 
     @Override
-    public Codec.DoubleCodec<Unit, Either<String, Schema>, Config> doubleCodec() {
+    public Codec.DoubleCodec<WithSchema, Object, Config> doubleCodec() {
         return doubleCodec;
     }
 
-    protected final Codec<double[], Unit, Either<String, Schema>, Config> doubleArrayCodec =
-            new Codec<double[], Unit, Either<String, Schema>, Config>() {
+    protected final Codec<double[], WithSchema, Object, Config> doubleArrayCodec =
+            new Codec<double[], WithSchema, Object, Config>() {
 
         @Override
         public Class<double[]> type() {
@@ -546,29 +545,29 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 double[] value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.createArray(Schema.create(Schema.Type.DOUBLE)),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public double[] decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public double[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     };
 
     @Override
-    public Codec<double[], Unit, Either<String, Schema>, Config> doubleArrayCodec() {
+    public Codec<double[], WithSchema, Object, Config> doubleArrayCodec() {
         return doubleArrayCodec;
     }
 
-    protected static class StringCodec implements Codec<String, Unit, Either<String, Schema>, Config> {
+    protected static class StringCodec implements Codec<String, WithSchema, Object, Config> {
 
         @Override
         public Class<String> type() {
@@ -576,33 +575,33 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 String value,
-                Either<String, Schema> out
+                Object out
         ) {
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.create(Schema.Type.STRING),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public String decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public String decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
-    protected final Codec<String, Unit, Either<String, Schema>, Config> stringCodec = new StringCodec();
+    protected final Codec<String, WithSchema, Object, Config> stringCodec = new StringCodec();
 
     @Override
-    public Codec<String, Unit, Either<String, Schema>, Config> stringCodec() {
+    public Codec<String, WithSchema, Object, Config> stringCodec() {
         return stringCodec;
     }
 
     @Override
-    public <EM extends Enum<EM>> Codec<EM, Unit, Either<String, Schema>, Config> enumCodec(Class<EM> enumType) {
-        return new Codec.FinalCodec<EM, Unit, Either<String, Schema>, Config>() {
+    public <EM extends Enum<EM>> Codec<EM, WithSchema, Object, Config> enumCodec(Class<EM> enumType) {
+        return new Codec.FinalCodec<EM, WithSchema, Object, Config>() {
 
             @Override
             public Class<EM> type() {
@@ -610,22 +609,22 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
             }
 
             @Override
-            public Either<String, Schema> encode(
-                    CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+            public Object encode(
+                    CodecCoreEx<WithSchema, Object, Config> core,
                     EM value,
-                    Either<String, Schema> out
+                    Object out
             ) {
                 final List<String> enumValues = Arrays.stream(enumType.getEnumConstants()).map(Object::toString).collect(toList());
-                return Either.right(Schema.createUnion(
-                        Schema.createEnum(out.left(), null, null, enumValues),
+                return Schema.createUnion(
+                        Schema.createEnum((String)out, null, null, enumValues),
                         Schema.create(Schema.Type.NULL)
-                ));
+                );
             }
 
             @Override
             public EM decode(
-                    CodecCoreEx<Unit, Either<String, Schema>, Config> core,
-                    Unit in
+                    CodecCoreEx<WithSchema, Object, Config> core,
+                    WithSchema in
             ) {
                 throw AvroSchemaTypes.notImplemented();
             }
@@ -633,91 +632,91 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
     }
 
     @Override
-    public <V> Codec<Map<String, V>, Unit, Either<String, Schema>, Config> createMapCodec(
+    public <V> Codec<Map<String, V>, WithSchema, Object, Config> createMapCodec(
             Class<Map<String, V>> type,
-            Codec<V, Unit, Either<String, Schema>, Config> valueCodec
+            Codec<V, WithSchema, Object, Config> valueCodec
     ) {
         return new AvroSchemaMapCodecs.StringMapCodec<V>(type, valueCodec);
     }
 
     @Override
-    public <K, V> Codec<Map<K, V>, Unit, Either<String, Schema>, Config> createMapCodec(
+    public <K, V> Codec<Map<K, V>, WithSchema, Object, Config> createMapCodec(
             Class<Map<K, V>> type,
-            Codec<K, Unit, Either<String, Schema>, Config> keyCodec,
-            Codec<V, Unit, Either<String, Schema>, Config> valueCodec
+            Codec<K, WithSchema, Object, Config> keyCodec,
+            Codec<V, WithSchema, Object, Config> valueCodec
     ) {
         throw new CodecException("AvroCodecformat does not handle Maps with a non-String key type");
     }
 
     @Override
-    public <T> Codec<Collection<T>, Unit, Either<String, Schema>, Config> createCollCodec(
+    public <T> Codec<Collection<T>, WithSchema, Object, Config> createCollCodec(
             Class<Collection<T>> collType,
-            Codec<T, Unit, Either<String, Schema>, Config> elemCodec
+            Codec<T, WithSchema, Object, Config> elemCodec
     ) {
-        return new CollectionCodec<T, Unit, Either<String, Schema>, Config>(collType, elemCodec) {
+        return new CollectionCodec<T, WithSchema, Object, Config>(collType, elemCodec) {
 
             @Override
-            public Either<String, Schema> encode(
-                    CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+            public Object encode(
+                    CodecCoreEx<WithSchema, Object, Config> core,
                     Collection<T> value,
-                    Either<String, Schema> out
+                    Object out
             ) {
                 final Schema schema = value.stream()
-                        .map(t -> elemCodec.encode(core, t, out.mapLeft(s -> s + ".coll")).right())
+                        .map(t -> (Schema)elemCodec.encode(core, t, out.toString() + ".coll"))
                         .reduce(SchemaMerge::merge)
                         .orElseGet(() -> Schema.create(Schema.Type.NULL));
-                return Either.right(Schema.createUnion(
+                return Schema.createUnion(
                         Schema.createArray(schema),
                         Schema.create(Schema.Type.NULL)
-                ));
+                );
             }
 
             @Override
-            public Collection<T> decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+            public Collection<T> decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
                 throw AvroSchemaTypes.notImplemented();
             }
         };
     }
 
     @Override
-    public <T> Codec<T[], Unit, Either<String, Schema>, Config> createObjectArrayCodec(
+    public <T> Codec<T[], WithSchema, Object, Config> createObjectArrayCodec(
             Class<T[]> arrType,
             Class<T> elemType,
-            Codec<T, Unit, Either<String, Schema>, Config> elemCodec
+            Codec<T, WithSchema, Object, Config> elemCodec
     ) {
-        return new Codec<T[], Unit, Either<String, Schema>, Config>() {
+        return new Codec<T[], WithSchema, Object, Config>() {
             @Override
             public Class<T[]> type() {
                 return arrType;
             }
 
             @Override
-            public Either<String, Schema> encode(
-                    CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+            public Object encode(
+                    CodecCoreEx<WithSchema, Object, Config> core,
                     T[] value,
-                    Either<String, Schema> out
+                    Object out
             ) {
                 final Schema schema = Arrays.stream(value)
-                        .map(t -> elemCodec.encode(core, t, out.mapLeft(s -> s + ".array")).right())
+                        .map(t -> (Schema)elemCodec.encode(core, t, out.toString() + ".array"))
                         .reduce(SchemaMerge::merge)
                         .orElseGet(() -> Schema.create(Schema.Type.NULL));
-                return Either.right(Schema.createUnion(
-                        Schema.createArray(Schema.create(Schema.Type.BOOLEAN)),
+                return Schema.createUnion(
+                        Schema.createArray(schema),
                         Schema.create(Schema.Type.NULL)
-                ));
+                );
             }
 
             @Override
-            public T[] decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+            public T[] decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
                 throw AvroSchemaTypes.notImplemented();
             }
         };
     }
 
     @Override
-    public <T, RA extends ObjectMeta.Builder<T>> Codec<T, Unit, Either<String, Schema>, Config> createObjectCodec(
+    public <T, RA extends ObjectMeta.Builder<T>> Codec<T, WithSchema, Object, Config> createObjectCodec(
             Class<T> type,
-            ObjectMeta<T, Unit, Either<String, Schema>, RA> objMeta) {
+            ObjectMeta<T, WithSchema, Object, RA> objMeta) {
         if (Modifier.isFinal(type.getModifiers())) {
             return new FinalObjectCodec<T, RA>(type, objMeta);
         } else {
@@ -726,15 +725,15 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
     }
 
     protected class ObjectCodec<T, RA extends ObjectMeta.Builder<T>>
-            implements Codec<T, Unit, Either<String, Schema>, Config> {
+            implements Codec<T, WithSchema, Object, Config> {
 
         private final Class<T> type;
-        private final ObjectMeta<T, Unit, Either<String, Schema>, RA> objMeta;
-        private final Map<String, ObjectMeta.Field<T, Unit, Either<String, Schema>, RA>> fields;
+        private final ObjectMeta<T, WithSchema, Object, RA> objMeta;
+        private final Map<String, ObjectMeta.Field<T, WithSchema, Object, RA>> fields;
 
         private ObjectCodec(
                 Class<T> type,
-                ObjectMeta<T, Unit, Either<String, Schema>, RA> objMeta
+                ObjectMeta<T, WithSchema, Object, RA> objMeta
         ) {
             this.type = type;
             this.objMeta = objMeta;
@@ -751,33 +750,36 @@ public class AvroSchemaCodecFormat implements CodecFormat<Unit, Either<String, S
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 T value,
-                Either<String, Schema> out
+                Object out
         ) {
+            final String path = out + "." + type.getSimpleName();
             final List<Schema.Field> fieldSchema =
                     fields.entrySet().stream()
                             .map(en -> new Schema.Field(
                                     en.getKey(),
-                                    en.getValue().encodeField(value, out).right()))
+                                    (Schema)en.getValue().encodeField(value, path)))
                             .collect(toList());
-            return Either.right(Schema.createRecord(fieldSchema));
+            final Schema schema = Schema.createRecord(path, null, null, false);
+            schema.setFields(fieldSchema);
+            return schema;
         }
 
         @Override
-        public T decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public T decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
 
     protected class FinalObjectCodec<T, RA extends ObjectMeta.Builder<T>>
             extends ObjectCodec<T, RA>
-            implements Codec.FinalCodec<T, Unit, Either<String, Schema>, Config> {
+            implements Codec.FinalCodec<T, WithSchema, Object, Config> {
 
         protected FinalObjectCodec(
                 Class<T> type,
-                ObjectMeta<T, Unit, Either<String, Schema>, RA> objMeta
+                ObjectMeta<T, WithSchema, Object, RA> objMeta
         ) {
             super(type, objMeta);
         }

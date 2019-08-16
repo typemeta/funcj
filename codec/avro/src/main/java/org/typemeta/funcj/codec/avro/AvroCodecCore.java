@@ -3,12 +3,14 @@ package org.typemeta.funcj.codec.avro;
 import org.apache.avro.Schema;
 import org.apache.avro.file.*;
 import org.apache.avro.generic.*;
-import org.typemeta.funcj.codec.CodecStrAPI;
+import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.Codec;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
 import org.typemeta.funcj.codec.avro.schema.AvroSchemaCodecCore;
 import org.typemeta.funcj.codec.impl.*;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.control.Either;
+import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Exceptions;
 
 import java.io.*;
@@ -35,6 +37,72 @@ public class AvroCodecCore
         this(new AvroConfig());
     }
 
+    @Override
+    public <T> void registerCodec(
+            Class<? extends T> clazz,
+            Codec<T, WithSchema, Object, Config> codec
+    ) {
+        avroSchemaCodec.registerCodec(clazz, codec);
+        super.registerCodec(clazz, codec);
+    }
+
+    @Override
+    public <T> ObjectCodecBuilderWithArgArray<T, WithSchema, Object, Config> registerCodecWithArgArray(Class<T> clazz) {
+        return new ObjectCodecBuilderWithArgArray<T, WithSchema, Object, Config>(delegate, clazz) {
+            @Override
+            protected Codec<T, WithSchema, Object, Config> registration(Codec<T, WithSchema, Object, Config> codec) {
+                avroSchemaCodec.registerCodec(clazz, codec);
+                registerCodec(clazz, codec);
+                return codec;
+            }
+        };
+    }
+
+    @Override
+    public <T> ObjectCodecBuilderWithArgMap<T, WithSchema, Object, Config> registerCodecWithArgMap(Class<T> clazz) {
+        return new ObjectCodecBuilderWithArgMap<T, WithSchema, Object, Config>(delegate, clazz) {
+            @Override
+            protected Codec<T, WithSchema, Object, Config> registration(Codec<T, WithSchema, Object, Config> codec) {
+                avroSchemaCodec.registerCodec(clazz, codec);
+                registerCodec(clazz, codec);
+                return codec;
+            }
+        };
+    }
+
+    @Override
+    public <T> void registerStringProxyCodec(
+            Class<T> clazz,
+            Functions.F<T, String> encode,
+            Functions.F<String, T> decode) {
+        avroSchemaCodec.registerStringProxyCodec(clazz, encode, decode);
+        super.registerStringProxyCodec(clazz, encode, decode);
+    }
+
+    @Override
+    public <T> void registerNoArgsCtor(
+            Class<? extends T> clazz,
+            NoArgsTypeCtor<T> typeCtor) {
+        avroSchemaCodec.registerNoArgsCtor(clazz, typeCtor);
+        super.registerNoArgsCtor(clazz, typeCtor);
+    }
+
+    @Override
+    public <T> void registerArgArrayCtor(
+            Class<? extends T> clazz,
+            ArgArrayTypeCtor<T> typeCtor) {
+        avroSchemaCodec.registerArgArrayCtor(clazz, typeCtor);
+        super.registerArgArrayCtor(clazz, typeCtor);
+    }
+
+    @Override
+    public <T> void registerArgMapTypeCtor(
+            Class<? extends T> clazz,
+            ArgMapTypeCtor<T> typeCtor) {
+        avroSchemaCodec.registerArgMapTypeCtor(clazz, typeCtor);
+        super.registerArgMapTypeCtor(clazz, typeCtor);
+    }
+
     public <T> DataFileWriter<GenericRecord> encode(
             Class<? super T> clazz,
             Schema schema,
@@ -53,7 +121,7 @@ public class AvroCodecCore
             OutputStream os
     ) throws IOException {
         final DataFileWriter<GenericRecord> writer =
-                new DataFileWriter<GenericRecord>(new GenericDatumWriter<GenericRecord>(schema))
+                new DataFileWriter<GenericRecord>(new GenericDatumWriter<GenericRecord>())
                         .create(schema, os);
         return encode(clazz, schema, value, writer);
     }
@@ -69,7 +137,7 @@ public class AvroCodecCore
             T value,
             OutputStream os
     ) {
-        final Schema schema = avroSchemaCodec.encodeImpl(clazz, value, Either.left("/")).right();
+        final Schema schema = (Schema)avroSchemaCodec.encodeImpl(clazz, value, "");
         System.out.println(schema);
         try (DataFileWriter<GenericRecord> dfw = encode(clazz, schema, value, os)) {
             return os;
@@ -80,7 +148,7 @@ public class AvroCodecCore
 
     @Override
     public <T> T decode(Class<? super T> clazz, InputStream is) {
-        return Exceptions.wrap(() -> {;
+        return Exceptions.wrap(() -> {
             try (final DataFileStream<GenericRecord> dfs =
                          new DataFileStream<>(is, new GenericDatumReader<>())) {
                 return decode(clazz, dfs);

@@ -2,42 +2,41 @@ package org.typemeta.funcj.codec.avro.schema;
 
 import org.apache.avro.Schema;
 import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.avro.AvroTypes.WithSchema;
 import org.typemeta.funcj.codec.impl.MapCodecs;
-import org.typemeta.funcj.control.Either;
-import org.typemeta.funcj.data.Unit;
 
 import java.util.Map;
 
 import static org.typemeta.funcj.codec.avro.AvroTypes.Config;
 
 public abstract class AvroSchemaMapCodecs {
-    public static class StringMapCodec<V> extends MapCodecs.AbstractStringMapCodec<V, Unit, Either<String, Schema>, Config> {
+    public static class StringMapCodec<V> extends MapCodecs.AbstractStringMapCodec<V, WithSchema, Object, Config> {
 
         public StringMapCodec(
                 Class<Map<String, V>> type,
-                Codec<V, Unit, Either<String, Schema>, Config> valueCodec
+                Codec<V, WithSchema, Object, Config> valueCodec
         ) {
             super(type, valueCodec);
         }
 
         @Override
-        public Either<String, Schema> encode(
-                CodecCoreEx<Unit, Either<String, Schema>, Config> core,
+        public Object encode(
+                CodecCoreEx<WithSchema, Object, Config> core,
                 Map<String, V> value,
-                Either<String, Schema> out
+                Object out
         ) {
             final Schema schema = value.values().stream()
-                    .map(t -> valueCodec.encode(core, t, out.mapLeft(s -> s + ".map")).right())
+                    .map(t -> (Schema)valueCodec.encode(core, t, out.toString() + ".map"))
                     .reduce(SchemaMerge::merge)
                     .orElseGet(() -> Schema.create(Schema.Type.NULL));
-            return Either.right(Schema.createUnion(
+            return Schema.createUnion(
                     Schema.createMap(schema),
                     Schema.create(Schema.Type.NULL)
-            ));
+            );
         }
 
         @Override
-        public Map<String, V> decode(CodecCoreEx<Unit, Either<String, Schema>, Config> core, Unit in) {
+        public Map<String, V> decode(CodecCoreEx<WithSchema, Object, Config> core, WithSchema in) {
             throw AvroSchemaTypes.notImplemented();
         }
     }
