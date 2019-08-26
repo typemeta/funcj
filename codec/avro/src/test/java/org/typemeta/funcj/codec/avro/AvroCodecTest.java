@@ -3,10 +3,12 @@ package org.typemeta.funcj.codec.avro;
 import org.apache.avro.Schema;
 import org.junit.*;
 import org.typemeta.funcj.codec.TestBase;
+import org.typemeta.funcj.codec.avro.schema.AvroSchemaCodecCore;
 import org.typemeta.funcj.util.Exceptions;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -353,7 +355,6 @@ public class AvroCodecTest {
             return result;
         }
     }
-
     private static final AvroTestType nullVal = new AvroTestType();
 
     private static final AvroTestType nonNullVal = new AvroTestType(
@@ -398,14 +399,49 @@ public class AvroCodecTest {
         roundTrip(nonNullVal, AvroTestType.class);
     }
 
-    protected <T> void roundTrip(T val, Class<T> clazz) {
-        final AvroConfig.Builder cfgBldr = AvroConfig.builder()
-                .registerAllowedPackage(AvroTestType.class.getPackage());
-        final AvroCodecCore codec = TestBase.prepareCodecCore(cfgBldr, Codecs::avroCodec);
+    public static void main(String[] args) {
+        try {
+            System.out.println("AvroTestType.o_d");
+            Field field = AvroTestType.class.getDeclaredField("o_d");
+            getTypeArgs(field);
 
+            System.out.println();
+
+            System.out.println("Optional.value");
+            Field field2 = Optional.class.getDeclaredField("value");
+            getTypeArgs(field2);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getTypeArgs(Field field) {
+        System.out.println(field.getGenericType());
+        System.out.println(field.getGenericType().getTypeName());
+        System.out.println(field.getGenericType().getClass());
+    }
+
+
+    protected <T> void roundTrip(T val, Class<T> clazz) {
+        final AvroCodecCore codec;
+        {
+            final AvroConfig.Builder cfgBldr = AvroConfig.builder()
+                    .registerAllowedPackage(AvroTestType.class.getPackage());
+            codec = TestBase.prepareCodecCore(cfgBldr, Codecs::avroCodec);
+        }
+
+        final AvroSchemaCodecCore schemaCodec;
+        {
+            final AvroConfig.Builder cfgBldr = AvroConfig.builder()
+                    .registerAllowedPackage(AvroTestType.class.getPackage());
+            schemaCodec = TestBase.prepareCodecCore(cfgBldr, Codecs::avroSchemaCodec);
+        }
+
+        final Schema schema = (Schema)schemaCodec.encodeImpl(clazz, val, "");
+        System.out.println(schema);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        codec.encode(clazz, val, baos);
+        codec.encode(clazz, schema, val, baos);
 
         final byte[] ba = baos.toByteArray();
 

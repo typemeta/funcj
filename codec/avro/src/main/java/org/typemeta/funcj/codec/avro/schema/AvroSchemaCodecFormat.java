@@ -328,10 +328,7 @@ public class AvroSchemaCodecFormat implements CodecFormat<WithSchema, Object, Co
 
         @Override
         public Object encodePrim(int value, Object out) {
-            return Schema.createUnion(
-                    Schema.createArray(Schema.create(Schema.Type.INT)),
-                    Schema.create(Schema.Type.NULL)
-            );
+            return Schema.create(Schema.Type.INT);
         }
 
         @Override
@@ -614,9 +611,12 @@ public class AvroSchemaCodecFormat implements CodecFormat<WithSchema, Object, Co
                     EM value,
                     Object out
             ) {
-                final List<String> enumValues = Arrays.stream(enumType.getEnumConstants()).map(Object::toString).collect(toList());
+                final List<String> enumValues =
+                        Arrays.stream(enumType.getEnumConstants())
+                                .map(Object::toString)
+                                .collect(toList());
                 return Schema.createUnion(
-                        Schema.createEnum((String)out, null, null, enumValues),
+                        Schema.createEnum(enumType.getCanonicalName(), null, null, enumValues),
                         Schema.create(Schema.Type.NULL)
                 );
             }

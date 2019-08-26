@@ -49,7 +49,7 @@ public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore
     }
 
     /**
-     * Lookup a {@code Codec} for a name, and, if one doesn't exist,
+     * Lookup a {@link Codec} for a name, and, if one doesn't exist,
      * then create a new one using the supplier.
      * <p>
      * This method needs to be thread-safe and re-entrant in case the
