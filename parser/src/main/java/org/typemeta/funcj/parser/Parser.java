@@ -507,7 +507,8 @@ public interface Parser<I, A> {
      * @return          a parser which applies this parser zero or more times alternated with {@code sep}
      */
     default <SEP> Parser<I, IList<A>> sepBy(Parser<I, SEP> sep) {
-        return this.sepBy1(sep)
+        // the cast is needed so both branches of the or return the same type
+        return this.sepBy1(sep).map(l -> (IList<A>) l)
                 .or(Parser.pure(IList.empty()));
     }
 
@@ -520,7 +521,7 @@ public interface Parser<I, A> {
      * @param <SEP>     the separator type
      * @return          a parser which applies this parser one or more times alternated with {@code sep}
      */
-    default <SEP> Parser<I, IList<A>> sepBy1(Parser<I, SEP> sep) {
+    default <SEP> Parser<I, IList.NonEmpty<A>> sepBy1(Parser<I, SEP> sep) {
         return this.and(sep.andR(this).many())
                 .map(a -> l -> l.add(a));
     }

@@ -155,7 +155,7 @@ Input<Chr> rdrInput = Input.of(new CharArrayReader(charData))
 It's essentially a discriminated union between the two following sub-types:
 
 * `Result.Success` - indicating a successful parse,
-consisting of a parse value of type `T`, and an `Input` value pointing to the next positiion in the input stream.
+consisting of a parse value of type `T`, and an `Input` value pointing to the next position in the input stream.
 * `Result.Failure`, indicating a failure, consisting of a error message and the position at which the error occurred.
 
 The `Result` value can be handled in various ways.
@@ -195,7 +195,7 @@ as E is defined in terms of itself.
 To circumvent this a parser reference can be used.
 The reference is initially uninitialised,
 however since it implements the `Parser` interface,
-it can be used to  construct fudther parsers as with any other parser value.
+it can be used to  construct further parsers as with any other parser value.
 It must subsequently be initialised with an actual parser before it is invoked -
 all methods other than set will throw an exception if invoked on an uninitialised `Ref` value.
 
