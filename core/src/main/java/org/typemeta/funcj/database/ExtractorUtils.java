@@ -1,12 +1,9 @@
 package org.typemeta.funcj.database;
 
 import java.sql.ResultSet;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.*;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.YEAR;
+import static java.time.temporal.ChronoField.*;
 
 /**
  * Simple combinator framework for extracting values from JDBC {@link ResultSet}s.

@@ -24,8 +24,8 @@
         <connection>scm:git:git@github.com:typemeta/${project.artifactId}.git</connection>
         <developerConnection>scm:git:git@github.com:typemeta/${project.artifactId}.git</developerConnection>
         <url>http://github.com:typemeta/${project.artifactId}/tree/master</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <issueManagement>
         <system>github</system>
@@ -77,6 +77,7 @@
         <site-maven-plugin.version>0.11</site-maven-plugin.version>
 
         <!-- Library versions -->
+        <derby.version>10.14.2.0</derby.version>
         <immutables.version>2.7.3</immutables.version>
         <jmh.version>1.21</jmh.version>
         <jsonp.version>1.1.5</jsonp.version>
@@ -104,20 +105,17 @@
                 <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-generator-annprocess</artifactId>
                 <version>${jmh.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.pholser</groupId>
                 <artifactId>junit-quickcheck-core</artifactId>
                 <version>${junit-quickcheck.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.pholser</groupId>
                 <artifactId>junit-quickcheck-generators</artifactId>
                 <version>${junit-quickcheck.version}</version>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -130,6 +128,12 @@
                 <groupId>org.glassfish</groupId>
                 <artifactId>jakarta.json</artifactId>
                 <version>${jsonp.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${derby.version}</version>
             </dependency>
 
         </dependencies>
