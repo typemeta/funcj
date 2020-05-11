@@ -7,11 +7,11 @@ import org.typemeta.funcj.util.Exceptions;
 import java.io.*;
 import java.sql.*;
 import java.time.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 import java.util.stream.*;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.joining;
 
 public class ExtractorTest {
     private static final Logger logger = LoggerFactory.getLogger(ExtractorTest.class);
@@ -155,8 +155,8 @@ public class ExtractorTest {
                     final Column column = TABLE_COLUMNS[nCol];
                     final List<Class<?>> javaTypes = sqlTypeMap.get(column.type);
                     if (i < javaTypes.size()) {
+                        final Class<?> javaType = javaTypes.get(i);
                         if (javaTypes.equals(NUMERIC_TYPES)) {
-                            final Class<?> javaType = javaTypes.get(i);
                             if (prevValues[nCol] == null) {
                                 final Object value = optExtractors.get(javaType).bind(column.name).extract(rs);
                                 final Number num = getOptionalValue(value);
@@ -169,7 +169,6 @@ public class ExtractorTest {
                                 }
                             }
                         } else {
-                            final Class<?> javaType = javaTypes.get(i);
                             final Object value = optExtractors.get(javaType).bind(column.name).extract(rs);
                         }
                     }
@@ -191,20 +190,19 @@ public class ExtractorTest {
                     final Column column = TABLE_COLUMNS[nCol];
                     final List<Class<?>> javaTypes = sqlTypeMap.get(column.type);
                     if (i < javaTypes.size()) {
+                        final Class<?> javaType = javaTypes.get(i);
                         if (javaTypes.equals(NUMERIC_TYPES)) {
-                            final Class<?> javaType = javaTypes.get(i);
                             if (prevValues[nCol] == null) {
                                 final Number num = (Number)extractors.get(javaType).bind(column.name).extract(rs);
                                 if (num != null) {
                                     prevValues[nCol] = num.doubleValue();
                                 }
                             } else {
-                                if ((prevValues[nCol] < NUMERIC_MAX[i])) {
+                                if (prevValues[nCol] < NUMERIC_MAX[i]) {
                                     final Object value = extractors.get(javaType).bind(column.name).extract(rs);
                                 }
                             }
                         } else {
-                            final Class<?> javaType = javaTypes.get(i);
                             final Object value = extractors.get(javaType).bind(column.name).extract(rs);
                         }
                     }
