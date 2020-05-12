@@ -1,4 +1,4 @@
-package org.typemeta.funcj.database;
+package org.typemeta.funcj.extractors;
 
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Exceptions;
@@ -9,7 +9,8 @@ import org.typemeta.funcj.util.Exceptions;
  * @param <T>       the value type
  * @param <EX>      the exception type
  */
-interface NamedExtractorEx<ENV, T, EX extends Exception> {
+@FunctionalInterface
+public interface NamedExtractorEx<ENV, T, EX extends Exception> {
 
     /**
      * Extract a value of type {@code T} from the given environment,

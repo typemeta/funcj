@@ -1,4 +1,4 @@
-package org.typemeta.funcj.database;
+package org.typemeta.funcj.extractors;
 
 import org.typemeta.funcj.functions.Functions;
 
@@ -7,6 +7,7 @@ import org.typemeta.funcj.functions.Functions;
  * @param <ENV>     the environment type
  * @param <T>       the extracted value type
  */
+@FunctionalInterface
 public interface Extractor<ENV, T> {
     /**
      * Extract a value of type {@code T} from the given env.
@@ -29,7 +30,7 @@ public interface Extractor<ENV, T> {
      * Flatmap a function over this extractor.
      * @param f         the function
      * @param <U>       the extractor value type returned by the function
-     * @return          the flatmapped extractor
+     * @return          the new extractor
      */
     default <U> Extractor<ENV, U> flatMap(Functions.F<T, Extractor<ENV, U>> f) {
         return rs -> f.apply(this.extract(rs)).extract(rs);

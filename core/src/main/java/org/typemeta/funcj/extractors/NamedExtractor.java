@@ -1,15 +1,14 @@
-package org.typemeta.funcj.database;
+package org.typemeta.funcj.extractors;
 
 import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.util.Exceptions;
-
-import java.util.function.*;
 
 /**
  * A function to extract a value from an environment, given a name.
  * @param <ENV>     the environment type
  * @param <T>       the value type
  */
+@FunctionalInterface
 public interface NamedExtractor<ENV, T> {
     static <ENV, T> NamedExtractor<ENV, T> of(FunctionsEx.F2<ENV, String, T> thrower) {
         return (env, name) -> {

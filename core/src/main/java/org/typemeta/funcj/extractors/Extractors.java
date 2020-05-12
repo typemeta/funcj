@@ -1,4 +1,4 @@
-package org.typemeta.funcj.database;
+package org.typemeta.funcj.extractors;
 
 import org.typemeta.funcj.functions.Functions;
 
@@ -13,7 +13,13 @@ public abstract class Extractors {
      * A specialisation of {@link Extractor} for {@code double} values.
      * @param <ENV>     the environment type
      */
+    @FunctionalInterface
     public interface DoubleExtractor<ENV> extends Extractor<ENV, Double> {
+        /**
+         * The extraction method, specialised to return an unboxed {@code double} value.
+         * @param env   the environment
+         * @return      the extracted double value
+         */
         double extractDbl(ENV env);
 
         @Override
@@ -22,7 +28,7 @@ public abstract class Extractors {
         }
 
         default <U> Extractor<ENV, U> mapDbl(DoubleFunction<U> f) {
-            return env -> f.apply(extract(env));
+            return env -> f.apply(extractDbl(env));
         }
     }
 
@@ -30,7 +36,13 @@ public abstract class Extractors {
      * A specialisation of {@link Extractor} for {@code int} values.
      * @param <ENV>     the environment type
      */
+    @FunctionalInterface
     public interface IntExtractor<ENV> extends Extractor<ENV, Integer> {
+        /**
+         * The extraction method, specialised to return an unboxed {@code int} value.
+         * @param env   the environment
+         * @return      the extracted int value
+         */
         int extractInt(ENV env);
 
         @Override
@@ -39,7 +51,7 @@ public abstract class Extractors {
         }
 
         default <U> Extractor<ENV, U> mapInt(IntFunction<U> f) {
-            return env -> f.apply(extract(env));
+            return env -> f.apply(extractInt(env));
         }
     }
 
@@ -47,7 +59,13 @@ public abstract class Extractors {
      * A specialisation of {@link Extractor} for {@code long} values.
      * @param <ENV>     the environment type
      */
+    @FunctionalInterface
     public interface LongExtractor<ENV> extends Extractor<ENV, Long> {
+        /**
+         * The extraction method, specialised to return an unboxed {@code long} value.
+         * @param env   the environment
+         * @return      the extracted long value
+         */
         long extractLong(ENV env);
 
         @Override
@@ -56,7 +74,7 @@ public abstract class Extractors {
         }
 
         default <U> Extractor<ENV, U> mapLong(LongFunction<U> f) {
-            return env -> f.apply(extract(env));
+            return env -> f.apply(extractLong(env));
         }
     }
 
@@ -70,7 +88,7 @@ public abstract class Extractors {
      * @param <A>       the type of value returned by the first extractor
      * @param <B>       the type of value returned by the second extractor
      * @param <R>       the value type
-     * @return          the new value
+     * @return          the new extractor
      */
     public static <ENV, A, B, R> Extractor<ENV, R> combine(
             Extractor<ENV, A> exA,
@@ -92,7 +110,7 @@ public abstract class Extractors {
      * @param <B>       the type of value returned by the second extractor
      * @param <C>       the type of value returned by the third extractor
      * @param <R>       the value type
-     * @return          the new value
+     * @return          the new extractor
      */
     public static <ENV, A, B, C, R> Extractor<ENV, R> combine(
             Extractor<ENV, A> exA,
@@ -117,7 +135,7 @@ public abstract class Extractors {
      * @param <C>       the type of value returned by the third extractor
      * @param <D>       the type of value returned by the fourth extractor
      * @param <R>       the value type
-     * @return          the new value
+     * @return          the new extractor
      */
     public static <ENV, A, B, C, D, R> Extractor<ENV, R> combine(
             Extractor<ENV, A> exA,
@@ -134,7 +152,7 @@ public abstract class Extractors {
      * @param extrs     the collection of extractors
      * @param <ENV>     the environment type
      * @param <T>       the extractor value type
-     * @return          the list of extracted values
+     * @return          an extractor for a list of values
      */
     public static <ENV, T> Extractor<ENV, List<T>> list(Collection<Extractor<ENV, T>> extrs) {
         return env ->

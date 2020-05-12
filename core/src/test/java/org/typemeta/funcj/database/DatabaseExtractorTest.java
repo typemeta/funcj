@@ -2,6 +2,7 @@ package org.typemeta.funcj.database;
 
 import org.junit.*;
 import org.slf4j.*;
+import org.typemeta.funcj.extractors.NamedExtractor;
 import org.typemeta.funcj.util.Exceptions;
 
 import java.io.*;
@@ -13,8 +14,8 @@ import java.util.stream.*;
 
 import static java.util.stream.Collectors.joining;
 
-public class ExtractorTest {
-    private static final Logger logger = LoggerFactory.getLogger(ExtractorTest.class);
+public class DatabaseExtractorTest {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseExtractorTest.class);
 
     private static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
     private static final String JDBC_CONN_URL = "jdbc:derby:memory:testdb;create=true";
@@ -67,7 +68,7 @@ public class ExtractorTest {
         sqlTypeMap.put("timestamp", list(LocalDate.class, LocalDateTime.class, LocalTime.class));
     }
 
-    private static final Map<Class<?>, NamedExtractor<?>> extractors;
+    private static final Map<Class<?>, NamedExtractor<ResultSet, ?>> extractors;
 
     static {
         extractors = new HashMap<>();
@@ -86,7 +87,7 @@ public class ExtractorTest {
         extractors.put(Time.class, DatabaseExtractors.SQLTIME_EX);
     }
 
-    private static final Map<Class<?>, NamedExtractor<?>>  optExtractors;
+    private static final Map<Class<?>, NamedExtractor<ResultSet, ?>>  optExtractors;
 
     static {
         optExtractors = new HashMap<>();
@@ -127,7 +128,7 @@ public class ExtractorTest {
 
     private static Number getOptionalValue(Object optional) {
         if (optional instanceof Optional) {
-            return (Number)((Optional)optional).get();
+            return (Number)((Optional<?>)optional).get();
         } else if (optional instanceof OptionalInt) {
             final OptionalInt optInt = ((OptionalInt)optional);
             return optInt.isPresent() ? optInt.getAsInt() : null;
@@ -227,7 +228,7 @@ class SqlUtils {
 
     static Stream<String> loadResource(String path) {
         final String text =
-                Optional.ofNullable(ExtractorTest.class.getResourceAsStream(path))
+                Optional.ofNullable(DatabaseExtractorTest.class.getResourceAsStream(path))
                         .map(InputStreamReader::new)
                         .map(is -> {
                             try (BufferedReader br = new BufferedReader(is)) {

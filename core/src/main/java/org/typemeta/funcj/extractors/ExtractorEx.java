@@ -1,13 +1,15 @@
-package org.typemeta.funcj.database;
+package org.typemeta.funcj.extractors;
 
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Exceptions;
 
 /**
- * A function to extract a value from an environment.
+ * A function to extract a value from an environment, which may throw a checked exception.
  * @param <ENV>     the environment type
  * @param <T>       the extracted value type
+ * @param <EX>      the exception type
  */
+@FunctionalInterface
 public interface ExtractorEx<ENV, T, EX extends Exception> {
     /**
      * Extract a value of type {@code T} from the given env.
