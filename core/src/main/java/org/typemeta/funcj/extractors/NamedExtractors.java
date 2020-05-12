@@ -1,17 +1,22 @@
 package org.typemeta.funcj.extractors;
 
 import org.typemeta.funcj.extractors.Extractors.*;
-import org.typemeta.funcj.extractors.NamedExtractorExs.*;
-import org.typemeta.funcj.util.Exceptions;
-
-import java.sql.*;
 import java.util.function.*;
 
 public class NamedExtractors {
 
+    /**
+     * A specialisation of {@link NamedExtractor} for {@code double} values.
+     * @param <ENV>     the environment type
+     */
     @FunctionalInterface
     public interface DoubleNamedExtractor<ENV> extends NamedExtractor<ENV, Double> {
 
+        /**
+         * The extraction method, specialised to return an unboxed {@code double} value.
+         * @param env   the environment
+         * @return      the extracted value
+         */
         double extractDouble(ENV env, String name);
 
         @Override
@@ -29,18 +34,18 @@ public class NamedExtractors {
         }
     }
 
+    /**
+     * A specialisation of {@code NamedExtractor} for {@code int} values.
+     * @param <ENV>     the environment type
+     */
     @FunctionalInterface
     public interface IntNamedExtractor<ENV> extends NamedExtractor<ENV, Integer> {
-        static <ENV> IntNamedExtractor<ENV> of(IntNamedExtractorEx<ENV, SQLException> extr) {
-            return (rs, name) -> {
-                try {
-                    return extr.extractInt(rs, name);
-                } catch (SQLException ex) {
-                    return Exceptions.throwUnchecked(ex);
-                }
-            };
-        }
 
+        /**
+         * The extraction method, specialised to return an unboxed {@code int} value.
+         * @param env   the environment
+         * @return      the extracted value
+         */
         int extractInt(ENV env, String name);
 
         @Override
@@ -58,18 +63,18 @@ public class NamedExtractors {
         }
     }
 
+    /**
+     * A specialisation of {@code NamedExtractor} for {@code long} values.
+     * @param <ENV>     the environment type
+     */
     @FunctionalInterface
     public interface LongNamedExtractor<ENV> extends NamedExtractor<ENV, Long> {
-        static <ENV> LongNamedExtractor<ENV> of(LongNamedExtractorEx<ENV, SQLException> extr) {
-            return (rs, name) -> {
-                try {
-                    return extr.extractLong(rs, name);
-                } catch (SQLException ex) {
-                    return Exceptions.throwUnchecked(ex);
-                }
-            };
-        }
 
+        /**
+         * The extraction method, specialised to return an unboxed {@code long} value.
+         * @param env   the environment
+         * @return      the extracted value
+         */
         long extractLong(ENV env, String name);
 
         @Override
@@ -77,7 +82,7 @@ public class NamedExtractors {
             return extractLong(env, name);
         }
 
-        default <U> NamedExtractor<ENV, U> map(LongFunction<U> f) {
+        default <U> NamedExtractor<ENV, U> mapLong(LongFunction<U> f) {
             return (env, name) -> f.apply(extractLong(env, name));
         }
 

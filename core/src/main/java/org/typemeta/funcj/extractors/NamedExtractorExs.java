@@ -17,6 +17,11 @@ public class NamedExtractorExs {
             return extr;
         }
 
+        /**
+         * The extraction method, specialised to return an unboxed {@code double} value.
+         * @param env   the environment
+         * @return      the extracted double value
+         */
         double extractDouble(ENV env, String name) throws EX;
 
         @Override
@@ -53,6 +58,11 @@ public class NamedExtractorExs {
             return extr;
         }
 
+        /**
+         * The extraction method, specialised to return an unboxed {@code int} value.
+         * @param env   the environment
+         * @return      the extracted value
+         */
         int extractInt(ENV env, String name) throws EX;
 
         @Override
@@ -89,6 +99,11 @@ public class NamedExtractorExs {
             return extr;
         }
 
+        /**
+         * The extraction method, specialised to return an unboxed {@code long} value.
+         * @param env   the environment
+         * @return      the extracted value
+         */
         long extractLong(ENV env, String name) throws EX;
 
         @Override
