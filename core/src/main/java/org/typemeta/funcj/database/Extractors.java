@@ -1,9 +1,7 @@
 package org.typemeta.funcj.database;
 
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.util.Exceptions;
 
-import java.sql.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -13,49 +11,52 @@ public abstract class Extractors {
 
     /**
      * A specialisation of {@link Extractor} for {@code double} values.
+     * @param <ENV>     the environment type
      */
-    public interface DoubleExtractor extends Extractor<Double> {
-        double extractDbl(ResultSet rs) throws SQLException;
+    public interface DoubleExtractor<ENV> extends Extractor<ENV, Double> {
+        double extractDbl(ENV env);
 
         @Override
-        default Double extract(ResultSet rs) throws SQLException {
-            return extractDbl(rs);
+        default Double extract(ENV env) {
+            return extractDbl(env);
         }
 
-        default <U> Extractor<U> mapDbl(DoubleFunction<U> f) {
-            return rs -> f.apply(extract(rs));
+        default <U> Extractor<ENV, U> mapDbl(DoubleFunction<U> f) {
+            return env -> f.apply(extract(env));
         }
     }
 
     /**
      * A specialisation of {@link Extractor} for {@code int} values.
+     * @param <ENV>     the environment type
      */
-    public interface IntExtractor extends Extractor<Integer> {
-        int extractInt(ResultSet rs) throws SQLException;
+    public interface IntExtractor<ENV> extends Extractor<ENV, Integer> {
+        int extractInt(ENV env);
 
         @Override
-        default Integer extract(ResultSet rs) throws SQLException {
-            return extractInt(rs);
+        default Integer extract(ENV env) {
+            return extractInt(env);
         }
 
-        default <U> Extractor<U> mapInt(IntFunction<U> f) {
-            return rs -> f.apply(extract(rs));
+        default <U> Extractor<ENV, U> mapInt(IntFunction<U> f) {
+            return env -> f.apply(extract(env));
         }
     }
 
     /**
      * A specialisation of {@link Extractor} for {@code long} values.
+     * @param <ENV>     the environment type
      */
-    public interface LongExtractor extends Extractor<Long> {
-        long extractLong(ResultSet rs) throws SQLException;
+    public interface LongExtractor<ENV> extends Extractor<ENV, Long> {
+        long extractLong(ENV env);
 
         @Override
-        default Long extract(ResultSet rs) throws SQLException {
-            return extractLong(rs);
+        default Long extract(ENV env) {
+            return extractLong(env);
         }
 
-        default <U> Extractor<U> mapLong(LongFunction<U> f) {
-            return rs -> f.apply(extract(rs));
+        default <U> Extractor<ENV, U> mapLong(LongFunction<U> f) {
+            return env -> f.apply(extract(env));
         }
     }
 
@@ -65,17 +66,18 @@ public abstract class Extractors {
      * @param exA       the first extractor
      * @param exB       the second extractor
      * @param f         the value constructor
+     * @param <ENV>     the environment type
      * @param <A>       the type of value returned by the first extractor
      * @param <B>       the type of value returned by the second extractor
      * @param <R>       the value type
      * @return          the new value
      */
-    public static <A, B, R> Extractor<R> combine(
-            Extractor<A> exA,
-            Extractor<B> exB,
+    public static <ENV, A, B, R> Extractor<ENV, R> combine(
+            Extractor<ENV, A> exA,
+            Extractor<ENV, B> exB,
             Functions.F2<A, B, R> f
     ) {
-        return rs -> f.apply(exA.extract(rs), exB.extract(rs));
+        return env -> f.apply(exA.extract(env), exB.extract(env));
     }
 
     /**
@@ -85,19 +87,20 @@ public abstract class Extractors {
      * @param exB       the second extractor
      * @param exC       the third extractor
      * @param f         the value constructor
+     * @param <ENV>     the environment type
      * @param <A>       the type of value returned by the first extractor
      * @param <B>       the type of value returned by the second extractor
      * @param <C>       the type of value returned by the third extractor
      * @param <R>       the value type
      * @return          the new value
      */
-    public static <A, B, C, R> Extractor<R> combine(
-            Extractor<A> exA,
-            Extractor<B> exB,
-            Extractor<C> exC,
+    public static <ENV, A, B, C, R> Extractor<ENV, R> combine(
+            Extractor<ENV, A> exA,
+            Extractor<ENV, B> exB,
+            Extractor<ENV, C> exC,
             Functions.F3<A, B, C, R> f
     ) {
-        return rs -> f.apply(exA.extract(rs), exB.extract(rs), exC.extract(rs));
+        return env -> f.apply(exA.extract(env), exB.extract(env), exC.extract(env));
     }
 
     /**
@@ -108,6 +111,7 @@ public abstract class Extractors {
      * @param exC       the third extractor
      * @param exD       the third extractor
      * @param f         the fourth constructor
+     * @param <ENV>     the environment type
      * @param <A>       the type of value returned by the first extractor
      * @param <B>       the type of value returned by the second extractor
      * @param <C>       the type of value returned by the third extractor
@@ -115,30 +119,27 @@ public abstract class Extractors {
      * @param <R>       the value type
      * @return          the new value
      */
-    public static <A, B, C, D, R> Extractor<R> combine(
-            Extractor<A> exA,
-            Extractor<B> exB,
-            Extractor<C> exC,
-            Extractor<D> exD,
+    public static <ENV, A, B, C, D, R> Extractor<ENV, R> combine(
+            Extractor<ENV, A> exA,
+            Extractor<ENV, B> exB,
+            Extractor<ENV, C> exC,
+            Extractor<ENV, D> exD,
             Functions.F4<A, B, C, D, R> f
     ) {
-        return rs -> f.apply(exA.extract(rs), exB.extract(rs), exC.extract(rs), exD.extract(rs));
+        return env -> f.apply(exA.extract(env), exB.extract(env), exC.extract(env), exD.extract(env));
     }
 
     /**
      * A combinator function to convert a collection of extractors into an extractor for a list.
      * @param extrs     the collection of extractors
+     * @param <ENV>     the environment type
      * @param <T>       the extractor value type
      * @return          the list of extracted values
      */
-    public static <T> Extractor<List<T>> list(Collection<Extractor<T>> extrs) {
-        return rs ->
-                Exceptions.<List<T>, SQLException>unwrap(
-                        () -> extrs
-                                .stream()
-                                .map(ext -> Exceptions.wrap(
-                                        () -> ext.extract(rs)
-                                )).collect(toList())
-                );
+    public static <ENV, T> Extractor<ENV, List<T>> list(Collection<Extractor<ENV, T>> extrs) {
+        return env ->
+                extrs.stream()
+                        .map(ext -> ext.extract(env))
+                        .collect(toList());
     }
 }
