@@ -8,7 +8,7 @@ import java.util.function.*;
 
 import static java.util.stream.Collectors.toList;
 
-public abstract class ExtractorExs {
+public abstract class ExtractorsEx {
 
     /**
      * A specialisation of {@link ExtractorEx} for {@code double} values.
@@ -17,6 +17,17 @@ public abstract class ExtractorExs {
      */
     @FunctionalInterface
     public interface DoubleExtractorEx<ENV, EX extends Exception> extends ExtractorEx<ENV, Double, EX> {
+        /**
+         * Static constructor method.
+         * @param extr      the extractor
+         * @param <ENV>     the environment type
+         * @param <EX>      the exception type
+         * @return          the extractor
+         */
+        static <ENV, EX extends Exception> DoubleExtractorEx<ENV, EX> of(DoubleExtractorEx<ENV, EX> extr) {
+            return extr;
+        }
+
         /**
          * The extraction method, specialised to return an unboxed {@code double} value.
          * @param env   the environment
@@ -29,7 +40,13 @@ public abstract class ExtractorExs {
             return extractDouble(env);
         }
 
-        default <U> ExtractorEx<ENV, U, EX> mapDbl(DoubleFunction<U> f) {
+        /**
+         * A variant of the {@link ExtractorEx#map} method specialised for {@code double} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
+        default <U> ExtractorEx<ENV, U, EX> mapDouble(DoubleFunction<U> f) {
             return env -> f.apply(extractDouble(env));
         }
     }
@@ -42,6 +59,17 @@ public abstract class ExtractorExs {
     @FunctionalInterface
     public interface IntExtractorEx<ENV, EX extends Exception> extends ExtractorEx<ENV, Integer, EX> {
         /**
+         * Static constructor method.
+         * @param extr      the extractor
+         * @param <ENV>     the environment type
+         * @param <EX>      the exception type
+         * @return          the extractor
+         */
+        static <ENV, EX extends Exception> IntExtractorEx<ENV, EX> of(IntExtractorEx<ENV, EX> extr) {
+            return extr;
+        }
+
+        /**
          * The extraction method, specialised to return an unboxed {@code int} value.
          * @param env   the environment
          * @return      the extracted value
@@ -53,6 +81,12 @@ public abstract class ExtractorExs {
             return extractInt(env);
         }
 
+        /**
+         * A variant of the {@link ExtractorEx#map} method specialised for {@code int} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> ExtractorEx<ENV, U, EX> mapInt(IntFunction<U> f) {
             return env -> f.apply(extractInt(env));
         }
@@ -66,6 +100,17 @@ public abstract class ExtractorExs {
     @FunctionalInterface
     public interface LongExtractorEx<ENV, EX extends Exception> extends ExtractorEx<ENV, Long, EX> {
         /**
+         * Static constructor method.
+         * @param extr      the extractor
+         * @param <ENV>     the environment type
+         * @param <EX>      the exception type
+         * @return          the extractor
+         */
+        static <ENV, EX extends Exception> LongExtractorEx<ENV, EX> of(LongExtractorEx<ENV, EX> extr) {
+            return extr;
+        }
+
+        /**
          * The extraction method, specialised to return an unboxed {@code long} value.
          * @param env   the environment
          * @return      the extracted value
@@ -77,6 +122,12 @@ public abstract class ExtractorExs {
             return extractLong(env);
         }
 
+        /**
+         * A variant of the {@link ExtractorEx#map} method specialised for {@code long} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> ExtractorEx<ENV, U, EX> mapLong(LongFunction<U> f) {
             return env -> f.apply(extractLong(env));
         }

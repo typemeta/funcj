@@ -68,6 +68,10 @@ public class TaglessFinalTest {
             this.futT = CompletableFuture.completedFuture(value);
         }
 
+        public T get() throws ExecutionException, InterruptedException {
+            return futT.get();
+        }
+
         @Override
         public <U> FlatMap<t, U> flatMap(F<T, FlatMap<t, U>> f) {
             return new Future<U>(futT.thenCompose(t -> prj(f.apply(t)).futT));

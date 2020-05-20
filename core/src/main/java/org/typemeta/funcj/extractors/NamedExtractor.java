@@ -1,6 +1,6 @@
 package org.typemeta.funcj.extractors;
 
-import org.typemeta.funcj.functions.*;
+import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Exceptions;
 
 /**
@@ -10,10 +10,14 @@ import org.typemeta.funcj.util.Exceptions;
  */
 @FunctionalInterface
 public interface NamedExtractor<ENV, T> {
-    static <ENV, T> NamedExtractor<ENV, T> of(FunctionsEx.F2<ENV, String, T> thrower) {
+    static <ENV, T, EX extends Exception> NamedExtractor<ENV, T> of(NamedExtractor<ENV, T> extr) {
+        return  extr;
+    }
+
+    static <ENV, T, EX extends Exception> NamedExtractor<ENV, T> ofEx(NamedExtractorEx<ENV, T, EX> extr) {
         return (env, name) -> {
             try {
-                return thrower.apply(env, name);
+                return extr.extract(env, name);
             } catch(Exception ex) {
                 return Exceptions.throwUnchecked(ex);
             }

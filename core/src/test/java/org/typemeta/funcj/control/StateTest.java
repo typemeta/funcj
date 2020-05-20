@@ -142,6 +142,6 @@ public class StateTest {
 
     @Property
     public void kleisliIsAssociative(double i) {
-        check("State.Kleisli Associativity", i, (add.andThen(div)).andThen(sub), add.andThen(div.andThen(sub)));
+        check("State.Kleisli Associativity", i, add.andThen(div).andThen(sub), add.andThen(div.andThen(sub)));
     }
 }

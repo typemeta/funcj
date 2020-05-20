@@ -61,10 +61,12 @@
 
         <!-- Misc defs -->
         <github.global.server>github</github.global.server>
+        <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <uberjar.name>benchmarks</uberjar.name>
 
         <!-- Maven plugin versions -->
+        <errorprone.version>2.3.4</errorprone.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
@@ -149,6 +151,11 @@
                     <version>${maven-compiler-plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_core</artifactId>
+                    <version>${errorprone.version}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${maven-jar-plugin.version}</version>
@@ -192,6 +199,13 @@
                     <compilerArgs>
                         <arg>-Xlint</arg>
                     </compilerArgs>
+<!--                    <annotationProcessorPaths>-->
+<!--                        <path>-->
+<!--                            <groupId>com.google.errorprone</groupId>-->
+<!--                            <artifactId>error_prone_core</artifactId>-->
+<!--                            <version>${errorprone.version}</version>-->
+<!--                        </path>-->
+<!--                    </annotationProcessorPaths>-->
                 </configuration>
             </plugin>
             <plugin>
@@ -293,6 +307,28 @@
     </reporting>
 
     <profiles>
+
+        <!-- using github.com/google/error-prone-javac is required when running on JDK 8 -->
+<!--        <profile>-->
+<!--            <id>jdk8</id>-->
+<!--            <activation>-->
+<!--                <jdk>1.8</jdk>-->
+<!--            </activation>-->
+<!--            <build>-->
+<!--                <plugins>-->
+<!--                    <plugin>-->
+<!--                        <groupId>org.apache.maven.plugins</groupId>-->
+<!--                        <artifactId>maven-compiler-plugin</artifactId>-->
+<!--                        <configuration>-->
+<!--                            <fork>true</fork>-->
+<!--                            <compilerArgs combine.children="append">-->
+<!--                                <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${errorprone.javac.version}/javac-${errorprone.javac.version}.jar</arg>-->
+<!--                            </compilerArgs>-->
+<!--                        </configuration>-->
+<!--                    </plugin>-->
+<!--                </plugins>-->
+<!--            </build>-->
+<!--        </profile>-->
         <profile>
             <id>release</id>
             <activation>

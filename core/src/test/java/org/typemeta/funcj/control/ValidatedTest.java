@@ -63,7 +63,7 @@ public class ValidatedTest {
         Assert.assertFalse("Validated is failure", r.isSuccess());
     }
 
-    private static <String, T> Validated<String, T> failure(String msg) {
+    private static <T> Validated<String, T> failure(String msg) {
         return Validated.failure(msg);
     }
 
@@ -100,7 +100,7 @@ public class ValidatedTest {
     @Property
     public void apply(char c) {
         assertEquals(Validated.success(String.valueOf(c)), Validated.success(c).app(Validated.success(Object::toString)));
-        assertEquals(failure("fail"), Validated.success(c).app(failure("fail")));
+        assertEquals(failure("fail"), Validated.<String, Character>success(c).app(failure("fail")));
         assertEquals(failure("fail"), failure("fail").app(Validated.success(Object::toString)));
     }
 

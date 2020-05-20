@@ -5,7 +5,7 @@ import org.typemeta.funcj.util.Exceptions;
 
 import java.util.function.*;
 
-public class NamedExtractorExs {
+public class NamedExtractorsEx {
 
     /**
      * A specialisation of {@link NamedExtractorEx} for {@code double} values.
@@ -13,6 +13,13 @@ public class NamedExtractorExs {
      * @param <EX>      the exception type
      */
     public interface DoubleNamedExtractorEx<ENV, EX extends Exception> extends NamedExtractorEx<ENV, Double, EX> {
+        /**
+         * Static constructor method.
+         * @param extr      the extractor
+         * @param <ENV>     the environment type
+         * @param <EX>      the exception type
+         * @return          the extractor
+         */
         static <ENV, EX extends Exception> DoubleNamedExtractorEx<ENV, EX> of(DoubleNamedExtractorEx<ENV, EX> extr) {
             return extr;
         }
@@ -29,6 +36,12 @@ public class NamedExtractorExs {
             return extractDouble(env, name);
         }
 
+        /**
+         * A variant of the {@link NamedExtractorEx#map} method specialised for {@code double} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> NamedExtractorEx<ENV, U, EX> mapDouble(DoubleFunction<U> f) {
             return (env, name) -> f.apply(extract(env, name));
         }
@@ -70,6 +83,12 @@ public class NamedExtractorExs {
             return extractInt(env, name);
         }
 
+        /**
+         * A variant of the {@link NamedExtractorEx#map} method specialised for {@code int} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> NamedExtractorEx<ENV, U, EX> mapInt(IntFunction<U> f) {
             return (env, name) -> f.apply(extract(env, name));
         }
@@ -111,6 +130,12 @@ public class NamedExtractorExs {
             return extractLong(env, name);
         }
 
+        /**
+         * A variant of the {@link NamedExtractorEx#map} method specialised for {@code long} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> NamedExtractorEx<ENV, U, EX> mapLong(LongFunction<U> f) {
             return (env, name) -> f.apply(extract(env, name));
         }
@@ -128,5 +153,18 @@ public class NamedExtractorExs {
                 }
             };
         }
+    }
+
+    /**
+     * Create a {@code NamedExtractor} for enum values.
+     * @param <ENV>     the environment type
+     * @param <E>       the enum type
+     * @param enumType  the enum type class
+     * @param strExtr   the string extractor
+     * @return          the enum extractor
+     */
+    public static <ENV, E extends Enum<E>, EX extends Exception>
+    NamedExtractorEx<ENV, E, EX> enumExtractor(Class<E> enumType, NamedExtractorEx<ENV, String, EX> strExtr) {
+        return strExtr.map(s -> Enum.valueOf(enumType, s));
     }
 }

@@ -10,7 +10,29 @@ import org.typemeta.funcj.functions.Functions;
 @FunctionalInterface
 public interface Extractor<ENV, T> {
     /**
-     * Extract a value of type {@code T} from the given env.
+     * An extractor that always returns the same value.
+     * @param t         the value
+     * @param <ENV>     environment type
+     * @param <T>       the extracted value type
+     * @return          the extractor
+     */
+    static <ENV, T> Extractor<ENV, T> pure(T t) {
+        return env -> t;
+    }
+
+    /**
+     * Static constructor method.
+     * @param extr      the extractor
+     * @param <ENV>     the environment type
+     * @param <T>       the extracted value type
+     * @return          the extractor
+     */
+    static <ENV, T> Extractor<ENV, T> of(Extractor<ENV, T> extr) {
+        return extr;
+    }
+
+    /**
+     * Extract a value of type {@code T} from the given environment.
      * @param env       the environment value
      * @return          the extracted value
      */

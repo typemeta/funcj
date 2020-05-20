@@ -109,33 +109,33 @@ public class EitherTest {
     }
 
     static class Utils {
-        static final EitherK<Error, Integer, Integer> pure = EitherK.of(Either::right);
+        static final EitherK<Failure, Integer, Integer> pure = EitherK.of(Either::right);
 
-        static final EitherK<Error, Integer, Integer> isPositive = i ->
+        static final EitherK<Failure, Integer, Integer> isPositive = i ->
                 (i >= 0) ?
                         Either.right(i) :
-                        Either.left(new Error("Negative value"));
+                        Either.left(new Failure("Negative value"));
 
-        static final EitherK<Error, Integer, Double> isEven = i ->
+        static final EitherK<Failure, Integer, Double> isEven = i ->
             (i % 2 == 0) ?
                 Either.right((double)i) :
-                Either.left(new Error("Odd value"));
+                Either.left(new Failure("Odd value"));
 
-        static final EitherK<Error, Double, String> upToFirstZero = d -> {
+        static final EitherK<Failure, Double, String> upToFirstZero = d -> {
             final String s = Double.toString(d);
             final int i = s.indexOf('0');
             if (i != -1) {
                 return Either.right(s.substring(0, i));
             } else {
-                return Either.left(new Error("Negative value"));
+                return Either.left(new Failure("Negative value"));
             }
         };
 
         static <T> void check(
                 String msg,
                 int i,
-                EitherK<Error, Integer, T> lhs,
-                EitherK<Error, Integer, T> rhs) {
+                EitherK<Failure, Integer, T> lhs,
+                EitherK<Failure, Integer, T> rhs) {
             assertEquals(
                     msg,
                     lhs.apply(i),

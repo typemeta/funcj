@@ -168,7 +168,7 @@ public interface SymSet<I> {
 
         @Override
         public boolean matches(I value) {
-            return pred.apply(value);
+            return pred.test(value);
         }
 
         @Override

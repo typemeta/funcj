@@ -1,6 +1,7 @@
 package org.typemeta.funcj.extractors;
 
 import org.typemeta.funcj.extractors.Extractors.*;
+
 import java.util.function.*;
 
 public class NamedExtractors {
@@ -24,6 +25,12 @@ public class NamedExtractors {
             return extractDouble(env, name);
         }
 
+        /**
+         * A variant of the {@link NamedExtractor#map} method specialised for {@code double} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> NamedExtractor<ENV, U> mapDouble(DoubleFunction<U> f) {
             return (env, name) -> f.apply(extractDouble(env, name));
         }
@@ -53,6 +60,12 @@ public class NamedExtractors {
             return extractInt(env, name);
         }
 
+        /**
+         * A variant of the {@link NamedExtractor#map} method specialised for {@code int} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> NamedExtractor<ENV, U> mapInt(IntFunction<U> f) {
             return (env, name) -> f.apply(extractInt(env, name));
         }
@@ -82,6 +95,12 @@ public class NamedExtractors {
             return extractLong(env, name);
         }
 
+        /**
+         * A variant of the {@link NamedExtractor#map} method specialised for {@code long} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> NamedExtractor<ENV, U> mapLong(LongFunction<U> f) {
             return (env, name) -> f.apply(extractLong(env, name));
         }
@@ -90,5 +109,20 @@ public class NamedExtractors {
         default LongExtractor<ENV> bind(String name) {
             return rs -> extractLong(rs, name);
         }
+    }
+
+    /**
+     * Create a {@code NamedExtractor} for enum values.
+     * @param <ENV>     the environment type
+     * @param <E>       the enum type
+     * @param enumType  the enum type class
+     * @param strExtr   the string extractor
+     * @return          the enum extractor
+     */
+    public static <ENV, E extends Enum<E>> NamedExtractor<ENV, E> enumExtractor(
+            Class<E> enumType,
+            NamedExtractor<ENV, String> strExtr
+    ) {
+        return strExtr.map(s -> Enum.valueOf(enumType, s));
     }
 }

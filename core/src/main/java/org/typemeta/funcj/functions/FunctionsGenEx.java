@@ -1055,6 +1055,7 @@ public abstract class FunctionsGenEx {
          * Flip this function by reversing the order of its arguments.
          * @return          the flipped function
          */
+        @Override
         default Op2<T, X> flip() {
             return (b, a) -> apply(a, b);
         }

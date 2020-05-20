@@ -5,7 +5,7 @@ import org.typemeta.funcj.data.IList;
 
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 
 public class JavaTypeTraversal<T> {
     private static final String ARRAY_NAME = "array";

@@ -61,7 +61,6 @@ public class OptionTest {
     @Property
     public void flatMap(char c) {
         final char e = c == 'X' ? 'x' : 'X';
-        final String cs = String.valueOf(c);
         Assert.assertEquals(Option.some(e), Option.some(c).flatMap(d -> Option.some(e)));
         Assert.assertEquals(Option.none(), Option.some(c).flatMap(d -> Option.none()));
         Assert.assertEquals(Option.none(), Option.none().flatMap(d -> Option.some(e)));
@@ -156,7 +155,7 @@ public class OptionTest {
         check(
                 "Kleisli Associativity",
                 i,
-                (isPositive.andThen(isEven)).andThen(upToFirstZero),
+                isPositive.andThen(isEven).andThen(upToFirstZero),
                 isPositive.andThen(isEven.andThen(upToFirstZero)));
     }
 }

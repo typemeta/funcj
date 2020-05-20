@@ -130,7 +130,7 @@ public abstract class FunctorsGenEx {
         return Exceptions.<SortedMap<K, W>, X>unwrap(() ->
                 Streams.tupleStream(m)
                         .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(wrap(f::apply))))
-                        .collect(toMap(Tuple2::get1, Tuple2::get2, throwingMerger(), TreeMap::new))
+                        .collect(toMap(Tuple2::get1, Tuple2::get2, FunctorsGenEx::throwingMerger, TreeMap::new))
         );
     }
 
@@ -172,11 +172,11 @@ public abstract class FunctorsGenEx {
         return Exceptions.<LinkedHashMap<K, W>, X>unwrap(() ->
                 Streams.tupleStream(m)
                         .map(t2 -> Tuple2.of(t2._1, t2.applyFrom(wrap(f::apply))))
-                        .collect(toMap(Tuple2::get1, Tuple2::get2, throwingMerger(), LinkedHashMap::new))
+                        .collect(toMap(Tuple2::get1, Tuple2::get2, FunctorsGenEx::throwingMerger, LinkedHashMap::new))
         );
     }
 
-    private static <T> BinaryOperator<T> throwingMerger() {
-        return (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
+    private static <T> T throwingMerger(T u, T v) {
+        throw new IllegalStateException(String.format("Duplicate key %s", u));
     }
 }

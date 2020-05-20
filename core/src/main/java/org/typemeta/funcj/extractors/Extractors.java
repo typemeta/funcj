@@ -16,6 +16,16 @@ public abstract class Extractors {
     @FunctionalInterface
     public interface DoubleExtractor<ENV> extends Extractor<ENV, Double> {
         /**
+         * Static constructor method.
+         * @param extr      the extractor
+         * @param <ENV>     the environment type
+         * @return          the extractor
+         */
+        static <ENV> DoubleExtractor<ENV> of(DoubleExtractor<ENV> extr) {
+            return extr;
+        }
+
+        /**
          * The extraction method, specialised to return an unboxed {@code double} value.
          * @param env   the environment
          * @return      the extracted value
@@ -27,7 +37,13 @@ public abstract class Extractors {
             return extractDouble(env);
         }
 
-        default <U> Extractor<ENV, U> mapDbl(DoubleFunction<U> f) {
+        /**
+         * A variant of the {@link Extractor#map} method specialised for {@code double} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
+        default <U> Extractor<ENV, U> mapDouble(DoubleFunction<U> f) {
             return env -> f.apply(extractDouble(env));
         }
     }
@@ -38,6 +54,16 @@ public abstract class Extractors {
      */
     @FunctionalInterface
     public interface IntExtractor<ENV> extends Extractor<ENV, Integer> {
+        /**
+         * Static constructor method.
+         * @param extr      the extractor
+         * @param <ENV>     the environment type
+         * @return          the extractor
+         */
+        static <ENV> IntExtractor<ENV> of(IntExtractor<ENV> extr) {
+            return extr;
+        }
+
         /**
          * The extraction method, specialised to return an unboxed {@code int} value.
          * @param env   the environment
@@ -50,6 +76,12 @@ public abstract class Extractors {
             return extractInt(env);
         }
 
+        /**
+         * A variant of the {@link Extractor#map} method specialised for {@code int} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> Extractor<ENV, U> mapInt(IntFunction<U> f) {
             return env -> f.apply(extractInt(env));
         }
@@ -62,9 +94,19 @@ public abstract class Extractors {
     @FunctionalInterface
     public interface LongExtractor<ENV> extends Extractor<ENV, Long> {
         /**
+         * Static constructor method.
+         * @param extr      the extractor
+         * @param <ENV>     the environment type
+         * @return          the extractor
+         */
+        static <ENV> LongExtractor<ENV> of(LongExtractor<ENV> extr) {
+            return extr;
+        }
+
+        /**
          * The extraction method, specialised to return an unboxed {@code long} value.
-         * @param env   the environment
-         * @return      the extracted value
+         * @param env       the environment
+         * @return          the extracted value
          */
         long extractLong(ENV env);
 
@@ -73,9 +115,40 @@ public abstract class Extractors {
             return extractLong(env);
         }
 
+        /**
+         * A variant of the {@link Extractor#map} method specialised for {@code long} values.
+         * @param f         the function
+         * @param <U>       the return type of the function
+         * @return          the mapped extractor
+         */
         default <U> Extractor<ENV, U> mapLong(LongFunction<U> f) {
             return env -> f.apply(extractLong(env));
         }
+    }
+    /**
+     * A combinator function to convert a {@link Extractor} into one for {@link Optional} values.
+     * The option extractor converts null values to
+     * @param extr      the extractor function for the value type
+     * @param <ENV>     the environment type
+     * @param <T>       the value type
+     * @return          the extractor function for the optional value
+     */
+    public static <ENV, T> Extractor<ENV, Optional<T>> optional(Extractor<ENV, T> extr) {
+        return extr.map(Optional::ofNullable);
+    }
+
+    /**
+     * A combinator function to convert a collection of extractors into an extractor for a list.
+     * @param extrs     the collection of extractors
+     * @param <ENV>     the environment type
+     * @param <T>       the extractor value type
+     * @return          an extractor for a list of values
+     */
+    public static <ENV, T> Extractor<ENV, List<T>> list(Collection<Extractor<ENV, T>> extrs) {
+        return env ->
+                extrs.stream()
+                        .map(ext -> ext.extract(env))
+                        .collect(toList());
     }
 
     /**
@@ -219,19 +292,5 @@ public abstract class Extractors {
                 exE.extract(env),
                 exF.extract(env)
         );
-    }
-
-    /**
-     * A combinator function to convert a collection of extractors into an extractor for a list.
-     * @param extrs     the collection of extractors
-     * @param <ENV>     the environment type
-     * @param <T>       the extractor value type
-     * @return          an extractor for a list of values
-     */
-    public static <ENV, T> Extractor<ENV, List<T>> list(Collection<Extractor<ENV, T>> extrs) {
-        return env ->
-                extrs.stream()
-                        .map(ext -> ext.extract(env))
-                        .collect(toList());
     }
 }

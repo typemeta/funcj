@@ -1,6 +1,6 @@
 package org.typemeta.funcj.codec.xmlnode;
 
-import org.typemeta.funcj.codec.*;
+import org.typemeta.funcj.codec.CodecStrAPI;
 import org.typemeta.funcj.codec.impl.*;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.codec.xmlnode.XmlNodeTypes.Config;

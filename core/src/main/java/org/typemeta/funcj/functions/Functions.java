@@ -971,7 +971,7 @@ public abstract class Functions {
      * @param <T>       the operand type
      */
     @FunctionalInterface
-    public interface Op<T> extends F<T, T> {
+    public interface Op<T> {
         /**
          * Static constructor
          * @param op        the operator function
@@ -982,6 +982,11 @@ public abstract class Functions {
             return op;
         }
 
+        /**
+         * Apply this operator.
+         * @param t         the operand
+         * @return          the operator result
+         */
         T apply(T t);
     }
 
@@ -990,7 +995,26 @@ public abstract class Functions {
      * @param <T>       the operand type
      */
     @FunctionalInterface
-    public interface Op2<T> extends F2<T, T, T> {
+    public interface Op2<T> {
+
+        /**
+         * A function that always returns its first argument.
+         * @param <T>       the operand type
+         * @return          a function that always returns its first argument.
+         */
+        static <T> Op2<T> first() {
+            return (a, b) -> a;
+        }
+
+        /**
+         * A function that always returns its second argument.
+         * @param <T>       the operand type
+         * @return          a function that always returns its second argument.
+         */
+        static <T> Op2<T> second() {
+            return (a, b) -> b;
+        }
+
         /**
          * Static constructor
          * @param op        the operator function
@@ -1012,7 +1036,15 @@ public abstract class Functions {
         }
 
         /**
-         * Flip this function by reversing the order of its arguments.
+         * Apply this operator.
+         * @param a         the first operand
+         * @param b         the second operand
+         * @return          the operator result
+         */
+        T apply(T a, T b);
+
+        /**
+         * Flip this operator by reversing the order of its arguments.
          * @return          the flipped function
          */
         default Op2<T> flip() {
@@ -1025,7 +1057,7 @@ public abstract class Functions {
      * @param <T>       the operand type
      */
     @FunctionalInterface
-    public interface Predicate<T> extends F<T, Boolean> {
+    public interface Predicate<T> {
         /**
          * Static constructor
          * @param pr        the predicate function
@@ -1057,12 +1089,14 @@ public abstract class Functions {
                     : lhs::equals;
         }
 
+        boolean test(T t);
+
         /**
          * Invert this {@code Predicate}
          * @return          a {@code Predicate} that logically inverts this {@code Predicate}
          */
         default Predicate<T> negate() {
-            return t -> !apply(t);
+            return t -> !test(t);
         }
 
         /**
@@ -1072,7 +1106,7 @@ public abstract class Functions {
          */
         default Predicate<T> and(Predicate<? super T> rhs) {
             Objects.requireNonNull(rhs);
-            return t -> apply(t) && rhs.apply(t);
+            return t -> test(t) && rhs.test(t);
         }
 
         /**
@@ -1082,7 +1116,7 @@ public abstract class Functions {
          */
         default Predicate<T> or(Predicate<? super T> rhs) {
             Objects.requireNonNull(rhs);
-            return t -> apply(t) ||  rhs.apply(t);
+            return t -> test(t) ||  rhs.test(t);
         }
     }
 }

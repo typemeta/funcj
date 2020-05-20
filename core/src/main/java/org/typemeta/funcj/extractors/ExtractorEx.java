@@ -12,6 +12,18 @@ import org.typemeta.funcj.util.Exceptions;
 @FunctionalInterface
 public interface ExtractorEx<ENV, T, EX extends Exception> {
     /**
+     * Static constructor method.
+     * @param extr      the extractor
+     * @param <ENV>     the environment type
+     * @param <T>       the extracted value type
+     * @param <EX>      the exception type
+     * @return          the extractor
+     */
+    static <ENV, T, EX extends Exception> ExtractorEx<ENV, T, EX> of(ExtractorEx<ENV, T, EX> extr) {
+        return extr;
+    }
+
+    /**
      * Extract a value of type {@code T} from the given env.
      * @param env       the environment value
      * @return          the extracted value

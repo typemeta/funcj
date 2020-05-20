@@ -125,12 +125,12 @@ public class TryTest {
         static final TryK<Integer, Integer> isPositive = i ->
                 (i >= 0) ?
                         Try.success(i) :
-                        Try.failure(new Error("Negative value"));
+                        Try.failure(new Failure("Negative value"));
 
         static final TryK<Integer, Double> isEven = i ->
                 (i % 2 == 0) ?
                         Try.success((double)i) :
-                        Try.failure(new Error("Odd value"));
+                        Try.failure(new Failure("Odd value"));
 
         static final TryK<Double, String> upToFirstZero = d -> {
             final String s = Double.toString(d);
@@ -138,7 +138,7 @@ public class TryTest {
             if (i != -1) {
                 return Try.success(s.substring(0, i));
             } else {
-                return Try.failure(new Error("Negative value"));
+                return Try.failure(new Failure("Negative value"));
             }
         };
 

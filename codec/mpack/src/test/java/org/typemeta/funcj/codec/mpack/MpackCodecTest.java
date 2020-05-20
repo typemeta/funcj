@@ -1,9 +1,8 @@
 package org.typemeta.funcj.codec.mpack;
 
 import org.junit.Assert;
-import org.typemeta.funcj.codec.TestBase;
+import org.typemeta.funcj.codec.*;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 
 public class MpackCodecTest extends TestBase {
@@ -20,7 +19,7 @@ public class MpackCodecTest extends TestBase {
         final byte[] ba = baos.toByteArray();
 
         if (printData()) {
-            System.out.println(DatatypeConverter.printHexBinary(ba));
+            System.out.println(TestDataUtils.printHexBinary(ba));
         }
 
         if (printSizes()) {
@@ -31,7 +30,7 @@ public class MpackCodecTest extends TestBase {
         final T val2 = codec.decode(clazz, bais);
 
         if (!printData() && !val.equals(val2)) {
-            System.out.println(DatatypeConverter.printHexBinary(ba));
+            System.out.println(TestDataUtils.printHexBinary(ba));
         }
 
         Assert.assertEquals(val, val2);

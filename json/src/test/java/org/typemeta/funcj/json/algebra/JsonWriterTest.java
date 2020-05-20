@@ -62,7 +62,7 @@ public class JsonWriterTest {
     @Test
     public void testIndent() {
         final String actual = JsonIndentWriter.toString(TEST_JSON, new StringWriter(), 4).toString();
-        System.out.println(actual);
+        //System.out.println(actual);
         assertEquals(indent, actual);
     }
 }

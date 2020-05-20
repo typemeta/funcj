@@ -1,7 +1,8 @@
 package org.typemeta.funcj.database;
 
+import org.typemeta.funcj.database.DatabaseExtractorsEx.*;
 import org.typemeta.funcj.extractors.*;
-import org.typemeta.funcj.extractors.NamedExtractorExs.*;
+import org.typemeta.funcj.extractors.NamedExtractorsEx.*;
 import org.typemeta.funcj.extractors.NamedExtractors.*;
 import org.typemeta.funcj.util.Exceptions;
 
@@ -11,6 +12,9 @@ import java.time.*;
 import java.util.*;
 import java.util.function.*;
 
+/**
+ * A set of extraction functions and combinator funcions.
+ */
 public abstract class DatabaseExtractors {
 
     /**
@@ -20,7 +24,7 @@ public abstract class DatabaseExtractors {
      * @return          the extractor function for the optional value
      */
     public static <T> NamedExtractor<ResultSet, Optional<T>> optional(NamedExtractor<ResultSet, T> extr) {
-        return NamedExtractor.of((ResultSet rs, String name) -> {
+        return NamedExtractor.ofEx((ResultSet rs, String name) -> {
             final T value = extr.extract(rs, name);
             if (rs.wasNull()) {
                 return Optional.empty();
@@ -31,19 +35,9 @@ public abstract class DatabaseExtractors {
     }
 
     /**
-     * An {@code NamedExtractor} for enum values.
-     * @param enumType  the enum type class
-     * @param <E>       the enum type
-     * @return          the enum extractor
-     */
-    public static <E extends Enum<E>> NamedExtractor<ResultSet, E> enumExtractor(Class<E> enumType) {
-        return NamedExtractor.of((rs, name) -> Enum.valueOf(enumType, rs.getString(name).toUpperCase()));
-    }
-
-    /**
      * An {@code NamedExtractor} instance for {@link boolean} values.
      */
-    public static final NamedExtractor<ResultSet, Boolean> BOOLEAN = NamedExtractor.of(ResultSet::getBoolean);
+    public static final NamedExtractor<ResultSet, Boolean> BOOLEAN = NamedExtractor.ofEx(ResultSet::getBoolean);
 
     /**
      * A {@code NamedExtractor} instance for optional {@code boolean} values.
@@ -53,7 +47,7 @@ public abstract class DatabaseExtractors {
     /**
      * An {@code NamedExtractor} instance for {@link byte} values.
      */
-    public static final NamedExtractor<ResultSet, Byte> BYTE = NamedExtractor.of(ResultSet::getByte);
+    public static final NamedExtractor<ResultSet, Byte> BYTE = NamedExtractor.ofEx(ResultSet::getByte);
 
     /**
      * A {@code NamedExtractor} instance for optional {@code byte} values.
@@ -65,38 +59,6 @@ public abstract class DatabaseExtractors {
      */
     public static final DoubleNamedExtractor<ResultSet> DOUBLE =
             DoubleNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getDouble).unchecked();
-
-    /**
-     * A {@code NamedExtractorEx} for optional {@code double} values.
-     */
-    public interface OptDoubleNamedExtractorEx extends NamedExtractorEx<ResultSet, OptionalDouble, SQLException> {
-        default <U> NamedExtractorEx<ResultSet, Optional<U>, SQLException> map(DoubleFunction<U> f) {
-            return (rs, name) -> {
-                final OptionalDouble od = extract(rs, name);
-                if (od.isPresent()) {
-                    return Optional.of(f.apply(od.getAsDouble()));
-                } else {
-                    return Optional.empty();
-                }
-            };
-        }
-
-        @Override
-        default ExtractorEx<ResultSet, OptionalDouble, SQLException> bind(String name) {
-            return rs -> extract(rs, name);
-        }
-
-        @Override
-        default OptDoubleNamedExtractor unchecked() {
-            return (rs, name) -> {
-                try {
-                    return extract(rs, name);
-                } catch (SQLException ex) {
-                    return Exceptions.throwUnchecked(ex);
-                }
-            };
-        }
-    }
 
     /**
      * A {@code NamedExtractor} for optional {@code double} values.
@@ -140,7 +102,7 @@ public abstract class DatabaseExtractors {
     /**
      * An {@code NamedExtractor} instance for {@code float} values.
      */
-    public static final NamedExtractor<ResultSet, Float> FLOAT = NamedExtractor.of(ResultSet::getFloat);
+    public static final NamedExtractor<ResultSet, Float> FLOAT = NamedExtractor.ofEx(ResultSet::getFloat);
 
     /**
      * A {@code NamedExtractor} instance for optional {@code float} values.
@@ -154,42 +116,10 @@ public abstract class DatabaseExtractors {
             IntNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getInt).unchecked();
 
     /**
-     * A {@code NamedExtractorEx} for optional {@code int} values.
-     */
-    public interface OptIntNamedExtractorEx extends NamedExtractorEx<ResultSet, OptionalInt, SQLException> {
-        default <U> NamedExtractorEx<ResultSet, Optional<U>, SQLException> map(IntFunction<U> f) {
-            return (rs, name) -> {
-                final OptionalInt od = extract(rs, name);
-                if (od.isPresent()) {
-                    return Optional.of(f.apply(od.getAsInt()));
-                } else {
-                    return Optional.empty();
-                }
-            };
-        }
-
-        @Override
-        default ExtractorEx<ResultSet, OptionalInt, SQLException> bind(String name) {
-            return rs -> extract(rs, name);
-        }
-
-        @Override
-        default OptIntNamedExtractor unchecked() {
-            return (rs, name) -> {
-                try {
-                    return extract(rs, name);
-                } catch (SQLException ex) {
-                    return Exceptions.throwUnchecked(ex);
-                }
-            };
-        }
-    }
-
-    /**
      * A {@code NamedExtractor} for optional {@code int} values.
      */
     public interface OptIntNamedExtractor extends NamedExtractor<ResultSet, OptionalInt> {
-        static OptIntNamedExtractor of(OptIntNamedExtractorEx extr) {
+        static OptIntNamedExtractor of(DatabaseExtractorsEx.OptIntNamedExtractorEx extr) {
             return extr.unchecked();
         }
 
@@ -229,38 +159,6 @@ public abstract class DatabaseExtractors {
      */
     public static final LongNamedExtractor<ResultSet> LONG =
             LongNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getLong).unchecked();
-
-    /**
-     * A {@code NamedExtractorEx} for optional {@code long} values.
-     */
-    public interface OptLongNamedExtractorEx extends NamedExtractorEx<ResultSet, OptionalLong, SQLException> {
-        default <U> NamedExtractorEx<ResultSet, Optional<U>, SQLException> map(LongFunction<U> f) {
-            return (rs, name) -> {
-                final OptionalLong od = extract(rs, name);
-                if (od.isPresent()) {
-                    return Optional.of(f.apply(od.getAsLong()));
-                } else {
-                    return Optional.empty();
-                }
-            };
-        }
-
-        @Override
-        default ExtractorEx<ResultSet, OptionalLong, SQLException> bind(String name) {
-            return rs -> extract(rs, name);
-        }
-
-        @Override
-        default OptLongNamedExtractor unchecked() {
-            return (rs, name) -> {
-                try {
-                    return extract(rs, name);
-                } catch (SQLException ex) {
-                    return Exceptions.throwUnchecked(ex);
-                }
-            };
-        }
-    }
 
     /**
      * A {@code NamedExtractor} for optional {@code long} values.
@@ -304,7 +202,7 @@ public abstract class DatabaseExtractors {
     /**
      * A {@code NamedExtractor} instance for {@code short} values.
      */
-    public static final NamedExtractor<ResultSet, Short> SHORT = NamedExtractor.of(ResultSet::getShort);
+    public static final NamedExtractor<ResultSet, Short> SHORT = NamedExtractor.ofEx(ResultSet::getShort);
 
     /**
      * A {@code NamedExtractor} instance for optional {@code short} values.
@@ -314,7 +212,7 @@ public abstract class DatabaseExtractors {
     /**
      * A {@code NamedExtractor} instance for {@code string} values.
      */
-    public static final NamedExtractor<ResultSet, String> STRING = NamedExtractor.of(ResultSet::getString);
+    public static final NamedExtractor<ResultSet, String> STRING = NamedExtractor.ofEx(ResultSet::getString);
 
     /**
      * A {@code NamedExtractor} instance for optional {@code string} values.
@@ -332,7 +230,7 @@ public abstract class DatabaseExtractors {
     /**
      * An extractor for {@link Date} values.
      */
-    public static final NamedExtractor<ResultSet, Date> SQLDATE = NamedExtractor.of(ResultSet::getDate);
+    public static final NamedExtractor<ResultSet, Date> SQLDATE = NamedExtractor.ofEx(ResultSet::getDate);
 
     /**
      * An extractor for optional {@code Date} values.
@@ -355,7 +253,7 @@ public abstract class DatabaseExtractors {
     /**
      * An extractor for {@link Time} values.
      */
-    public static final NamedExtractor<ResultSet, Time> SQLTIME = NamedExtractor.of(ResultSet::getTime);
+    public static final NamedExtractor<ResultSet, Time> SQLTIME = NamedExtractor.ofEx(ResultSet::getTime);
 
     /**
      * An extractor for optional {@code Time} values.
@@ -377,7 +275,8 @@ public abstract class DatabaseExtractors {
     /**
      * An extractor for {@link Timestamp} values.
      */
-    public static final NamedExtractor<ResultSet, Timestamp> SQLTIMESTAMP = NamedExtractor.of(ResultSet::getTimestamp);
+    public static final NamedExtractor<ResultSet, Timestamp> SQLTIMESTAMP =
+            NamedExtractor.ofEx(ResultSet::getTimestamp);
 
     /**
      * An extractor for optional {@code Time} values.

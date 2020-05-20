@@ -198,13 +198,20 @@ public abstract class IList<T> implements Iterable<T> {
      * List equality.
      * @return          true if this list and rhs are equal in terms of their size and elements.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object rhs) {
         return this == rhs ||
             (rhs != null &&
                 getClass() == rhs.getClass() &&
                 equals((IList<T>) rhs));
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 1;
+        for (T t : this)
+            hashCode = 31 * hashCode + Objects.hashCode(t);
+        return hashCode;
     }
 
     /**
@@ -280,6 +287,7 @@ public abstract class IList<T> implements Iterable<T> {
      * Create a {@link java.util.Spliterator}.
      * @return          the spliterator
      */
+    @Override
     public abstract Spliterator<T> spliterator();
 
     /**
@@ -302,6 +310,7 @@ public abstract class IList<T> implements Iterable<T> {
      * Create an {@link java.util.Iterator} over this list.
      * @return          the iterator
      */
+    @Override
     public abstract Iterator<T> iterator();
 
     /**

@@ -22,8 +22,7 @@ public interface ReaderM<ENV, A> {
     }
 
     static <ENV, A, T> ReaderM<ENV, A> local(F<ENV, T> f, ReaderM<T, A> r) {
-        //return ReaderM.<ENV>ask().map(env -> r.run(f.apply(env)));
-        return a -> r.run(f.apply(a));
+        return env -> r.run(f.apply(env));
     }
 
     /**

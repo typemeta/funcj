@@ -11,6 +11,9 @@ import org.typemeta.funcj.util.Exceptions;
  */
 @FunctionalInterface
 public interface NamedExtractorEx<ENV, T, EX extends Exception> {
+    static <ENV, T, EX extends Exception> NamedExtractorEx<ENV, T, EX> of(NamedExtractorEx<ENV, T, EX> extr) {
+        return  extr;
+    }
 
     /**
      * Extract a value of type {@code T} from the given environment,

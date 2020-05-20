@@ -50,11 +50,15 @@ public class Id<T> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Id<?> id = (Id<?>) o;
-        return Objects.equals(value, id.value);
+    public boolean equals(Object rhs) {
+        if (this == rhs) {
+            return true;
+        } else if (rhs == null || !(rhs instanceof Id)) {
+            return false;
+        } else {
+            final Id<?> rhsT = (Id<?>) rhs;
+            return Objects.equals(value, rhsT.value);
+        }
     }
 
     @Override
