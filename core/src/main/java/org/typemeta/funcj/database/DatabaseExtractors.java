@@ -2,9 +2,8 @@ package org.typemeta.funcj.database;
 
 import org.typemeta.funcj.database.DatabaseExtractorsEx.*;
 import org.typemeta.funcj.extractors.*;
-import org.typemeta.funcj.extractors.NamedExtractorsEx.*;
 import org.typemeta.funcj.extractors.NamedExtractors.*;
-import org.typemeta.funcj.util.Exceptions;
+import org.typemeta.funcj.extractors.NamedExtractorsEx.*;
 
 import java.sql.Date;
 import java.sql.*;
@@ -64,8 +63,8 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} for optional {@code double} values.
      */
     public interface OptDoubleNamedExtractor extends NamedExtractor<ResultSet, OptionalDouble> {
-        static OptDoubleNamedExtractor of(OptDoubleNamedExtractorEx extr) {
-            return extr.unchecked();
+        static OptDoubleNamedExtractor of(OptDoubleNamedExtractor extr) {
+            return extr;
         }
 
         default <U> NamedExtractor<ResultSet, Optional<U>> map(DoubleFunction<U> f) {
@@ -89,7 +88,7 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} instance for optional {@code double} values.
      */
     public static final OptDoubleNamedExtractor OPT_DOUBLE =
-            OptDoubleNamedExtractor.of((rs, name) -> {
+            OptDoubleNamedExtractorEx.of((rs, name) -> {
                     final double value = DOUBLE.extractDouble(rs, name);
                     if (rs.wasNull()) {
                         return OptionalDouble.empty();
@@ -97,7 +96,7 @@ public abstract class DatabaseExtractors {
                         return OptionalDouble.of(value);
                     }
                 }
-    );
+            ).unchecked();
 
     /**
      * An {@code NamedExtractor} instance for {@code float} values.
@@ -119,8 +118,8 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} for optional {@code int} values.
      */
     public interface OptIntNamedExtractor extends NamedExtractor<ResultSet, OptionalInt> {
-        static OptIntNamedExtractor of(DatabaseExtractorsEx.OptIntNamedExtractorEx extr) {
-            return extr.unchecked();
+        static OptIntNamedExtractor of(OptIntNamedExtractor extr) {
+            return extr;
         }
 
         default <U> NamedExtractor<ResultSet, Optional<U>> map(IntFunction<U> f) {
@@ -144,7 +143,7 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} instance for optional {@code int} values.
      */
     public static final OptIntNamedExtractor OPT_INTEGER =
-            OptIntNamedExtractor.of((rs, name) -> {
+            OptIntNamedExtractorEx.of((rs, name) -> {
                     final int value = INTEGER.extractInt(rs, name);
                     if (rs.wasNull()) {
                         return OptionalInt.empty();
@@ -152,7 +151,7 @@ public abstract class DatabaseExtractors {
                         return OptionalInt.of(value);
                     }
                 }
-            );
+            ).unchecked();
 
     /**
      * A {@code NamedExtractor} instance for {@code long} values.
@@ -164,8 +163,8 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} for optional {@code long} values.
      */
     public interface OptLongNamedExtractor extends NamedExtractor<ResultSet, OptionalLong> {
-        static OptLongNamedExtractor of(OptLongNamedExtractorEx extr) {
-            return extr.unchecked();
+        static OptLongNamedExtractor of(OptLongNamedExtractor extr) {
+            return extr;
         }
 
         default <U> NamedExtractor<ResultSet, Optional<U>> map(LongFunction<U> f) {
@@ -189,7 +188,7 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} instance for optional {@code long} values.
      */
     public static final OptLongNamedExtractor OPT_LONG =
-            OptLongNamedExtractor.of((rs, name) -> {
+            OptLongNamedExtractorEx.of((rs, name) -> {
                     final long value = LONG.extractLong(rs, name);
                     if (rs.wasNull()) {
                         return OptionalLong.empty();
@@ -197,7 +196,7 @@ public abstract class DatabaseExtractors {
                         return OptionalLong.of(value);
                     }
                 }
-            );
+            ).unchecked();
 
     /**
      * A {@code NamedExtractor} instance for {@code short} values.

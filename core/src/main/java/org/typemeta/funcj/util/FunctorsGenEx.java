@@ -6,7 +6,6 @@ import org.typemeta.funcj.tuples.Tuple2;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BinaryOperator;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.*;

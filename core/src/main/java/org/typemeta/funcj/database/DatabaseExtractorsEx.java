@@ -62,6 +62,10 @@ public abstract class DatabaseExtractorsEx {
      * A {@code NamedExtractorEx} for optional {@code double} values.
      */
     public interface OptDoubleNamedExtractorEx extends NamedExtractorEx<ResultSet, OptionalDouble, SQLException> {
+        static OptDoubleNamedExtractorEx of(OptDoubleNamedExtractorEx extr) {
+            return  extr;
+        }
+
         default <U> NamedExtractorEx<ResultSet, Optional<U>, SQLException> map(DoubleFunction<U> f) {
             return (rs, name) -> {
                 final OptionalDouble od = extract(rs, name);
@@ -122,6 +126,10 @@ public abstract class DatabaseExtractorsEx {
      * A {@code NamedExtractorEx} for optional {@code int} values.
      */
     public interface OptIntNamedExtractorEx extends NamedExtractorEx<ResultSet, OptionalInt, SQLException> {
+        static OptIntNamedExtractorEx of(OptIntNamedExtractorEx extr) {
+            return  extr;
+        }
+
         default <U> NamedExtractorEx<ResultSet, Optional<U>, SQLException> map(IntFunction<U> f) {
             return (rs, name) -> {
                 final OptionalInt od = extract(rs, name);
@@ -172,6 +180,10 @@ public abstract class DatabaseExtractorsEx {
      * A {@code NamedExtractorEx} for optional {@code long} values.
      */
     public interface OptLongNamedExtractorEx extends NamedExtractorEx<ResultSet, OptionalLong, SQLException> {
+        static OptLongNamedExtractorEx of(OptLongNamedExtractorEx extr) {
+            return  extr;
+        }
+
         default <U> NamedExtractorEx<ResultSet, Optional<U>, SQLException> map(LongFunction<U> f) {
             return (rs, name) -> {
                 final OptionalLong od = extract(rs, name);
