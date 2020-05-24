@@ -6,6 +6,8 @@ import org.typemeta.funcj.injectors.NumberedInjector;
 import org.typemeta.funcj.util.Exceptions;
 
 import java.sql.*;
+import java.sql.Date;
+import java.time.*;
 import java.util.*;
 
 import static org.typemeta.funcj.database.DatabaseMeta.*;
@@ -17,38 +19,38 @@ public class DatabaseInjectorTest {
 
     static {
         injectors = new HashMap<>();
-//        injectors.put(Boolean.class, DatabaseInjectors.BOOLEAN);
-//        injectors.put(Byte.class, DatabaseInjectors.BYTE);
-//        injectors.put(Date.class, DatabaseInjectors.SQLDATE);
-//        injectors.put(Double.class, DatabaseInjectors.DOUBLE);
-//        injectors.put(Float.class, DatabaseInjectors.FLOAT);
-//        injectors.put(Integer.class, DatabaseInjectors.INTEGER);
-//        injectors.put(LocalDate.class, DatabaseInjectors.LOCALDATE);
-//        injectors.put(LocalDateTime.class, DatabaseInjectors.LOCALDATETIME);
-//        injectors.put(LocalTime.class, DatabaseInjectors.LOCALTIME);
-//        injectors.put(Long.class, DatabaseInjectors.LONG);
-//        injectors.put(Short.class, DatabaseInjectors.SHORT);
+        injectors.put(Boolean.class, DatabaseInjectors.BOOLEAN);
+        injectors.put(Byte.class, DatabaseInjectors.BYTE);
+        injectors.put(Date.class, DatabaseInjectors.SQLDATE);
+        injectors.put(Double.class, DatabaseInjectors.DOUBLE);
+        injectors.put(Float.class, DatabaseInjectors.FLOAT);
+        injectors.put(Integer.class, DatabaseInjectors.INTEGER);
+        injectors.put(LocalDate.class, DatabaseInjectors.LOCALDATE);
+        injectors.put(LocalDateTime.class, DatabaseInjectors.LOCALDATETIME);
+        injectors.put(LocalTime.class, DatabaseInjectors.LOCALTIME);
+        injectors.put(Long.class, DatabaseInjectors.LONG);
+        injectors.put(Short.class, DatabaseInjectors.SHORT);
         injectors.put(String.class, DatabaseInjectors.STRING);
-//        injectors.put(Time.class, DatabaseInjectors.SQLTIME);
+        injectors.put(Time.class, DatabaseInjectors.SQLTIME);
     }
 
     private static final Map<Class<?>, NumberedInjector<PreparedStatement, ?>> optInjectors;
 
     static {
         optInjectors = new HashMap<>();
-//        optInjectors.put(Boolean.class, DatabaseInjectors.OPT_BOOLEAN);
-//        optInjectors.put(Byte.class, DatabaseInjectors.OPT_BYTE);
-//        optInjectors.put(Date.class, DatabaseInjectors.OPT_SQLDATE);
-//        optInjectors.put(Double.class, DatabaseInjectors.OPT_DOUBLE);
-//        optInjectors.put(Float.class, DatabaseInjectors.OPT_FLOAT);
-//        optInjectors.put(Integer.class, DatabaseInjectors.OPT_INTEGER);
-//        optInjectors.put(LocalDate.class, DatabaseInjectors.OPT_LOCALDATE);
-//        optInjectors.put(LocalDateTime.class, DatabaseInjectors.OPT_LOCALDATETIME);
-//        optInjectors.put(LocalTime.class, DatabaseInjectors.OPT_LOCALTIME);
-//        optInjectors.put(Long.class, DatabaseInjectors.OPT_LONG);
-//        optInjectors.put(Short.class, DatabaseInjectors.OPT_SHORT);
+        optInjectors.put(Boolean.class, DatabaseInjectors.OPT_BOOLEAN);
+        optInjectors.put(Byte.class, DatabaseInjectors.OPT_BYTE);
+        optInjectors.put(Date.class, DatabaseInjectors.OPT_SQLDATE);
+        optInjectors.put(Double.class, DatabaseInjectors.OPT_DOUBLE);
+        optInjectors.put(Float.class, DatabaseInjectors.OPT_FLOAT);
+        optInjectors.put(Integer.class, DatabaseInjectors.OPT_INTEGER);
+        optInjectors.put(LocalDate.class, DatabaseInjectors.OPT_LOCALDATE);
+        optInjectors.put(LocalDateTime.class, DatabaseInjectors.OPT_LOCALDATETIME);
+        optInjectors.put(LocalTime.class, DatabaseInjectors.OPT_LOCALTIME);
+        optInjectors.put(Long.class, DatabaseInjectors.OPT_LONG);
+        optInjectors.put(Short.class, DatabaseInjectors.OPT_SHORT);
         optInjectors.put(String.class, DatabaseInjectors.OPT_STRING);
-//        optInjectors.put(Time.class, DatabaseInjectors.OPT_SQLTIME);
+        optInjectors.put(Time.class, DatabaseInjectors.OPT_SQLTIME);
     }
 
     private static Connection testDbConn;

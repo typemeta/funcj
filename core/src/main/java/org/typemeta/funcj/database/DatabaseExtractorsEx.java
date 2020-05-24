@@ -267,7 +267,7 @@ public abstract class DatabaseExtractorsEx {
     /**
      * An extractor for {@link LocalDate} values.
      */
-    public static final NamedExtractorEx<ResultSet, LocalDate, SQLException> LOCALDATE = SQLDATE.map(Date::toLocalDate);
+        public static final NamedExtractorEx<ResultSet, LocalDate, SQLException> LOCALDATE = SQLDATE.map(Date::toLocalDate);
 
     /**
      * An extractor for optional {@code LocalDate} values.

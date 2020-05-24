@@ -7,7 +7,7 @@ public interface Injector<ENV, T> {
 
     ENV inject(ENV env, T value);
 
-    default <U> Injector<ENV, U> map(Functions.F<U, T> f) {
+    default <U> Injector<ENV, U> premap(Functions.F<U, T> f) {
         return (env, value) ->inject(env, f.apply(value));
     }
 }

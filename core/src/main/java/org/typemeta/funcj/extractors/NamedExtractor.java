@@ -1,7 +1,6 @@
 package org.typemeta.funcj.extractors;
 
 import org.typemeta.funcj.functions.Functions;
-import org.typemeta.funcj.util.Exceptions;
 
 /**
  * A function to extract a value from an environment, given a name.
@@ -10,18 +9,8 @@ import org.typemeta.funcj.util.Exceptions;
  */
 @FunctionalInterface
 public interface NamedExtractor<ENV, T> {
-    static <ENV, T, EX extends Exception> NamedExtractor<ENV, T> of(NamedExtractor<ENV, T> extr) {
+    static <ENV, T> NamedExtractor<ENV, T> of(NamedExtractor<ENV, T> extr) {
         return  extr;
-    }
-
-    static <ENV, T, EX extends Exception> NamedExtractor<ENV, T> ofEx(NamedExtractorEx<ENV, T, EX> extr) {
-        return (env, name) -> {
-            try {
-                return extr.extract(env, name);
-            } catch(Exception ex) {
-                return Exceptions.throwUnchecked(ex);
-            }
-        };
     }
 
     /**

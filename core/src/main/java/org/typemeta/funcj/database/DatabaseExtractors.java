@@ -23,20 +23,22 @@ public abstract class DatabaseExtractors {
      * @return          the extractor function for the optional value
      */
     public static <T> NamedExtractor<ResultSet, Optional<T>> optional(NamedExtractor<ResultSet, T> extr) {
-        return NamedExtractor.ofEx((ResultSet rs, String name) -> {
+        return NamedExtractorEx.<ResultSet, Optional<T>, SQLException>of((ResultSet rs, String name) -> {
             final T value = extr.extract(rs, name);
             if (rs.wasNull()) {
                 return Optional.empty();
             } else {
                 return Optional.of(value);
             }
-        });
+        }).unchecked();
     }
 
     /**
      * An {@code NamedExtractor} instance for {@link boolean} values.
      */
-    public static final NamedExtractor<ResultSet, Boolean> BOOLEAN = NamedExtractor.ofEx(ResultSet::getBoolean);
+    public static final NamedExtractor<ResultSet, Boolean> BOOLEAN =
+            NamedExtractorEx.<ResultSet, Boolean, SQLException>of(ResultSet::getBoolean)
+                    .unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code boolean} values.
@@ -46,7 +48,9 @@ public abstract class DatabaseExtractors {
     /**
      * An {@code NamedExtractor} instance for {@link byte} values.
      */
-    public static final NamedExtractor<ResultSet, Byte> BYTE = NamedExtractor.ofEx(ResultSet::getByte);
+    public static final NamedExtractor<ResultSet, Byte> BYTE =
+            NamedExtractorEx.<ResultSet, Byte, SQLException>of(ResultSet::getByte)
+                    .unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code byte} values.
@@ -57,7 +61,8 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} instance for {@code double} values.
      */
     public static final DoubleNamedExtractor<ResultSet> DOUBLE =
-            DoubleNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getDouble).unchecked();
+            DoubleNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getDouble)
+                    .unchecked();
 
     /**
      * A {@code NamedExtractor} for optional {@code double} values.
@@ -101,7 +106,9 @@ public abstract class DatabaseExtractors {
     /**
      * An {@code NamedExtractor} instance for {@code float} values.
      */
-    public static final NamedExtractor<ResultSet, Float> FLOAT = NamedExtractor.ofEx(ResultSet::getFloat);
+    public static final NamedExtractor<ResultSet, Float> FLOAT =
+            NamedExtractorEx.<ResultSet, Float, SQLException>of(ResultSet::getFloat)
+                    .unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code float} values.
@@ -157,7 +164,8 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} instance for {@code long} values.
      */
     public static final LongNamedExtractor<ResultSet> LONG =
-            LongNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getLong).unchecked();
+            LongNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getLong)
+                    .unchecked();
 
     /**
      * A {@code NamedExtractor} for optional {@code long} values.
@@ -201,7 +209,9 @@ public abstract class DatabaseExtractors {
     /**
      * A {@code NamedExtractor} instance for {@code short} values.
      */
-    public static final NamedExtractor<ResultSet, Short> SHORT = NamedExtractor.ofEx(ResultSet::getShort);
+    public static final NamedExtractor<ResultSet, Short> SHORT =
+            NamedExtractorEx.<ResultSet, Short, SQLException>of(ResultSet::getShort)
+                    .unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code short} values.
@@ -211,7 +221,9 @@ public abstract class DatabaseExtractors {
     /**
      * A {@code NamedExtractor} instance for {@code string} values.
      */
-    public static final NamedExtractor<ResultSet, String> STRING = NamedExtractor.ofEx(ResultSet::getString);
+    public static final NamedExtractor<ResultSet, String> STRING =
+            NamedExtractorEx.<ResultSet, String, SQLException>of(ResultSet::getString)
+                    .unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code string} values.
@@ -229,7 +241,9 @@ public abstract class DatabaseExtractors {
     /**
      * An extractor for {@link Date} values.
      */
-    public static final NamedExtractor<ResultSet, Date> SQLDATE = NamedExtractor.ofEx(ResultSet::getDate);
+    public static final NamedExtractor<ResultSet, Date> SQLDATE =
+            NamedExtractorEx.<ResultSet, Date, SQLException>of(ResultSet::getDate)
+                    .unchecked();
 
     /**
      * An extractor for optional {@code Date} values.
@@ -252,7 +266,9 @@ public abstract class DatabaseExtractors {
     /**
      * An extractor for {@link Time} values.
      */
-    public static final NamedExtractor<ResultSet, Time> SQLTIME = NamedExtractor.ofEx(ResultSet::getTime);
+    public static final NamedExtractor<ResultSet, Time> SQLTIME =
+            NamedExtractorEx.<ResultSet, Time, SQLException>of(ResultSet::getTime)
+                    .unchecked();
 
     /**
      * An extractor for optional {@code Time} values.
@@ -275,7 +291,8 @@ public abstract class DatabaseExtractors {
      * An extractor for {@link Timestamp} values.
      */
     public static final NamedExtractor<ResultSet, Timestamp> SQLTIMESTAMP =
-            NamedExtractor.ofEx(ResultSet::getTimestamp);
+            NamedExtractorEx.<ResultSet, Timestamp, SQLException>of(ResultSet::getTimestamp)
+                    .unchecked();
 
     /**
      * An extractor for optional {@code Time} values.
@@ -286,7 +303,8 @@ public abstract class DatabaseExtractors {
      * An extractor for {@link LocalDateTime} values.
      */
     public static final NamedExtractor<ResultSet, LocalDateTime> LOCALDATETIME =
-            SQLTIMESTAMP.map(Timestamp::toInstant)
+            SQLTIMESTAMP
+                    .map(Timestamp::toInstant)
                     .map(inst -> LocalDateTime.ofInstant(inst, ZoneId.systemDefault()));
 
     /**
