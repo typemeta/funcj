@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.function.*;
 
 /**
- * A set of extraction functions and combinator funcions.
+ * A set of extraction functions and combinator functions.
  */
 public abstract class DatabaseExtractorsEx {
 
@@ -22,7 +22,9 @@ public abstract class DatabaseExtractorsEx {
      * @param <T>       the value type
      * @return          the extractor function for the optional value
      */
-    public static <T> NamedExtractorEx<ResultSet, Optional<T>, SQLException> optional(NamedExtractorEx<ResultSet, T, SQLException> extr) {
+    public static <T> NamedExtractorEx<ResultSet, Optional<T>, SQLException> optional(
+            NamedExtractorEx<ResultSet, T, SQLException> extr
+    ) {
         return (ResultSet rs, String name) -> {
             final T value = extr.extract(rs, name);
             if (rs.wasNull()) {
@@ -36,27 +38,32 @@ public abstract class DatabaseExtractorsEx {
     /**
      * An {@code NamedExtractorEx} instance for {@link boolean} values.
      */
-    public static final NamedExtractorEx<ResultSet, Boolean, SQLException> BOOLEAN = ResultSet::getBoolean;
+    public static final NamedExtractorEx<ResultSet, Boolean, SQLException> BOOLEAN =
+            ResultSet::getBoolean;
 
     /**
      * A {@code NamedExtractorEx} instance for optional {@code boolean} values.
      */
-    public static final NamedExtractorEx<ResultSet, Optional<Boolean>, SQLException> OPT_BOOLEAN = optional(BOOLEAN);
+    public static final NamedExtractorEx<ResultSet, Optional<Boolean>, SQLException> OPT_BOOLEAN =
+            optional(BOOLEAN);
 
     /**
      * An {@code NamedExtractorEx} instance for {@link byte} values.
      */
-    public static final NamedExtractorEx<ResultSet, Byte, SQLException> BYTE = ResultSet::getByte;
+    public static final NamedExtractorEx<ResultSet, Byte, SQLException> BYTE =
+            ResultSet::getByte;
 
     /**
      * A {@code NamedExtractorEx} instance for optional {@code byte} values.
      */
-    public static final NamedExtractorEx<ResultSet, Optional<Byte>, SQLException> OPT_BYTE = optional(BYTE);
+    public static final NamedExtractorEx<ResultSet, Optional<Byte>, SQLException> OPT_BYTE =
+            optional(BYTE);
 
     /**
      * A {@code NamedExtractorEx} instance for {@code double} values.
      */
-    public static final DoubleNamedExtractorEx<ResultSet, SQLException> DOUBLE = ResultSet::getDouble;
+    public static final DoubleNamedExtractorEx<ResultSet, SQLException> DOUBLE =
+            ResultSet::getDouble;
 
     /**
      * A {@code NamedExtractorEx} for optional {@code double} values.
@@ -110,17 +117,20 @@ public abstract class DatabaseExtractorsEx {
     /**
      * An {@code NamedExtractorEx} instance for {@code float} values.
      */
-    public static final NamedExtractorEx<ResultSet, Float, SQLException> FLOAT = ResultSet::getFloat;
+    public static final NamedExtractorEx<ResultSet, Float, SQLException> FLOAT =
+            ResultSet::getFloat;
 
     /**
      * A {@code NamedExtractorEx} instance for optional {@code float} values.
      */
-    public static final NamedExtractorEx<ResultSet, Optional<Float>, SQLException> OPT_FLOAT = optional(FLOAT);
+    public static final NamedExtractorEx<ResultSet, Optional<Float>, SQLException> OPT_FLOAT =
+            optional(FLOAT);
 
     /**
      * A {@code NamedExtractor} instance for {@code int} values.
      */
-    public static final NamedExtractorsEx.IntNamedExtractorEx<ResultSet, SQLException> INTEGER = ResultSet::getInt;
+    public static final NamedExtractorsEx.IntNamedExtractorEx<ResultSet, SQLException> INTEGER =
+            ResultSet::getInt;
 
     /**
      * A {@code NamedExtractorEx} for optional {@code int} values.
@@ -174,7 +184,8 @@ public abstract class DatabaseExtractorsEx {
     /**
      * A {@code NamedExtractorEx} instance for {@code long} values.
      */
-    public static final LongNamedExtractorEx<ResultSet, SQLException> LONG = ResultSet::getLong;
+    public static final LongNamedExtractorEx<ResultSet, SQLException> LONG =
+            ResultSet::getLong;
 
     /**
      * A {@code NamedExtractorEx} for optional {@code long} values.
@@ -228,22 +239,26 @@ public abstract class DatabaseExtractorsEx {
     /**
      * A {@code NamedExtractorEx} instance for {@code short} values.
      */
-    public static final NamedExtractorEx<ResultSet, Short, SQLException> SHORT = ResultSet::getShort;
+    public static final NamedExtractorEx<ResultSet, Short, SQLException> SHORT =
+            ResultSet::getShort;
 
     /**
      * A {@code NamedExtractorEx} instance for optional {@code short} values.
      */
-    public static final NamedExtractorEx<ResultSet, Optional<Short>, SQLException> OPT_SHORT = optional(SHORT);
+    public static final NamedExtractorEx<ResultSet, Optional<Short>, SQLException> OPT_SHORT =
+            optional(SHORT);
 
     /**
      * A {@code NamedExtractorEx} instance for {@code string} values.
      */
-    public static final NamedExtractorEx<ResultSet, String, SQLException> STRING = ResultSet::getString;
+    public static final NamedExtractorEx<ResultSet, String, SQLException> STRING =
+            ResultSet::getString;
 
     /**
      * A {@code NamedExtractorEx} instance for optional {@code string} values.
      */
-    public static final NamedExtractorEx<ResultSet, Optional<String>, SQLException> OPT_STRING = optional(STRING);
+    public static final NamedExtractorEx<ResultSet, Optional<String>, SQLException> OPT_STRING =
+            optional(STRING);
 
     /**
      * A {@code NamedExtractorEx} instance for optional {@code string} values.
@@ -256,18 +271,21 @@ public abstract class DatabaseExtractorsEx {
     /**
      * An extractor for {@link Date} values.
      */
-    public static final NamedExtractorEx<ResultSet, Date, SQLException> SQLDATE = ResultSet::getDate;
+    public static final NamedExtractorEx<ResultSet, Date, SQLException> SQLDATE =
+            ResultSet::getDate;
 
     /**
      * An extractor for optional {@code Date} values.
      */
-    public static final NamedExtractorEx<ResultSet, Optional<Date>, SQLException> OPT_SQLDATE = optional(SQLDATE);
+    public static final NamedExtractorEx<ResultSet, Optional<Date>, SQLException> OPT_SQLDATE =
+            optional(SQLDATE);
 
 
     /**
      * An extractor for {@link LocalDate} values.
      */
-        public static final NamedExtractorEx<ResultSet, LocalDate, SQLException> LOCALDATE = SQLDATE.map(Date::toLocalDate);
+        public static final NamedExtractorEx<ResultSet, LocalDate, SQLException> LOCALDATE =
+            SQLDATE.map(Date::toLocalDate);
 
     /**
      * An extractor for optional {@code LocalDate} values.
@@ -279,17 +297,20 @@ public abstract class DatabaseExtractorsEx {
     /**
      * An extractor for {@link Time} values.
      */
-    public static final NamedExtractorEx<ResultSet, Time, SQLException> SQLTIME = ResultSet::getTime;
+    public static final NamedExtractorEx<ResultSet, Time, SQLException> SQLTIME =
+            ResultSet::getTime;
 
     /**
      * An extractor for optional {@code Time} values.
      */
-    public static final NamedExtractorEx<ResultSet, Optional<Time>, SQLException> OPT_SQLTIME = optional(SQLTIME);
+    public static final NamedExtractorEx<ResultSet, Optional<Time>, SQLException> OPT_SQLTIME =
+            optional(SQLTIME);
 
     /**
      * An extractor for {@link LocalTime} values.
      */
-    public static final NamedExtractorEx<ResultSet, LocalTime, SQLException> LOCALTIME = SQLTIME.map(Time::toLocalTime);
+    public static final NamedExtractorEx<ResultSet, LocalTime, SQLException> LOCALTIME =
+            SQLTIME.map(Time::toLocalTime);
 
     /**
      * An extractor for optional {@code LocalTime} values.
@@ -301,12 +322,14 @@ public abstract class DatabaseExtractorsEx {
     /**
      * An extractor for {@link Timestamp} values.
      */
-    public static final NamedExtractorEx<ResultSet, Timestamp, SQLException> SQLTIMESTAMP = ResultSet::getTimestamp;
+    public static final NamedExtractorEx<ResultSet, Timestamp, SQLException> SQLTIMESTAMP =
+            ResultSet::getTimestamp;
 
     /**
      * An extractor for optional {@code Time} values.
      */
-    public static final NamedExtractorEx<ResultSet, Optional<Timestamp>, SQLException> OPT_SQLTIMESTAMP = optional(SQLTIMESTAMP);
+    public static final NamedExtractorEx<ResultSet, Optional<Timestamp>, SQLException> OPT_SQLTIMESTAMP =
+            optional(SQLTIMESTAMP);
 
     /**
      * An extractor for {@link LocalDateTime} values.

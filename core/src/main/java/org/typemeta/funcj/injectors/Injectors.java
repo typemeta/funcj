@@ -1,6 +1,9 @@
 package org.typemeta.funcj.injectors;
 
-import java.util.Optional;
+import org.typemeta.funcj.extractors.Extractor;
+import org.typemeta.funcj.functions.Functions;
+
+import java.util.*;
 
 public abstract class Injectors {
     @FunctionalInterface
@@ -48,5 +51,23 @@ public abstract class Injectors {
     public static <ENV, T> Injector<ENV, Optional<T>> optional(Injector<ENV, T> injr) {
         return (env, optVal) ->
                 optVal.isPresent() ? injr.inject(env, optVal.get()) : env;
+    }
+
+    /**
+     * Combinator function for building an injector from an array of injectors.
+     * @param exs       the array of the extractors
+     * @param <ENV>     the environment type
+     * @param <T>       the injector value type
+     * @return          the new injector
+     */
+    public static <ENV, T> Injector<ENV, T> combine(
+            Injector<ENV, T> ... exs
+    ) {
+        return (env, value) -> {
+            for(Injector<ENV, T> ex : exs) {
+                env = ex.inject(env, value);
+            }
+            return env;
+        };
     }
 }

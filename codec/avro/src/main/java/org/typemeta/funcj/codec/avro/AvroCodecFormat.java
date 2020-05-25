@@ -2,15 +2,12 @@ package org.typemeta.funcj.codec.avro;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
-import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
 import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
 
-import java.lang.reflect.*;
 import java.nio.ByteBuffer;
-import java.util.*;
 
 import static org.typemeta.funcj.codec.utils.StreamUtils.toLinkedHashMap;
 

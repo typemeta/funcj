@@ -37,32 +37,32 @@ public abstract class DatabaseExtractors {
      * An {@code NamedExtractor} instance for {@link boolean} values.
      */
     public static final NamedExtractor<ResultSet, Boolean> BOOLEAN =
-            NamedExtractorEx.<ResultSet, Boolean, SQLException>of(ResultSet::getBoolean)
-                    .unchecked();
+            DatabaseExtractorsEx.BOOLEAN.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code boolean} values.
      */
-    public static final NamedExtractor<ResultSet, Optional<Boolean>> OPT_BOOLEAN = optional(BOOLEAN);
+    public static final NamedExtractor<ResultSet, Optional<Boolean>> OPT_BOOLEAN =
+            DatabaseExtractorsEx.OPT_BOOLEAN.unchecked();
 
     /**
      * An {@code NamedExtractor} instance for {@link byte} values.
      */
     public static final NamedExtractor<ResultSet, Byte> BYTE =
-            NamedExtractorEx.<ResultSet, Byte, SQLException>of(ResultSet::getByte)
-                    .unchecked();
+            DatabaseExtractorsEx.BYTE.unchecked();
+
 
     /**
      * A {@code NamedExtractor} instance for optional {@code byte} values.
      */
-    public static final NamedExtractor<ResultSet, Optional<Byte>> OPT_BYTE = optional(BYTE);
+    public static final NamedExtractor<ResultSet, Optional<Byte>> OPT_BYTE =
+            DatabaseExtractorsEx.OPT_BYTE.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for {@code double} values.
      */
     public static final DoubleNamedExtractor<ResultSet> DOUBLE =
-            DoubleNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getDouble)
-                    .unchecked();
+            DatabaseExtractorsEx.DOUBLE.unchecked();
 
     /**
      * A {@code NamedExtractor} for optional {@code double} values.
@@ -93,33 +93,25 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} instance for optional {@code double} values.
      */
     public static final OptDoubleNamedExtractor OPT_DOUBLE =
-            OptDoubleNamedExtractorEx.of((rs, name) -> {
-                    final double value = DOUBLE.extractDouble(rs, name);
-                    if (rs.wasNull()) {
-                        return OptionalDouble.empty();
-                    } else {
-                        return OptionalDouble.of(value);
-                    }
-                }
-            ).unchecked();
+            DatabaseExtractorsEx.OPT_DOUBLE.unchecked();
 
     /**
      * An {@code NamedExtractor} instance for {@code float} values.
      */
     public static final NamedExtractor<ResultSet, Float> FLOAT =
-            NamedExtractorEx.<ResultSet, Float, SQLException>of(ResultSet::getFloat)
-                    .unchecked();
+            DatabaseExtractorsEx.FLOAT.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code float} values.
      */
-    public static final NamedExtractor<ResultSet, Optional<Float>> OPT_FLOAT = optional(FLOAT);
+    public static final NamedExtractor<ResultSet, Optional<Float>> OPT_FLOAT =
+            DatabaseExtractorsEx.OPT_FLOAT.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for {@code int} values.
      */
     public static final IntNamedExtractor<ResultSet> INTEGER =
-            IntNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getInt).unchecked();
+            DatabaseExtractorsEx.INTEGER.unchecked();
 
     /**
      * A {@code NamedExtractor} for optional {@code int} values.
@@ -150,22 +142,13 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} instance for optional {@code int} values.
      */
     public static final OptIntNamedExtractor OPT_INTEGER =
-            OptIntNamedExtractorEx.of((rs, name) -> {
-                    final int value = INTEGER.extractInt(rs, name);
-                    if (rs.wasNull()) {
-                        return OptionalInt.empty();
-                    } else {
-                        return OptionalInt.of(value);
-                    }
-                }
-            ).unchecked();
+            DatabaseExtractorsEx.OPT_INTEGER.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for {@code long} values.
      */
     public static final LongNamedExtractor<ResultSet> LONG =
-            LongNamedExtractorEx.<ResultSet, SQLException>of(ResultSet::getLong)
-                    .unchecked();
+            DatabaseExtractorsEx.LONG.unchecked();
 
     /**
      * A {@code NamedExtractor} for optional {@code long} values.
@@ -196,123 +179,109 @@ public abstract class DatabaseExtractors {
      * A {@code NamedExtractor} instance for optional {@code long} values.
      */
     public static final OptLongNamedExtractor OPT_LONG =
-            OptLongNamedExtractorEx.of((rs, name) -> {
-                    final long value = LONG.extractLong(rs, name);
-                    if (rs.wasNull()) {
-                        return OptionalLong.empty();
-                    } else {
-                        return OptionalLong.of(value);
-                    }
-                }
-            ).unchecked();
+            DatabaseExtractorsEx.OPT_LONG.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for {@code short} values.
      */
     public static final NamedExtractor<ResultSet, Short> SHORT =
-            NamedExtractorEx.<ResultSet, Short, SQLException>of(ResultSet::getShort)
-                    .unchecked();
+            DatabaseExtractorsEx.SHORT.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code short} values.
      */
-    public static final NamedExtractor<ResultSet, Optional<Short>> OPT_SHORT = optional(SHORT);
+    public static final NamedExtractor<ResultSet, Optional<Short>> OPT_SHORT =
+            DatabaseExtractorsEx.OPT_SHORT.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for {@code string} values.
      */
     public static final NamedExtractor<ResultSet, String> STRING =
-            NamedExtractorEx.<ResultSet, String, SQLException>of(ResultSet::getString)
-                    .unchecked();
+            DatabaseExtractorsEx.STRING.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code string} values.
      */
-    public static final NamedExtractor<ResultSet, Optional<String>> OPT_STRING = optional(STRING);
+    public static final NamedExtractor<ResultSet, Optional<String>> OPT_STRING =
+            DatabaseExtractorsEx.OPT_STRING.unchecked();
 
     /**
      * A {@code NamedExtractor} instance for optional {@code string} values.
      * This converter will convert empty strings to an empty optional value.
      */
     public static final NamedExtractor<ResultSet, Optional<String>> OPT_NONEMPTY_STRING =
-            optional(STRING)
-                    .map(oi -> oi.flatMap(s -> s.isEmpty() ? Optional.empty() : Optional.of(s)));
+            DatabaseExtractorsEx.OPT_NONEMPTY_STRING.unchecked();
 
     /**
      * An extractor for {@link Date} values.
      */
     public static final NamedExtractor<ResultSet, Date> SQLDATE =
-            NamedExtractorEx.<ResultSet, Date, SQLException>of(ResultSet::getDate)
-                    .unchecked();
+            DatabaseExtractorsEx.SQLDATE.unchecked();
 
     /**
      * An extractor for optional {@code Date} values.
      */
-    public static final NamedExtractor<ResultSet, Optional<Date>> OPT_SQLDATE = optional(SQLDATE);
+    public static final NamedExtractor<ResultSet, Optional<Date>> OPT_SQLDATE =
+            DatabaseExtractorsEx.OPT_SQLDATE.unchecked();
 
 
     /**
      * An extractor for {@link LocalDate} values.
      */
-    public static final NamedExtractor<ResultSet, LocalDate> LOCALDATE = SQLDATE.map(Date::toLocalDate);
+    public static final NamedExtractor<ResultSet, LocalDate> LOCALDATE =
+            DatabaseExtractorsEx.LOCALDATE.unchecked();
 
     /**
      * An extractor for optional {@code LocalDate} values.
      */
     public static final NamedExtractor<ResultSet, Optional<LocalDate>> OPT_LOCALDATE =
-            optional(SQLDATE)
-                    .map(od -> od.map(Date::toLocalDate));
+            DatabaseExtractorsEx.OPT_LOCALDATE.unchecked();
 
     /**
      * An extractor for {@link Time} values.
      */
     public static final NamedExtractor<ResultSet, Time> SQLTIME =
-            NamedExtractorEx.<ResultSet, Time, SQLException>of(ResultSet::getTime)
-                    .unchecked();
+            DatabaseExtractorsEx.SQLTIME.unchecked();
 
     /**
      * An extractor for optional {@code Time} values.
      */
-    public static final NamedExtractor<ResultSet, Optional<Time>> OPT_SQLTIME = optional(SQLTIME);
+    public static final NamedExtractor<ResultSet, Optional<Time>> OPT_SQLTIME =
+            DatabaseExtractorsEx.OPT_SQLTIME.unchecked();
 
     /**
      * An extractor for {@link LocalTime} values.
      */
-    public static final NamedExtractor<ResultSet, LocalTime> LOCALTIME = SQLTIME.map(Time::toLocalTime);
+    public static final NamedExtractor<ResultSet, LocalTime> LOCALTIME =
+            DatabaseExtractorsEx.LOCALTIME.unchecked();
 
     /**
      * An extractor for optional {@code LocalTime} values.
      */
     public static final NamedExtractor<ResultSet, Optional<LocalTime>> OPT_LOCALTIME =
-            optional(SQLTIME)
-                    .map(od -> od.map(Time::toLocalTime));
+            DatabaseExtractorsEx.OPT_LOCALTIME.unchecked();
 
     /**
      * An extractor for {@link Timestamp} values.
      */
     public static final NamedExtractor<ResultSet, Timestamp> SQLTIMESTAMP =
-            NamedExtractorEx.<ResultSet, Timestamp, SQLException>of(ResultSet::getTimestamp)
-                    .unchecked();
+            DatabaseExtractorsEx.SQLTIMESTAMP.unchecked();
 
     /**
      * An extractor for optional {@code Time} values.
      */
-    public static final NamedExtractor<ResultSet, Optional<Timestamp>> OPT_SQLTIMESTAMP = optional(SQLTIMESTAMP);
+    public static final NamedExtractor<ResultSet, Optional<Timestamp>> OPT_SQLTIMESTAMP =
+            DatabaseExtractorsEx.OPT_SQLTIMESTAMP.unchecked();
 
     /**
      * An extractor for {@link LocalDateTime} values.
      */
     public static final NamedExtractor<ResultSet, LocalDateTime> LOCALDATETIME =
-            SQLTIMESTAMP
-                    .map(Timestamp::toInstant)
-                    .map(inst -> LocalDateTime.ofInstant(inst, ZoneId.systemDefault()));
+            DatabaseExtractorsEx.LOCALDATETIME.unchecked();
 
     /**
      * An extractor for optional {@code LocalDateTime} values.
      */
     public static final NamedExtractor<ResultSet, Optional<LocalDateTime>> OPT_LOCALDATETIME =
-            optional(SQLTIMESTAMP)
-                    .map(ots -> ots.map(Timestamp::toInstant)
-                            .map(inst -> LocalDateTime.ofInstant(inst, ZoneId.systemDefault()))
-                    );
+            DatabaseExtractorsEx.OPT_LOCALDATETIME.unchecked();
 }

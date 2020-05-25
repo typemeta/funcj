@@ -1,16 +1,11 @@
 package org.typemeta.funcj.codec.avro;
 
 import org.apache.avro.Schema;
-import org.junit.*;
 import org.typemeta.funcj.codec.TestBase;
 import org.typemeta.funcj.codec.avro.schema.AvroSchemaCodecCore;
-import org.typemeta.funcj.util.Exceptions;
 
-import javax.xml.bind.DatatypeConverter;
-import java.io.*;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.util.*;
 
 public class AvroCodecTest {
 
@@ -446,7 +441,7 @@ public class AvroCodecTest {
         final byte[] ba = baos.toByteArray();
 
         if (printData()) {
-            System.out.println(DatatypeConverter.printHexBinary(ba));
+            System.out.println(TestDataUtils.printHexBinary(ba));
         }
 
         if (printSizes()) {
@@ -457,7 +452,7 @@ public class AvroCodecTest {
         final T val2 = codec.decode(clazz, bais);
 
         if (!printData() && !val.equals(val2)) {
-            System.out.println(DatatypeConverter.printHexBinary(ba));
+            System.out.println(TestDataUtils.printHexBinary(ba));
         }
 
         Assert.assertEquals(val, val2);

@@ -3,8 +3,6 @@ package org.typemeta.funcj.codec.avro.schema;
 import org.apache.avro.Schema;
 import org.typemeta.funcj.codec.utils.CodecException;
 
-import java.util.*;
-
 public abstract class SchemaMerge {
 
     public static Schema merge(Schema lhs, Schema rhs) {

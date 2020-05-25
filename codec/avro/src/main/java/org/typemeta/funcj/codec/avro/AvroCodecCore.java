@@ -3,15 +3,10 @@ package org.typemeta.funcj.codec.avro;
 import org.apache.avro.Schema;
 import org.apache.avro.file.*;
 import org.apache.avro.generic.*;
-import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.Codec;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
-import org.typemeta.funcj.codec.avro.schema.AvroSchemaCodecCore;
-import org.typemeta.funcj.codec.impl.*;
 import org.typemeta.funcj.functions.Functions;
 import org.typemeta.funcj.util.Exceptions;
-
-import java.io.*;
 
 /**
  * Interface for classes which implement an encoding via JSON.

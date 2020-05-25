@@ -2,7 +2,8 @@ package org.typemeta.funcj.database;
 
 import org.junit.*;
 import org.slf4j.*;
-import org.typemeta.funcj.injectors.NumberedInjector;
+import org.typemeta.funcj.extractors.Extractor;
+import org.typemeta.funcj.injectors.*;
 import org.typemeta.funcj.util.Exceptions;
 
 import java.sql.*;
@@ -10,6 +11,7 @@ import java.sql.Date;
 import java.time.*;
 import java.util.*;
 
+import static org.junit.Assert.assertEquals;
 import static org.typemeta.funcj.database.DatabaseMeta.*;
 
 public class DatabaseInjectorTest {
@@ -57,7 +59,7 @@ public class DatabaseInjectorTest {
 
     static void loadScript(String path) throws SQLException {
         logger.info("Loading script " + path);
-        Exceptions.<SQLException>unwrap(() -> SqlUtils.loadResource(path)
+        Exceptions.<SQLException>unwrap(() -> SqlUtils.loadMultiResource(path)
                 .forEach(sql -> Exceptions.wrap(() -> testDbConn.createStatement().execute(sql)))
         );
     }
@@ -70,7 +72,6 @@ public class DatabaseInjectorTest {
         testDbConn = DriverManager.getConnection(JDBC_CONN_URL);
 
         loadScript("/sql/create.sql");
-        loadScript("/sql/data.sql");
     }
 
     @AfterClass
@@ -82,7 +83,7 @@ public class DatabaseInjectorTest {
 
     private static Number getOptionalValue(Object optional) {
         if (optional instanceof Optional) {
-            return (Number)((Optional<?>)optional).get();
+            return (Number)((Optional<?>)optional).orElse(null);
         } else if (optional instanceof OptionalInt) {
             final OptionalInt optInt = ((OptionalInt)optional);
             return optInt.isPresent() ? optInt.getAsInt() : null;
@@ -99,6 +100,34 @@ public class DatabaseInjectorTest {
 
     @Test
     public void testNullable() throws SQLException {
+        roundTrip(RECORD1_VALUES, RECORD1_INJECTOR, RECORD1_EXTRACTOR);
+        roundTrip(RECORD2_VALUES, RECORD2_INJECTOR, RECORD2_EXTRACTOR);
+        roundTrip(OPTRECORD1_VALUES, OPTRECORD1_INJECTOR, OPTRECORD1_EXTRACTOR);
+        roundTrip(OPTRECORD2_VALUES, OPTRECORD2_INJECTOR, OPTRECORD2_EXTRACTOR);
+    }
+
+    private <T> void roundTrip(
+            T[] values,
+            Injector<PreparedStatement, T> injector,
+            Extractor<ResultSet, T> extractor
+    ) throws SQLException {
+        try (final PreparedStatement ps = testDbConn.prepareStatement(SqlUtils.loadSingleResource("/sql/insert_null.sql"))) {
+            for(T rec : values) {
+                injector.inject(ps, rec);
+                ps.execute();
+            }
+
+            final ResultSet rs = testDbConn.createStatement()
+                    .executeQuery("SELECT * FROM test_null");
+
+            for(T rec : values) {
+                rs.next();
+                final T dbRec = extractor.extract(rs);
+                assertEquals(rec, dbRec);
+            }
+        }
+
+        testDbConn.createStatement().execute("DELETE FROM test_null");
     }
 
     @Test

@@ -13,7 +13,19 @@ abstract class SqlUtils {
 
     static final String SQL_SEP_TOKEN = ";;";
 
-    static Stream<String> loadResource(String path) {
+    static String loadSingleResource(String path) {
+        return Optional.ofNullable(DatabaseExtractorTest.class.getResourceAsStream(path))
+                .map(InputStreamReader::new)
+                .map(is -> {
+                    try (BufferedReader br = new BufferedReader(is)) {
+                        return br.lines().collect(joining("\n"));
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }).orElseThrow(() -> new RuntimeException("Resource '" + path + "' not found"));
+    }
+
+    static Stream<String> loadMultiResource(String path) {
         final String text =
                 Optional.ofNullable(DatabaseExtractorTest.class.getResourceAsStream(path))
                         .map(InputStreamReader::new)

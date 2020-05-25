@@ -271,7 +271,7 @@ public abstract class Extractors {
      * @param <C>       the type of value returned by the third extractor
      * @param <D>       the type of value returned by the fourth extractor
      * @param <E>       the type of value returned by the fifth extractor
-     * @param <E>       the type of value returned by the sixth extractor
+     * @param <F>       the type of value returned by the sixth extractor
      * @param <R>       the value type
      * @return          the new extractor
      */
@@ -292,5 +292,114 @@ public abstract class Extractors {
                 exE.extract(env),
                 exF.extract(env)
         );
+    }
+
+    /**
+     * Combinator function for building an extractor for a class type,
+     * using extractors for the fields that comprise the class type.
+     * @param exA       the first extractor
+     * @param exB       the second extractor
+     * @param exC       the third extractor
+     * @param exD       the fourth extractor
+     * @param exE       the fifth extractor
+     * @param exF       the sixth extractor
+     * @param exG       the seventh extractor
+     * @param f         the value constructor
+     * @param <ENV>     the environment type
+     * @param <A>       the type of value returned by the first extractor
+     * @param <B>       the type of value returned by the second extractor
+     * @param <C>       the type of value returned by the third extractor
+     * @param <D>       the type of value returned by the fourth extractor
+     * @param <E>       the type of value returned by the fifth extractor
+     * @param <F>       the type of value returned by the sixth extractor
+     * @param <G>       the type of value returned by the seventh extractor
+     * @param <R>       the value type
+     * @return          the new extractor
+     */
+    public static <ENV, A, B, C, D, E, F, G, R> Extractor<ENV, R> combine(
+            Extractor<ENV, A> exA,
+            Extractor<ENV, B> exB,
+            Extractor<ENV, C> exC,
+            Extractor<ENV, D> exD,
+            Extractor<ENV, E> exE,
+            Extractor<ENV, F> exF,
+            Extractor<ENV, G> exG,
+            Functions.F7<A, B, C, D, E, F, G, R> f
+    ) {
+        return env -> f.apply(
+                exA.extract(env),
+                exB.extract(env),
+                exC.extract(env),
+                exD.extract(env),
+                exE.extract(env),
+                exF.extract(env),
+                exG.extract(env)
+        );
+    }
+
+    /**
+     * Combinator function for building an extractor for a class type,
+     * using extractors for the fields that comprise the class type.
+     * @param exA       the first extractor
+     * @param exB       the second extractor
+     * @param exC       the third extractor
+     * @param exD       the fourth extractor
+     * @param exE       the fifth extractor
+     * @param exF       the sixth extractor
+     * @param exG       the seventh extractor
+     * @param exH       the eighth extractor
+     * @param f         the value constructor
+     * @param <ENV>     the environment type
+     * @param <A>       the type of value returned by the first extractor
+     * @param <B>       the type of value returned by the second extractor
+     * @param <C>       the type of value returned by the third extractor
+     * @param <D>       the type of value returned by the fourth extractor
+     * @param <E>       the type of value returned by the fifth extractor
+     * @param <F>       the type of value returned by the sixth extractor
+     * @param <G>       the type of value returned by the seventh extractor
+     * @param <H>       the type of value returned by the eighth extractor
+     * @param <R>       the value type
+     * @return          the new extractor
+     */
+    public static <ENV, A, B, C, D, E, F, G, H, R> Extractor<ENV, R> combine(
+            Extractor<ENV, A> exA,
+            Extractor<ENV, B> exB,
+            Extractor<ENV, C> exC,
+            Extractor<ENV, D> exD,
+            Extractor<ENV, E> exE,
+            Extractor<ENV, F> exF,
+            Extractor<ENV, G> exG,
+            Extractor<ENV, H> exH,
+            Functions.F8<A, B, C, D, E, F, G, H, R> f
+    ) {
+        return env -> f.apply(
+                exA.extract(env),
+                exB.extract(env),
+                exC.extract(env),
+                exD.extract(env),
+                exE.extract(env),
+                exF.extract(env),
+                exG.extract(env),
+                exH.extract(env)
+        );
+    }
+
+    /**
+     * Combinator function for building an extractor for a class type,
+     * using extractors for the fields that comprise the class type.
+     * @param f         the value constructor
+     * @param exs       an array of the extractors
+     * @param <ENV>     the environment type
+     * @param <R>       the value type
+     * @return          the new extractor
+     */
+    public static <ENV, R> Extractor<ENV, R> combine(
+            Functions.F<Object[], R> f,
+            Extractor<ENV, ?> ... exs
+    ) {
+        return env -> {
+            final Object[] vals = Arrays.stream(exs).map(ex -> ex.extract(env)).toArray();
+            return f.apply(vals);
+        };
     }
 }

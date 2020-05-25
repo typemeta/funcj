@@ -1,14 +1,10 @@
 package org.typemeta.funcj.codec.avro.schema;
 
-import static java.util.stream.Collectors.toList;
-import static org.typemeta.funcj.codec.avro.AvroTypes.Config;
-
-import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.*;
 import org.typemeta.funcj.codec.avro.AvroTypes.WithSchema;
-import org.typemeta.funcj.codec.impl.*;
 
-import java.util.*;
+import static java.util.stream.Collectors.toList;
+import static org.typemeta.funcj.codec.avro.AvroTypes.Config;
 
 public class AvroSchemaCodecCore
         extends CodecCoreDelegate<WithSchema, Object, Config> {

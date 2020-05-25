@@ -1,11 +1,8 @@
 package org.typemeta.funcj.codec.avro;
 
 import org.apache.avro.Schema;
-import org.typemeta.funcj.codec.algebra.*;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.data.IList;
-
-import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 

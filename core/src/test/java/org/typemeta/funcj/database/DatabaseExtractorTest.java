@@ -2,12 +2,12 @@ package org.typemeta.funcj.database;
 
 import org.junit.*;
 import org.slf4j.*;
-import org.typemeta.funcj.extractors.NamedExtractor;
+import org.typemeta.funcj.extractors.*;
 import org.typemeta.funcj.util.Exceptions;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.*;
-import java.util.Date;
 import java.util.*;
 
 import static org.typemeta.funcj.database.DatabaseMeta.*;
@@ -57,7 +57,7 @@ public class DatabaseExtractorTest {
 
     static void loadScript(String path) throws SQLException {
         logger.info("Loading script " + path);
-        Exceptions.<SQLException>unwrap(() -> SqlUtils.loadResource(path)
+        Exceptions.<SQLException>unwrap(() -> SqlUtils.loadMultiResource(path)
                 .forEach(sql -> Exceptions.wrap(() -> testDbConn.createStatement().execute(sql)))
         );
     }
@@ -82,7 +82,7 @@ public class DatabaseExtractorTest {
 
     private static Number getOptionalValue(Object optional) {
         if (optional instanceof Optional) {
-            return (Number)((Optional<?>)optional).get();
+            return (Number)((Optional<?>)optional).orElse(null);
         } else if (optional instanceof OptionalInt) {
             final OptionalInt optInt = ((OptionalInt)optional);
             return optInt.isPresent() ? optInt.getAsInt() : null;
@@ -124,6 +124,9 @@ public class DatabaseExtractorTest {
                                 }
                             }
                         } else {
+                            NamedExtractor<ResultSet, ?> a = optExtractors.get(javaType);
+                            Extractor<ResultSet, ?> b = a.bind(column.name);
+                            b.extract(rs);
                             final Object value = optExtractors.get(javaType).bind(column.name).extract(rs);
                         }
                     }

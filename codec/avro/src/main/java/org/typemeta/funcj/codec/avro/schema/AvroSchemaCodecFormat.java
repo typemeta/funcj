@@ -1,14 +1,12 @@
 package org.typemeta.funcj.codec.avro.schema;
 
 import org.apache.avro.Schema;
-import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.AvroTypes.WithSchema;
 import org.typemeta.funcj.codec.impl.CollectionCodec;
 import org.typemeta.funcj.codec.utils.CodecException;
 import org.typemeta.funcj.functions.Functions;
 
 import java.lang.reflect.Modifier;
-import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 import static org.typemeta.funcj.codec.avro.AvroTypes.Config;

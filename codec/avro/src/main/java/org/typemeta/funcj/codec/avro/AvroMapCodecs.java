@@ -2,11 +2,8 @@ package org.typemeta.funcj.codec.avro;
 
 import org.apache.avro.Schema;
 import org.apache.avro.util.Utf8;
-import org.typemeta.funcj.codec.*;
 import org.typemeta.funcj.codec.avro.AvroTypes.*;
 import org.typemeta.funcj.codec.impl.MapCodecs.AbstractStringMapCodec;
-
-import java.util.*;
 
 import static org.typemeta.funcj.codec.avro.AvroCodecFormat.checkSchemaType;
 

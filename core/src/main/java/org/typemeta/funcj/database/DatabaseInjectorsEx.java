@@ -18,11 +18,17 @@ public abstract class DatabaseInjectorsEx {
                 return ps;
             };
 
+    public static final NumberedInjectorEx<PreparedStatement, Optional<Boolean>, SQLException> OPT_BOOLEAN =
+            optional(BOOLEAN);
+
     public static final NumberedInjectorEx<PreparedStatement, Byte, SQLException> BYTE =
             (PreparedStatement ps, int n, Byte value) -> {
                 ps.setByte(n, value);
                 return ps;
             };
+
+    public static final NumberedInjectorEx<PreparedStatement, Optional<Byte>, SQLException> OPT_BYTE =
+            optional(BYTE);
 
     public static final DoubleNumberedInjectorEx<PreparedStatement, SQLException> DOUBLE =
             (PreparedStatement ps, int n, double value) -> {
