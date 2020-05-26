@@ -36,10 +36,6 @@ abstract class DatabaseMeta {
             new Column("col_timestamp", "timestamp"),
     };
 
-    static <T> T[] nullify(T[] values) {
-        return (T[])Arrays.stream(values).map(t -> null).toArray(Object[]::new);
-    }
-
     private static boolean optFloatEquals(Optional<Float> lhs, Optional<Float> rhs) {
         if (lhs.isPresent()) {
             if (rhs.isPresent()) {

@@ -98,7 +98,7 @@ public class DatabaseInjectorTest {
     }
 
     private <T> T[] dropFirst(T[] values) {
-        return Arrays.stream(values).skip(1).toArray(n -> (T[])(new Object[n]));
+        return Arrays.copyOfRange(values, 1, values.length);
     }
 
     private enum TableType {
