@@ -6,8 +6,8 @@ import org.typemeta.funcj.extractors.Extractor;
 import org.typemeta.funcj.injectors.*;
 import org.typemeta.funcj.util.Exceptions;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.time.*;
 import java.util.*;
 
@@ -71,54 +71,78 @@ public class DatabaseInjectorTest {
         logger.info("Connecting to embedded database");
         testDbConn = DriverManager.getConnection(JDBC_CONN_URL);
 
-        loadScript("/sql/create.sql");
+        loadScript("create.sql");
     }
 
     @AfterClass
     public static void shutdown() throws SQLException {
         if (testDbConn != null) {
-            loadScript("/sql/cleanup.sql");
-        }
-    }
-
-    private static Number getOptionalValue(Object optional) {
-        if (optional instanceof Optional) {
-            return (Number)((Optional<?>)optional).orElse(null);
-        } else if (optional instanceof OptionalInt) {
-            final OptionalInt optInt = ((OptionalInt)optional);
-            return optInt.isPresent() ? optInt.getAsInt() : null;
-        } else if (optional instanceof OptionalDouble) {
-            final OptionalDouble optDbl = ((OptionalDouble)optional);
-            return optDbl.isPresent() ? optDbl.getAsDouble() : null;
-        } else if (optional instanceof OptionalLong) {
-            final OptionalLong optLng = ((OptionalLong)optional);
-            return optLng.isPresent() ? optLng.getAsLong() : null;
-        } else {
-            throw new RuntimeException("Value is not an optional : " + optional);
+            loadScript("cleanup.sql");
         }
     }
 
     @Test
     public void testNullable() throws SQLException {
-        roundTrip(RECORD1_VALUES, RECORD1_INJECTOR, RECORD1_EXTRACTOR);
-        roundTrip(RECORD2_VALUES, RECORD2_INJECTOR, RECORD2_EXTRACTOR);
-        roundTrip(OPTRECORD1_VALUES, OPTRECORD1_INJECTOR, OPTRECORD1_EXTRACTOR);
-        roundTrip(OPTRECORD2_VALUES, OPTRECORD2_INJECTOR, OPTRECORD2_EXTRACTOR);
+        roundTrip(TableType.NULLABLE, RECORD1_VALUES, RECORD1_INJECTOR, RECORD1_EXTRACTOR);
+        roundTrip(TableType.NULLABLE, RECORD2_VALUES, RECORD2_INJECTOR, RECORD2_EXTRACTOR);
+        roundTrip(TableType.NULLABLE, OPTRECORD1_VALUES, OPTRECORD1_INJECTOR, OPTRECORD1_EXTRACTOR);
+        roundTrip(TableType.NULLABLE, OPTRECORD2_VALUES, OPTRECORD2_INJECTOR, OPTRECORD2_EXTRACTOR);
+    }
+
+    @Test
+    public void testNonNullable() throws SQLException {
+        roundTrip(TableType.NOTNULLABLE, RECORD1_VALUES, RECORD1_INJECTOR, RECORD1_EXTRACTOR);
+        roundTrip(TableType.NOTNULLABLE, RECORD2_VALUES, RECORD2_INJECTOR, RECORD2_EXTRACTOR);
+        roundTrip(TableType.NOTNULLABLE, dropFirst(OPTRECORD1_VALUES), OPTRECORD1_INJECTOR, OPTRECORD1_EXTRACTOR);
+        roundTrip(TableType.NOTNULLABLE, dropFirst(OPTRECORD2_VALUES), OPTRECORD2_INJECTOR, OPTRECORD2_EXTRACTOR);
+    }
+
+    private <T> T[] dropFirst(T[] values) {
+        return Arrays.stream(values).skip(1).toArray(n -> (T[])(new Object[n]));
+    }
+
+    private enum TableType {
+        NULLABLE {
+            @Override
+            String insertScript() {
+                return "insert_null.sql";
+            }
+
+            @Override
+            String tableName() {
+                return "test_null";
+            }
+        },
+        NOTNULLABLE {
+            @Override
+            String insertScript() {
+                return "insert_notnull.sql";
+            }
+
+            @Override
+            String tableName() {
+                return "test_notnull";
+            }
+        };
+
+        abstract String insertScript();
+        abstract String tableName();
     }
 
     private <T> void roundTrip(
+            TableType tableType,
             T[] values,
             Injector<PreparedStatement, T> injector,
             Extractor<ResultSet, T> extractor
     ) throws SQLException {
-        try (final PreparedStatement ps = testDbConn.prepareStatement(SqlUtils.loadSingleResource("/sql/insert_null.sql"))) {
+        try (final PreparedStatement ps = testDbConn.prepareStatement(SqlUtils.loadSingleResource(tableType.insertScript()))) {
             for(T rec : values) {
                 injector.inject(ps, rec);
                 ps.execute();
             }
 
             final ResultSet rs = testDbConn.createStatement()
-                    .executeQuery("SELECT * FROM test_null");
+                    .executeQuery("SELECT * FROM " + tableType.tableName());
 
             for(T rec : values) {
                 rs.next();
@@ -127,11 +151,7 @@ public class DatabaseInjectorTest {
             }
         }
 
-        testDbConn.createStatement().execute("DELETE FROM test_null");
-    }
-
-    @Test
-    public void testNonNullable() throws SQLException {
+        testDbConn.createStatement().execute("DELETE FROM " + tableType.tableName());
     }
 }
 

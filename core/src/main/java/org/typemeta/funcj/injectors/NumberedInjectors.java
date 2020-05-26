@@ -1,6 +1,6 @@
 package org.typemeta.funcj.injectors;
 
-import java.util.Optional;
+import java.util.*;
 
 public abstract class NumberedInjectors {
 
@@ -34,5 +34,20 @@ public abstract class NumberedInjectors {
     public static <ENV, T> NumberedInjector<ENV, Optional<T>> optional(NumberedInjector<ENV, T> injr) {
         return (env, n, optVal) ->
                 optVal.isPresent() ? injr.inject(env, n, optVal.get()) : env;
+    }
+
+    public static <ENV> NumberedInjector<ENV, OptionalDouble> optional(DoubleNumberedInjector<ENV> injr) {
+        return (env, n, optVal) ->
+                optVal.isPresent() ? injr.inject(env, n, optVal.getAsDouble()) : env;
+    }
+
+    public static <ENV> NumberedInjector<ENV, OptionalInt> optional(IntNumberedInjector<ENV> injr) {
+        return (env, n, optVal) ->
+                optVal.isPresent() ? injr.inject(env, n, optVal.getAsInt()) : env;
+    }
+
+    public static <ENV> NumberedInjector<ENV, OptionalLong> optional(LongNumberedInjector<ENV> injr) {
+        return (env, n, optVal) ->
+                optVal.isPresent() ? injr.inject(env, n, optVal.getAsLong()) : env;
     }
 }

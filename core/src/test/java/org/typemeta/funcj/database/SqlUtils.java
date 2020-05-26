@@ -11,10 +11,11 @@ import static java.util.stream.Collectors.joining;
 abstract class SqlUtils {
     private static final Logger logger = LoggerFactory.getLogger(SqlUtils.class);
 
-    static final String SQL_SEP_TOKEN = ";;";
+    private static final String SQL_DIR = "/sql/";
+    private static final String SQL_SEP_TOKEN = ";;";
 
     static String loadSingleResource(String path) {
-        return Optional.ofNullable(DatabaseExtractorTest.class.getResourceAsStream(path))
+        return Optional.ofNullable(DatabaseExtractorTest.class.getResourceAsStream(SQL_DIR + path))
                 .map(InputStreamReader::new)
                 .map(is -> {
                     try (BufferedReader br = new BufferedReader(is)) {
@@ -27,7 +28,7 @@ abstract class SqlUtils {
 
     static Stream<String> loadMultiResource(String path) {
         final String text =
-                Optional.ofNullable(DatabaseExtractorTest.class.getResourceAsStream(path))
+                Optional.ofNullable(DatabaseExtractorTest.class.getResourceAsStream(SQL_DIR + path))
                         .map(InputStreamReader::new)
                         .map(is -> {
                             try (BufferedReader br = new BufferedReader(is)) {

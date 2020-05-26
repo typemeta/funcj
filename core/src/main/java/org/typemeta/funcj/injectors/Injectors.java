@@ -1,9 +1,6 @@
 package org.typemeta.funcj.injectors;
 
-import org.typemeta.funcj.extractors.Extractor;
-import org.typemeta.funcj.functions.Functions;
-
-import java.util.*;
+import java.util.Optional;
 
 public abstract class Injectors {
     @FunctionalInterface

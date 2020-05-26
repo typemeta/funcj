@@ -1,9 +1,7 @@
 package org.typemeta.funcj.database;
 
-import org.typemeta.funcj.database.DatabaseExtractorsEx.*;
 import org.typemeta.funcj.extractors.*;
 import org.typemeta.funcj.extractors.NamedExtractors.*;
-import org.typemeta.funcj.extractors.NamedExtractorsEx.*;
 
 import java.sql.Date;
 import java.sql.*;

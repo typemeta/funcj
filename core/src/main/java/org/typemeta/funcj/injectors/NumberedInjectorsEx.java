@@ -30,8 +30,10 @@ public abstract class NumberedInjectorsEx {
             return injectLong(env, n, value);
         }
     }
-    
-    public static <ENV, T, EX extends Exception> NumberedInjectorEx<ENV, Optional<T>, EX> optional(NumberedInjectorEx<ENV, T, EX> injr) {
+
+    public static <ENV, T, EX extends Exception> NumberedInjectorEx<ENV, Optional<T>, EX> optional(
+            NumberedInjectorEx<ENV, T, EX> injr
+    ) {
         return (env, n, optVal) ->
                 optVal.isPresent() ? injr.inject(env, n, optVal.get()) : env;
     }

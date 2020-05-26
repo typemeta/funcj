@@ -1,15 +1,83 @@
 package org.typemeta.funcj.database;
 
-import org.typemeta.funcj.injectors.NumberedInjector;
+import org.typemeta.funcj.injectors.*;
+import org.typemeta.funcj.util.Exceptions;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.time.*;
 import java.util.*;
 
-import static org.typemeta.funcj.injectors.NumberedInjectors.optional;
-
 public abstract class DatabaseInjectors {
+
+    public static <T> NumberedInjector<PreparedStatement, Optional<T>> optional(
+            NumberedInjector<PreparedStatement, T> injr
+    ) {
+        return (ps, n, optValue) -> {
+            if (optValue.isPresent()) {
+                return injr.inject(ps, n, optValue.get());
+            } else {
+                try {
+                    ps.setNull(n, ps.getParameterMetaData().getParameterType(n));
+                    return ps;
+                } catch (SQLException ex) {
+                    return Exceptions.throwUnchecked(ex);
+                }
+            }
+        };
+    }
+
+    public static <T> NumberedInjector<PreparedStatement, OptionalDouble> optional(
+            NumberedInjectors.DoubleNumberedInjector<PreparedStatement> injr
+    ) {
+        return (ps, n, optValue) -> {
+            if (optValue.isPresent()) {
+                return injr.inject(ps, n, optValue.getAsDouble());
+            } else {
+                try {
+                    ps.setNull(n, Types.DOUBLE);
+                    return ps;
+                } catch (SQLException ex) {
+                    return Exceptions.throwUnchecked(ex);
+                }
+            }
+        };
+    }
+
+    public static <T> NumberedInjector<PreparedStatement, OptionalInt> optional(
+            NumberedInjectors.IntNumberedInjector<PreparedStatement> injr
+    ) {
+        return (ps, n, optValue) -> {
+            if (optValue.isPresent()) {
+                return injr.inject(ps, n, optValue.getAsInt());
+            } else {
+                try {
+                    ps.setNull(n, Types.INTEGER);
+                    return ps;
+                } catch (SQLException ex) {
+                    return Exceptions.throwUnchecked(ex);
+                }
+            }
+        };
+    }
+
+    public static <T> NumberedInjector<PreparedStatement, OptionalLong> optional(
+            NumberedInjectors.LongNumberedInjector<PreparedStatement> injr
+    ) {
+        return (ps, n, optValue) -> {
+            if (optValue.isPresent()) {
+                return injr.inject(ps, n, optValue.getAsLong());
+            } else {
+                try {
+                    ps.setNull(n, Types.BIGINT);
+                    return ps;
+                } catch (SQLException ex) {
+                    return Exceptions.throwUnchecked(ex);
+                }
+            }
+        };
+    }
+
     public static final NumberedInjector<PreparedStatement, Boolean> BOOLEAN =
             DatabaseInjectorsEx.BOOLEAN.unchecked();
 

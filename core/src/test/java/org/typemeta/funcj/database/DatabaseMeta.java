@@ -3,8 +3,8 @@ package org.typemeta.funcj.database;
 import org.typemeta.funcj.extractors.*;
 import org.typemeta.funcj.injectors.*;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.time.*;
 import java.util.*;
 
@@ -35,6 +35,10 @@ abstract class DatabaseMeta {
             new Column("col_time", "time"),
             new Column("col_timestamp", "timestamp"),
     };
+
+    static <T> T[] nullify(T[] values) {
+        return (T[])Arrays.stream(values).map(t -> null).toArray(Object[]::new);
+    }
 
     private static boolean optFloatEquals(Optional<Float> lhs, Optional<Float> rhs) {
         if (lhs.isPresent()) {
@@ -482,6 +486,17 @@ abstract class DatabaseMeta {
 
     public static final OptRecord1[] OPTRECORD1_VALUES = new OptRecord1[] {
             new OptRecord1(
+                    Optional.empty(),
+                    Optional.empty(),
+                    OptionalDouble.empty(),
+                    OptionalDouble.empty(),
+                    Optional.empty(),
+                    OptionalInt.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty()
+            ),
+            new OptRecord1(
                     Optional.of(true),
                     Optional.of(new Date(2012, 3, 4)),
                     OptionalDouble.of(323.45f),
@@ -638,6 +653,17 @@ abstract class DatabaseMeta {
     }
 
     public static final OptRecord2[] OPTRECORD2_VALUES = new OptRecord2[] {
+            new OptRecord2(
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    OptionalDouble.empty(),
+                    Optional.empty(),
+                    OptionalInt.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty()
+            ),
             new OptRecord2(
                     Optional.of(true),
                     Optional.of(LocalDate.of(2012, 3, 4)),

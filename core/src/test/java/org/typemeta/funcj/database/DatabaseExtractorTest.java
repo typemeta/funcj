@@ -5,8 +5,8 @@ import org.slf4j.*;
 import org.typemeta.funcj.extractors.*;
 import org.typemeta.funcj.util.Exceptions;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.time.*;
 import java.util.*;
 
@@ -69,14 +69,14 @@ public class DatabaseExtractorTest {
         logger.info("Connecting to embedded database");
         testDbConn = DriverManager.getConnection(JDBC_CONN_URL);
 
-        loadScript("/sql/create.sql");
-        loadScript("/sql/data.sql");
+        loadScript("create.sql");
+        loadScript("data.sql");
     }
 
     @AfterClass
     public static void shutdown() throws SQLException {
         if (testDbConn != null) {
-            loadScript("/sql/cleanup.sql");
+            loadScript("cleanup.sql");
         }
     }
 

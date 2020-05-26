@@ -1,20 +1,69 @@
 package org.typemeta.funcj.database;
 
-import org.typemeta.funcj.injectors.*;
+import org.typemeta.funcj.injectors.NumberedInjectorEx;
 import org.typemeta.funcj.injectors.NumberedInjectorsEx.*;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.time.*;
 import java.util.*;
 
-import static org.typemeta.funcj.injectors.NumberedInjectorsEx.*;
-
 public abstract class DatabaseInjectorsEx {
+
+    public static <T> NumberedInjectorEx<PreparedStatement, Optional<T>, SQLException> optional(
+            NumberedInjectorEx<PreparedStatement, T, SQLException> injr
+    ) {
+        return (ps, n, optValue) -> {
+            return injr.inject(ps, n, optValue.orElse(null));
+        };
+    }
+
+    public static <T> NumberedInjectorEx<PreparedStatement, OptionalDouble, SQLException> optional(
+            DoubleNumberedInjectorEx<PreparedStatement, SQLException> injr
+    ) {
+        return (ps, n, optValue) -> {
+            if (optValue.isPresent()) {
+                return injr.inject(ps, n, optValue.getAsDouble());
+            } else {
+                ps.setNull(n, Types.DOUBLE);
+                return ps;
+            }
+        };
+    }
+
+    public static <T> NumberedInjectorEx<PreparedStatement, OptionalInt, SQLException> optional(
+            IntNumberedInjectorEx<PreparedStatement, SQLException> injr
+    ) {
+        return (ps, n, optValue) -> {
+            if (optValue.isPresent()) {
+                return injr.inject(ps, n, optValue.getAsInt());
+            } else {
+                ps.setNull(n, Types.INTEGER);
+                return ps;
+            }
+        };
+    }
+
+    public static <T> NumberedInjectorEx<PreparedStatement, OptionalLong, SQLException> optional(
+            LongNumberedInjectorEx<PreparedStatement, SQLException> injr
+    ) {
+        return (ps, n, optValue) -> {
+            if (optValue.isPresent()) {
+                return injr.inject(ps, n, optValue.getAsLong());
+            } else {
+                ps.setNull(n, Types.BIGINT);
+                return ps;
+            }
+        };
+    }
 
     public static final NumberedInjectorEx<PreparedStatement, Boolean, SQLException> BOOLEAN =
             (PreparedStatement ps, int n, Boolean value) -> {
-                ps.setBoolean(n, value);
+                if (value != null) {
+                    ps.setBoolean(n, value);
+                } else {
+                    ps.setNull(n, Types.BOOLEAN);
+                }
                 return ps;
             };
 
@@ -23,7 +72,11 @@ public abstract class DatabaseInjectorsEx {
 
     public static final NumberedInjectorEx<PreparedStatement, Byte, SQLException> BYTE =
             (PreparedStatement ps, int n, Byte value) -> {
-                ps.setByte(n, value);
+                if (value != null) {
+                    ps.setByte(n, value);
+                } else {
+                    ps.setNull(n, Types.BOOLEAN);
+                }
                 return ps;
             };
 
@@ -41,7 +94,11 @@ public abstract class DatabaseInjectorsEx {
 
     public static final NumberedInjectorEx<PreparedStatement, Float, SQLException> FLOAT =
             (PreparedStatement ps, int n, Float value) -> {
-                ps.setFloat(n, value);
+                if (value != null) {
+                    ps.setFloat(n, value);
+                } else {
+                    ps.setNull(n, Types.BOOLEAN);
+                }
                 return ps;
             };
 
@@ -50,7 +107,7 @@ public abstract class DatabaseInjectorsEx {
 
     public static final IntNumberedInjectorEx<PreparedStatement, SQLException> INTEGER =
             (PreparedStatement ps, int n, int value) -> {
-                ps.setDouble(n, value);
+                ps.setInt(n, value);
                 return ps;
             };
 
@@ -68,7 +125,11 @@ public abstract class DatabaseInjectorsEx {
 
     public static final NumberedInjectorEx<PreparedStatement, Short, SQLException> SHORT =
             (PreparedStatement ps, int n, Short value) -> {
-                ps.setShort(n, value);
+                if (value != null) {
+                    ps.setShort(n, value);
+                } else {
+                    ps.setNull(n, Types.BOOLEAN);
+                }
                 return ps;
             };
 
@@ -97,7 +158,7 @@ public abstract class DatabaseInjectorsEx {
             SQLDATE.premap(Date::valueOf);
 
     public static final NumberedInjectorEx<PreparedStatement, Optional<LocalDate>, SQLException> OPT_LOCALDATE =
-            optional(LOCALDATE);
+            optional(SQLDATE).premap(od -> od.map(Date::valueOf));
 
     public static final NumberedInjectorEx<PreparedStatement, Time, SQLException> SQLTIME =
             (PreparedStatement ps, int n, Time value) -> {
@@ -112,7 +173,7 @@ public abstract class DatabaseInjectorsEx {
             SQLTIME.premap(Time::valueOf);
 
     public static final NumberedInjectorEx<PreparedStatement, Optional<LocalTime>, SQLException> OPT_LOCALTIME =
-            optional(LOCALTIME);
+            optional(SQLTIME).premap(od -> od.map(Time::valueOf));
 
     public static final NumberedInjectorEx<PreparedStatement, Timestamp, SQLException> SQLTIMESTAMP =
             (PreparedStatement ps, int n, Timestamp value) -> {
@@ -127,5 +188,5 @@ public abstract class DatabaseInjectorsEx {
             SQLTIMESTAMP.premap(Timestamp::valueOf);
 
     public static final NumberedInjectorEx<PreparedStatement, Optional<LocalDateTime>, SQLException> OPT_LOCALDATETIME =
-            optional(LOCALDATETIME);
+            optional(SQLTIMESTAMP).premap(od -> od.map(Timestamp::valueOf));
 }
