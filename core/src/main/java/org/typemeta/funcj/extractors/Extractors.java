@@ -393,6 +393,7 @@ public abstract class Extractors {
      * @param <R>       the value type
      * @return          the new extractor
      */
+    @SafeVarargs
     public static <ENV, R> Extractor<ENV, R> combine(
             Functions.F<Object[], R> f,
             Extractor<ENV, ?> ... exs

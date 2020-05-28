@@ -383,6 +383,7 @@ public abstract class ExtractorsEx {
      * @param <EX>      the exception type
      * @return          the new extractor
      */
+    @SafeVarargs
     public static <ENV, R, EX extends Exception> ExtractorEx<ENV, R, EX> combine(
             Functions.F<Object[], R> f,
             ExtractorEx<ENV, ?, EX> ... exs

@@ -8,6 +8,7 @@ import java.sql.*;
 import java.time.*;
 import java.util.*;
 
+@SuppressWarnings({"deprecation", "unchecked"})
 abstract class DatabaseMeta {
 
     static final String DATABASE_NAME = "testdb";

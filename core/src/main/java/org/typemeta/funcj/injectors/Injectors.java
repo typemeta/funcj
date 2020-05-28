@@ -57,6 +57,7 @@ public abstract class Injectors {
      * @param <T>       the injector value type
      * @return          the new injector
      */
+    @SafeVarargs
     public static <ENV, T> Injector<ENV, T> combine(
             Injector<ENV, T> ... exs
     ) {
