@@ -49,4 +49,22 @@ public abstract class InjectorsEx {
         return (env, optVal) ->
                 optVal.isPresent() ? injr.inject(env, optVal.get()) : env;
     }
+
+    /**
+     * Combinator function for building an injector from an array of injectors.
+     * @param exs       the array of the extractors
+     * @param <ENV>     the environment type
+     * @param <T>       the injector value type
+     * @return          the new injector
+     */
+    public static <ENV, T, EX extends Exception> InjectorEx<ENV, T, EX> combine(
+            InjectorEx<ENV, T, EX> ... exs
+    ) {
+        return (env, value) -> {
+            for(InjectorEx<ENV, T, EX> ex : exs) {
+                env = ex.inject(env, value);
+            }
+            return env;
+        };
+    }
 }
