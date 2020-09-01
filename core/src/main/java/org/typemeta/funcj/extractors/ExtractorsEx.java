@@ -9,6 +9,17 @@ import java.util.function.*;
 import static java.util.stream.Collectors.toList;
 
 public abstract class ExtractorsEx {
+    /**
+     * An extractor that always returns the given value.
+     * @param value     the value
+     * @param <ENV>     the value type
+     * @param <T>       the exception type
+     * @param <EX>      the exception type
+     * @return          the extractor
+     */
+    public static <ENV, T, EX extends Exception> ExtractorEx<ENV, T, EX> konst(T value) {
+        return env -> value;
+    }
 
     /**
      * A specialisation of {@link ExtractorEx} for {@code double} values.
@@ -49,6 +60,17 @@ public abstract class ExtractorsEx {
         default <U> ExtractorEx<ENV, U, EX> mapDouble(DoubleFunction<U> f) {
             return env -> f.apply(extractDouble(env));
         }
+    }
+
+    /**
+     * An extractor that always returns the given value.
+     * @param value     the value
+     * @param <ENV>     the environment type
+     * @param <EX>      the exception type
+     * @return          the extractor
+     */
+    public static <ENV, EX extends Exception> DoubleExtractorEx<ENV, EX> konst(double value) {
+        return env -> value;
     }
 
     /**
@@ -93,6 +115,17 @@ public abstract class ExtractorsEx {
     }
 
     /**
+     * An extractor that always returns the given value.
+     * @param value     the value
+     * @param <ENV>     the environment type
+     * @param <EX>      the exception type
+     * @return          the extractor
+     */
+    public static <ENV, EX extends Exception> IntExtractorEx<ENV, EX> konst(int value) {
+        return env -> value;
+    }
+
+    /**
      * A specialisation of {@code ExtractorEx} for {@code long} values.
      * @param <ENV>     the environment type
      * @param <EX>      the exception type
@@ -131,6 +164,17 @@ public abstract class ExtractorsEx {
         default <U> ExtractorEx<ENV, U, EX> mapLong(LongFunction<U> f) {
             return env -> f.apply(extractLong(env));
         }
+    }
+
+    /**
+     * An extractor that always returns the given value.
+     * @param value     the value
+     * @param <ENV>     the environment type
+     * @param <EX>      the exception type
+     * @return          the extractor
+     */
+    public static <ENV, EX extends Exception> LongExtractorEx<ENV, EX> konst(long value) {
+        return env -> value;
     }
 
     /**

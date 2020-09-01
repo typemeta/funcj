@@ -10,6 +10,16 @@ import static java.util.stream.Collectors.toList;
 public abstract class Extractors {
 
     /**
+     * An extractor that always returns the given value.
+     * @param value     the value
+     * @param <ENV>     the environment type
+     * @return          the extractor
+     */
+    public static <ENV, T> Extractor<ENV, T> konst(T value) {
+        return env -> value;
+    }
+
+    /**
      * A specialisation of {@link Extractor} for {@code double} values.
      * @param <ENV>     the environment type
      */
@@ -46,6 +56,16 @@ public abstract class Extractors {
         default <U> Extractor<ENV, U> mapDouble(DoubleFunction<U> f) {
             return env -> f.apply(extractDouble(env));
         }
+    }
+
+    /**
+     * An extractor that always returns the given value.
+     * @param value     the value
+     * @param <ENV>     the environment type
+     * @return          the extractor
+     */
+    public static <ENV> DoubleExtractor<ENV> konst(double value) {
+        return env -> value;
     }
 
     /**
@@ -88,6 +108,16 @@ public abstract class Extractors {
     }
 
     /**
+     * An extractor that always returns the given value.
+     * @param value     the value
+     * @param <ENV>     the environment type
+     * @return          the extractor
+     */
+    public static <ENV> IntExtractor<ENV> konst(int value) {
+        return env -> value;
+    }
+
+    /**
      * A specialisation of {@code Extractor} for {@code long} values.
      * @param <ENV>     the environment type
      */
@@ -125,6 +155,17 @@ public abstract class Extractors {
             return env -> f.apply(extractLong(env));
         }
     }
+
+    /**
+     * An extractor that always returns the given value.
+     * @param value     the value
+     * @param <ENV>     the environment type
+     * @return          the extractor
+     */
+    public static <ENV> LongExtractor<ENV> konst(long value) {
+        return env -> value;
+    }
+
     /**
      * A combinator function to convert a {@link Extractor} into one for {@link Optional} values.
      * The option extractor converts null values to

@@ -67,16 +67,15 @@
 
         <!-- Maven plugin versions -->
         <errorprone.version>2.3.4</errorprone.version>
-        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.0.0-M1</maven-javadoc-plugin.version>
-        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
-        <maven-site-plugin.version>3.4</maven-site-plugin.version>
-        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+        <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+        <maven-release-plugin.version>3.0.0-M1</maven-release-plugin.version>
+        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+        <maven-site-plugin.version>3.9.0</maven-site-plugin.version>
+        <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-        <site-maven-plugin.version>0.11</site-maven-plugin.version>
 
         <!-- Library versions -->
         <derby.version>10.14.2.0</derby.version>
@@ -166,6 +165,7 @@
                     <version>${maven-javadoc-plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
                     <version>${maven-site-plugin.version}</version>
                 </plugin>
@@ -178,11 +178,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>${maven-release-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.github.github</groupId>
-                    <artifactId>site-maven-plugin</artifactId>
-                    <version>${site-maven-plugin.version}</version>
                 </plugin>
 
             </plugins>
@@ -199,13 +194,6 @@
                     <compilerArgs>
                         <arg>-Xlint</arg>
                     </compilerArgs>
-<!--                    <annotationProcessorPaths>-->
-<!--                        <path>-->
-<!--                            <groupId>com.google.errorprone</groupId>-->
-<!--                            <artifactId>error_prone_core</artifactId>-->
-<!--                            <version>${errorprone.version}</version>-->
-<!--                        </path>-->
-<!--                    </annotationProcessorPaths>-->
                 </configuration>
             </plugin>
             <plugin>
@@ -245,6 +233,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
             </plugin>
             <plugin>
@@ -266,22 +255,6 @@
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy</goals>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <configuration>
-                    <message>Creating site for ${project.version}</message>
-                    <branch>refs/heads/gh-pages</branch>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>site</goal>
-                        </goals>
-                        <phase>site</phase>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -307,28 +280,6 @@
     </reporting>
 
     <profiles>
-
-        <!-- using github.com/google/error-prone-javac is required when running on JDK 8 -->
-<!--        <profile>-->
-<!--            <id>jdk8</id>-->
-<!--            <activation>-->
-<!--                <jdk>1.8</jdk>-->
-<!--            </activation>-->
-<!--            <build>-->
-<!--                <plugins>-->
-<!--                    <plugin>-->
-<!--                        <groupId>org.apache.maven.plugins</groupId>-->
-<!--                        <artifactId>maven-compiler-plugin</artifactId>-->
-<!--                        <configuration>-->
-<!--                            <fork>true</fork>-->
-<!--                            <compilerArgs combine.children="append">-->
-<!--                                <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${errorprone.javac.version}/javac-${errorprone.javac.version}.jar</arg>-->
-<!--                            </compilerArgs>-->
-<!--                        </configuration>-->
-<!--                    </plugin>-->
-<!--                </plugins>-->
-<!--            </build>-->
-<!--        </profile>-->
         <profile>
             <id>release</id>
             <activation>

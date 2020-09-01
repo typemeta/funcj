@@ -199,11 +199,12 @@ public abstract class IList<T> implements Iterable<T> {
      * @return          true if this list and rhs are equal in terms of their size and elements.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(Object rhs) {
         return this == rhs ||
             (rhs != null &&
                 getClass() == rhs.getClass() &&
-                equals((IList<T>) rhs));
+                equals((IList<T>)rhs));
     }
 
     @Override

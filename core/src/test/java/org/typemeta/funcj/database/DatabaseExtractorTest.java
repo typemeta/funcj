@@ -64,7 +64,7 @@ public class DatabaseExtractorTest {
 
     @BeforeClass
     public static void setupDatabase() throws Exception {
-        Class.forName(DERBY_DRIVER).newInstance();
+        Class.forName(DERBY_DRIVER).getDeclaredConstructor().newInstance();
 
         logger.info("Connecting to embedded database");
         testDbConn = DriverManager.getConnection(JDBC_CONN_URL);
