@@ -43,12 +43,14 @@ public interface NoArgsTypeCtor<T> {
                 default:
                     noArgsCtor = ctors.stream()
                             .filter(AccessibleObject::isAccessible)
+                            //JDK11: .filter(ctor -> ctor.canAccess(null))
                             .findAny()
                             .orElse(ctors.get(0));
                     break;
             }
 
             final F0<T, ReflectiveOperationException> accCtor;
+            //JDK11: if (!noArgsCtor.canAccess(null)) {
             if (!noArgsCtor.isAccessible()) {
                 noArgsCtor.setAccessible(true);
             }
