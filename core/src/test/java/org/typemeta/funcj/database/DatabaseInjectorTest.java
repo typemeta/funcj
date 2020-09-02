@@ -60,7 +60,9 @@ public class DatabaseInjectorTest {
     static void loadScript(String path) throws SQLException {
         logger.info("Loading script " + path);
         Exceptions.<SQLException>unwrap(() -> SqlUtils.loadMultiResource(path)
-                .forEach(sql -> Exceptions.wrap(() -> testDbConn.createStatement().execute(sql)))
+                .forEach(sql -> Exceptions.wrap(() -> {
+                    testDbConn.createStatement().execute(sql);
+                }))
         );
     }
 
@@ -149,6 +151,8 @@ public class DatabaseInjectorTest {
                 final T dbRec = extractor.extract(rs);
                 assertEquals(rec, dbRec);
             }
+
+            rs.close();
         }
 
         testDbConn.createStatement().execute("DELETE FROM " + tableType.tableName());
