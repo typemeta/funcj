@@ -51,7 +51,7 @@ public abstract class Injectors {
     }
 
     /**
-     * Combinator function for building an injector from an array of injectors.
+     * A combinator function for building an injector from an array of injectors.
      * @param exs       the array of the extractors
      * @param <ENV>     the environment type
      * @param <T>       the injector value type

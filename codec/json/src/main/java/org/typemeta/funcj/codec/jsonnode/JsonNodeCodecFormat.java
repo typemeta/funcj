@@ -473,7 +473,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, Config
 
         @Override
         public double decodePrim(JsValue in ) {
-            return in.asNumber().doublealue();
+            return in.asNumber().doubleValue();
         }
     }
 

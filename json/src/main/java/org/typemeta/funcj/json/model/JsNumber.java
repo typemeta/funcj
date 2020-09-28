@@ -39,7 +39,7 @@ public final class JsNumber implements JsValue {
         return (float)value;
     }
 
-    public double doublealue() {
+    public double doubleValue() {
         return value;
     }
 

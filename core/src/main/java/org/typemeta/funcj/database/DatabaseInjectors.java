@@ -8,6 +8,9 @@ import java.sql.*;
 import java.time.*;
 import java.util.*;
 
+/**
+ * A set of database injection combinator functions.
+ */
 public abstract class DatabaseInjectors {
 
     public static <T> NumberedInjector<PreparedStatement, Optional<T>> optional(
