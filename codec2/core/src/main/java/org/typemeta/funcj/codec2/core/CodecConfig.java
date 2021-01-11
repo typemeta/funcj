@@ -11,6 +11,18 @@ import java.util.Set;
  */
 public interface CodecConfig {
 
+    interface Property<CFG extends CodecConfig, T> {
+        T value(CFG cfg);
+    }
+
+    interface Property1<CFG extends CodecConfig, S, T> {
+        T value(CFG cfg, S arg);
+    }
+
+    <CFG extends CodecConfig, T> T get(Property<CFG, T> prop);
+
+    <CFG extends CodecConfig, S, T> T get(Property1<CFG, S, T> prop, S arg);
+
     /**
      * Check this class is allowed.
      * @param clazz     the class

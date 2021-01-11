@@ -119,10 +119,59 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream> {
         }
     };
 
-    @Override
-    public <T> OutStream encodeDynamic(T value, OutStream outStream, Encoder<? extends T, OutStream> encoder) {
-        return null;
-    }
+    private final Codec<String, InStream, OutStream> STRING_CODEC = new FinalCodec<String, InStream, OutStream>() {
+        @Override
+        public Class<String> type() {
+            return String.class;
+        }
+
+        @Override
+        public OutStream encodeImpl(EncoderCore<OutStream> core, Context ctx, String value, OutStream os) {
+            return (OutStream)os.writeString(value);
+        }
+
+        @Override
+        public String decodeImpl(DecoderCore<InStream> core, Context ctx, InStream is) {
+            return is.readString();
+        }
+    };
+
+    private final DynamicCodec<InStream, OutStream> DYNAMIC_CODEC = new DynamicCodec<InStream, OutStream>() {
+
+        @Override
+        public <T> CodecFormat.EncodeResult<OutStream> encodeDynamic(
+                EncoderCore<OutStream> core,
+                Context ctx,
+                T value,
+                OutStream os,
+                Encoder<T, OutStream> encoder
+        ) {
+            final Class<T> dynType = (Class<T>) value.getClass();
+            if (core.config().dynamicTypeMatch(encoder.type(), dynType)) {
+                return new EncodeResult<>(false, os);
+            } else if (!core.config().dynamicTypeTags()) {
+                final Codec<T, InStream, OutStream> dynCodec = getDynCodec.apply(dynType);
+                dynCodec.encode(core, ctx, value, os);
+                return new EncodeResult<>(true, os);
+            } else {
+                final Codec<T, InStream, OutStream> dynCodec = getDynCodec.apply(dynType);
+                os.startObject();
+
+                os.writeField(core.config().get(JsonConfig.TYPE_FIELD_NAME))
+                        .writeString(core.config().classToName(dynType));
+                os.writeField(core.config().get(JsonConfig.VALUE_FIELD_NAME));
+                dynCodec.encode(core, ctx, value, os);
+
+                os.endObject();
+                return new EncodeResult<>(true, os);
+            }
+        }
+
+        @Override
+        public <T> T decodeDynamic(EncoderCore<OutStream> core, Context ctx, InStream is) {
+            throw null;
+        }
+    };
 
     @Override
     public NullCodec<InStream, OutStream> nullCodec() {
@@ -141,17 +190,17 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream> {
 
     @Override
     public IntegerCodec<InStream, OutStream> integerCodec() {
-        return null;
+        return INTEGER_CODEC;
     }
 
     @Override
     public Codec<int[], InStream, OutStream> integerArrayCodec() {
-        return null;
+        return INTEGER_ARRAY_CODEC;
     }
 
     @Override
     public Codec<String, InStream, OutStream> stringCodec() {
-        return null;
+        return STRING_CODEC;
     }
 
     @Override
@@ -162,5 +211,10 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream> {
     @Override
     public <T> Codec<T[], InStream, OutStream> objectArrayCodec(Class<T[]> arrType, Class<T> elemType, Codec<T, InStream, OutStream> elemCodec) {
         return null;
+    }
+
+    @Override
+    public DynamicCodec<InStream, OutStream> dynamicCodec() {
+        return DYNAMIC_CODEC;
     }
 }

@@ -25,8 +25,6 @@ public interface CodecFormat<IN, OUT> {
         }
     }
 
-    <T> OUT encodeDynamic(T value, OUT out, Encoder<? extends T, OUT> encoder);
-
     NullCodec<IN, OUT> nullCodec();
 
     BooleanCodec<IN, OUT> booleanCodec();
@@ -50,4 +48,7 @@ public interface CodecFormat<IN, OUT> {
             Class<T> elemType,
             Codec<T, IN, OUT> elemCodec
     );
+
+    DynamicCodec<IN, OUT> dynamicCodec();
+
 }
