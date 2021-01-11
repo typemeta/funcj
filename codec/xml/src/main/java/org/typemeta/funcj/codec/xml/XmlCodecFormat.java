@@ -643,7 +643,7 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
 
             @Override
             public Collection<T> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-                final CollProxy<T> collProxy = getCollectionProxy(core);
+                final CollectionBuilder<T> collectionBuilder = getCollectionBuilder(core);
 
                 while (in.hasNext()) {
                     if (!in.type().equals(InStream.Type.START_ELEMENT)) {
@@ -651,11 +651,11 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
                     }
 
                     in.startElement(config.entryElemName());
-                    collProxy.add(elemCodec.decodeWithCheck(core, in));
+                    collectionBuilder.add(elemCodec.decodeWithCheck(core, in));
                     in.endElement();
                 }
 
-                return collProxy.construct();
+                return collectionBuilder.construct();
             }
         };
     }
@@ -752,7 +752,7 @@ public class XmlCodecFormat implements StreamCodecFormat<InStream, OutStream, Co
         public T decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
             final Set<String> expNames = fields.keySet();
             final Set<String> actNames = new HashSet<>();
-            final RA ra = objMeta.startDecode();
+            final RA ra = objMeta.createBuilder();
 
             while (in.hasNext() && in.type().equals(InStream.Type.START_ELEMENT)) {
                 final String name = in.startElement();

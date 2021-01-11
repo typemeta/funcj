@@ -597,13 +597,13 @@ public class MpackCodecFormat
             @Override
             public Collection<T> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
                 final int l = in.startArray();
-                final CollProxy<T> collProxy = getCollectionProxy(core);
+                final CollectionBuilder<T> collectionBuilder = getCollectionBuilder(core);
 
                 for (int i = 0; i < l; ++i) {
-                    collProxy.add(elemCodec.decodeWithCheck(core, in));
+                    collectionBuilder.add(elemCodec.decodeWithCheck(core, in));
                 }
 
-                return collProxy.construct();
+                return collectionBuilder.construct();
             }
         };
     }
@@ -693,7 +693,7 @@ public class MpackCodecFormat
         public T decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
             return Folds.foldLeft(
                     (acc, field) -> field.decodeField(acc, in),
-                    objMeta.startDecode(),
+                    objMeta.createBuilder(),
                     objMeta
             ).construct();
         }

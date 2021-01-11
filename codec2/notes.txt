@@ -1,0 +1,13 @@
+encode
+
+Static type = T
+    Dynamic type:
+        T -> encode(T)
+        S where S > T -> encode(name(S), S)
+        T<A> -> encode(T)
+
+    List<V>, Set<V>
+        default impl: encodeColl()
+        else: encodeColl(name(type))
+
+    Map<K, V>

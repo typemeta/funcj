@@ -19,13 +19,13 @@ public interface ObjectMeta<
         T construct();
     }
 
-    interface Field<T, IN, OUT, RA> {
+    interface Field<T, IN, OUT, B> {
         String name();
         OUT encodeField(T val, OUT out);
-        RA decodeField(RA acc, IN in);
+        B decodeField(B acc, IN in);
     }
 
-    B startDecode();
+    B createBuilder();
 
     default Stream<Field<T, IN, OUT, B>> stream() {
         return StreamSupport.stream(spliterator(), false);

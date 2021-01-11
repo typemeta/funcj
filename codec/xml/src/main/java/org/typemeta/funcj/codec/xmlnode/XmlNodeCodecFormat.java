@@ -670,19 +670,19 @@ public class XmlNodeCodecFormat implements CodecFormat<Element, Element, Config>
                 final NodeList nodes = in.getChildNodes();
                 final int l = nodes.getLength();
 
-                final CollProxy<T> collProxy = getCollectionProxy(core);
+                final CollectionBuilder<T> collectionBuilder = getCollectionBuilder(core);
 
                 for (int i = 0; i < l; ++i) {
                     final Node node = nodes.item(i);
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
                         final Element elem = (Element) node;
                         if (elem.getTagName().equals(config().entryElemName())) {
-                            collProxy.add(elemCodec.decodeWithCheck(core, elem));
+                            collectionBuilder.add(elemCodec.decodeWithCheck(core, elem));
                         }
                     }
                 }
 
-                return collProxy.construct();
+                return collectionBuilder.construct();
             }
         };
     }
@@ -780,7 +780,7 @@ public class XmlNodeCodecFormat implements CodecFormat<Element, Element, Config>
 
             final Set<String> expNames = fields.keySet();
             final Set<String> actNames = new HashSet<>();
-            final RA ra = objMeta.startDecode();
+            final RA ra = objMeta.createBuilder();
 
             for (int i = 0; i < l; ++i) {
                 final Node node = nodes.item(i);

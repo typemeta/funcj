@@ -63,12 +63,8 @@ public class JsonParser {
     private final JsonTokeniser tokeniser;
     private JsonEvent nextEvent = null;
 
-    public JsonParser(Reader rdr, boolean commentsAllowed) {
-        this.tokeniser = new JsonTokeniser(rdr, commentsAllowed);
-    }
-
     public JsonParser(Reader rdr) {
-        this(rdr, false);
+        this.tokeniser = new JsonTokeniser(rdr);
     }
 
     public boolean isEof() {

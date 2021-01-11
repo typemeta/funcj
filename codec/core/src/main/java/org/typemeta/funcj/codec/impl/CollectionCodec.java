@@ -83,25 +83,25 @@ public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
         }
     }
 
-    protected CollProxy<T> getCollectionProxy(CodecCoreEx<IN, OUT, CFG> core) {
+    protected CollectionBuilder<T> getCollectionBuilder(CodecCoreEx<IN, OUT, CFG> core) {
         final ArgArrayTypeCtor<Collection<T>> argArrCtor = core.getArgArrayCtor(collType);
         if (argArrCtor != null) {
-            return new CollProxy2<T>(elemCodec.type(), argArrCtor);
+            return new ArgsCollectionBuilder<T>(elemCodec.type(), argArrCtor);
         } else {
             final NoArgsTypeCtor<Collection<T>> noaCtor = core.getNoArgsCtor(collType);
-            return new CollProxy1<T>(noaCtor.construct());
+            return new DirectCollectionBuilder<T>(noaCtor.construct());
         }
     }
 
-    protected interface CollProxy<T> {
+    protected interface CollectionBuilder<T> {
         void add(T elem);
         Collection<T> construct();
     }
 
-    protected static class CollProxy1<T> implements CollProxy<T> {
+    protected static class DirectCollectionBuilder<T> implements CollectionBuilder<T> {
         protected final Collection<T> coll;
 
-        public CollProxy1(Collection<T> coll) {
+        public DirectCollectionBuilder(Collection<T> coll) {
             this.coll = coll;
         }
 
@@ -116,12 +116,12 @@ public abstract class CollectionCodec<T, IN, OUT, CFG extends CodecConfig>
         }
     }
 
-    protected static class CollProxy2<T> implements CollProxy<T> {
+    protected static class ArgsCollectionBuilder<T> implements CollectionBuilder<T> {
         final Class<T> elemType;
         final List<T> args = new ArrayList<>();
         final ArgArrayTypeCtor<Collection<T>> argArrCtor;
 
-        public CollProxy2(
+        public ArgsCollectionBuilder(
                 Class<T> elemType,
                 ArgArrayTypeCtor<Collection<T>> argArrCtor
         ) {

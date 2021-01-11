@@ -54,7 +54,6 @@ public class JsonTokeniser {
         OTHER
     }
 
-    private final boolean allowComments;
     private Reader rdr;
     private int nextChar = EMPTY;
     private long pos = 0;
@@ -62,14 +61,9 @@ public class JsonTokeniser {
     private State state = State.OTHER;
     private final List<State> stateStack = new ArrayList<>();
 
-    public JsonTokeniser(Reader rdr, boolean allowComments) {
-        this.allowComments = allowComments;
+    public JsonTokeniser(Reader rdr) {
         this.rdr = rdr;
         this.buffer = new Buffer();
-    }
-
-    public JsonTokeniser(Reader rdr) {
-        this(rdr, false);
     }
 
     public long position() {

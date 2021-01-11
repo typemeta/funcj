@@ -605,13 +605,13 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, Config
             public Collection<T> decode(CodecCoreEx<JsValue, JsValue, Config> core, JsValue in) {
                 final JsArray jsa = in.asArray();
 
-                final CollProxy<T> collProxy = getCollectionProxy(core);
+                final CollectionBuilder<T> collectionBuilder = getCollectionBuilder(core);
 
                 for (int i = 0; i < jsa.size(); ++i) {
-                    collProxy.add(elemCodec.decodeWithCheck(core, jsa.get(i)));
+                    collectionBuilder.add(elemCodec.decodeWithCheck(core, jsa.get(i)));
                 }
 
-                return collProxy.construct();
+                return collectionBuilder.construct();
             }
         };
     }
@@ -701,7 +701,7 @@ public class JsonNodeCodecFormat implements CodecFormat<JsValue, JsValue, Config
 
             final Set<String> expNames = fields.keySet();
             final Set<String> actNames = new HashSet<>();
-            final RA ra = objMeta.startDecode();
+            final RA ra = objMeta.createBuilder();
 
             jso.forEach(field -> {
                 final String name = field.name();

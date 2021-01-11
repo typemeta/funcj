@@ -23,19 +23,11 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
 
     /**
      * A map that associates a class with a {@code Codec}.
-     * Although {@code Codec}s can be registered by the caller prior to en/decoding,
-     * the primary populator of the registry is this {@code CodecCore} implementation.
-     * As and when new classes are encountered, they are inspected via Reflection,
-     * and a {@code Codec} is constructed and registered.
      */
     protected final ConcurrentMap<ClassKey<?>, Codec<?, IN, OUT, CFG>> codecRegistry = new ConcurrentHashMap<>();
 
     /**
-     * A map that associates a class with a {@code NoArgsCtor}.
-     * Although {@code TypeConstructor}s can be registered by the caller prior to en/decoding,
-     * the primary populator of the registry is this {@code CodecCore} implementation.
-     * As and when new classes are encountered, they are inspected via Reflection,
-     * and a {@code TypeConstructor} is constructed and registered.
+     * A map that associates a class with a {@code NoArgsTypeCtor}.
      */
     protected final ConcurrentMap<ClassKey<?>, NoArgsTypeCtor<?>> noArgsCtorRegistry = new ConcurrentHashMap<>();
 
@@ -490,7 +482,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                         }
 
                         @Override
-                        public BuilderImpl startDecode() {
+                        public BuilderImpl createBuilder() {
                             return new BuilderImpl();
                         }
                 }
@@ -575,7 +567,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                     }
 
                     @Override
-                    public BuilderImpl startDecode() {
+                    public BuilderImpl createBuilder() {
                         return new BuilderImpl();
                     }
                 }
@@ -644,7 +636,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                     }
 
                     @Override
-                    public BuilderImpl startDecode() {
+                    public BuilderImpl createBuilder() {
                         return new BuilderImpl();
                     }
                 }
@@ -667,8 +659,8 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
     }
 
     @Override
-    public <T> FieldCodec<IN, OUT, CFG> createFieldCodec(Field field) {
-        final Class<T> clazz = (Class<T>)field.getType();
+    public FieldCodec<IN, OUT, CFG> createFieldCodec(Field field) {
+        final Class<?> clazz = field.getType();
         if (clazz.isPrimitive()) {
             if (clazz.equals(boolean.class)) {
                 return new FieldCodec.BooleanFieldCodec<>(field, format.booleanCodec());
@@ -712,7 +704,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                 return new FieldCodec.ObjectArrayFieldCodec<>(field, codec);
             }
         } else {
-            final Codec<T, IN, OUT, CFG> codec;
+            final Codec<?, IN, OUT, CFG> codec;
 
             if (clazz.isEnum() ||
                     clazz.equals(Boolean.class) ||
@@ -730,9 +722,9 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                 if (typeArgs.size() == 2) {
                     final Class<?> keyType = typeArgs.get(0);
                     final Class<?> valueType = typeArgs.get(1);
-                    codec = (Codec<T, IN, OUT, CFG>) getMapCodec((Class)clazz, keyType, valueType);
+                    codec = (Codec<?, IN, OUT, CFG>) getMapCodec((Class)clazz, keyType, valueType);
                 } else {
-                    codec = (Codec<T, IN, OUT, CFG>) getMapCodec((Class)clazz, Object.class, Object.class);
+                    codec = (Codec<?, IN, OUT, CFG>) getMapCodec((Class)clazz, Object.class, Object.class);
                 }
             } else if (Collection.class.isAssignableFrom(clazz)) {
                 final Codec<Object, IN, OUT, CFG> elemCodec;
@@ -743,7 +735,7 @@ public class CodecCoreImpl<IN, OUT, CFG extends CodecConfig>
                 } else {
                     elemCodec = getCodec(Object.class);
                 }
-                codec = (Codec<T, IN, OUT, CFG>) getCollCodec((Class<Collection<Object>>) clazz, elemCodec);
+                codec = getCollCodec((Class<Collection<Object>>) clazz, elemCodec);
             } else {
                 codec = getCodec(clazz);
             }

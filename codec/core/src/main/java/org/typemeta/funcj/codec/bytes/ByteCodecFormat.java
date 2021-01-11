@@ -591,13 +591,13 @@ public class ByteCodecFormat implements StreamCodecFormat<InStream, OutStream, C
             @Override
             public Collection<T> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
                 final int l = in.readInt();
-                final CollProxy<T> collProxy = getCollectionProxy(core);
+                final CollectionBuilder<T> collectionBuilder = getCollectionBuilder(core);
 
                 for (int i = 0; i < l; ++i) {
-                    collProxy.add(elemCodec.decodeWithCheck(core, in));
+                    collectionBuilder.add(elemCodec.decodeWithCheck(core, in));
                 }
 
-                return collProxy.construct();
+                return collectionBuilder.construct();
             }
         };
     }
@@ -678,7 +678,7 @@ public class ByteCodecFormat implements StreamCodecFormat<InStream, OutStream, C
         public T decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
             return Folds.foldLeft(
                     (acc, field) -> field.decodeField(acc, in),
-                    objMeta.startDecode(),
+                    objMeta.createBuilder(),
                     objMeta
             ).construct();
         }

@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.typemeta</groupId>
+    <artifactId>funcj-codec2-json</artifactId>
+    <version>0.6.17-SNAPSHOT</version>
+
+    <parent>
+        <groupId>org.typemeta</groupId>
+        <artifactId>funcj-codec2</artifactId>
+        <version>0.6.17-SNAPSHOT</version>
+    </parent>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>An encoder/decoder framework.</description>
+
+    <packaging>jar</packaging>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>funcj-codec2-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>funcj-codec2-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>funcj-json</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+    </dependencies>
+</project>

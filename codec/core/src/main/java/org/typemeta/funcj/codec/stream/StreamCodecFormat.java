@@ -6,7 +6,7 @@ public interface StreamCodecFormat<
         IN extends StreamCodecFormat.Input<IN>,
         OUT extends StreamCodecFormat.Output<OUT>,
         CFG extends CodecConfig
-        > extends CodecFormat<IN, OUT, CFG> {
+> extends CodecFormat<IN, OUT, CFG> {
 
     /**
      * An abstraction for codec input, typically a stream of tokens.
