@@ -71,10 +71,10 @@ public interface CodecConfig {
 
     /**
      * Return the new size for arrays that are full.
-     * @param size      the current size of the array to be re-sized
+     * @param oldSize      the current size of the array to be re-sized
      * @return          the new array size
      */
-    int resizeArray(int size);
+    int newArraySize(int oldSize);
 
     /**
      * Check whether a collection class is a default for that collection type.

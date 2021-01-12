@@ -4,6 +4,7 @@ import org.typemeta.funcj.codec2.core.*;
 import org.typemeta.funcj.codec2.core.PrimitiveCodecs.BooleanCodec;
 import org.typemeta.funcj.codec2.core.PrimitiveCodecs.IntegerCodec;
 import org.typemeta.funcj.codec2.core.fields.FieldCodec;
+import org.typemeta.funcj.codec2.core.utils.CodecException;
 import org.typemeta.funcj.codec2.json.JsonTypes.InStream;
 import org.typemeta.funcj.codec2.json.JsonTypes.OutStream;
 import org.typemeta.funcj.json.parser.JsonEvent;
@@ -73,7 +74,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream> {
             int i = 0;
             while (is.notEOF() && is.currentEventType() != JsonEvent.Type.ARRAY_END) {
                 if (i == arr.length) {
-                    arr = Arrays.copyOf(arr, core.config().resizeArray(arr.length));
+                    arr = Arrays.copyOf(arr, core.config().newArraySize(arr.length));
                 }
                 arr[i++] = booleanCodec().decodeBool(core, ctx, is);
             }
@@ -127,7 +128,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream> {
 
         @Override
         public OutStream encodeImpl(EncoderCore<OutStream> core, Context ctx, String value, OutStream os) {
-            return (OutStream)os.writeString(value);
+            return os.writeString(value);
         }
 
         @Override
@@ -150,26 +151,66 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream> {
             if (core.config().dynamicTypeMatch(encoder.type(), dynType)) {
                 return new EncodeResult<>(false, os);
             } else if (!core.config().dynamicTypeTags()) {
-                final Codec<T, InStream, OutStream> dynCodec = getDynCodec.apply(dynType);
+                final Encoder<T, OutStream> dynCodec = core.getEncoder(dynType);
                 dynCodec.encode(core, ctx, value, os);
                 return new EncodeResult<>(true, os);
             } else {
-                final Codec<T, InStream, OutStream> dynCodec = getDynCodec.apply(dynType);
+                final String typeFieldName = core.config().get(JsonConfig.TYPE_FIELD_NAME);
+                final String valueFieldName = core.config().get(JsonConfig.VALUE_FIELD_NAME);
+
+                final Encoder<T, OutStream> dynCodec = core.getEncoder(dynType);
+
                 os.startObject();
 
-                os.writeField(core.config().get(JsonConfig.TYPE_FIELD_NAME))
-                        .writeString(core.config().classToName(dynType));
-                os.writeField(core.config().get(JsonConfig.VALUE_FIELD_NAME));
-                dynCodec.encode(core, ctx, value, os);
+                {
+                    os.writeField(typeFieldName).writeString(core.config().classToName(dynType))
+                            .writeField(valueFieldName);
+
+                    dynCodec.encode(core, ctx, value, os);
+                }
 
                 os.endObject();
+
                 return new EncodeResult<>(true, os);
             }
         }
 
         @Override
-        public <T> T decodeDynamic(EncoderCore<OutStream> core, Context ctx, InStream is) {
-            throw null;
+        public <T> T decodeDynamic(DecoderCore<InStream> core, Context ctx, InStream is) {
+            if (core.config().dynamicTypeTags() &&
+                    is.notEOF() &&
+                    is.currentEventType() == JsonEvent.Type.OBJECT_START
+            ) {
+                final String typeFieldName = core.config().get(JsonConfig.TYPE_FIELD_NAME);
+                final String valueFieldName = core.config().get(JsonConfig.VALUE_FIELD_NAME);
+
+                final JsonEvent.FieldName typeField = new JsonEvent.FieldName(typeFieldName);
+
+                final JsonEvent next = is.event(1);
+                if (next.equals(typeField)) {
+                    is.startObject();
+
+                    final T val;
+                    {
+                        is.readFieldName(typeFieldName);
+                        final String typeName = is.readString();
+
+                        final String field2 = is.readFieldName();
+                        if (!field2.equals(valueFieldName)) {
+                            throw new CodecException("Was expecting field '" + valueFieldName + "' but got '" + field2 + "'");
+                        }
+
+                        val = core.getDecoder(core.config().<T>nameToClass(typeName)).decode(core, ctx, is);
+                    }
+
+                    is.endObject();
+
+                    return val;
+                }
+            }
+
+            // null indicates a dynamic encoded value was not found.
+            return null;
         }
     };
 

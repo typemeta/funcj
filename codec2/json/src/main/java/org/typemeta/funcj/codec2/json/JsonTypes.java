@@ -62,6 +62,25 @@ public abstract class JsonTypes {
 
         OutStream writeNull();
 
+        @Override
+        OutStream writeBoolean(boolean value);
+        @Override
+        OutStream writeChar(char value);
+        @Override
+        OutStream writeByte(byte value);
+        @Override
+        OutStream writeShort(short value);
+        @Override
+        OutStream writeInt(int value);
+        @Override
+        OutStream writeLong(long value);
+        @Override
+        OutStream writeFloat(float value);
+        @Override
+        OutStream writeDouble(double value);
+        @Override
+        OutStream writeString(String value);
+
         OutStream writeNumber(Number value);
         OutStream writeBigDecimal(BigDecimal value);
         OutStream writeStringNumber(String value);

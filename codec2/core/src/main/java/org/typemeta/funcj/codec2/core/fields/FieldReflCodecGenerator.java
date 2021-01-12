@@ -45,24 +45,13 @@ public class FieldReflCodecGenerator<IN, OUT> implements CodecGenerator<IN, OUT>
             for (Field field : fields) {
                 final int fm = field.getModifiers();
                 if (!Modifier.isStatic(fm) && !Modifier.isTransient(fm)) {
-                    final String fieldName = getFieldName(field, depth, fieldCodecs.keySet());
+                    final String fieldName = core.config().getFieldName(field, depth, fieldCodecs.keySet());
                     fieldCodecs.put(fieldName, createFieldCodec(core, field));
                 }
             }
             clazz = clazz.getSuperclass();
         }
         return core.format().objectCodec(type, fieldCodecs, ctor);
-    }
-
-    protected String getFieldName(Field field, int depth, Set<String> existingNames) {
-        String name = field.getName();
-        if (existingNames.contains(name)) {
-            name = field.getDeclaringClass().getSimpleName() + "." +  field.getName();
-            if (existingNames.contains(name)) {
-                return field.getDeclaringClass().getName() + "." +  field.getName();
-            }
-        }
-        return name;
     }
 
     protected <T> FieldCodec<T, IN, OUT> createFieldCodec(CodecCore<IN, OUT> core, Field field) {

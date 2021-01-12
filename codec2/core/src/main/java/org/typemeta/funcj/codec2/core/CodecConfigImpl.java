@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Base class for {@link CodecConfig} implementations.
  */
-public class CodecConfigImpl implements CodecConfig {
+public abstract class CodecConfigImpl implements CodecConfig {
 
     /**
      * Abstract base class for {@link Builder} implementations.
@@ -119,7 +119,7 @@ public class CodecConfigImpl implements CodecConfig {
     protected boolean failOnUnrecognisedFields;
 
     protected CodecConfigImpl() {
-        this.allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));;
+        this.allowedPackages = new TreeSet<>(Comparator.comparing(Package::getName));
         this.allowedClasses = new TreeSet<>(Comparator.comparing(Class::getName));
         this.classToNameMap = new TreeMap<>(Comparator.comparing(Class::getName));
         this.nameToClassMap = new HashMap<>();
@@ -191,7 +191,7 @@ public class CodecConfigImpl implements CodecConfig {
             try {
                 return (Class<T>) Class.forName(name);
             } catch (ClassNotFoundException ex) {
-                throw new CodecException("Cannot find class from name '" + name + "'", ex);
+                throw new CodecException("Cannot find class for name '" + name + "'", ex);
             }
         }
     }
@@ -199,8 +199,11 @@ public class CodecConfigImpl implements CodecConfig {
     @Override
     public String getFieldName(Field field, int depth, Set<String> existingNames) {
         String name = field.getName();
-        while (existingNames.contains(name)) {
-            name = "*" + name;
+        if (existingNames.contains(name)) {
+            name = field.getDeclaringClass().getSimpleName() + "." +  field.getName();
+            if (existingNames.contains(name)) {
+                return field.getDeclaringClass().getName() + "." +  field.getName();
+            }
         }
         return name;
     }
@@ -211,8 +214,8 @@ public class CodecConfigImpl implements CodecConfig {
     }
 
     @Override
-    public int resizeArray(int size) {
-        return size + (size >> 1);
+    public int newArraySize(int oldSize) {
+        return oldSize + (oldSize >> 1);
     }
 
     @Override

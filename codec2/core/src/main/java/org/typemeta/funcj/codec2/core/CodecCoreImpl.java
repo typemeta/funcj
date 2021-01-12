@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class CodecCoreImpl<IN, OUT> implements CodecCore<IN, OUT> {
+
     protected final CodecFormat<IN, OUT> format;
     protected final CodecConfig config;
     protected final CodecGenerator<IN, OUT> codecGenerator;
