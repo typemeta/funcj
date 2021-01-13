@@ -25,7 +25,9 @@ public interface CodecFormat<IN, OUT> {
         }
     }
 
-    NullCodec<IN, OUT> nullCodec();
+    <T> CodecFormat.EncodeResult<OUT> encodeNull(EncoderCore<OUT> core, Context ctx, T val, OUT out);
+
+    boolean decodeNull(DecoderCore<IN> core, Context ctx, IN in);
 
     BooleanCodec<IN, OUT> booleanCodec();
 
@@ -38,7 +40,7 @@ public interface CodecFormat<IN, OUT> {
     Codec<String, IN, OUT> stringCodec();
 
     <T> Codec<T, IN, OUT> objectCodec(
-            Class<T> clazz,
+            Class<T> type,
             Map<String, FieldCodec<?, IN, OUT>> fieldCodecs,
             ObjectCreator<T> ctor
     );
@@ -49,6 +51,7 @@ public interface CodecFormat<IN, OUT> {
             Codec<T, IN, OUT> elemCodec
     );
 
-    DynamicCodec<IN, OUT> dynamicCodec();
+    <T> CodecFormat.EncodeResult<OUT> encodeDynamic(EncoderCore<OUT> core, Context ctx, T value, OUT out, Encoder<T, OUT> encoder);
 
+    <T> T decodeDynamic(DecoderCore<IN> core, Context ctx, IN in);
 }

@@ -4,6 +4,7 @@ import org.typemeta.funcj.codec2.core.utils.CodecException;
 
 import java.lang.reflect.Field;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Interface for classes which provide configuration information
@@ -119,6 +120,8 @@ public interface CodecConfig {
      * @return          whether an unrecognised field should give rise to an error
      */
     boolean failOnUnrecognisedFields();
+
+    void checkFields(Class<?> clazz, Set<String> expNames, Set<String> actNames);
 
     /**
      * Interface for classes which build {@link CodecConfig} implementations.

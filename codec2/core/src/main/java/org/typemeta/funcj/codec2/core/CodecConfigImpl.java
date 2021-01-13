@@ -265,4 +265,20 @@ public abstract class CodecConfigImpl implements CodecConfig {
     public boolean failOnUnrecognisedFields() {
         return failOnUnrecognisedFields;
     }
+
+    @Override
+    public void checkFields(Class<?> clazz, Set<String> expNames, Set<String> actNames) {
+        if (!expNames.equals(actNames)) {
+            if (!expNames.containsAll(actNames)) {
+                if (failOnUnrecognisedFields()) {
+                    actNames.removeAll(expNames);
+                    throw new CodecException("Unrecognised fields for type " + clazz + " : " + actNames);
+                }
+            } else if (!actNames.containsAll(expNames)) {
+                final Set<String> keys = new TreeSet<>(expNames);
+                keys.removeAll(actNames);
+                throw new CodecException("Missing fields for type " + clazz + " : " + keys);
+            }
+        }
+    }
 }
