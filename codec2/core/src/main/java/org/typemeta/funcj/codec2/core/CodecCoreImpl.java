@@ -42,12 +42,12 @@ public class CodecCoreImpl<IN, OUT> implements CodecCore<IN, OUT> {
 
     @Override
     public CodecFormat<IN, OUT> format() {
-        return null;
+        return format;
     }
 
     @Override
     public CodecConfig config() {
-        return null;
+        return config;
     }
 
     @Override

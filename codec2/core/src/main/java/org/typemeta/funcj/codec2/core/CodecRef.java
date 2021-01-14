@@ -46,6 +46,11 @@ public class CodecRef<T, IN, OUT> implements Codec<T, IN, OUT> {
 
     private volatile Codec<T, IN, OUT> impl;
 
+    @SuppressWarnings("unchecked")
+    public CodecRef() {
+        this.impl = Uninitialised.of();
+    }
+
     /**
      * Initialise this reference.
      * @param impl      the codec

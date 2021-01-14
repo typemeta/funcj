@@ -102,7 +102,11 @@ public class FieldReflCodecGenerator<IN, OUT> implements CodecGenerator<IN, OUT>
         } else {
             final Codec<?, IN, OUT> codec;
 
-            if (clazz.isEnum() ||
+            if (clazz.isEnum()) {
+
+            } else if clazz.equals(Boolean.class)) {
+                return
+            }
                     clazz.equals(Boolean.class) ||
                     clazz.equals(Byte.class) ||
                     clazz.equals(Character.class) ||

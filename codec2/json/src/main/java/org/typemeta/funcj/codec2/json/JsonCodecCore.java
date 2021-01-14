@@ -9,4 +9,8 @@ public class JsonCodecCore extends CodecCoreImpl<InStream, OutStream> {
     public JsonCodecCore(JsonCodecFormat format, CodecConfig config) {
         super(format, config);
     }
+
+    public JsonCodecCore() {
+        this(new JsonCodecFormat(), new JsonConfig());
+    }
 }

@@ -27,7 +27,7 @@ public class JsonParser {
      * @throws JsonException if an error occurs while parsing the input
      */
     public static JsValue parse(String json) throws JsonException {
-        return parse(new StringReader(json), Consume.ALL, Comments.DISALLOWED);
+        return parse(new StringReader(json), Consume.ALL);
     }
 
     /**
@@ -37,19 +37,18 @@ public class JsonParser {
      * @throws JsonException if an error occurs while parsing the input
      */
     public static JsValue parse(Reader rdr) throws JsonException {
-        return parse(rdr, Consume.FIRST, Comments.DISALLOWED);
+        return parse(rdr, Consume.FIRST);
     }
 
     /**
      * Parse the JSON content in the given reader into a JSON value.
      * @param rdr           the JSON reader to be read from
      * @param consume       consume flag
-     * @param comments      comments flag
      * @return              the parsed JSON value
      * @throws JsonException if an error occurs while parsing the input
      */
-    public static JsValue parse(Reader rdr, Consume consume, Comments comments) throws JsonException {
-        final JsonParser parser = new JsonParser(rdr, comments.equals(Comments.ALLOWED));
+    public static JsValue parse(Reader rdr, Consume consume) throws JsonException {
+        final JsonParser parser = new JsonParser(rdr);
         final JsValue jsv = parser.readValue();
         if (consume.equals(Consume.ALL) && !parser.isEof()) {
             throw parser.tokeniser.raiseError("Input not at EOF after parsing JSON value");
