@@ -13,9 +13,7 @@ public abstract class DatabaseInjectorsEx {
     public static <T> NumberedInjectorEx<PreparedStatement, Optional<T>, SQLException> optional(
             NumberedInjectorEx<PreparedStatement, T, SQLException> injr
     ) {
-        return (ps, n, optValue) -> {
-            return injr.inject(ps, n, optValue.orElse(null));
-        };
+        return (ps, n, optValue) -> injr.inject(ps, n, optValue.orElse(null));
     }
 
     public static <T> NumberedInjectorEx<PreparedStatement, OptionalDouble, SQLException> optional(

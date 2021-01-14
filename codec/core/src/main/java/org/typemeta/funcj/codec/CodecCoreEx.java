@@ -112,6 +112,5 @@ public interface CodecCoreEx<IN, OUT, CFG extends CodecConfig> extends CodecCore
             Map<String, ObjectCodecBuilder.FieldCodec<T, IN, OUT, CFG>> fieldCodecs,
             ArgArrayTypeCtor<T> ctor);
 
-    <T> FieldCodec<IN, OUT, CFG> createFieldCodec(Field field);
-
+    FieldCodec<IN, OUT, CFG> createFieldCodec(Field field);
 }

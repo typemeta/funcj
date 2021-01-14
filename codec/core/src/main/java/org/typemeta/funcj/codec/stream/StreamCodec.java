@@ -13,5 +13,6 @@ public interface StreamCodec<
         T,
         IN extends StreamCodecFormat.Input<IN>,
         OUT extends StreamCodecFormat.Output<OUT>,
-        CFG extends CodecConfig> extends Codec<T, IN, OUT, CFG> {
+        CFG extends CodecConfig
+        > extends Codec<T, IN, OUT, CFG> {
 }

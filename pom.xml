@@ -17,7 +17,7 @@
         <module>core</module>
         <module>parser</module>
         <module>json</module>
-        <module>codec</module>
+        <module>codec2</module>
     </modules>
 
     <scm>
@@ -216,6 +216,7 @@
                     <encoding>UTF-8</encoding>
                     <docencoding>UTF-8</docencoding>
                     <charset>UTF-8</charset>
+                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                     <additionalJOptions>
                         <additionalJOption>-XDignore.symbol.file</additionalJOption>
                         <additionalKOption>-Xdoclint:-html</additionalKOption>

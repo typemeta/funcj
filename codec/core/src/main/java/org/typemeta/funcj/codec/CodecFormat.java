@@ -21,8 +21,8 @@ public interface CodecFormat<IN, OUT, CFG extends CodecConfig> {
      * @param <OUT>     the encoded output type
      */
     class WasEncoded<OUT> {
-        public static <OUT> WasEncoded<OUT> of(boolean isNull, OUT out) {
-            return new WasEncoded<>(isNull, out);
+        public static <OUT> WasEncoded<OUT> of(boolean encoded, OUT out) {
+            return new WasEncoded<>(encoded, out);
         }
 
         public final boolean wasEncoded;

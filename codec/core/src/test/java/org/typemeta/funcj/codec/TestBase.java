@@ -50,6 +50,7 @@ public abstract class TestBase {
 
         core.registerArgArrayCtor(StaticCtor.class, args -> StaticCtor.create((boolean)args[0]));
 
+        core.registerCodec(Optional.class, new OptionalCodec<>());
         return core;
     }
 
@@ -170,12 +171,12 @@ public abstract class TestBase {
 
     @Test
     public void testOptionalEmpty() throws Exception {
-        roundTrip(new TestTypes.HasOptional<Integer>(Optional.empty(), Optional.empty()), HasOptional.class);
+        roundTrip(new HasOptional<Integer>(Optional.empty(), Optional.empty()), HasOptional.class);
     }
 
     @Test
     public void testOptional() throws Exception {
-        roundTrip(new TestTypes.HasOptional<Integer>(1234, "abcd"), HasOptional.class);
+        roundTrip(new HasOptional<Integer>(1234, "abcd"), HasOptional.class);
     }
 
     @Test

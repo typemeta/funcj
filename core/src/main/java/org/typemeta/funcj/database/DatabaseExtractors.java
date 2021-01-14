@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.function.*;
 
 /**
- * A set of extraction functions and combinator funcions.
+ * A set of database extraction combinator functions.
  */
 public abstract class DatabaseExtractors {
 

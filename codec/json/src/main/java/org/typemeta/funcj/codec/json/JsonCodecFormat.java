@@ -81,9 +81,10 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
 
     @Override
     public <T> T decodeDynamicType(InStream in, Functions.F2<String, InStream, T> decoder) {
-        if (!config().dynamicTypeTags()) {
-            return null;
-        } else if (in.notEOF() && in.currentEventType() == JsonEvent.Type.OBJECT_START) {
+        if (config().dynamicTypeTags() &&
+                in.notEOF() &&
+                in.currentEventType() == JsonEvent.Type.OBJECT_START
+        ) {
             final String typeFieldName = config.typeFieldName();
             final JsonEvent.FieldName typeField = new JsonEvent.FieldName(typeFieldName);
             final String valueFieldName = config.valueFieldName();
@@ -105,12 +106,11 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
                 in.endObject();
 
                 return val;
-            } else {
-                return null;
             }
-        } else {
-            return null;
         }
+
+        // null indicates a dynamic encoded value was not found.
+        return null;
     }
 
     protected static class BooleanCodec implements Codec.BooleanCodec<InStream, OutStream, Config> {
@@ -634,17 +634,17 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
 
             @Override
             public Collection<T> decode(CodecCoreEx<InStream, OutStream, Config> core, InStream in) {
-                final CollProxy<T> collProxy = getCollectionProxy(core);
+                final CollectionBuilder<T> collectionBuilder = getCollectionBuilder(core);
 
                 in.startArray();
 
                 while(in.notEOF() && in.currentEventType() != JsonEvent.Type.ARRAY_END) {
-                    collProxy.add(elemCodec.decodeWithCheck(core, in));
+                    collectionBuilder.add(elemCodec.decodeWithCheck(core, in));
                 }
 
                 in.endArray();
 
-                return collProxy.construct();
+                return collectionBuilder.construct();
             }
         };
     }
@@ -741,7 +741,7 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream, C
 
             final Set<String> expNames = fields.keySet();
             final Set<String> actNames = new HashSet<>();
-            final RA ra = objMeta.startDecode();
+            final RA ra = objMeta.createBuilder();
 
             while (in.notEOF() && in.currentEventType() != JsonEvent.Type.OBJECT_END) {
                 final String name = in.readFieldName();
