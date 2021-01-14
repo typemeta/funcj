@@ -192,8 +192,8 @@ public class CodecCoreImpl<IN, OUT> implements CodecCore<IN, OUT> {
 //                } else {
 //                    return (Codec<T, IN, OUT>)getCollCodec((Class<Collection<Object>>) type, Object.class);
 //                }
-//            } else if (type.isInterface()) {
-//                return new InterfaceCodec<>(type);
+            } else if (type.isInterface()) {
+                return new InterfaceCodec<>(type);
             } else {
                 return createObjectCodec(type);
             }

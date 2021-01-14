@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,7 +50,7 @@ public class FieldReflCodecGenerator<IN, OUT> implements CodecGenerator<IN, OUT>
                     fieldCodecs.put(fieldName, createFieldCodec(core, field));
                 }
             }
-            clazz = clazz.getSuperclass();
+            clazz = Objects.requireNonNull(clazz.getSuperclass());
         }
         return core.format().objectCodec(type, fieldCodecs, ctor);
     }

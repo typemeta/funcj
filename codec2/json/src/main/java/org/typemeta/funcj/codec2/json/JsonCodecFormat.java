@@ -9,6 +9,7 @@ import org.typemeta.funcj.codec2.json.JsonTypes.InStream;
 import org.typemeta.funcj.codec2.json.JsonTypes.OutStream;
 import org.typemeta.funcj.json.parser.JsonEvent;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -294,7 +295,75 @@ public class JsonCodecFormat implements StreamCodecFormat<InStream, OutStream> {
 
     @Override
     public <T> Codec<T[], InStream, OutStream> objectArrayCodec(Class<T[]> arrType, Class<T> elemType, Codec<T, InStream, OutStream> elemCodec) {
-        return null;
+        if (Modifier.isFinal(elemType.getModifiers())) {
+            return new FinalCodec<T[], InStream, OutStream>() {
+
+                @Override
+                public Class<T[]> type() {
+                    return arrType;
+                }
+
+                @Override
+                public OutStream encodeImpl(EncoderCore<OutStream> core, Context ctx, T[] value, OutStream os) {
+                    os.startArray();
+                    for (T val : value) {
+                        elemCodec.encode(core, ctx, val, os);
+                    }
+                    return os.endArray();
+                }
+
+                @Override
+                public T[] decodeImpl(DecoderCore<InStream> core, Context ctx, InStream is) {
+                    T[] arr = (T[]) Array.newInstance(elemType, core.config().defaultArraySize());
+
+                    is.startArray();
+                    int i = 0;
+                    while (is.notEOF() && is.currentEventType() != JsonEvent.Type.ARRAY_END) {
+                        if (i == arr.length) {
+                            arr = Arrays.copyOf(arr, core.config().newArraySize(arr.length));
+                        }
+                        arr[i++] = elemCodec.decode(core, ctx, is);
+                    }
+                    is.endArray();
+
+                    return Arrays.copyOf(arr, i);
+                }
+            };
+        } else {
+            return new NonFinalCodec<T[], InStream, OutStream>() {
+
+                @Override
+                public Class<T[]> type() {
+                    return arrType;
+                }
+
+                @Override
+                public OutStream encodeImpl(EncoderCore<OutStream> core, Context ctx, T[] value, OutStream os) {
+                    os.startArray();
+                    for (T val : value) {
+                        elemCodec.encode(core, ctx, val, os);
+                    }
+                    return os.endArray();
+                }
+
+                @Override
+                public T[] decodeImpl(DecoderCore<InStream> core, Context ctx, InStream is) {
+                    T[] arr = (T[]) Array.newInstance(elemType, core.config().defaultArraySize());
+
+                    is.startArray();
+                    int i = 0;
+                    while (is.notEOF() && is.currentEventType() != JsonEvent.Type.ARRAY_END) {
+                        if (i == arr.length) {
+                            arr = Arrays.copyOf(arr, core.config().newArraySize(arr.length));
+                        }
+                        arr[i++] = elemCodec.decode(core, ctx, is);
+                    }
+                    is.endArray();
+
+                    return Arrays.copyOf(arr, i);
+                }
+            };
+        }
     }
 
     @Override

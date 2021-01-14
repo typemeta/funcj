@@ -3,13 +3,13 @@ package org.typemeta.funcj.codec2.core;
 public interface NonFinalCodec<T, IN, OUT> extends Codec<T, IN, OUT> {
     @Override
     default OUT encode(EncoderCore<OUT> core, Context ctx, T value, OUT out) {
-        final CodecFormat.EncodeResult<OUT> encodeResult = core.format().encodeNull(core, ctx, value, out);
-        if (encodeResult.encoded()) {
-            return encodeResult.out();
+        final CodecFormat.EncodeResult<OUT> nullResult = core.format().encodeNull(core, ctx, value, out);
+        if (nullResult.encoded()) {
+            return nullResult.out();
         } else {
-            final CodecFormat.EncodeResult<OUT> z = core.format().encodeDynamic(core, ctx, value, out, this);
-            if (encodeResult.encoded()) {
-                return encodeResult.out();
+            final CodecFormat.EncodeResult<OUT> dynResult = core.format().encodeDynamic(core, ctx, value, out, this);
+            if (dynResult.encoded()) {
+                return dynResult.out();
             } else {
                 return encodeImpl(core, ctx, value, out);
             }
