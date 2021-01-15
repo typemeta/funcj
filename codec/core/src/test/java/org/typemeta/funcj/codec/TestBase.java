@@ -50,7 +50,6 @@ public abstract class TestBase {
 
         core.registerArgArrayCtor(StaticCtor.class, args -> StaticCtor.create((boolean)args[0]));
 
-        core.registerCodec(Optional.class, new OptionalCodec<>());
         return core;
     }
 

@@ -55,20 +55,44 @@ public class JsonCodecTest {
         }
     }
 
+    private static Boolean[] box(boolean[] arr) {
+        final Boolean[] boxed = new Boolean[arr.length];
+        for (int i = 0; i < arr.length; ++i) {
+            boxed[i] = arr[i];
+        }
+        return boxed;
+    }
+
+    private static Integer[] box(int[] arr) {
+        return Arrays.stream(arr).boxed().toArray(Integer[]::new);
+    }
+
     public static class ArrayTypes {
         public final boolean[] boolField;
+        public final Boolean[] boolField2;
         public final int[] intField;
+        public final Integer[] intField2;
+        public final Number[] numField;
+        public final Number[] numField2;
         public final String[] strField;
 
         public ArrayTypes(boolean[] boolField, int[] intField, String[] strField) {
             this.boolField = boolField;
+            this.boolField2 = box(boolField);
             this.intField = intField;
+            this.intField2 = box(intField);
+            this.numField = box(intField);
+            this.numField2 = intField2;
             this.strField = strField;
         }
 
         private ArrayTypes() {
             this.boolField = null;
+            this.boolField2 = null;
             this.intField = null;
+            this.intField2 = null;
+            this.numField = null;
+            this.numField2 = null;
             this.strField = null;
         }
 
@@ -76,7 +100,11 @@ public class JsonCodecTest {
         public String toString() {
             return "ArrayTypes{" +
                     "boolField=" + Arrays.toString(boolField) +
+                    "boolField2=" + Arrays.toString(boolField2) +
                     ", intField=" + Arrays.toString(intField) +
+                    ", intField2=" + Arrays.toString(intField2) +
+                    ", numField=" + Arrays.toString(numField) +
+                    ", numField2=" + Arrays.toString(numField2) +
                     ", strField=" + Arrays.toString(strField) +
                     '}';
         }
@@ -90,7 +118,11 @@ public class JsonCodecTest {
             } else {
                 final ArrayTypes rhsT = (ArrayTypes) rhs;
                 return Arrays.equals(boolField, rhsT.boolField) &&
+                        Arrays.equals(boolField2, rhsT.boolField2) &&
                         Arrays.equals(intField, rhsT.intField) &&
+                        Arrays.equals(intField2, rhsT.intField2) &&
+                        Arrays.equals(numField, rhsT.numField) &&
+                        Arrays.equals(numField2, rhsT.numField2) &&
                         Arrays.equals(strField, rhsT.strField);
             }
         }
@@ -98,7 +130,11 @@ public class JsonCodecTest {
         @Override
         public int hashCode() {
             int result = Arrays.hashCode(boolField);
+            result = 31 * result + Arrays.hashCode(boolField2);
             result = 31 * result + Arrays.hashCode(intField);
+            result = 31 * result + Arrays.hashCode(intField2);
+            result = 31 * result + Arrays.hashCode(numField);
+            result = 31 * result + Arrays.hashCode(numField2);
             result = 31 * result + Arrays.hashCode(strField);
             return result;
         }
