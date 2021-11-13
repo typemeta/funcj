@@ -17,7 +17,8 @@
         <module>core</module>
         <module>parser</module>
         <module>json</module>
-        <module>codec2</module>
+        <module>codec</module>
+<!--        <module>codec2</module>-->
     </modules>
 
     <scm>
@@ -43,7 +44,7 @@
         <developer>
             <id>jonhanson</id>
             <name>Jon Hanson</name>
-            <email>jon.h@nson.io</email>
+            <email>jon.hanson@gmail.com</email>
             <url>https://github.com/jon-hanson</url>
         </developer>
     </developers>
@@ -145,37 +146,30 @@
             <plugins>
 
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.google.errorprone</groupId>
                     <artifactId>error_prone_core</artifactId>
                     <version>${errorprone.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${maven-jar-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
                     <version>${maven-site-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
                     <version>${nexus-staging-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>${maven-release-plugin.version}</version>
                 </plugin>

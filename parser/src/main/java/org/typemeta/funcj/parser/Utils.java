@@ -1,8 +1,10 @@
 package org.typemeta.funcj.parser;
 
 import org.typemeta.funcj.data.*;
-import org.typemeta.funcj.functions.Functions;
+import org.typemeta.funcj.functions.*;
 import org.typemeta.funcj.tuples.Tuple2;
+
+import java.util.Optional;
 
 abstract class Utils {
 
@@ -24,14 +26,16 @@ abstract class Utils {
     static <I> Lazy<SymSet<I>> combine(
             Lazy<Boolean> acceptsEmpty,
             Lazy<SymSet<I>> fs1,
-            Lazy<SymSet<I>> fs2) {
+            Lazy<SymSet<I>> fs2
+    ) {
         return Lazy.of(() -> (acceptsEmpty.apply() ? union(fs1, fs2) : fs1).apply());
     }
 
     static <I> SymSet<I> combine(
             boolean acceptsEmpty,
             SymSet<I> fs1,
-            SymSet<I> fs2) {
+            SymSet<I> fs2
+    ) {
         return acceptsEmpty ? fs1.union(fs2) : fs1;
     }
 
@@ -52,5 +56,13 @@ abstract class Utils {
                 nel -> nel.head()._1.apply(a, reduce(nel.head()._2, nel.tail())),
                 nil -> a
         );
+    }
+
+    static <T> Optional<T> ifClass(Class<T> clazz, Object value) {
+        if (clazz.isInstance(value)) {
+            return Optional.of(clazz.cast(value));
+        } else {
+            return Optional.empty();
+        }
     }
 }

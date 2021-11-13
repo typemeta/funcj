@@ -9,10 +9,7 @@ import org.typemeta.funcj.codec2.core.utils.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FieldReflCodecGenerator<IN, OUT> implements CodecGenerator<IN, OUT> {
@@ -123,16 +120,16 @@ public class FieldReflCodecGenerator<IN, OUT> implements CodecGenerator<IN, OUT>
 //                } else {
 //                    codec = (Codec<?, IN, OUT>) getMapCodec((Class) clazz, Object.class, Object.class);
 //                }
-//            } else if (Collection.class.isAssignableFrom(clazz)) {
-//                final Codec<Object, IN, OUT> elemCodec;
-//                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Collection.class);
-//                if (typeArgs.size() == 1) {
-//                    final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
-//                    elemCodec = getCodec(elemType);
-//                } else {
-//                    elemCodec = getCodec(Object.class);
-//                }
-//                codec = getCollCodec((Class<Collection<Object>>) clazz, elemCodec);
+            } else if (Collection.class.isAssignableFrom(clazz)) {
+                final Codec<Object, IN, OUT> elemCodec;
+                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(field, Collection.class);
+                if (typeArgs.size() == 1) {
+                    final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
+                    elemCodec = getCodec(elemType);
+                } else {
+                    elemCodec = getCodec(Object.class);
+                }
+                codec = getCollCodec((Class<Collection<Object>>) clazz, elemCodec);
             } else {
                 codec = core.getCodec(clazz);
             }

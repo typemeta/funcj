@@ -336,9 +336,15 @@ public interface Parser<I, A> {
      * @return          a parser which applies this parser zero or more times until it fails
      */
     default Parser<I, IList<A>> many() {
-        if (acceptsEmpty().apply()) {
+        // We want to provide an alert at construction time if the caller attempts to create a many
+        // parser from one that accepts empty (which would lead to an infinite loop at parsing time).
+        // But, an unitialise Ref will throw an exception if we call acceptsEmpty,
+        // so for that particular case we have to skip the check.
+        if (Utils.ifClass(Ref.class, this).map(Ref::initialised).orElse(true)
+                && acceptsEmpty().apply()) {
             throw new RuntimeException("Cannot construct a many parser from one that accepts empty");
         }
+
         // We use an iterative implementation, in favour of a more concise recursive solution,
         // for performance, and to avoid StackOverflowExceptions.
         return new ParserImpl<I, IList<A>>(LTRUE, this.firstSet()) {

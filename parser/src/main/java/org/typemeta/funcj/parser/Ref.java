@@ -17,7 +17,7 @@ import java.util.Objects;
  */
 public class Ref<I, A> implements Parser<I, A> {
 
-    private enum Uninitialised implements Parser<Object, Object> {
+    protected enum Uninitialised implements Parser<Object, Object> {
         INSTANCE {
 
             @Override
@@ -40,7 +40,7 @@ public class Ref<I, A> implements Parser<I, A> {
         }
 
         @SuppressWarnings("unchecked")
-        static <I, A> Parser<I, A> of() {
+        static <I, A> Parser<I, A> instance() {
             return (Parser<I, A>) INSTANCE;
         }
     }
@@ -52,7 +52,15 @@ public class Ref<I, A> implements Parser<I, A> {
     }
 
     Ref() {
-        this.impl = Uninitialised.of();
+        this.impl = Uninitialised.instance();
+    }
+
+    /**
+     * Indicate if this reference is initialised.
+     * @return true if this reference is initialised
+     */
+    public boolean initialised() {
+        return impl != Uninitialised.instance();
     }
 
     /**

@@ -15,7 +15,7 @@ abstract class SqlUtils {
     private static final String SQL_SEP_TOKEN = ";;";
 
     static String loadSingleResource(String path) {
-        return Optional.ofNullable(DatabaseExtractorTest.class.getResourceAsStream(SQL_DIR + path))
+        return Optional.ofNullable(SqlUtils.class.getResourceAsStream(SQL_DIR + path))
                 .map(InputStreamReader::new)
                 .map(is -> {
                     try (BufferedReader br = new BufferedReader(is)) {
@@ -28,7 +28,7 @@ abstract class SqlUtils {
 
     static Stream<String> loadMultiResource(String path) {
         final String text =
-                Optional.ofNullable(DatabaseExtractorTest.class.getResourceAsStream(SQL_DIR + path))
+                Optional.ofNullable(SqlUtils.class.getResourceAsStream(SQL_DIR + path))
                         .map(InputStreamReader::new)
                         .map(is -> {
                             try (BufferedReader br = new BufferedReader(is)) {

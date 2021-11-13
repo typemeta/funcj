@@ -184,14 +184,14 @@ public class CodecCoreImpl<IN, OUT> implements CodecCore<IN, OUT> {
 //                } else {
 //                    return (Codec<T, IN, OUT>) getMapCodec((Class)type, Object.class, Object.class);
 //                }
-//            } else if (Collection.class.isAssignableFrom(type)) {
-//                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(type, Collection.class);
-//                if (typeArgs.size() == 1) {
-//                    final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
-//                    return (Codec<T, IN, OUT>)getCollCodec((Class<Collection<Object>>) type, elemType);
-//                } else {
-//                    return (Codec<T, IN, OUT>)getCollCodec((Class<Collection<Object>>) type, Object.class);
-//                }
+            } else if (Collection.class.isAssignableFrom(type)) {
+                final ReflectionUtils.TypeArgs typeArgs = ReflectionUtils.getTypeArgs(type, Collection.class);
+                if (typeArgs.size() == 1) {
+                    final Class<Object> elemType = (Class<Object>) typeArgs.get(0);
+                    return (Codec<T, IN, OUT>)getCollCodec((Class<Collection<Object>>) type, elemType);
+                } else {
+                    return (Codec<T, IN, OUT>)getCollCodec((Class<Collection<Object>>) type, Object.class);
+                }
             } else if (type.isInterface()) {
                 return new InterfaceCodec<>(type);
             } else {

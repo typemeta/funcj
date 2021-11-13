@@ -223,6 +223,11 @@ public abstract class Codecs {
                 core.config()::nameToClass
         );
 
+        core.registerCodec(
+                (Class)Optional.class,
+                new OptionalCodec<IN, OUT, CFG>()
+        );
+
         // Register codecs for Java 8 date/time classes.
 
         core.registerCodecWithArgArray(LocalDate.class)

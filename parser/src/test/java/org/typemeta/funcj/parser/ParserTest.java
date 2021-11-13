@@ -4,7 +4,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.typemeta.funcj.data.Chr;
+import org.typemeta.funcj.data.*;
 import org.typemeta.funcj.functions.Functions.*;
 import org.typemeta.funcj.tuples.Tuple2;
 
@@ -193,6 +193,26 @@ public class ParserTest {
         TestUtils.ParserCheck.parser(parser)
                 .withInput(input)
                 .fails();
+    }
+
+    @Test
+    public void testUninitialisedRefManyDoesNotThrow() {
+        final Ref<Chr, Chr> r = Parser.ref();
+        Parser<Chr, IList<Chr>> rs = r.many();
+    }
+
+    @Test
+    public void testInitialisedRefManyDoesNotThrow() {
+        final Ref<Chr, Chr> ref = Parser.ref();
+        ref.set(Text.chr('x'));
+        Parser<Chr, IList<Chr>> rs = ref.many();
+    }
+
+    @Test(expected=Exception.class)
+    public void testInitialisedRefManyDoesThrow() {
+        final Ref<Chr, Chr> ref = Parser.ref();
+        ref.set(fail());
+        Parser<Chr, IList<Chr>> rs = ref.many();
     }
 
     private static void assertEvaluate(Parser<Chr, Integer> parser, String s, int expected) {

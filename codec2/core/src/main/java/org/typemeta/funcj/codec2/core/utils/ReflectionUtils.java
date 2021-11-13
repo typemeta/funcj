@@ -12,6 +12,34 @@ import static java.util.stream.Collectors.toList;
 public abstract class ReflectionUtils {
     private ReflectionUtils() {}
 
+    private static final int ENUM      = 0x00004000;
+
+    /**
+     * Determine whether a class is an enum type.
+     * @param clazz     the class to check
+     * @return          true if the class is an enum type.
+     */
+    public static boolean isEnumSubType(Class<?> clazz) {
+        return (clazz.getModifiers() & ENUM) != 0 &&
+                (clazz.getSuperclass() != null &&
+                        clazz.getSuperclass().getSuperclass() == java.lang.Enum.class
+                );
+    }
+
+    /**
+     * Return the {@link Class} for the given name.
+     * Alternative to {@link Class#forName(String)}, that throws a {@link RuntimeException}.
+     * @param className the class name
+     * @return          the class
+     */
+    public static Class<?> classForName(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     public static <T> ObjectCreator<T> createObjectCreator(Class<T> type) {
         // Get the empty-arg constructors.
         final List<Constructor<T>> ctors =
@@ -31,21 +59,24 @@ public abstract class ReflectionUtils {
                 break;
             default:
                 noArgsCtor = ctors.stream()
-                        .filter(AccessibleObject::isAccessible)
-                        //JDK11: .filter(ctor -> ctor.canAccess(null))
+                        .filter(ReflectionUtils::isAccessible)
                         .findAny()
                         .orElse(ctors.get(0));
                 break;
         }
 
-        final ObjectCreator.Checked<T, ReflectiveOperationException> accCtor;
-        //JDK11: if (!noArgsCtor.canAccess(null)) {
-        if (!noArgsCtor.isAccessible()) {
+        if (!isAccessible(noArgsCtor)) {
             noArgsCtor.setAccessible(true);
         }
 
-        accCtor = () -> noArgsCtor.newInstance((Object[]) null);
+        final ObjectCreator.Checked<T, ReflectiveOperationException> accCtor =
+                () -> noArgsCtor.newInstance((Object[]) null);
 
         return accCtor.unchecked();
+    }
+
+    private static boolean isAccessible(AccessibleObject ao) {
+        // JDK11: return ao.canAccess(null);
+        return ao.isAccessible();
     }
 }

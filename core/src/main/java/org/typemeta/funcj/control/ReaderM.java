@@ -43,7 +43,7 @@ public interface ReaderM<ENV, A> {
      * @param <ENV>     the function argument type
      * @param <A>       the function input type
      * @param <B>       the function return type
-     * @return          the result of applying the function to the argument, wrapped in a {@code Try}
+     * @return          the result of applying the function to the argument, wrapped in a {@code ReaderM}
      */
     static <ENV, A, B> ReaderM<ENV, B> ap(ReaderM<ENV, F<A, B>> rf, ReaderM<ENV, A> ra) {
         return ra.app(rf);
@@ -87,14 +87,14 @@ public interface ReaderM<ENV, A> {
      * <p>
      * Translate a {@link IList} of {@code F}s into a {@code F} of an {@code IList},
      * by composing each consecutive {@code F}s using the {@link F#app} method.
-     * @param lrb       the list of {@code F} values
+     * @param lra       the list of {@code F} values
      * @param <ENV>     the input type of the applicative function
      * @param <A>       the return type of the {@code F}s in the list
      * @return          a {@code Reader} which wraps an {@link IList} of values
      */
-    static <ENV, A> ReaderM<ENV, IList<A>> sequence(IList<ReaderM<ENV, A>> lrb) {
-        return lrb.foldRight(
-                (ra, rla) -> rla.app(ra.map(a -> la -> la.add(a))),
+    static <ENV, A> ReaderM<ENV, IList<A>> sequence(IList<ReaderM<ENV, A>> lra) {
+        return lra.foldRight(
+                (ra, rla) -> env -> rla.run(env).add(ra.run(env)),
                 pure(IList.empty())
         );
     }
@@ -107,12 +107,13 @@ public interface ReaderM<ENV, A> {
      * @return          a {@code F} which wraps a list of values
      */
     static <ENV, A> ReaderM<ENV, List<A>> sequence(List<ReaderM<ENV, A>> lra) {
-        final ReaderM<ENV, List<A>> res = Folds.foldRight(
-                (ra, rla) -> rla.app(ra.map(a -> la -> {la.add(a); return la;})),
-                pure(new ArrayList<A>(lra.size())),
-                lra
-        );
-        return res.map(l -> {Collections.reverse(l); return l;});
+         return env -> {
+            final List<A> la = new ArrayList<A>(lra.size());
+            for (ReaderM<ENV, A> ra : lra) {
+                la.add(ra.run(env));
+            }
+            return la;
+        };
     }
 
     /**

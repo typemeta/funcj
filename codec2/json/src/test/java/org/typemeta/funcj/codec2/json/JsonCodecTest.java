@@ -98,9 +98,9 @@ public class JsonCodecTest {
 
         @Override
         public String toString() {
-            return "ArrayTypes{" +
-                    "boolField=" + Arrays.toString(boolField) +
-                    "boolField2=" + Arrays.toString(boolField2) +
+            return "ArrayTypes" +
+                    "{ boolField=" + Arrays.toString(boolField) +
+                    ", boolField2=" + Arrays.toString(boolField2) +
                     ", intField=" + Arrays.toString(intField) +
                     ", intField2=" + Arrays.toString(intField2) +
                     ", numField=" + Arrays.toString(numField) +
@@ -157,8 +157,8 @@ public class JsonCodecTest {
 
         @Override
         public String toString() {
-            return "SomeImpl{" +
-                    "name='" + name + '\'' +
+            return "SomeImpl" +
+                    "{ name='" + name + '\'' +
                     '}';
         }
 
@@ -193,8 +193,8 @@ public class JsonCodecTest {
 
         @Override
         public String toString() {
-            return "Recursive{" +
-                    "parent='" + parent + '\'' +
+            return "Recursive" +
+                    "{ parent='" + parent + '\'' +
                     '}';
         }
 
@@ -238,8 +238,8 @@ public class JsonCodecTest {
 
         @Override
         public String toString() {
-            return "Container{" +
-                    "baseTypes=" + baseTypes +
+            return "Container" +
+                    "{ baseTypes=" + baseTypes +
                     ", arrayTypes=" + arrayTypes +
                     ", intfType=" + intfType +
                     ", intfTypes=" + Arrays.toString(intfTypes) +
@@ -344,14 +344,17 @@ public class JsonCodecTest {
         final StringWriter sw = new StringWriter();
         final JsonGenerator jsonGen = new JsonGenerator(sw);
 
-        codecCore.getEncoder(Container.class).encode(codecCore, ctx, container, jsonGen);
+        codecCore.getEncoder(Container.class)
+                .encode(codecCore, ctx, container, jsonGen);
 
         final String json = sw.toString();
         System.out.println("JSON=" + json);
 
         final StringReader sr = new StringReader(json);
         final JsonStreamParser parser = new JsonStreamParser(sr, 3);
-        final Container container2 = codecCore.getDecoder(Container.class).decode(codecCore, ctx, parser);
+        final Container container2 =
+                codecCore.getDecoder(Container.class)
+                        .decode(codecCore, ctx, parser);
 
         System.out.println("AFTER=" + container2);
 
