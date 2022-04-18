@@ -32,13 +32,86 @@ public class JsonCombParser {
         return sign ? r : -r;
     }
 
+    /**
+     * A parser for JSON null values;
+     */
+    public static final Parser<Chr, JsNull> jnull;
+
+    /**
+     * A parser for JSON true values;
+     */
+    public static final Parser<Chr, Boolean> jtrue;
+
+    /**
+     * A parser for JSON false values;
+     */
+    public static final Parser<Chr, Boolean> jfalse;
+
+    /**
+     * A parser for JSON boolean values;
+     */
+    public static final Parser<Chr, JsBool> jbool;
+
+    /**
+     * A parser for JSON number values;
+     */
+    public static final Parser<Chr, JsNumber> jnumber;
+
+    /**
+     * A parser for JSON string values;
+     */
+    public static final Parser<Chr, JsString> jtext;
+
+    /**
+     * A parser for JSON array values;
+     */
+    public static final Parser<Chr, JsValue> jarray;
+
+    /**
+     * A parser for JSON object field values;
+     */
+    public static final Parser<Chr, JsObject.Field> jfield;
+
+    /**
+     * A parser for JSON object values;
+     */
+    public static final Parser<Chr, JsValue> jobject;
+
+    /**
+     * A parser for JSON values;
+     */
+    public static final Ref<Chr, JsValue> jvalue;
+
+    /**
+     * A parser for JSON values (that skips leading whitespace.
+     */
+    public static final Parser<Chr, JsValue> parser;
+
+    /**
+     * Parse a JSON string into a parse result.
+     * @param str   JSON string
+     * @return      parse result
+     */
+    public static Result<Chr, JsValue> parse(String str) {
+        return parser.parse(Input.of(str));
+    }
+
+    /**
+     * Parse a JSON input stream into a parse result.
+     * @param rdr   JSON input stream
+     * @return      parse result
+     */
+    public static Result<Chr, JsValue> parse(Reader rdr) {
+        return parser.parse(Input.of(rdr));
+    }
+
     static {
-        final Parser<Chr, JsNull> jnull = tok(string("null")).andR(pure(JSAPI.nul()));
+        jnull = tok(string("null")).andR(pure(JSAPI.nul()));
 
-        final Parser<Chr, Boolean> jtrue = tok(string("true")).andR(pure(Boolean.TRUE));
-        final Parser<Chr, Boolean> jfalse = tok(string("false")).andR(pure(Boolean.FALSE));
+        jtrue = tok(string("true")).andR(pure(Boolean.TRUE));
+        jfalse = tok(string("false")).andR(pure(Boolean.FALSE));
 
-        final Parser<Chr, JsBool> jbool = tok(jtrue.or(jfalse)).map(JSAPI::bool);
+        jbool = tok(jtrue.or(jfalse)).map(JSAPI::bool);
 
         final Parser<Chr, Long> nzMtsa =
                 nonZeroDigit.and(digit.many())
@@ -78,7 +151,7 @@ public class JsonCombParser {
                         .and((chr('e').or(chr('E'))).andR(expnt).optional())
                         .map(JsonCombParser::makeDbl);
 
-        final Parser<Chr, JsNumber> jnumber = tok(dble).map(JSAPI::num);
+        jnumber = tok(dble).map(JSAPI::num);
 
         final Parser<Chr, Byte> digit = Text.digit.map(c -> (byte)Chr.digit(c.charValue(), 10));
         final Parser<Chr, Byte> hexA = chr('a').or(chr('A')).map(u -> (byte)10);
@@ -141,25 +214,25 @@ public class JsonCombParser {
                         .between(dqChr, dqChr)
                 );
 
-        final Parser<Chr, JsString> jtext =
+        jtext =
                 jstring.map(JSAPI::str);
 
-        final Ref<Chr, JsValue> jvalue = Parser.ref();
+        jvalue = Parser.ref();
 
-        final Parser<Chr, JsValue> jarray =
+        jarray =
                 jvalue.sepBy(tok(chr(',')))
                         .between(
                                 tok(chr('[')),
                                 tok(chr(']')))
                         .map(JSAPI::arr);
 
-        final Parser<Chr, JsObject.Field> jfield =
+        jfield =
                 jstring
                         .andL(tok(chr(':')))
                         .and(jvalue)
                         .map(JSAPI::field);
 
-        final Parser<Chr, JsValue> jobject =
+        jobject =
                 jfield
                         .sepBy(tok(chr(',')))
                         .between(
@@ -179,29 +252,6 @@ public class JsonCombParser {
         );
 
         parser = ws.skipMany().andR(tok(jarray.or(jobject)));
-    }
-
-    /**
-     * Parser value (primarily for composing with other Parsers).
-     */
-    public static final Parser<Chr, JsValue> parser;
-
-    /**
-     * Parse a JSON string into a parse result.
-     * @param str   JSON string
-     * @return      parse result
-     */
-    public static Result<Chr, JsValue> parse(String str) {
-        return parser.parse(Input.of(str));
-    }
-
-    /**
-     * Parse a JSON input stream into a parse result.
-     * @param rdr   JSON input stream
-     * @return      parse result
-     */
-    public static Result<Chr, JsValue> parse(Reader rdr) {
-        return parser.parse(Input.of(rdr));
     }
 }
 
