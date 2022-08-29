@@ -3,7 +3,7 @@
 
     <groupId>org.typemeta</groupId>
     <artifactId>funcj</artifactId>
-    <version>0.6.17-SNAPSHOT</version>
+    <version>0.6.18-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
