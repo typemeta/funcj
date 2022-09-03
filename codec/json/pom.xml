@@ -3,12 +3,12 @@
 
     <groupId>org.typemeta</groupId>
     <artifactId>funcj-codec-json</artifactId>
-    <version>0.6.18-SNAPSHOT</version>
+    <version>0.6.18</version>
 
     <parent>
         <groupId>org.typemeta</groupId>
         <artifactId>funcj-codec</artifactId>
-        <version>0.6.18-SNAPSHOT</version>
+        <version>0.6.18</version>
     </parent>
 
     <name>${project.groupId}:${project.artifactId}</name>
