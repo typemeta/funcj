@@ -28,14 +28,14 @@ public class GrammarTest {
     }
 
     @Test
-    public void testSuccess() throws Exception {
+    public void testSuccess() {
         assertSuccess(
             "123.456*4+(5+x)-1",
             "(((123.456*4.0)+(5.0+x))-1.0)");
     }
 
     @Test
-    public void testFailure() throws Exception {
+    public void testFailure() {
         assertFailure("3*4+(5+)-1", 7);
     }
 }

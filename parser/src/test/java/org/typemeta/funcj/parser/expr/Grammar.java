@@ -19,7 +19,6 @@ public abstract class Grammar {
 
         final Parser<Chr, Chr> open = chr('(');
         final Parser<Chr, Chr> close = chr(')');
-        final Parser<Chr, Chr> comma = chr(',');
 
         final Parser<Chr, UnaryOp> plus = chr('+').andR(pure(UnaryOp.POS));
         final Parser<Chr, UnaryOp> minus = chr('-').andR(pure(UnaryOp.NEG));
