@@ -204,10 +204,10 @@ all methods other than set will throw an exception if invoked on an uninitialise
 Ref<Chr, String> e = Parser.ref();
 
 // Use the reference.
-Parser<Chr, String> aEb = string("a").and(e).and(string("b")).map(a -> e -> b -> a + e + b);
+Parser<Chr, String> aEb = string("a").and(e).and(string("b")).map(a -> xe -> b -> a + xe + b);
 
 // Initialise the reference with a parser.
-e.set(string("x")or(aEb));
+e.set(string("x").or(aEb));
 ```
 
 ## Combinators
