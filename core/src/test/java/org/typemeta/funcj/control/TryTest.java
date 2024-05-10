@@ -117,6 +117,7 @@ public class TryTest {
         assertEquals("", Try.success(a+b), tiA.and(tiB).map(iA -> iB -> iA + iB));
         assertEquals("", fail, fail.and(tiB).map(iA -> iB -> iA + iB));
         assertEquals("", fail, tiA.and(fail).map(iA -> iB -> iA + iB));
+        assertEquals("", fail, fail.and(fail).map(iA -> iB -> iA + iB));
     }
 
     static class Utils {
