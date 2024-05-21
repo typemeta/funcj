@@ -219,8 +219,8 @@ public interface Validated<E, T> {
 
     /**
      * Push the result to a {@link SideEffect.F}.
-     * @param failF     the side-effect to be applied to the {@code Failure} value
-     * @param succF     the side-effect to be applied to the {@code Success} value
+     * @param failF     the side effect to be applied to the {@code Failure} value
+     * @param succF     the side effect to be applied to the {@code Success} value
      */
     void handle(SideEffect.F<Failure<E, T>> failF, SideEffect.F<Success<E, T>> succF);
 
@@ -273,7 +273,7 @@ public interface Validated<E, T> {
     <U> Validated<E, U> andThen(F<T, Validated<E, U>> f);
 
     /**
-     * Apply a side-effect operation to this value
+     * Apply a side effect operation to this value
      * If this value is a {@code Success} then apply the function to the value,
      * otherwise do nothing.
      * @param f         the function to be applied

@@ -63,7 +63,7 @@ public class Id<T> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(value);
+        return value.hashCode();
     }
 
     public <U> Id<U> map(F<T, U> f) {

@@ -37,7 +37,7 @@ public abstract class API {
      * @return          the {@code Document.Text} object
      */
     public static Document text(char c) {
-        return new Document.Text(new String(new char[]{c}));
+        return new Document.Text(String.valueOf(c));
     }
 
     /**

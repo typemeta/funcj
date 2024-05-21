@@ -17,7 +17,7 @@
         <module>core</module>
         <module>parser</module>
         <module>json</module>
-        <module>codec</module>
+<!--        <module>codec</module>-->
 <!--        <module>codec2</module>-->
     </modules>
 

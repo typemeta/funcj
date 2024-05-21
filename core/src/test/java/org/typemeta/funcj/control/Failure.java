@@ -10,7 +10,7 @@ final class Failure extends Exception {
 
     @Override
     public String toString() {
-        return "Error{msg='" + getMessage() + "\'}";
+        return "Error{msg='" + getMessage() + "'}";
     }
 
     @Override

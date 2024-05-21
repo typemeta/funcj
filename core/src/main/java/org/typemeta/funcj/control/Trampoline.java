@@ -155,21 +155,21 @@ public interface Trampoline<T> {
         Trampoline<T> next = this;
         while (true) {
             if (next instanceof Trampoline.Pure) {
-                final Pure<T> pure = (Pure) next;
+                final Pure<T> pure = (Pure<T>) next;
                 return Either.right(pure.result);
             } else if (next instanceof Trampoline.Suspend) {
-                final Suspend<T> suspend = (Suspend) next;
+                final Suspend<T> suspend = (Suspend<T>) next;
                 return Either.left(suspend.next);
             } else {
-                final FlatMapped<Object, T> fm = (FlatMapped) next;
+                final FlatMapped<Object, T> fm = (FlatMapped<Object, T>) next;
                 if (fm.sub instanceof Trampoline.Pure) {
-                    final Pure<T> pure = (Pure) fm.sub;
+                    final Pure<T> pure = (Pure<T>) fm.sub;
                     next = fm.k(pure.result);
                 } else if (fm.sub instanceof Trampoline.Suspend) {
-                    final Suspend<T> suspend = (Suspend) fm.sub;
+                    final Suspend<T> suspend = (Suspend<T>) fm.sub;
                     return Either.left(() -> suspend.next.apply().flatMap(fm::k));
                 } else {
-                    final FlatMapped<Object, T> fm2 = (FlatMapped) fm.sub;
+                    final FlatMapped<Object, T> fm2 = (FlatMapped<Object, T>) fm.sub;
                     next = fm2.sub.flatMap(x -> flatMapOf(fm2.k(x), fm::k));
                 }
             }

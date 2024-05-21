@@ -12,8 +12,8 @@ import java.util.stream.Stream;
  * Tagged union type over two types.
  * <p>
  * A value of {@code Either<A, B>} is either
- * the sub-type {@code Either.Left<A, B>} which wraps a value of type A, or
- * the sub-type {@code Either.Right<A, B>} which wraps a value of type B.
+ * the subtype {@code Either.Left<A, B>} which wraps a value of type A, or
+ * the subtype {@code Either.Right<A, B>} which wraps a value of type B.
  * <p>
  * Either has right-bias, meaning that map, apply and flatMap operate on the
  * {@code Right} value and bypass the {@code Left} value.
@@ -215,8 +215,8 @@ public interface Either<E, S> {
 
     /**
      * Push the result to a {@link SideEffect.F}.
-     * @param leftF     the side-effect to be applied to the {@code Left} value
-     * @param rightF    the side-effect to be applied to the {@code Right} value
+     * @param leftF     the side effect to be applied to the {@code Left} value
+     * @param rightF    the side effect to be applied to the {@code Right} value
      */
     void handle(SideEffect.F<Left<E, S>> leftF, SideEffect.F<Right<E, S>> rightF);
 
@@ -279,7 +279,7 @@ public interface Either<E, S> {
     <T> Either<E, T> flatMap(F<? super S, Either<E, T>> f);
 
     /**
-     * Apply a side-effect operation to this value
+     * Apply a side effect operation to this value
      * If this value is a {@code Right} then apply the function to the value,
      * otherwise do nothing.
      * @param f         the function to be applied
@@ -321,14 +321,14 @@ public interface Either<E, S> {
             } else if (rhs == null || getClass() != rhs.getClass()) {
                 return false;
             } else {
-                Left<?, ?> left = (Left<?, ?>) rhs;
+                final Left<?, ?> left = (Left<?, ?>) rhs;
                 return Objects.equals(value, left.value);
             }
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(value);
+            return value.hashCode();
         }
 
         @Override
@@ -433,14 +433,14 @@ public interface Either<E, S> {
             } else if (rhs == null || getClass() != rhs.getClass()) {
                 return false;
             } else {
-                Right<?, ?> right = (Right<?, ?>) rhs;
+                final Right<?, ?> right = (Right<?, ?>) rhs;
                 return Objects.equals(value, right.value);
             }
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(value);
+            return value.hashCode();
         }
 
         @Override

@@ -200,8 +200,8 @@ public interface Option<T> {
 
     /**
      * Push the result to a {@link SideEffect.F}.
-     * @param noneF     the side-effect to be applied to {@code None} values
-     * @param someF     the side-effect to be applied to {@code Some} values
+     * @param noneF     the side effect to be applied to {@code None} values
+     * @param someF     the side effect to be applied to {@code Some} values
      */
     void handle(SideEffect.F0 noneF, SideEffect.F<Some<T>> someF);
 
@@ -264,7 +264,7 @@ public interface Option<T> {
     }
 
     /**
-     * Apply a side-effect operation to this value
+     * Apply a side effect operation to this value
      * If this value is a {@code Some} then apply the function to the value,
      * otherwise do nothing.
      * @param f         the function to be applied

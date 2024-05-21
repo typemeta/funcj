@@ -119,7 +119,8 @@ public class StateTest {
                 String msg,
                 double d,
                 StateK<Double, Double, Double> lhs,
-                StateK<Double, Double, Double> rhs) {
+                StateK<Double, Double, Double> rhs
+        ) {
             assertEquals(
                     msg,
                     lhs.apply(d).exec(INIT),
