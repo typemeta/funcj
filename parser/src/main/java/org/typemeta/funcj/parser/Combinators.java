@@ -203,7 +203,7 @@ public abstract class Combinators {
             Parser<I, ? extends A> p2,
             Parser<I, ? extends A> p3,
             Parser<I, ? extends A> p4) {
-        return Parser.choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast()));
+        return Parser.choice(IList.of(p1.cast(), p2.cast(), p3.cast(), p4.cast()));
     }
 
     /**
@@ -225,7 +225,7 @@ public abstract class Combinators {
             Parser<I, ? extends A> p3,
             Parser<I, ? extends A> p4,
             Parser<I, ? extends A> p5) {
-        return Parser.choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast()));
+        return Parser.choice(IList.of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast()));
     }
 
     /**
@@ -249,6 +249,6 @@ public abstract class Combinators {
             Parser<I, ? extends A> p4,
             Parser<I, ? extends A> p5,
             Parser<I, ? extends A> p6) {
-        return Parser.choice(IList.<Parser<I, A>>of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast(), p6.cast()));
+        return Parser.choice(IList.of(p1.cast(), p2.cast(), p3.cast(), p4.cast(), p5.cast(), p6.cast()));
     }
 }
