@@ -2,6 +2,7 @@ package org.typemeta.funcj.control;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.typemeta.funcj.data.IList;
@@ -52,10 +53,13 @@ public class EitherTest {
     }
 
     @Property
-    public void apply(char c) {
+    public void apply(char c, char d) {
         assertEquals(Either.right(String.valueOf(c)), Either.right(c).app(Either.right(Object::toString)));
         assertEquals(Either.left("fail"), Either.right(c).app(Either.left("fail")));
         assertEquals(Either.left(c), Either.left(c).app(Either.right(Object::toString)));
+
+        Assume.assumeTrue(c != d);
+        assertEquals(Either.left(c), Either.left(c).app(Either.left(d)));
     }
 
     @Property

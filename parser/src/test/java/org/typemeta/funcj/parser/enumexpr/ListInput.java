@@ -57,7 +57,7 @@ public class ListInput<T> implements Input<T> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final ListInput<T> that = (ListInput) o;
+        final ListInput<T> that = (ListInput<T>) o;
         return position == that.position &&
                 data == that.data;
     }

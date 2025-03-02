@@ -388,10 +388,7 @@ public interface Either<E, S> {
 
         @Override
         public <C> Either<E, C> app(Either<E, F<S, C>> ef) {
-            return ef.match(
-                    left -> left.cast(),
-                    right -> this.cast()
-            );
+            return cast();
         }
 
         @Override
@@ -501,7 +498,10 @@ public interface Either<E, S> {
 
         @Override
         public <C> Either<E, C> app(Either<E, F<S, C>> ef) {
-            return ef.map(f -> f.apply(value));
+            return ef.match(
+                    left -> left.cast(),
+                    right -> Either.right(right.value.apply(value))
+            );
         }
 
         @Override
