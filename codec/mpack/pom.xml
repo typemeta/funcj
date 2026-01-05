@@ -17,7 +17,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <msgpack.version>0.8.16</msgpack.version>
+        <msgpack.version>0.9.11</msgpack.version>
     </properties>
 
     <dependencies>
